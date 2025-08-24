@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta Edital - Ajuda e FAQ</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="monitoramento.css"> 
+    <link rel="stylesheet" href="ajuda.css"> 
+    <link rel="stylesheet" href="planos.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+            </div>
+            <nav class="navbar-center">
+                <ul>
+                    <li><a href="monitoramento.html"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+                    <li><a href="planos.html"><i class="fas fa-clipboard-list"></i> Planos</a></li>
+                    <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+                    <li><a href="suporte.html"><i class="fas fa-question-circle"></i> Suporte</a></li>
+                    <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li> 
+                </ul>
+            </nav>
+            <div class="navbar-right">
+                <a href="#" class="notification-icon"><i class="fas fa-bell"></i></a>
+                <div class="user-menu" id="user-dropdown-toggle"> 
+                    <span class="user-avatar" id="userDefaultAvatar"></span> 
+                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
+                    <span id="userNameDisplay">Carregando...</span> 
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="dropdown-content">
+                        <h3 class="olausuario">Olá, Usuário!</h3>
+                        <a href="#"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                        <a href="#"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                        <hr>
+                        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="ajuda-content">
+        <div class="card help-center-header" style="margin-top: 60px;">
+            <div class="icon-wrapper green-icon-bg">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div>
+                <h1>Central de Ajuda</h1>
+                <p>Encontre respostas rápidas para suas dúvidas.</p>
+            </div>
+        </div>
+    
+        <div class="main-content-wrapper">
+            <section class="faq-section-ajuda">
+                <div class="search-filter-section">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar por artigos, palavras-chave...">
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="todos"><i class="fas fa-list-ul"></i> Todos</button>
+                        <button class="filter-btn tag-geral" data-filter="geral"><i class="fas fa-globe"></i> Geral</button>
+                        <button class="filter-btn tag-monitoramento" data-filter="monitoramento"><i class="fas fa-chart-line"></i> Monitoramento</button>
+                        <button class="filter-btn tag-planos" data-filter="planos"><i class="fas fa-clipboard-list"></i> Planos</button>
+                    </div>
+                </div>
+    
+                <div class="faq-accordion">
+                    <div class="faq-item" data-id="faq-link-diario" data-category="geral">
+                        <div class="faq-question">
+                            <div class="faq-icon-wrapper star-icon-bg"><i class="fas fa-star"></i></div> <h3>Preciso saber qual é o link exato do diário oficial para usar o serviço?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-meta">
+                            <span class="views-counter" data-faq-id="faq-link-diario"><i class="fas fa-eye"></i> 27 visualizações</span>
+                            <span><i class="fas fa-fire"></i> Pergunta popular</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Não! Você não precisa se preocupar em encontrar o link exato. Nossa inteligência artificial varre Diários Oficiais e sites de bancas 24/7 para você não perder nenhuma atualização crucial. Basta nos informar as palavras-chave.</p>
+                        </div>
+                    </div>
+                
+                    <div class="faq-item" data-id="faq-deteccao-variacoes" data-category="geral monitoramento">
+                        <div class="faq-question">
+                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
+                            <h3>O sistema detecta variações no nome ou erros de digitação nos diários?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-meta">
+                            <span class="views-counter" data-faq-id="faq-deteccao-variacoes"><i class="fas fa-eye"></i> 3 visualizações</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sim, nossa IA avançada é projetada para identificar variações de nomes e até pequenos erros de digitação, garantindo que você não perca sua nomeação por detalhes.</p>
+                        </div>
+                    </div>
+                
+                    <div class="faq-item" data-id="faq-monitoramento-simultaneo" data-category="monitoramento planos">
+                        <div class="faq-question">
+                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
+                            <h3>Posso monitorar mais de um edital ao mesmo tempo?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-meta">
+                            <span class="views-counter" data-faq-id="faq-monitoramento-simultaneo"><i class="fas fa-eye"></i> 6 visualizações</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sim, você pode monitorar múltiplos editais simultaneamente, dependendo do seu plano. O plano Essencial oferece X monitoramentos, enquanto o Premium oferece monitoramentos ilimitados.</p>
+                        </div>
+                    </div>
+                
+                    <div class="faq-item" data-id="faq-alterar-monitoramento" data-category="monitoramento">
+                        <div class="faq-question">
+                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
+                            <h3>É possível alterar os dados ou diários monitorados depois da contratação?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-meta">
+                            <span class="views-counter" data-faq-id="faq-alterar-monitoramento"><i class="fas fa-eye"></i> 5 visualizações</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sim, você pode ajustar suas palavras-chave e diários monitorados a qualquer momento através do seu painel de controle, de forma simples e intuitiva.</p>
+                        </div>
+                    </div>
+                
+                    <div class="faq-item" data-id="faq-como-funciona-monitoramento" data-category="geral monitoramento">
+                        <div class="faq-question">
+                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
+                            <h3>Como funciona o monitoramento?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-meta">
+                            <span class="views-counter" data-faq-id="faq-como-funciona-monitoramento"><i class="fas fa-eye"></i> 20 visualizações</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Nosso monitoramento funciona em três passos simples: 1. Informe as palavras-chave (seu nome, CPF, edital, etc.). 2. Nossa IA varre os diários oficiais 24/7. 3. Você recebe alertas instantâneos por email e WhatsApp quando algo for encontrado.</p>
+                        </div>
+                    </div>
+                
+                    <div class="faq-item" data-id="faq-o-que-e-conecta-edital" data-category="geral">
+                        <div class="faq-question">
+                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
+                            <h3>O que é o Conecta Edital e como funciona?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-meta">
+                            <span class="views-counter" data-faq-id="faq-o-que-e-conecta-edital"><i class="fas fa-eye"></i> 30 visualizações</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Conecta Edital é uma plataforma inovadora de monitoramento de concursos públicos que usa inteligência artificial para encontrar sua nomeação em diários oficiais e sites de bancas. Nosso objetivo é poupar seu tempo e garantir que você não perca nenhuma oportunidade.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dynamic-faq-container" class="faq-accordion"></div>
+            </section>
+    
+            <aside class="chatbot-section">
+                <div class="chatbot-header">
+                    <div class="chatbot-avatar-icon"><i class="fas fa-robot"></i></div> <div class="chatbot-info">
+                        <h4>Conectinha</h4>
+                        <span>Sua assistente de IA</span>
+                    </div>
+                </div>
+                <div class="chatbot-messages" id="chat-messages">
+                   
+                  
+    
+                    
+                </div>
+                <div class="chatbot-input">
+                    <input type="text" id="user-input" placeholder="Digite sua pergunta...">
+                    <button id="send-button" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </aside>
+        </div>
+        <a href="#top" class="back-to-top-button" aria-label="Voltar ao topo">
+            <i class="fas fa-arrow-up"></i>
+        </a>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script> 
+    <script src="common-auth-ui.js"></script>
+    <script src="ajuda.js"></script>
+    <script src="planos.js"></script> 
+</body>
+</html>

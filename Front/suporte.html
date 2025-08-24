@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta Edital - Central de Suporte</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="monitoramento.css">
+    <link rel="stylesheet" href="suporte.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="logo">
+                    <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+            </div>
+            <nav class="navbar-center">
+                <ul>
+                    <li><a href="monitoramento.html"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+                    <li><a href="planos.html" ><i class="fas fa-clipboard-list"></i> Planos </a></li>
+                    <li><a href="dicas.html" ><i class="fas fa-lightbulb"></i> Dicas</a></li>
+                    <li><a href="#" class="active"><i class="fas fa-question-circle" ></i> Suporte     </a></li>
+                    <li style="margin-top: 4px;"> | </li>
+                    <li><a href="ajuda.html" class="ajuda">     <i class="fas fa-info-circle"></i>   Ajuda</a></li>
+                </ul>
+            </nav>
+            <div class="navbar-right">
+                <a href="#" class="notification-icon"><i class="fas fa-bell"></i></a>
+                <div class="user-menu" id="user-dropdown-toggle">
+                    <span class="user-avatar" id="userDefaultAvatar"></span>
+                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;">
+                    <span id="userNameDisplay">Carregando...</span>
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="dropdown-content">
+                        <h3 class="olausuario">Olá, Usuário!</h3>
+                        <a href="#"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                        <a href="#"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                        <hr>
+                        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="suporte-content">
+        <div class="support-header-card" style="margin-top: 60px;">
+            <div class="support-header-info" >
+                <div class="title-wrapper">
+                    <div class="icon-header-wrapper">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h2>Central de Suporte</h2>
+                </div>
+                <p class="subtitle">Abra e acompanhe seus chamados. Nossa equipe responderá por e-mail ou WhatsApp.</p>
+            </div>
+            <button class="btn-new-chamado" id="open-new-chamado-btn"><i class="fas fa-plus"></i> Abrir Novo Chamado</button>
+        </div>
+
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="ticket-search" placeholder="Buscar tickets por título, ID ou descrição...">
+            </div>
+            <div class="filter-dropdowns">
+                <div class="dropdown-container">
+                    <button class="dropdown-toggle" id="status-toggle">
+                        <span id="status-display">Todos Status</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="status-menu">
+                        <div class="dropdown-option active" data-filter="status" data-value="all">Todos Status</div>
+                        <div class="dropdown-option" data-filter="status" data-value="Aguardando">Aguardando</div>
+                        <div class="dropdown-option" data-filter="status" data-value="Em Atendimento">Em Atendimento</div>
+                        <div class="dropdown-option" data-filter="status" data-value="Respondido">Respondido</div>
+                        <div class="dropdown-option" data-filter="status" data-value="Fechado">Fechado</div>
+                    </div>
+                </div>
+                <div class="dropdown-container">
+                    <button class="dropdown-toggle" id="category-toggle">
+                        <span id="category-display">Todas Categorias</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="category-menu">
+                        <div class="dropdown-option active" data-filter="category" data-value="all">Todas Categorias</div>
+                        <div class="dropdown-option" data-filter="category" data-value="Suporte Técnico">Suporte Técnico</div>
+                        <div class="dropdown-option" data-filter="category" data-value="Dúvidas Gerais">Dúvidas Gerais</div>
+                        <div class="dropdown-option" data-filter="category" data-value="Reclamações">Reclamações</div>
+                        <div class="dropdown-option" data-filter="category" data-value="Feedback/Sugestões">Feedback/Sugestões</div>
+                        <div class="dropdown-option" data-filter="category" data-value="Relatório de Bugs">Relatório de Bugs</div>
+                        <div class="dropdown-option" data-filter="category" data-value="Solicitações">Solicitações</div>
+                    </div>
+                </div>
+                <div class="dropdown-container">
+                    <button class="dropdown-toggle" id="sort-toggle">
+                        <span id="sort-display">Mais Recentes</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="sort-menu">
+                        <div class="dropdown-option active" data-filter="sort" data-value="recent">Mais Recentes</div>
+                        <div class="dropdown-option" data-filter="sort" data-value="oldest">Mais Antigos</div>
+                        <div class="dropdown-option" data-filter="sort" data-value="status">Por Status</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tickets-list-container">
+        </div>
+
+        <div class="no-tickets-message" id="no-tickets-message">
+            <div class="icon-no-tickets-wrapper">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3>Nenhum Ticket Encontrado</h3>
+            <p>Você ainda não possui tickets abertos.</p>
+            <p>Se precisar de ajuda, abra um novo chamado.</p>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="create-ticket-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Criar Novo Ticket de Suporte</h3>
+                <button class="modal-close-btn" data-modal-id="create-ticket-modal">&times;</button>
+            </div>
+            <form id="create-ticket-form">
+                <div class="form-group">
+                    <label for="ticket-category">Categoria *</label>
+                    <select id="ticket-category" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="Suporte Técnico">Suporte Técnico</option>
+                        <option value="Dúvidas Gerais">Dúvidas Gerais</option>
+                        <option value="Reclamações">Reclamações</option>
+                        <option value="Feedback/Sugestões">Feedback/Sugestões</option>
+                        <option value="Relatório de Bugs">Relatório de Bugs</option>
+                        <option value="Solicitações">Solicitações</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ticket-subject">Assunto *</label>
+                    <input type="text" id="ticket-subject" placeholder="Descreva brevemente o problema" required>
+                </div>
+                <div class="form-group">
+                    <label for="ticket-description">Descrição *</label>
+                    <textarea id="ticket-description" placeholder="Descreva detalhadamente o problema ou dúvida" rows="5" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="cancel-create-ticket-btn">Cancelar</button>
+                    <button type="submit" class="btn-submit" id="create-ticket-submit-btn">Criar Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="ticket-detail-modal">
+        <div class="modal-content ticket-detail-content">
+            <div class="modal-header">
+                <h3 id="ticket-detail-title">#ID_DO_TICKET</h3>
+                <div class="ticket-detail-meta-header">
+                    <span class="ticket-created-at"><i class="fas fa-clock"></i> Criado em <span id="ticket-detail-created-at"></span></span>
+                    <span class="ticket-status-tag" id="ticket-detail-status-tag"></span>
+                </div>
+                <button class="modal-close-btn" data-modal-id="ticket-detail-modal">&times;</button>
+            </div>
+
+            <div class="ticket-messages-container" id="ticket-messages-container">
+                </div>
+
+            <div class="ticket-reply-form-section">
+                <textarea id="reply-message-input" placeholder="Digite sua mensagem..." rows="3"></textarea>
+                <div class="reply-actions">
+                    <button class="btn-send-reply" id="send-reply-btn"><i class="fas fa-paper-plane"></i> Enviar Mensagem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="common-auth-ui.js"></script>
+    <script src="suporte.js"></script>
+</body>
+</html>
