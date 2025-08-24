@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const activationCompletedMessage = document.querySelector('.activation-completed-message');
 
     // --- URL base do seu backend FastAPI ---
-    const BACKEND_URL = "http://127.0.0.1:8000";
+    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
 
     // --- Funções Auxiliares de UI ---
     function openModal(modalElement) {

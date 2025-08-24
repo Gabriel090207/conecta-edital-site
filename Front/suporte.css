@@ -363,7 +363,7 @@ ul {
 .btn-new-chamado {
     margin-top: 20px;
     margin-left: 60px;
-    background-color: #0427c1; /* Azul */
+    background: linear-gradient(135deg, #3a68ff, #0427c1); /* Azul */
     color: white;
     border: none;
     border-radius: 8px;

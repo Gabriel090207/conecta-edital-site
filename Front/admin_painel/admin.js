@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("admin.js: Script carregado e DOM content loaded.");
 
-    const BACKEND_URL = "http://127.0.0.1:8000";
+    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
     const token = localStorage.getItem("adminToken");
 
     let allUsers = [];

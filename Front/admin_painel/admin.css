@@ -995,7 +995,7 @@ ul { list-style: none; }
 }
 
 .btn-new-dica {
-    background-color: #17a2b8;
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -1007,7 +1007,7 @@ ul { list-style: none; }
     gap: 10px;
     margin-bottom: 20px;
 }
-.btn-new-dica:hover { background-color: #117a8b; }
+.btn-new-dica:hover { background: linear-gradient(135deg,#0056b3, #0056b3); }
 
 .dicas-list-admin {
     display: flex;
@@ -1045,8 +1045,14 @@ ul { list-style: none; }
     font-size: 14px;
     margin-left: 10px;
 }
-.dica-card .dica-actions .btn-edit { color: #007bff; }
-.dica-card .dica-actions .btn-delete { color: #dc3545; }
+.dica-card .dica-actions .btn-edit { 
+    background: linear-gradient(135deg,#3a68ff, #0427c1); ; 
+    color: white; 
+    border-radius: 4px;}
+.dica-card .dica-actions .btn-delete {  
+    background: linear-gradient(135deg,#ff3a3a, #b31818); ; 
+    color: white; 
+    border-radius: 4px; }
 
 /* Estilos do formulário */
 .form-group { margin-bottom: 20px; }
