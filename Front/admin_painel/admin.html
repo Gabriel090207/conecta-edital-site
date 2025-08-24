@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Conecta Edital</title>
+   <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+ 
+    <main class="container">
+        <section class="admin-panel-header">
+            <div class="panel-title-block">
+                <i class="fas fa-cog panel-icon"></i>
+                <div>
+                    <h1>Painel Administrativo</h1>
+                    <p>Gerencie usuários, tickets e configurações do sistema.</p>
+                </div>
+            </div>
+            <div class="panel-actions">
+                <button class="btn btn-primary" id="audit-users-btn"><i class="fas fa-clipboard-check" style="margin-right: 3px;"></i> Usuários</button>
+                <button class="btn btn-secondary" id="view-tickets-btn"><i class="fas fa-ticket-alt" style="margin-right: 3px;"></i> Ver Tickets</button>
+            </div>
+        </section>
+
+        <section class="admin-tools">
+            <h2>Ferramentas Administrativas</h2>
+            <p>Gerencie o conteúdo e o engajamento da plataforma.</p>
+            <div class="tools-grid">
+                <div class="tool-card marketing">
+                    <i class="fas fa-envelope icon"></i>
+                    <h3>Marketing</h3>
+                    <p>Campanhas de e-mail</p>
+                </div>
+                <div class="tool-card feedback">
+                    <i class="fas fa-chart-line icon"></i>
+                    <h3>Feedback</h3>
+                    <p>Análise de tickets</p>
+                </div>
+                <div class="tool-card tips" id="manage-dicas-btn">
+                    <i class="fas fa-lightbulb icon"></i>
+                    <h3>Gerenciar Dicas</h3>
+                    <p>Criar e editar artigos</p>
+                </div>
+                <div class="tool-card faq" id="manage-faq-btn">
+                    <i class="fas fa-question-circle icon"></i>
+                    <h3>Gerenciar FAQ</h3>
+                    <p>Editar perguntas</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-overview">
+            <div class="stat-card plans-distribution">
+                <h3>Distribuição de Planos <span class="count" id="total-users-plans">0</span></h3>
+                <div class="plan-item">
+                    <i class="fas fa-user-slash icon no-plan"></i>
+                    <span>Sem plano</span>
+                    <span class="percentage" id="no-plan-percentage">0.0%</span>
+                    <span class="value" id="no-plan-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar no-plan-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="plan-item">
+                    <i class="fas fa-shield-alt icon essencial"></i>
+                    <span>Essencial</span>
+                    <span class="percentage" id="essencial-percentage">0.0%</span>
+                    <span class="value" id="essencial-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar essencial-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="plan-item">
+                    <i class="fas fa-crown icon premium"></i>
+                    <span>Premium</span>
+                    <span class="percentage" id="premium-percentage">0.0%</span>
+                    <span class="value" id="premium-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar premium-bar" style="width: 0%;"></div></div>
+                </div>
+            </div>
+
+            <div class="stat-card slots-distribution">
+                <h3>Distribuição de Slots <span class="count" id="total-slots-users">0</span></h3>
+                <div class="slot-item">
+                    <i class="fas fa-circle-notch icon zero-slots"></i>
+                    <span>0 slots</span>
+                    <span class="percentage" id="zero-slots-percentage">0.0%</span>
+                    <span class="value" id="zero-slots-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar zero-slots-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="slot-item">
+                    <i class="fas fa-ellipsis-h icon one-two-slots"></i>
+                    <span>1-2 slots</span>
+                    <span class="percentage" id="one-two-slots-percentage">0.0%</span>
+                    <span class="value" id="one-two-slots-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar one-two-slots-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="slot-item">
+                    <i class="fas fa-ellipsis-h  icon three-five-slots"></i>
+                    <span>3-5 slots</span>
+                    <span class="percentage" id="three-five-slots-percentage">0.0%</span>
+                    <span class="value" id="three-five-slots-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar three-five-slots-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="slot-item">
+                    <i class="fas fa-plus-circle icon six-plus-slots"></i>
+                    <span>6+ slots</span>
+                    <span class="percentage" id="six-plus-slots-percentage">0.0%</span>
+                    <span class="value" id="six-plus-slots-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar six-plus-slots-bar" style="width: 0%;"></div></div>
+                </div>
+            </div>
+
+            <div class="stat-card user-status">
+                <h3>Status dos Usuários <span class="count" id="total-status-users">0</span></h3>
+                <div class="status-item">
+                    <i class="fas fa-check-circle icon active-users"></i>
+                    <span>Ativos</span>
+                    <span class="percentage" id="active-users-percentage">0.0%</span>
+                    <span class="value" id="active-users-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar active-users-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-times-circle icon inactive-users"></i>
+                    <span>Inativos</span>
+                    <span class="percentage" id="inactive-users-percentage">0.0%</span>
+                    <span class="value" id="inactive-users-value">0</span>
+                    <div class="progress-bar-container"><div class="progress-bar inactive-users-bar" style="width: 0%;"></div></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="dica-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Gerenciar Dicas e Artigos</h3>
+                <button class="modal-close-btn" data-modal-id="dica-modal">&times;</button>
+            </div>
+            
+            <button class="btn-new-dica" id="open-new-dica-btn">
+                <i class="fas fa-plus"></i> Nova Dica
+            </button>
+
+            <div id="dicas-list-container" class="dicas-list-admin">
+                <p class="loading-message">Carregando dicas...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="dica-form-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="dica-modal-title">Criar Nova Dica</h3>
+                <button class="modal-close-btn" data-modal-id="dica-form-modal">&times;</button>
+            </div>
+            <form id="dica-form">
+                <input type="hidden" id="dica-id">
+                <div class="form-group">
+                    <label for="dica-titulo">Título *</label>
+                    <input type="text" id="dica-titulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="dica-autor">Autor *</label>
+                    <input type="text" id="dica-autor" required>
+                </div>
+                <div class="form-group">
+                    <label for="dica-topico">Tópico (Tag) *</label>
+                    <select id="dica-topico" required>
+                        <option value="">Selecione um tópico</option>
+                        <option value="Geral">Geral</option>
+                        <option value="Monitoramento">Monitoramento</option>
+                        <option value="Estudos">Estudos</option>
+                        <option value="Notificação">Notificação</option>
+                        <option value="Avançado">Avançado</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dica-conteudo">Conteúdo *</label>
+                    <textarea id="dica-conteudo" rows="10" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" data-modal-id="dica-form-modal">Cancelar</button>
+                    <button type="submit" class="btn-submit" id="dica-submit-btn">Salvar Dica</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="all-tickets-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Todos os Tickets de Suporte</h3>
+                <button class="modal-close-btn" data-modal-id="all-tickets-modal">&times;</button>
+            </div>
+            <div class="tickets-list-admin" id="tickets-list-admin">
+                <p class="loading-tickets-message">Carregando tickets...</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="ticket-detail-modal">
+        <div class="modal-content ticket-detail-content">
+            <button class="modal-close-btn" data-modal-id="ticket-detail-modal">&times;</button>
+            <div class="ticket-detail-header">
+                <div class="ticket-detail-meta">
+                    <h3 id="ticket-detail-title">#ID_DO_TICKET</h3>
+                    <span class="ticket-status-tag" id="ticket-detail-status-tag"></span>
+                </div>
+                <div class="ticket-detail-info-row">
+                    <span class="ticket-created-at"><i class="fas fa-clock"></i> Criado em <span id="ticket-detail-created-at"></span></span>
+                    <span class="ticket-user-email"><i class="fas fa-envelope"></i> <span id="ticket-detail-user-email"></span></span>
+                </div>
+            </div>
+            <div class="ticket-messages-container" id="ticket-messages-container">
+            </div>
+            <div class="ticket-reply-form-section">
+                <textarea id="admin-reply-message-input" placeholder="Digite sua mensagem..." rows="3"></textarea>
+                <div class="reply-actions">
+                    <div class="status-change-container">
+                        <label for="change-status-select">Alterar Status:</label>
+                        <select id="change-status-select">
+                            <option value="Aguardando">Aguardando</option>
+                            <option value="Em Atendimento">Em Atendimento</option>
+                            <option value="Respondido">Respondido</option>
+                            <option value="Resolvido">Resolvido</option>
+                        </select>
+                    </div>
+                    <button class="btn-send-reply" id="send-admin-reply-btn"><i class="fas fa-paper-plane"></i> Enviar Resposta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="audit-users-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" data-modal-id="audit-users-modal">
+                &times;
+            </button>
+            <h3 class="modal-title">Auditoria de Usuários</h3>
+            <div class="modal-body">
+                <div class="search-bar-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="user-search-input" placeholder="Pesquisar por email...">
+                </div>
+                <div id="users-audit-list" class="audit-users-list">
+                </div>
+                <p id="loading-audit-users" class="loading-message">
+                    Carregando usuários...
+                </p>
+                <p id="no-audit-users" class="error-message" style="display: none;">
+                    Nenhum usuário encontrado.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="faq-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Gerenciar FAQs</h3>
+                <button class="modal-close-btn" data-modal-id="faq-modal">&times;</button>
+            </div>
+            
+            <button class="btn-new-faq" id="open-new-faq-btn">
+                <i class="fas fa-plus"></i> Nova Pergunta
+            </button>
+
+            <div id="faq-list-container" class="faq-list-admin">
+                <p class="loading-message">Carregando FAQs...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="faq-form-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="faq-modal-title">Criar Nova Pergunta</h3>
+                <button class="modal-close-btn" data-modal-id="faq-form-modal">&times;</button>
+            </div>
+            <form id="faq-form">
+                <input type="hidden" id="faq-id">
+                <div class="form-group">
+                    <label for="faq-pergunta">Pergunta *</label>
+                    <input type="text" id="faq-pergunta" required>
+                </div>
+                <div class="form-group">
+                    <label for="faq-resposta">Resposta *</label>
+                    <textarea id="faq-resposta" rows="10" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="faq-categoria">Categoria *</label>
+                    <select id="faq-categoria" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="geral">Geral</option>
+                        <option value="monitoramento">Monitoramento</option>
+                        <option value="planos">Planos</option>
+                        <option value="contato">Contato</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="faq-popular">
+                        <input type="checkbox" id="faq-popular"> Marcar como "Popular"
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" data-modal-id="faq-form-modal">Cancelar</button>
+                    <button type="submit" class="btn-submit" id="faq-submit-btn">Salvar FAQ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="admin.js"></script>
+</body>
+</html>

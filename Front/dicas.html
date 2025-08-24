@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta Edital - Central de Conhecimento</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="monitoramento.css"> 
+    <link rel="stylesheet" href="dicas.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="logo">
+                    <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+            </div>
+            <nav class="navbar-center">
+                <ul>
+                    <li><a href="monitoramento.html"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+                    <li><a href="planos.html" ><i class="fas fa-clipboard-list"></i> Planos </a></li> 
+                    <li><a href="#l" class="active"><i class="fas fa-lightbulb"></i> Dicas</a></li> 
+                    <li><a href="suporte.html"><i class="fas fa-question-circle" ></i> Suporte </a></li>
+                    <li style="margin-top: 4px;"> | </li>
+                    <li ><a href="ajuda.html" class="ajuda"> <i class="fas fa-info-circle"></i> Ajuda</a></li>
+                </ul>
+            </nav>
+            <div class="navbar-right">
+                <a href="#" class="notification-icon"><i class="fas fa-bell"></i></a>
+                <div class="user-menu" id="user-dropdown-toggle"> 
+                    <span class="user-avatar" id="userDefaultAvatar"></span> 
+                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
+                    <span id="userNameDisplay">Carregando...</span> 
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="dropdown-content">
+                        <h3 class="olausuario">Olá, Usuário!</h3>
+                        <a href="#"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                        <a href="#"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                        <hr>
+                        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content" >
+        <div class="card knowledge-center-header" style=" margin-top: 110px;">
+            <div class="icon-wrapper">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <div>
+                <h1>Central de Conhecimento</h1>
+                <p>Seu portal de insights para dominar os concursos públicos.</p>
+            </div>
+        </div>
+
+        <div class="card search-filter-section">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="dica-search-input" placeholder="Buscar dicas por título ou tags...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="todos"><i class="fas fa-list-ul"></i> Todos</button>
+                <button class="filter-btn tag-geral" data-filter="geral"><i class="fas fa-globe"></i> Geral</button>
+                <button class="filter-btn tag-monitoramento" data-filter="monitoramento"><i class="fas fa-chart-line"></i> Monitoramento</button>
+                <button class="filter-btn tag-estudos" data-filter="estudos"><i class="fas fa-book-open"></i> Estudos</button>
+                <button class="filter-btn tag-notificacao" data-filter="notificacao"><i class="fas fa-bell"></i> Notificação</button>
+                <button class="filter-btn tag-avancado" data-filter="avancado"><i class="fas fa-star"></i> Avançado</button>
+            </div>
+        </div>
+        
+        <div id="dicas-list-container" class="dicas-grid">
+            </div>
+
+        <div class="card no-articles-message" id="no-articles-message" style="display: none;">
+            <div class="icon-wrapper large">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <h2>Nenhum artigo encontrado.</h2>
+            <p>Tente ajustar os filtros ou os termos da sua busca.</p>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="dica-viewer-modal">
+        <div class="modal-content dica-viewer-content">
+            <div class="modal-header">
+                <h3 id="dica-viewer-title"></h3>
+                <button class="modal-close-btn" data-modal-id="dica-viewer-modal">&times;</button>
+            </div>
+            <div class="dica-viewer-meta">
+                <span id="dica-viewer-autor"></span>
+                <span id="dica-viewer-date"></span>
+            </div>
+            <div class="dica-viewer-content" id="dica-viewer-conteudo">
+                </div>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script> 
+    <script src="common-auth-ui.js"></script>
+    <script src="dicas.js"></script>
+</body>
+</html>

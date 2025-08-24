@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Conecta Edital - Sua Nomeação Monitorada</title>
+        <link rel="icon" type="image/x-icon" href="favicon.ico">
+        <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+    </head>
+<body>
+<body>
+    <header class="navbar-index">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="logo">
+                    <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+            </div>
+            <nav class="navbar-center-index">
+                <ul>
+                    <li><a href="#beneficios">Benefícios</a></li>
+                    <li><a href="#resultados">Resultados</a></li>
+                    <li><a href="#planos">Planos</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+            </nav>
+            <div class="navbar-right-index">
+                <a href="login-cadastro.html" class="btn-entrar" id="btn-entrar-navbar">
+                    <i class="fas fa-arrow-right"></i> Entrar
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="index-content">
+        <section class="hero-section-index" >
+    
+    <h1>Sua Nomeação Nunca Mais Passará <span class="highlight-blue"> Despercebida</span></h1>
+    <p class="subtitle">Pare de perder tempo checando diários oficiais. Nossa IA monitora tudo para você e dispara alertas instantâneos quando sua convocação sair.</p>
+    <button class="btn-tag btn-demo-action-tag" id="start-demo-btn"><i class="fas fa-bolt"></i> Veja a IA em Ação</button>
+    <div class="monitoramento-demo-card">
+        <div class="demo-header">
+         
+        </div>
+        <div class="demo-content-area">
+            <div class="demo-title">
+                Monitoramento Automático em Tempo Real
+            </div>
+            <p class="demo-subtitle-inner">Enquanto você estuda, nossa IA trabalha 24/7 para encontrar sua nomeação</p>
+
+            <div class="demo-states-wrapper">
+                <div class="demo-state initial-state" id="state-0">
+                    <div class="demo-state-icon-wrapper grey-bg-light-state">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <p class="demo-state-text">Aguardando nova publicação...</p>
+                    <p class="demo-state-subtext">Nossa IA está monitorando continuamente</p>
+                </div>
+
+                <div class="demo-state state-loading" id="state-1">
+                    <div class="demo-step-item active">
+                        <div class="demo-step-icon-wrapper blue-bg-light-state">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Carregando Diário Oficial...</p>
+                            <i class="fas fa-sync-alt spin"></i> </div>
+                    </div>
+                    <div class="demo-step-item"> <div class="demo-step-icon-wrapper grey-bg-light-state">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">IA analisando conteúdo...</p>
+                            </div>
+                    </div>
+                    <div class="demo-step-item">
+                        <div class="demo-step-icon-wrapper grey-bg-light-state">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Procurando palavra-chave...</p>
+                            </div>
+                    </div>
+                    <div class="demo-step-item">
+                        <div class="demo-step-icon-wrapper grey-bg-light-state">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">João Silva encontrado!</p>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="demo-state state-analyzing" id="state-2">
+                    <div class="demo-step-item completed">
+                        <div class="demo-step-icon-wrapper blue-bg-light-state">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Carregando Diário Oficial...</p>
+                            <i class="fas fa-check-circle checkmark-green"></i> </div>
+                    </div>
+                    <div class="demo-step-item active">
+                        <div class="demo-step-icon-wrapper purple-bg-light-state">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">IA analisando conteúdo...</p>
+                            <i class="fas fa-sync-alt spin"></i> </div>
+                    </div>
+                    <div class="demo-step-item">
+                        <div class="demo-step-icon-wrapper grey-bg-light-state">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Procurando palavra-chave...</p>
+                        </div>
+                    </div>
+                    <div class="demo-step-item">
+                        <div class="demo-step-icon-wrapper grey-bg-light-state">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">João Silva encontrado!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-state state-searching" id="state-3">
+                    <div class="demo-step-item completed">
+                        <div class="demo-step-icon-wrapper blue-bg-light-state">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Carregando Diário Oficial...</p>
+                            <i class="fas fa-check-circle checkmark-green"></i> </div>
+                    </div>
+                    <div class="demo-step-item completed">
+                        <div class="demo-step-icon-wrapper purple-bg-light-state">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">IA analisando conteúdo...</p>
+                            <i class="fas fa-check-circle checkmark-green"></i> </div>
+                    </div>
+                    <div class="demo-step-item active">
+                        <div class="demo-step-icon-wrapper orange-bg-light-state">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Procurando palavra-chave...</p>
+                            <i class="fas fa-sync-alt spin"></i> </div>
+                    </div>
+                    <div class="demo-step-item">
+                        <div class="demo-step-icon-wrapper grey-bg-light-state">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">João Silva encontrado!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-state state-found" id="state-4">
+                    <div class="demo-step-item completed">
+                        <div class="demo-step-icon-wrapper blue-bg-light-state">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Carregando Diário Oficial...</p>
+                            <i class="fas fa-check-circle checkmark-green"></i>
+                        </div>
+                    </div>
+                    <div class="demo-step-item completed">
+                        <div class="demo-step-icon-wrapper purple-bg-light-state">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">IA analisando conteúdo...</p>
+                            <i class="fas fa-check-circle checkmark-green"></i>
+                        </div>
+                    </div>
+                    <div class="demo-step-item completed">
+                        <div class="demo-step-icon-wrapper orange-bg-light-state">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">Procurando palavra-chave...</p>
+                            <i class="fas fa-check-circle checkmark-green"></i>
+                        </div>
+                    </div>
+                    <div class="demo-step-item completed">
+                        <div class="demo-step-icon-wrapper orange-bg-light-state">
+                            <i class="fas fa-check-circle checkmark-green"></i>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-text">João Silva encontrado!</p>
+                            <i class="fas fa-check-circle checkmark-green"></i>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div> <p class="auto-message">Isso acontece automaticamente - você não precisa fazer nada além de configurar uma vez.</p>
+        </div> </div>  <div class="demo-actions">
+                <a href="login-cadastro.html" class="btn-primary btn-acessar-conta"><i class="fas fa-arrow-right"></i> Acessar Minha Conta</a>
+                <a href="#testar" class="btn-secondary btn-ver-demonstracao" id="start-demo-btn"><i class="fas fa-play-circle"></i> Ver Demonstração</a>
+            </div>
+            <div class="demo-features">
+                <span><i class="fas fa-check-circle"></i> 100% gratuito para testar</span>
+                <span><i class="fas fa-check-circle"></i> Sem compromisso</span>
+                <span><i class="fas fa-check-circle"></i> Ativação instantânea</span>
+            </div>
+        </section>
+
+        <section class="numbers-section" id="resultados" style="margin-top: -90px; ">
+            <h1>Números que <span class="highlight-blue">Comprovam </span> Nossa Eficácia</h1>
+            <p class="subtitle">Resultados reais de quem transformou sua preparação</p>
+
+            <div class="stats-grid">
+                <div class="stat-card-index">
+                    <div class="stat-icon-wrapper-index purple-bg-light-3"> <i class="fas fa-users"></i>
+                    </div>
+                    <h3>25.847</h3>
+                    <p>Concurseiros Aprovados</p>
+                </div>
+                <div class="stat-card-index">
+                    <div class="stat-icon-wrapper-index green-bg-light-3"> <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>3.2M+</h3>
+                    <p>Publicações Monitoradas</p>
+                </div>
+                <div class="stat-card-index">
+                    <div class="stat-icon-wrapper-index blue-bg-light-3"> <i class="fas fa-percent"></i>
+                    </div>
+                    <h3>99.8%</h3>
+                    <p>Taxa de Precisão</p>
+                </div>
+                <div class="stat-card-index">
+                    <div class="stat-icon-wrapper-index orange-bg-light-3"> <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>&lt; 15s</h3>
+                    <p>Tempo de Notificação</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="testar" class="precisao-section" style="margin-top: -90px;">
+            <button class="btn-tag btn-demonstracao-tag"><i class="fas fa-star"></i> Demonstração Gratuita</button>
+            <h1>Descubra a Precisão do <span class="highlight-blue">Conecta Edital</span> em Segundos</h1>
+            <p class="subtitle">Carregue um PDF, informe a palavra-chave e receba o resultado no seu email. Rápido, seguro e sem compromisso.</p>
+
+            <div class="upload-form-card">
+                <div class="form-step-item">
+                    <span class="step-number-circle-form">1</span>
+                    <span class="step-title-form">Anexe seu Edital ou Documento PDF</span>
+                    <div class="upload-box">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p class="upload-text">Clique aqui ou arraste seu PDF</p>
+                        <small>Tamanho máximo: 5MB - Apenas arquivos PDF</small>
+                    </div>
+                </div>
+                <div class="form-step-item">
+                    <span class="step-number-circle-form">2</span>
+                    <span class="step-title-form">Qual palavra-chave quer monitorar?</span>
+                    <div class="input-with-icon">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Ex: Seu nome, cargo, número do edital...">
+                    </div>
+                    <small class="input-hint"><i class="fas fa-info-circle"></i> A IA buscará este termo em todo o documento</small>
+                </div>
+                <div class="form-step-item">
+                    <span class="step-number-circle-form">3</span>
+                    <span class="step-title-form">Para qual e-mail devemos enviar o resultado?</span>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="seu@email.com">
+                    </div>
+                    <small class="input-hint"><i class="fas fa-info-circle"></i> Para demonstrar como você receberá as notificações</small>
+                </div>
+                <button class="btn-analisar-ia"><i class="fas fa-bolt"></i> Analisar com IA Agora</button>
+            </div>
+        </section>
+
+        <section class="why-choose-us-section" id="beneficios" style="margin-top: -90px;">
+            <h1>Por que Escolher o <span class="highlight-blue">Conecta Edital</span>?</h1>
+            <p class="subtitle">A plataforma mais confiável para monitoramento de concursos públicos</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon-wrapper blue-bg-light-2"> <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Alertas Instantâneos</h3>
+                    <p>Seja avisado no exato momento que sua nomeação sair</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon-wrapper purple-bg-light-2"> <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Precisão da IA</h3>
+                    <p>Algoritmos avançados que não deixam passar nada</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon-wrapper green-bg-light-2"> <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Foco Total</h3>
+                    <p>Liberdade para se dedicar aos estudos sem preocupações</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon-wrapper orange-bg-light-2"> <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Cobertura Nacional</h3>
+                    <p>Monitoramento em todos os diários oficiais do Brasil</p>
+                </div>
+            </div>
+        </section>
+
+       
+        <section class="how-it-works-section" style="margin-top: -90px; ">
+            <h1>Como <span class="highlight-green">Funciona</span></h1>
+            <p class="subtitle">3 passos simples para nunca mais perder uma oportunidade</p>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-icon-wrapper blue-bg-light"> <i class="fas fa-globe"></i>
+                        <span class="step-number-circle-overlay">1</span>
+                    </div>
+                    <h3>Link do Diário Oficial</h3>
+                    <p>Informe a URL do Diário Oficial que deseja monitorar. Aceitamos todos os veículos oficiais do Brasil.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon-wrapper purple-bg-light"> <i class="fas fa-search"></i>
+                        <span class="step-number-circle-overlay">2</span>
+                    </div>
+                    <h3>Palavras-Chave Essenciais</h3>
+                    <p>Adicione nomes, CPF, números de editais ou termos específicos para rastrear. Nossa IA cuida do resto.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon-wrapper green-bg-light"> <i class="fas fa-bell"></i>
+                        <span class="step-number-circle-overlay">3</span>
+                    </div>
+                    <h3>Alerta Criado</h3>
+                    <p>Receba notificações instantâneas por email e WhatsApp (Premium) sempre que encontrarmos novidades.</p>
+                </div>
+            </div>
+        </section>
+
+       
+
+        <section class="plans-section-index" id="planos" style="margin-top: -90px;">
+            <h1>Escolha Seu Plano de <span class="highlight-blue">Aprovação</span></h1>
+            <p class="subtitle">Investir na sua aprovação é investir no seu futuro</p>
+
+            <div class="plans-grid-index">
+                <div class="plan-card-index basic-plan-index">
+                    <div class="plan-header-index">
+                        <div class="plan-icon-wrapper-index blue-bg-light-4"> <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Básico</h3>
+                    </div>
+                    <p class="plan-description-index">Sua primeira linha de defesa</p>
+                    <div class="plan-price-index">
+                        <span class="price-value-index">R$ 19.90</span><span class="price-unit-index">/mês</span>
+                    </div>
+                    <div class="included-features-index">
+                        <ul>
+                            <li><i class="fas fa-check"></i> 3 monitoramentos</li>
+                            <li><i class="fas fa-check"></i> Email instantâneo</li>
+                            <li><i class="fas fa-check"></i> Suporte técnico</li>
+                            <li><i class="fas fa-check"></i> Dashboard de acompanhamento</li>
+                            <li><i class="fas fa-check"></i> Histórico de publicações (30 dias)</li>
+                        </ul>
+                    </div>
+                    <button class="choose-plan-btn-index">Escolher Plano</button>
+                </div>
+
+                <div class="plan-card-index premium-plan-index">
+                    <span class="most-popular-index"><i class="fas fa-star"></i> Mais Popular</span>
+                    <div class="plan-header-index">
+                        <div class="plan-icon-wrapper-index purple-bg-light-4"> <i class="fas fa-crown"></i>
+                        </div>
+                        <h3>Premium</h3>
+                    </div>
+                    <p class="plan-description-index">Máxima velocidade, zero ansiedade</p>
+                    <div class="plan-price-index">
+                        <span class="price-value-index">R$ 39.90</span><span class="price-unit-index">/mês</span>
+                    </div>
+                    <div class="included-features-index">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Monitoramentos ilimitados</li>
+                            <li><i class="fas fa-check"></i> Email + WhatsApp</li>
+                            <li><i class="fas fa-check"></i> Suporte prioritário</li>
+                            <li><i class="fas fa-check"></i> Acesso antecipado a novas funcionalidades</li>
+                            <li><i class="fas fa-check"></i> Análise de IA aprimorada</li>
+                        </ul>
+                    </div>
+                    <button class="choose-plan-btn-index premium-btn-index">Escolher Plano</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-section" id="faq" style="margin-top: -90px; ">
+            <button class="btn-tag btn-faq-tag"><i class="fas fa-question-circle"></i> Dúvidas Frequentes</button>
+            <h1>Perguntas <span class="highlight-blue">Frequentes</span></h1>
+            <p class="subtitle">Tire suas dúvidas sobre nossa plataforma e veja como podemos te ajudar</p>
+        
+            <div class="faq-accordion" style="margin-top: -30px;">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div class="faq-icon-wrapper purple-to-blue-gradient"><i class="fas fa-bolt"></i></div> <h3>Como funciona o monitoramento?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-meta">
+                        <span><i class="fas fa-eye"></i> 127 visualizações</span>
+                        <span><i class="fas fa-fire"></i> Pergunta popular</span>
+                    </div>
+                    <div class="faq-answer" style="margin-bottom: 20px";>
+                        <p>Nossa IA varre milhares de Diários Oficiais 24/7, procurando por seu nome, CPF e dados do concurso. Quando encontra algo relevante, você recebe um alerta instantâneo por email e WhatsApp (Premium).</p>
+                    </div>
+                </div>
+        
+                <div class="faq-item">
+                    <div class="faq-question" >
+                        <div class="faq-icon-wrapper green-gradient-faq"><i class="fas fa-shield-alt"></i></div> <h3>É seguro fornecer meus dados pessoais?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-meta">
+                        <span><i class="fas fa-eye"></i> 95 visualizações</span>
+                        <span><i class="fas fa-fire"></i> Pergunta popular</span>
+                    </div>
+                    <div class="faq-answer" style="margin-bottom: 20px">
+                        <p>Sim, seus dados são protegidos com as mais avançadas tecnologias de segurança. Respeitamos a privacidade dos nossos usuários e seguimos rigorosas políticas de proteção de dados.</p>
+                    </div>
+                </div>
+        
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div class="faq-icon-wrapper orange-to-purple-gradient"><i class="fas fa-bullseye"></i></div> <h3>Quantos concursos posso monitorar?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-meta">
+                        <span><i class="fas fa-eye"></i> 78 visualizações</span>
+                        <span><i class="fas fa-fire"></i> Pergunta popular</span>
+                    </div>
+                    <div class="faq-answer" style="margin-bottom: 20px">
+                        <p>O número de concursos que você pode monitorar depende do seu plano. O Plano Básico oferece X monitoramentos, enquanto o Plano Premium oferece monitoramentos ilimitados.</p>
+                    </div>
+                </div>
+        
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div class="faq-icon-wrapper red-to-orange-gradient"><i class="fas fa-crown"></i></div> <h3>Qual a diferença entre os planos?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-meta">
+                        <span><i class="fas fa-eye"></i> 156 visualizações</span>
+                        <span><i class="fas fa-fire"></i> Pergunta popular</span>
+                    </div>
+                    <div class="faq-answer" style="margin-bottom: 20px">
+                        <p>O Conecta Edital oferece diversos planos para atender às suas necessidades. O plano Básico é ideal para quem busca funcionalidades essenciais, enquanto o plano Premium oferece acesso ilimitado a todos os recursos, incluindo monitoramento em tempo real e suporte prioritário.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="support-section" style="margin-top: -90px;">
+            <div class="support-card">
+                <div class="support-header">
+                    <i class="fas fa-headset"></i>
+                    <h2>Ainda tem dúvidas?</h2>
+                </div>
+                <p>Nossa equipe de suporte está sempre disponível para te ajudar. Entre em contato conosco!</p>
+                <div class="support-buttons">
+                    <button class="btn-support chat-btn"><i class="fas fa-comments"></i> Chat Online</button>
+                    <button class="btn-support email-btn"><i class="fas fa-envelope"></i> Enviar E-mail</button>
+                </div>
+            </div>
+        </section>
+
+        
+
+    </main>
+
+
+    <footer class="main-page-footer">
+        <div class="footer-container">
+            <div class="footer-column about-us">
+                <a href="#" class="footer-logo">
+                    <img src="Captura de tela 2025-07-16 145658.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+                <p>O Conecta Edital é a plataforma líder em monitoramento inteligente para concurseiros. Transformamos a forma como você acompanha editais e convocações.</p>
+                <div class="security-badges">
+                    <span class="badge online"><i class="fas fa-circle"></i> Sistema Online</span>
+                    <span class="badge secure"><i class="fas fa-lock"></i> Dados Seguros</span>
+                </div>
+            </div>
+
+            <div class="footer-column navigation">
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="#beneficios">Benefícios</a></li>
+                    <li><a href="#resultados">Resultados</a></li>
+                    <li><a href="#planos">Planos</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column support-contact">
+                <h3>Suporte</h3>
+                <ul>
+                    <li><a href="mailto:contato@conectaedital.com"><i class="fas fa-envelope"></i> contato@conectaedital.com</a></li>
+                    <li><a href="https://wa.me/seunumerodowhatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp 24/7</a></li>
+                    <li><a href="ajuda.html"><i class="fas fa-headset"></i> Central de Ajuda</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Conecta Edital. Todos os direitos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Termos de Uso</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">LGPD</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="index.js"></script>
+   
+    
+</body>
+</html>

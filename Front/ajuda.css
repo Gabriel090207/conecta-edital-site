@@ -1,0 +1,888 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html, body {
+    overflow-x: hidden;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: white;
+    color: #343a40;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+
+    /* --- Propriedades para o Efeito Vidro --- */
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(80px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    /* --- Propriedades para Fixar a Navbar --- */
+    position: fixed; /* Torna o elemento fixo na tela */
+    top: 0;           /* Fixa no topo (0 pixels do topo) */
+    width: 100%;      /* Garante que ocupe 100% da largura da tela */
+    z-index: 1000;    /* Garante que fique acima de outros elementos na página */
+}
+
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1440px; /* Use a largura que você definiu para o conteúdo principal */
+    padding: 0 30px; /* Padding horizontal interno para o container */
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left .logo {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #007bff; /* Azul Conecta Edital */
+}
+
+.navbar-left .logo img {
+    margin-right: 10px;
+    border-radius: 4px;
+    /* Se o texto 'Conecta Edital' já faz parte da imagem do logo,
+       ajuste seu HTML para não duplicar o texto */
+}
+
+.navbar-center ul {
+    display: flex;
+    gap: 30px;
+}
+
+.navbar-center ul li a {
+    display: flex;
+    align-items: center;
+    color: #6c757d; /* Cinza para textos secundários */
+    font-weight: 500;
+    padding: 5px 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-center ul li a.ajuda {
+    display: flex;
+    align-items: center;
+    color:#08ac6d; /* Cinza para textos secundários */
+    font-weight: 500;
+    padding: 5px 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-center ul li a.ajuda:hover { /* ADICIONE ESTE BLOCO */
+    color: #14a06a; /* Ou outra cor de destaque, por exemplo, um azul mais vibrante */
+    transform: translateY(-2px); /* Desloca o link um pouco para cima */
+}
+
+.navbar-center ul li a:hover,
+.navbar-center ul li a.active {
+    color: #007bff; /* Azul Conecta Edital */
+    transform: scale(1.05); /* Aumenta o tamanho em 5% */
+}
+
+.navbar-center ul li a i {
+    margin-right: 8px;
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.navbar-center ul li a:hover i,
+.navbar-center ul li a.active i {
+    transform: scale(1.1); /* Ícone aumenta um pouco mais que o texto */
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar-right .notification-icon {
+    font-size: 1.2rem;
+    color: #6c757d;
+    position: relative;
+    padding: 5px;
+}
+
+.navbar-right .user-menu {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 20px;
+    padding: 5px 15px 5px 5px;
+    cursor: pointer;
+    border: 1px solid #e0e0e0;
+}
+
+.navbar-right .user-avatar {
+    background-color: #007bff;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.navbar-right .user-menu span {
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.navbar-right .user-menu i {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* ========================================= */
+/* FIM do CSS do HEADER */
+/* ========================================= */
+
+
+/* ========================================= */
+/* CSS ESPECÍFICO DA PÁGINA DE AJUDA */
+/* ========================================= */
+
+/* Cores de Fundo para Ícones dos FAQs na Ajuda */
+.star-icon-bg {
+    background-color: #fffde7; /* Light yellow */
+    color: #fbc02d; /* Dark yellow */
+    border-radius: 50%; /* Circular */
+}
+.help-icon-bg {
+    background-color: #e3f2fd; /* Light blue */
+    color: #1976d2; /* Dark blue */
+    border-radius: 50%; /* Circular */
+}
+.green-icon-bg { /* Para o ícone do header da Central de Ajuda */
+    background: linear-gradient(135deg, #05bc5b, #00823c); color: white;
+    border-radius: 20%; /* Circular */
+}
+
+
+.ajuda-content {
+    flex-grow: 1;
+    padding: 40px 30px 10px 30px; /* Reduzido padding-bottom para 10px */
+    max-width: 1440px; /* Largura padrão dos conteúdos principais */
+    margin: 30px auto 0 auto; /* Reduzido margin-bottom para 0, mantendo o auto para centralizar */
+    display: flex; /* Para empilhar o header-card e o wrapper principal */
+    flex-direction: column;
+    gap: 25px; /* Espaço entre o card de cabeçalho e o wrapper principal */
+}
+
+/* Card de Título da Seção (Central de Ajuda) */
+.help-center-header { /* Corrigido de .card .help-center-header */
+    display: flex;
+    align-items: center;
+    text-align: left;
+    background-color: #ffffff; /* Propriedades do card */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    border: 1px solid #e0e0e0;
+}
+
+.help-center-header .icon-wrapper {
+    /* Estilos do icon-wrapper são comuns, a cor de fundo muda pela classe específica */
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem; /* Aumentado para corresponder */
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.help-center-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 5px;
+}
+
+.help-center-header p {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.main-content-wrapper {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Coluna da Esquerda: FAQ Section */
+.faq-section-ajuda {
+    flex: 1; /* Ocupa o espaço restante */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Espaço entre a seção de busca/filtro e a lista de FAQs */
+}
+
+/* Search and Filter Section (Reutilizado do Dicas) */
+.search-filter-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.search-bar {
+    position: relative;
+}
+
+.search-bar i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #343a40;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.search-bar input:focus {
+    border-color: #007bff;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-btn {
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.filter-btn i {
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
+
+.filter-btn:hover {
+    opacity: 0.9;
+}
+
+.filter-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Cores específicas para cada tag do filtro (dicas.html) */
+.filter-btn.tag-geral {
+    background-color: #e0f7fa; /* Light cyan */
+    color: #00838f; /* Dark cyan */
+}
+.filter-btn.tag-geral.active {
+    background-color: #00838f;
+    color: white;
+}
+
+.filter-btn.tag-monitoramento {
+    background-color: #e3f2fd; /* Light blue */
+    color: #1976d2; /* Dark blue */
+}
+.filter-btn.tag-monitoramento.active {
+    background-color: #1976d2;
+    color: white;
+}
+
+.filter-btn.tag-planos { /* NOVO: Para página ajuda, se tiver filtro de planos */
+    background-color: #f3e5f5; /* Light purple */
+    color: #8e24aa; /* Dark purple */
+}
+.filter-btn.tag-planos.active {
+    background-color: #8e24aa;
+    color: white;
+}
+
+.filter-btn.tag-estudos { /* Mantenho para compatibilidade, se você quiser usar em dicas */
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+.filter-btn.tag-estudos.active {
+    background-color: #388e3c;
+    color: white;
+}
+
+.filter-btn.tag-notificacao { /* Mantenho para compatibilidade, se você quiser usar em dicas */
+    background-color: #fffde7;
+    color: #fbc02d;
+}
+.filter-btn.tag-notificacao.active {
+    background-color: #fbc02d;
+    color: white;
+}
+
+.filter-btn.tag-avancado { /* Mantenho para compatibilidade, se você quiser usar em dicas */
+    background-color: #f3e5f5;
+    color: #8e24aa;
+}
+.filter-btn.tag-avancado.active {
+    background-color: #8e24aa;
+    color: white;
+}
+
+
+/* FAQ List (Acordeão) */
+.faq-question h3 {
+    margin-left: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #343A40;
+    text-align: left; /* **CRUCIAL: Alinha o texto à esquerda** */
+    flex-grow: 1; /* Permite que o h3 ocupe o espaço restante */
+    /* Remova qualquer margin-left aqui se houver */
+}
+
+.faq-accordion {
+    width: 100%;
+    max-width: 800px; /* Adapta a largura para a coluna do FAQ */
+    margin-top: 25px; /* Espaço entre a barra de filtro e o primeiro FAQ */
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaço entre os itens da FAQ */
+}
+
+.faq-item {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #E0E0E0;
+    overflow: hidden; /* CRUCIAL para a animação de max-height */
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.faq-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.faq-item.active {
+    border-color: #007BFF; /* Borda azul quando o item está ativo/aberto */
+}
+
+.faq-question {
+    display: flex;
+    gap: 12px; /* Reduzido o gap entre o ícone e o texto/seta */
+    padding: 19px 40px; /* Reduzido o padding interno do faq-question */
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: left;
+    color: #343A40;
+    margin-left: 20px ;
+    cursor: pointer;
+    justify-content: space-between;
+    flex-wrap: nowrap; /* Impede quebrar linha na pergunta */
+}
+
+
+.faq-icon-wrapper {
+    /* Corrigido para ser CIRCULAR (50%) como na imagem */
+    border-radius: 20%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem; /* Tamanho do ícone */
+    flex-shrink: 0;
+}
+
+/* Cores dos ícones dos FAQs */
+.star-icon-bg {
+    margin-left: -20px;
+    margin-bottom: -40px; /* Para a primeira pergunta (estrela) */
+    background: linear-gradient(135deg, #faf282, #d8701b); color: white; /* Ícone laranja/amarelo vibrante como na imagem */
+    /* Removido border-radius aqui, já está no .faq-icon-wrapper */
+}
+.help-icon-bg {
+    margin-left: -20px;
+    margin-bottom: -40px;/* Para as outras perguntas (interrogação) */
+    background: linear-gradient(135deg, #12d3f5, #0163c5); color: white; /* Ícone azul vibrante como na imagem */
+    /* Removido border-radius aqui, já está no .faq-icon-wrapper */
+}
+
+
+/* Estilos para o ícone de seta */
+.faq-question i.fa-chevron-down {
+    transition: transform 0.3s ease;
+    font-size: 1rem;
+    color: #6C757D;
+    flex-shrink: 0;
+    margin-left: 8px; /* Reduz a margem à esquerda da seta */
+}
+
+/* Gira a seta quando o item está ativo */
+.faq-item.active .faq-question i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.faq-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Reduzido o espaçamento entre visualizações e popular */
+    font-size: 0.85rem;
+    color: #6C757D;
+    /* Ajusta padding para alinhar com o texto da pergunta, considerando o novo padding do faq-question */
+    padding: 0 20px 10px 80px; /* Calculado: 20px (padding lateral faq-question) + 12px (gap) + 48px (ícone) = 80px */
+    text-align: left;
+    margin-left: 30px;
+}
+
+.faq-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.faq-meta i {
+    font-size: 0.9rem;
+}
+
+.faq-answer {
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.4s ease-out, opacity 0.4s ease-out, visibility 0.4s;
+
+    /* Fundo e sombra para a resposta */
+    background-color: #F8F9FA;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    /* Margem lateral para descolar do faq-item */
+    margin: 0 20px;
+    margin-bottom: 10px;
+    /* Zera padding top/bottom no estado fechado */
+    padding-top: 0px; /* Alterado para 0px no estado fechado */
+    padding-bottom: 0px; /* Alterado para 0px no estado fechado */
+    padding-left: 20px; /* Padding lateral */
+    padding-right: 20px; /* Padding lateral */
+
+    font-size: 0.95rem;
+    color: #495057;
+    text-align: left;
+}
+
+/* Propriedade para o parágrafo dentro da resposta, para garantir espaçamento */
+.faq-answer p {
+    margin: 0; /* **CRUCIAL: Remove TODAS as margens padrão do parágrafo** */
+    padding: 0; /* **CRUCIAL: Remove TODOS os paddings padrão do parágrafo** */
+    line-height: 1.5; /* Ajusta espaçamento entre linhas */
+}
+
+
+/* **CRUCIAL: Propriedades quando o item está ATIVO (aberto)** */
+.faq-item.active .faq-answer {
+    /* max-height será definido pelo JS */
+    opacity: 1;
+    visibility: visible;
+
+    /* **NOVO/AJUSTADO**: Aplica o padding vertical aqui */
+    padding-top: 15px; /* Espaço entre o topo do fundo da resposta e o texto */
+    padding-bottom: 15px; /* Espaço entre o texto e a borda inferior do fundo da resposta */
+}
+/* Coluna da Direita: Chatbot Section */
+.chatbot-section {
+    flex-shrink: 0;
+    width: 350px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, #e94c1c, #dda610);   /* Laranja do header do chatbot */
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* NOVO: Estilo para o ícone de robô como avatar */
+.chatbot-avatar-icon {
+    background-color: #fb902d; /* Cor de fundo do círculo do avatar (laranja mais escuro) */
+    color: white; /* Cor do ícone do robô */
+    border-radius: 50%; /* Torna o div circular */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem; /* Tamanho do ícone do robô */
+    border: 2px solid white; /* Borda branca */
+    flex-shrink: 0; /* Impede que ele encolha */
+}
+
+/* Remover ou garantir que .chatbot-avatar não afete o novo ícone se você tinha um img antes */
+.chatbot-avatar { /* Seletor do img antigo, remova ou comente se não for usar img */
+    display: none; /* Esconde a imagem antiga se ainda estiver no HTML */
+}
+
+.chatbot-info h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: white;
+}
+
+.chatbot-info span {
+    font-size: 0.85rem;
+    color: white;
+}
+
+.chatbot-messages {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+.message.received {
+    background-color: #ffffff;
+    border: 1px solid  #e9ecef;
+    border-radius: 12px 12px 12px 0;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    color: #343a40;
+    line-height: 1.4;
+    max-width: 90%;
+    align-self: flex-start;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Permite que a altura se ajuste ao conteúdo */
+    /* Mantenha o padding, font-size, line-height, max-width que já tem */
+    /* Certifique-se que box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); está definido na classe base .message-bubble */
+}
+
+.message.sent {
+    background: linear-gradient(135deg, #e94c1c, #dda610);
+    border: 1px solid  #e9ecef;
+    border-radius: 12px 12px 0px 12px;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    color: white;
+    line-height: 1.4;
+    max-width: 90%;
+    align-self: flex-end;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Cantos arredondados, com o inferior esquerdo reto */
+    /* Mantenha o padding, font-size, line-height, max-width que já tem */
+}
+
+.message-bubble {
+    background-color: #ffffff;
+    border: 1px solid  #e9ecef;
+    border-radius: 12px 12px 12px 0;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    color: #343a40;
+    line-height: 1.4;
+    max-width: 90%;
+    align-self: flex-start;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.message-bubble.received {
+    border-radius: 12px 12px 12px 0;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.quick-action-btn {
+    background-color: white;
+    color: #f13000;
+    border: 1px solid #f13000;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    background-color: #ffe2db;
+    border-color: #f13000;
+}
+
+.message-bubble.show-on-click {
+    display: none;
+}
+
+.chatbot-input {
+    display: flex;
+    border-top: 1px solid #e0e0e0;
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+}
+
+.chatbot-input input {
+    flex-grow: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.chatbot-input input:focus {
+    border-color: #dda610;
+}
+
+.chatbot-input .send-btn {
+    background: linear-gradient(135deg, #e94c1c, #dda610);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.chatbot-input .send-btn:hover {
+    background-color: #0056b3;
+}
+
+
+/* ========================================= */
+/* RESPONSIVIDADE */
+/* ========================================= */
+@media (max-width: 1440px) {
+    .navbar-container,
+    .ajuda-content {
+        max-width: 1200px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .navbar-container,
+    .ajuda-content {
+        max-width: 960px;
+    }
+    .main-content-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .chatbot-section {
+        width: 100%;
+        max-height: 600px;
+    }
+}
+
+@media (max-width: 992px) {
+    .ajuda-content {
+        padding: 30px 20px 10px 20px; /* Ajustado padding-bottom */
+    }
+    .search-filter-section {
+        padding: 20px;
+    }
+    .search-bar input {
+        padding: 10px 15px 10px 40px;
+        font-size: 0.9rem;
+    }
+    .filter-btn {
+        padding: 6px 15px;
+        font-size: 0.8rem;
+    }
+    .faq-question {
+        font-size: 1rem;
+        padding: 15px 20px;
+    }
+    .faq-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+    .faq-meta {
+        padding: 0 20px 10px 75px;
+        font-size: 0.8rem;
+    }
+    .faq-answer {
+        padding: 0 20px 15px 75px;
+        font-size: 0.9rem;
+    }
+    .chatbot-messages {
+        padding: 15px;
+    }
+    .message-bubble {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    .quick-action-btn {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+    .chatbot-input {
+        padding: 10px 15px;
+    }
+    .chatbot-input input {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    .chatbot-input .send-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .ajuda-content {
+        padding: 20px 15px 10px 15px; /* Ajustado padding-bottom */
+    }
+    .navbar-center ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    .navbar-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 0 20px;
+    }
+    .navbar-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .help-center-header h1 {
+        font-size: 1.5rem;
+    }
+    .help-center-header p {
+        font-size: 0.9rem;
+    }
+    .search-filter-section {
+        padding: 20px;
+    }
+    .search-bar input {
+        font-size: 0.9rem;
+        padding: 10px 15px 10px 40px;
+    }
+    .filter-btn {
+        padding: 6px 15px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .help-center-header .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+    .help-center-header h1 {
+        font-size: 1.3rem;
+    }
+    .help-center-header p {
+        font-size: 0.85rem;
+    }
+    .search-bar input {
+        padding: 8px 10px 8px 35px;
+        font-size: 0.85rem;
+    }
+    .filter-buttons {
+        gap: 8px;
+    }
+    .filter-btn {
+        padding: 5px 12px;
+        font-size: 0.75rem;
+    }
+    .faq-question h3 {
+        font-size: 0.95rem;
+    }
+    .faq-icon-wrapper {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+    }
+    .faq-meta, .faq-answer {
+        padding-left: 60px;
+        font-size: 0.85rem;
+    }
+}

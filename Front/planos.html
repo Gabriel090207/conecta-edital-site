@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta Edital - Nossos Planos</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="monitoramento.css"> 
+    <link rel="stylesheet" href="planos.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="logo">
+                    <img src="logo.png.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+            </div>
+            <nav class="navbar-center">
+                <ul>
+                    <li><a href="monitoramento.html" ><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+                    <li><a href="planos.html" class="active"><i class="fas fa-clipboard-list"></i> Planos </a></li> 
+                    <li><a href="dicas.html" ><i class="fas fa-lightbulb"></i> Dicas</a></li> 
+                    <li><a href="suporte.html"><i class="fas fa-question-circle" ></i> Suporte     </a></li>
+                    <li style="margin-top: 4px;"> | </li>
+                    <li ><a href="ajuda.html" class="ajuda">     <i class="fas fa-info-circle"></i>   Ajuda</a></li>
+                </ul>
+            </nav>
+            <div class="navbar-right">
+                <a href="#" class="notification-icon"><i class="fas fa-bell"></i></a>
+                <div class="user-menu" id="user-dropdown-toggle"> 
+                    <span class="user-avatar" id="userDefaultAvatar"></span> 
+                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
+                    <span id="userNameDisplay">Carregando...</span> 
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="dropdown-content">
+                        <h3 class="olausuario" >Olá, Usuário!</h3>
+                        <a href="#"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                        <a href="#"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                        <hr>
+                        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="planos-content">
+        <div class="hero-section">
+            <button class="call-to-action-button"><i class="fas fa-star"></i> Seu Sucesso Começa Aqui</button>
+            <h1>Planos <span class="highlight">Conecta Edital</span>: Sua Aprovação Monitorada.</h1>
+            <p>Escolha o plano ideal e nunca mais perca uma nomeação, convocação ou atualização importante do seu concurso. Deixe que a nossa inteligência trabalhe por você!</p>
+            <div class="welcome-message">
+                <i class="fas fa-lightbulb" style="color: #fbc02d"></i> Bem-vindo(a),<span id="welcome-user-name">Usuário</span><span class="exclamacao">!</span> Pronto para focar no que importa?
+            </div>
+        </div>
+
+        <div class="card current-plan-card" id="current-plan-card" style="display: none;">
+            <div class="current-plan-info">
+                
+          
+            </div>
+            <span id="current-plan-name" class="current-plan-name">rregando...</span>
+        </div>
+        
+        <section class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>50.000+</h3>
+                <p>Candidatos Aprovados</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-file-alt" style="background-color: #b7facc; color: #00cc44"></i>
+                </div>
+                <h3>1,2M+</h3>
+                <p>Publicações Monitoradas</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>99.9%</h3>
+                <p>Uptime da Plataforma</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-clock" style="background-color: #b7facc; color: #00cc44;"></i>
+                </div>
+                <h3>&lt; 1h</h3>
+                <p>Tempo Médio de Notificação</p>
+            </div>
+        </section>
+
+        <section class="plans-overview-section">
+            <h2>Invista na Sua Tranquilidade e Foco</h2>
+            <p class="subtitle">Nossos planos são pensados para cada etapa da sua jornada como concurseiro:</p>
+            <div class="plans-grid">
+                <div class="plan-card" data-plan-id="essencial_plan">
+                    <div class="plan-header">
+                        <div class="plan-icon-wrapper">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Plano Essencial</h3>
+                    </div>
+                    <p class="plan-description">Seu foco, nossa prioridade.</p>
+                    <p class="plan-details">Ideal para quem precisa de monitoramento preciso e confiável para os concursos mais importantes.</p>
+                    <div class="plan-price">
+                        <span class="price-value">R$ 19.90</span><span class="price-unit">/mês</span>
+                    </div>
+                    <div class="included-features">
+                        <h4><i class="fas fa-check-circle"></i> O que está incluído:</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Até 3 monitoramentos simultâneos</li>
+                            <li><i class="fas fa-check"></i> Verificação automática diária</li>
+                            <li><i class="fas fa-check"></i> Notificações por email</li>
+                            <li><i class="fas fa-check"></i> Histórico de publicações (30 dias)</li>
+                            <li><i class="fas fa-check"></i> Dashboard amplificado</li>
+                            <li><i class="fas fa-check"></i> Suporte técnico via ticket</li>
+                        </ul>
+                    </div>
+                    <div class="limitations">
+                        <h4><i class="fas fa-times-circle"></i> Algumas limitações:</h4>
+                        <ul>
+                            <li><i class="fas fa-times"></i> Sem notificações por WhatsApp</li>
+                            <li><i class="fas fa-times"></i> Sem verificação em tempo real</li>
+                        </ul>
+                    </div>
+                    <button class="choose-plan-btn" data-plan-id="essencial_plan">Assinar Plano Essencial</button>
+                </div>
+
+                <div class="plan-card premium-plan" data-plan-id="premium_plan">
+                    <span class="most-chosen" style="background: linear-gradient(135deg, #ff74a7, #db3c76); color: white; border: none;"><i class="fas fa-star" style="color: white"></i> O mais escolhido!</span>
+                    <div class="plan-header">
+                        <div class="plan-icon-wrapper">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h3>Plano Premium</h3>
+                    </div>
+                    <p class="plan-description">Acelere sua aprovação.</p>
+                    <p class="plan-details">A solução completa para o concurseiro que busca máxima performance e não quer perder nenhuma oportunidade.</p>
+                    <div class="plan-price">
+                        <span class="price-value">R$ 39.90</span><span class="price-unit">/mês</span>
+                        <span class="original-price">R$ 59.90</span> <span class="discount">Economize 33%</span>
+                    </div>
+                    <div class="included-features">
+                        <h4><i class="fas fa-check-circle"></i> O que está incluído:</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Monitoramentos ILIMITADOS</li>
+                            <li><i class="fas fa-check"></i> Verificação em TEMPO REAL (a cada hora)</li>
+                            <li><i class="fas fa-check"></i> Notificações por Email e WhatsApp</li>
+                            <li><i class="fas fa-check"></i> Suporte PRIORITÁRIO 24/7</li>
+                            <li><i class="fas fa-check"></i> Histórico COMPLETO e ilimitado</li>
+                            <li><i class="fas fa-check"></i> Alertas personalizados AVANÇADOS</li>
+                            <li><i class="fas fa-check"></i> Backup automático de todos os dados</li>
+                            <li><i class="fas fa-check"></i> Monitoramento aprimorado com IA</li>
+                            <li><i class="fas fa-check"></i> Acesso antecipado a novas funcionalidades</li>
+                        </ul>
+                    </div>
+                    <button class="choose-plan-btn premium-btn" data-plan-id="premium_plan">Escolher Plano</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="differentials-section">
+            <h2>Nossos <span class="highlight-purple">Diferenciais</span> Exclusivos</h2>
+            <p class="subtitle">Tecnologia e dedicação para impulsionar sua jornada rumo à aprovação.</p>
+            <div class="differentials-grid">
+                <div class="differential-card">
+                    <div class="differential-icon-wrapper">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>Monitoramento de Precisão</h3>
+                    <p>Nossa IA varre Diários Oficiais e sites de bancas 24/7 para você não perder nenhuma atualização crucial.</p>
+                </div>
+                <div class="differential-card">
+                    <div class="differential-icon-wrapper1">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Alertas Instantâneos</h3>
+                    <p>Seja notificado na hora por email ou WhatsApp. A agilidade que faz a diferença na sua convocação.</p>
+                </div>
+                <div class="differential-card">
+                    <div class="differential-icon-wrapper2">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Foco Total nos Estudos</h3>
+                    <p>Deixe o trabalho pesado de acompanhar publicações conosco e concentre-se no que realmente importa: sua preparação.</p>
+                </div>
+            </div>
+        </section>
+
+        <a href="#top" class="back-to-top-button" aria-label="Voltar ao topo">
+            <i class="fas fa-arrow-up"></i>
+        </a>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="common-auth-ui.js"></script>
+    <script src="planos.js"></script>
+</body>
+</html>
