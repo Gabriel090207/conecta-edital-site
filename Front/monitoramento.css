@@ -650,15 +650,9 @@ ul {
     white-space: nowrap;
 }
 
-.status-tag1 {
-    background-color: #ffe6e3;
-    color: #a30f0f;
-    border-color: 2px solid #28a745;
-    padding: 5px 12px;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
+.status-tag.status-inativo {
+    background-color: #f8d7da; /* Vermelho claro */
+    color: #721c24; /* Vermelho escuro */
 }
 /* Grid de Detalhes */
 .item-details-grid {

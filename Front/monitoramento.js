@@ -49,6 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- URL base do seu backend FastAPI ---
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
 
+    // --- VARIÁVEL GLOBAL PARA ARMAZENAR OS DADOS DO DASHBOARD ---
+    let currentMonitorings = [];
+    let currentStatusData = {};
+
     // --- Funções Auxiliares de UI ---
     function openModal(modalElement) {
         if (modalElement) {
@@ -135,8 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     `;
         }
+        const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo'; // Corrigido aqui
+        const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo'; // Corrigido aqui
+
         itemCard.innerHTML = `
-            <div class="item-header"><div class="item-header-title"><i class="${titleIconClass}"></i><h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3><button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button><button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button></div><span class="status-tag monitoring">${mon.status === 'active' ? 'Monitorando' : 'Inativo'}</span></div>
+            <div class="item-header"><div class="item-header-title"><i class="${titleIconClass}"></i><h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3><button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button><button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button></div><span class="status-tag ${statusTagClass}">${mon.status === 'active' ? 'Monitorando' : 'Inativo'}</span></div>
             <div class="item-details-grid">${detailsHtml}
                         <div class="detail-item"><i class="fas fa-clock" style=" text-shadow:
         -1px -1px 0 #230094ff,
@@ -155,12 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
         1px 1px 0 #009479ff;"></i><span>Ocorrências</span><p class="occurrences-count"><strong>${mon.occurrences || 0} ocorrência(s)</strong> <a href="#" class="view-history-link">Ver Histórico</a></p></div>
 
                 <div class="detail-item"><i class="fas fa-bell" style="text-shadow:
-                   -1px -1px 0 #a600e8ff,
+                       -1px -1px 0 #a600e8ff,
         1px -1px 0 #a600e8ff,
         -1px 1px 0 #a600e8ff,
         1px 1px 0 #a600e8ff;"></i><span>Status das Notificações</span><div class="notification-status"><span class="notification-tag email-enabled">Email</span><span class="notification-tag whatsapp-enabled">WhatsApp</span></div></div>
             </div>
-            <div class="item-actions"><div class="toggle-switch"><input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}"><label for="toggle-monitoramento-${mon.id}">Ativo</label></div><div class="action-buttons"><button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button><button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button><button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button></div></div>
+            <div class="item-actions"><div class="toggle-switch"><input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}"><label for="toggle-monitoramento-${mon.id}">${toggleLabelText}</label></div><div class="action-buttons"><button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button><button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button><button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button></div></div>
         `;
         return itemCard;
     }
@@ -191,6 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const statusData = await responseStatus.json();
             const monitoramentosList = await responseMonitorings.json();
+
+            // Armazena os dados localmente para o polling
+            currentStatusData = statusData;
+            currentMonitorings = monitoramentosList;
 
             // Renderiza os cards de resumo com os dados obtidos
             updateSummaryCards(statusData);
@@ -242,13 +253,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Crie seu primeiro monitoramento para começar e aproveite seus slots ilimitados!';
-                const createFirstMonitoramentoButton = initialNoMonitoramentoMessage.querySelector('#create-first-monitoramento-btn');
-                if (createFirstMonitoramentoButton) {
-                    createFirstMonitoramentoButton.href = '#';
-                    createFirstMonitoramentoButton.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
-                    createFirstMonitoramentoButton.style.opacity = '1';
-                    createFirstMonitoramentoButton.style.cursor = 'pointer';
-                    createFirstMonitoramentoButton.disabled = false;
+                if (createFirstMonitoramentoBtn) { // Usando a const global
+                    createFirstMonitoramentoBtn.href = '#';
+                    createFirstMonitoramentoBtn.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
+                    createFirstMonitoramentoBtn.style.opacity = '1';
+                    createFirstMonitoramentoBtn.style.cursor = 'pointer';
+                    createFirstMonitoramentoBtn.disabled = false;
                 }
             }
             canCreateNewMonitoring = true;
@@ -267,13 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Crie seu primeiro monitoramento e aproveite seus 3 slots!';
-                const createFirstMonitoramentoButton = initialNoMonitoramentoMessage.querySelector('#create-first-monitoramento-btn');
-                if (createFirstMonitoramentoButton) {
-                    createFirstMonitoramentoButton.href = '#';
-                    createFirstMonitoramentoButton.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
-                    createFirstMonitoramentoButton.style.opacity = '1';
-                    createFirstMonitoramentoButton.style.cursor = 'pointer';
-                    createFirstMonitoramentoButton.disabled = false;
+                if (createFirstMonitoramentoBtn) { // Usando a const global
+                    createFirstMonitoramentoBtn.href = '#';
+                    createFirstMonitoramentoBtn.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
+                    createFirstMonitoramentoBtn.style.opacity = '1';
+                    createFirstMonitoramentoBtn.style.cursor = 'pointer';
+                    createFirstMonitoramentoBtn.disabled = false;
                 }
             }
             // LÓGICA DE VERIFICAÇÃO DE SLOTS DISPONÍVEIS
@@ -293,13 +302,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Crie seu primeiro monitoramento e aproveite seus 5 slots!';
-                const createFirstMonitoramentoButton = initialNoMonitoramentoMessage.querySelector('#create-first-monitoramento-btn');
-                if (createFirstMonitoramentoButton) {
-                    createFirstMonitoramentoButton.href = '#';
-                    createFirstMonitoramentoButton.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
-                    createFirstMonitoramentoButton.style.opacity = '1';
-                    createFirstMonitoramentoButton.style.cursor = 'pointer';
-                    createFirstMonitoramentoButton.disabled = false;
+                if (createFirstMonitoramentoBtn) { // Usando a const global
+                    createFirstMonitoramentoBtn.href = '#';
+                    createFirstMonitoramentoBtn.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
+                    createFirstMonitoramentoBtn.style.opacity = '1';
+                    createFirstMonitoramentoBtn.style.cursor = 'pointer';
+                    createFirstMonitoramentoBtn.disabled = false;
                 }
             }
             // LÓGICA DE VERIFICAÇÃO DE SLOTS DISPONÍVEIS
@@ -320,13 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Seus slots estão indisponíveis. Visite a página de planos para mais opções.';
-                const createFirstMonitoramentoButton = initialNoMonitoramentoMessage.querySelector('#create-first-monitoramento-btn');
-                if (createFirstMonitoramentoButton) {
-                    createFirstMonitoramentoButton.href = 'planos.html';
-                    createFirstMonitoramentoButton.innerHTML = 'Ver planos';
-                    createFirstMonitoramentoButton.style.opacity = '1';
-                    createFirstMonitoramentoButton.style.cursor = 'pointer';
-                    createFirstMonitoramentoButton.disabled = false;
+                if (createFirstMonitoramentoBtn) { // Usando a const global
+                    createFirstMonitoramentoBtn.href = 'planos.html';
+                    createFirstMonitoramentoBtn.innerHTML = 'Ver planos';
+                    createFirstMonitoramentoBtn.style.opacity = '1';
+                    createFirstMonitoramentoBtn.style.cursor = 'pointer';
+                    createFirstMonitoramentoBtn.disabled = false;
                 }
             }
         }
@@ -341,6 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (openNewMonitoramentoModalBtn) {
             openNewMonitoramentoModalBtn.removeEventListener('click', showUpgradeAlert);
             openNewMonitoramentoModalBtn.removeEventListener('click', () => openModal(chooseTypeModal));
+            // O listener correto será adicionado DENTRO da função updateSummaryCards
             if (canCreateNewMonitoring) { 
                 openNewMonitoramentoModalBtn.disabled = false; openNewMonitoramentoModalBtn.style.opacity = '1'; openNewMonitoramentoModalBtn.style.cursor = 'pointer'; 
                 openNewMonitoramentoModalBtn.addEventListener('click', () => openModal(chooseTypeModal));
@@ -352,6 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (createFirstMonitoramentoBtn) {
             createFirstMonitoramentoBtn.removeEventListener('click', showUpgradeAlert);
             createFirstMonitoramentoBtn.removeEventListener('click', () => openModal(chooseTypeModal));
+            // O listener correto será adicionado DENTRO da função updateSummaryCards
             if (canCreateNewMonitoring) { 
                 createFirstMonitoramentoBtn.disabled = false; createFirstMonitoramentoBtn.style.opacity = '1'; createFirstMonitoramentoBtn.style.cursor = 'pointer'; 
                 createFirstMonitoramentoBtn.addEventListener('click', () => openModal(chooseTypeModal));
@@ -400,8 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 step++;
                 setTimeout(nextStep, 1500); // tempo entre passos
             } else {
-                // Esta é a parte que faltava! ✅
-                // Finaliza a animação e fecha o modal
                 const modalAtivado = document.getElementById('monitoramento-ativado-modal');
                 
                 // Recarrega os dados do dashboard para mostrar o novo monitoramento
@@ -552,14 +559,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     closeModal(personalMonitoramentoModal);
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress({ message: "Monitoramento ativado com sucesso." });
-                    window.loadDashboardDataAndRender(); // Recarrega os dados do dashboard
                 } else if (response.ok) {
                     const result = await response.json();
                     console.log('Monitoramento pessoal criado com sucesso:', result);
                     closeModal(personalMonitoramentoModal);
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress(result);
-                    window.loadDashboardDataAndRender(); // Recarrega os dados do dashboard
                 } else {
                     const errorData = await response.json();
                     alert(`Erro ao criar monitoramento pessoal: ${errorData.detail || 'Erro desconhecido.'}`);
@@ -598,17 +603,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (response.status === 201) {
                     console.log('Monitoramento radar criado com sucesso!');
-                    closeModal(radarMonitoringForm);
+                    closeModal(radarMonitoramentoModal); 
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress({ message: "Monitoramento ativado com sucesso." });
-                    window.loadDashboardDataAndRender(); // Recarrega os dados do dashboard
                 } else if (response.ok) {
                     const result = await response.json();
                     console.log('Monitoramento radar criado com sucesso:', result);
-                    closeModal(radarMonitoringForm);
+                    closeModal(radarMonitoramentoModal); 
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress(result);
-                    window.loadDashboardDataAndRender(); // Recarrega os dados do dashboard
                 } else {
                     const errorData = await response.json();
                     alert(`Erro ao criar monitoramento radar: ${errorData.detail || 'Erro desconhecido.'}`);
@@ -624,4 +627,44 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delegação de Eventos para Itens de Monitoramento Criados Dinamicamente
     if (monitoringListSection) { monitoringListSection.addEventListener('change', (e) => { if (e.target.matches('input[type="checkbox"][id^="toggle-monitoramento-"]')) { const monitoringId = e.target.dataset.id; const isActive = e.target.checked; toggleMonitoringStatus(monitoringId, isActive); } });
         monitoringListSection.addEventListener('click', (e) => { const targetButton = e.target.closest('.btn-action'); if (targetButton) { const monitoringId = targetButton.dataset.id; if (targetButton.classList.contains('btn-delete')) { deleteMonitoring(monitoringId); } else if (targetButton.classList.contains('btn-configure')) { console.log(`Botão "Configurar" clicado para ${monitoringId}! (Ainda não implementado)`); alert(`Configurar monitoramento ${monitoringId} - Funcionalidade em desenvolvimento.`); } else if (targetButton.classList.contains('btn-test')) { testMonitoring(monitoringId); } } }); }
+
+    // --- Lógica de Polling para Atualização em Tempo Real ---
+    let pollingInterval;
+
+    async function checkMonitoringsForUpdates() {
+        const user = window.auth.currentUser;
+        if (!user) {
+            // Se o usuário não estiver logado, para o polling
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+            return;
+        }
+
+        try {
+            const idToken = await user.getIdToken();
+            const response = await fetch(`${BACKEND_URL}/api/monitoramentos`, {
+                headers: { 'Authorization': `Bearer ${idToken}` }
+            });
+
+            if (!response.ok) {
+                console.error("Erro na verificação periódica de monitoramentos.");
+                return;
+            }
+            
+            const newMonitorings = await response.json();
+            
+            if (JSON.stringify(currentMonitorings) !== JSON.stringify(newMonitorings)) {
+                console.log("Detectadas atualizações nos monitoramentos. Recarregando...");
+                currentMonitorings = newMonitorings;
+                window.loadDashboardDataAndRender();
+            }
+        } catch (error) {
+            console.error("Erro durante a verificação de atualizações:", error);
+        }
+    }
+
+    // Inicia o polling apenas se não estiver rodando
+    if (!pollingInterval) {
+      pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+    }
 });

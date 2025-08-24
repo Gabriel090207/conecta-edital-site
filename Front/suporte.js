@@ -1,5 +1,3 @@
-// suporte.js
-
 document.addEventListener('DOMContentLoaded', () => {
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
 
@@ -153,11 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
             filteredTickets = filteredTickets.filter(ticket => normalizeString(ticket.status) === normalizeString(selectedStatus));
         }
 
-        // Aplica filtro de categoria
+        // APLICA FILTRO DE CATEGORIA (AJUSTADO)
         const selectedCategory = categoryMenu.querySelector('.dropdown-option.active').dataset.value;
         if (selectedCategory !== 'all') {
             const normalizedCategory = normalizeString(selectedCategory);
-            filteredTickets = filteredTickets.filter(ticket => normalizeString(ticket.subject).includes(normalizedCategory));
+            // Aqui é a parte corrigida. Assume que a categoria do ticket vem em `ticket.category`
+            // ou, como fallback, usa o subject se for uma correspondência exata.
+            filteredTickets = filteredTickets.filter(ticket => {
+                const ticketCategory = ticket.category ? normalizeString(ticket.category) : normalizeString(ticket.subject);
+                return ticketCategory.includes(normalizedCategory);
+            });
         }
 
         // Aplica ordenação
@@ -460,15 +463,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         window.addEventListener('click', (e) => {
-            if (!statusToggle.contains(e.target) && !statusMenu.contains(e.target)) {
+            if (statusToggle && statusMenu && !statusToggle.contains(e.target) && !statusMenu.contains(e.target)) {
                 statusMenu.classList.remove('show');
                 statusToggle.classList.remove('active');
             }
-            if (!categoryToggle.contains(e.target) && !categoryMenu.contains(e.target)) {
+            if (categoryToggle && categoryMenu && !categoryToggle.contains(e.target) && !categoryMenu.contains(e.target)) {
                 categoryMenu.classList.remove('show');
                 categoryToggle.classList.remove('active');
             }
-            if (!sortToggle.contains(e.target) && !sortMenu.contains(e.target)) {
+            if (sortToggle && sortMenu && !sortToggle.contains(e.target) && !sortMenu.contains(e.target)) {
                 sortMenu.classList.remove('show');
                 sortToggle.classList.remove('active');
             }
@@ -497,8 +500,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    let pollingInterval;
     async function checkTicketsForUpdates() {
         if (!window.firebase.auth().currentUser) {
+             clearInterval(pollingInterval);
+             pollingInterval = null;
             return;
         }
 
@@ -539,5 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    setInterval(checkTicketsForUpdates, 5000);
+    if (!pollingInterval) {
+      pollingInterval = setInterval(checkTicketsForUpdates, 5000);
+    }
 });

@@ -134,12 +134,14 @@ class Ticket(BaseModel):
     user_email: str
     subject: str
     status: str
+    category: str # NOVO CAMPO
     created_at: datetime
     last_updated_at: datetime
     messages: List[TicketMessage] = []
 
 class NewTicket(BaseModel):
     subject: str
+    category: str # NOVO CAMPO
     initial_message: str
 
 class UserReply(BaseModel):
@@ -862,7 +864,7 @@ async def test_monitoring_endpoint(
         return {"message": "Palavra-chave não encontrada. Verifique se a palavra está correta ou tente outro PDF."}
 
 # ========================================================================================================
-#                                        ROTAS DE SUPORTE
+#                                            ROTAS DE SUPORTE
 # ========================================================================================================
 
 @app.get("/api/tickets", response_model=List[Ticket])
@@ -874,6 +876,7 @@ async def list_user_tickets(user_uid: str = Depends(get_current_user_uid)):
     for doc in tickets_ref.stream():
         ticket_data = doc.to_dict()
         
+        # Converte o timestamp do Firestore para o formato ISO
         if 'created_at' in ticket_data and ticket_data['created_at']:
             ticket_data['created_at'] = ticket_data['created_at'].isoformat()
         if 'last_updated_at' in ticket_data and ticket_data['last_updated_at']:
@@ -883,6 +886,10 @@ async def list_user_tickets(user_uid: str = Depends(get_current_user_uid)):
             for message in ticket_data['messages']:
                 if isinstance(message.get('timestamp'), datetime):
                     message['timestamp'] = message['timestamp'].isoformat()
+
+        # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
+        if 'category' not in ticket_data:
+            ticket_data['category'] = 'Outros'
 
         tickets_list.append(Ticket(id=doc.id, **ticket_data))
 
@@ -911,6 +918,7 @@ async def create_ticket(
         "user_uid": user_uid,
         "user_email": user_email,
         "subject": new_ticket.subject,
+        "category": new_ticket.category, # NOVO CAMPO ADICIONADO AQUI
         "status": "Aguardando",
         "created_at": firestore.SERVER_TIMESTAMP,
         "last_updated_at": firestore.SERVER_TIMESTAMP,
@@ -960,7 +968,7 @@ async def user_reply_to_ticket(
 
 
 # ========================================================================================================
-#                                         ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
+#                                             ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
 # ========================================================================================================
 
 @app.get("/admin/tickets")
@@ -973,6 +981,7 @@ async def list_all_tickets():
     for doc in tickets_ref.stream():
         ticket_data = doc.to_dict()
         
+        # Converte o timestamp do Firestore para o formato ISO
         if 'created_at' in ticket_data and ticket_data['created_at']:
             ticket_data['created_at'] = ticket_data['created_at'].isoformat()
         if 'last_updated_at' in ticket_data and ticket_data['last_updated_at']:
@@ -983,6 +992,10 @@ async def list_all_tickets():
                 if isinstance(message.get('timestamp'), datetime):
                     message['timestamp'] = message['timestamp'].isoformat()
 
+        # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
+        if 'category' not in ticket_data:
+            ticket_data['category'] = 'Outros'
+            
         tickets_list.append(Ticket(id=doc.id, **ticket_data))
 
     return tickets_list
@@ -1143,7 +1156,7 @@ async def get_all_users_for_audit():
     return users_list
     
 # ========================================================================================================
-#                                            ROTAS PARA DICAS
+#                                             ROTAS PARA DICAS
 # ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
 async def create_dica(dica: Dica):
@@ -1203,12 +1216,8 @@ async def record_dica_view(dica_id: str):
     return {"message": "Visualização registrada com sucesso."}
 
 # ========================================================================================================
-#                                            ROTAS PARA FAQ
+#                                             ROTAS PARA FAQ
 # ========================================================================================================
-# ========================================================================================================
-#                                            ROTAS PARA FAQ
-# ========================================================================================================
-
 @app.post("/faq", response_model=FAQ, status_code=201)
 async def create_faq(faq: FAQ):
     db = firestore.client()
