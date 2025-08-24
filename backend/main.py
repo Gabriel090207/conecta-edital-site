@@ -647,8 +647,8 @@ async def create_preference(
     if not plan_info:
         raise HTTPException(status_code=404, detail="Plano não encontrado.")
 
-    YOUR_FRONTEND_BASE_URL = "http://127.0.0.1:5500"
-    YOUR_BACKEND_BASE_URL = "http://127.0.0.1:8000"
+    YOUR_FRONTEND_BASE_URL = "https://siteconectaedital.netlify.app"
+    YOUR_BACKEND_BASE_URL = "https://siteconectaedital.netlify.app"
 
     notification_url = f"{YOUR_BACKEND_BASE_URL}/webhook/mercadopago"
 
