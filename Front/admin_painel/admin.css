@@ -658,7 +658,7 @@ ul { list-style: none; }
 }
 
 .ticket-admin-status.status-fechado {
-    background-color: #6c757d; /* Cinza para "Fechado" */
+    background: linear-gradient(135deg, rgb(148, 148, 148), #50504e); /* Cinza para "Fechado" */
 }
 
 .ticket-admin-status.status-resolvido {

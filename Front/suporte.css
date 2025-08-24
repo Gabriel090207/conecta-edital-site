@@ -1246,6 +1246,9 @@ ul {
     font-size: 0.9rem;
 }
 
+.ticket-status{
+    font-weight: bold;
+}
 /* Status Colors (Exemplo) */
 .ticket-status.status-aberto { color: #007bff; }
 .ticket-status.status-aguardando { color: #ffc107; }
@@ -1476,12 +1479,38 @@ ul {
 }
 
 .ticket-status-tag {
+    background: red;
+    
+    color: white;
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: bold;
     white-space: nowrap;
 }
+
+
+.ticket-status-tag.status-em-atendimento{
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
+}
+
+.ticket-status-tag.status-respondido{
+    background: linear-gradient(135deg, #05bc5b, #00823c);
+}
+
+.ticket-status-tag.status-aguardando{
+    background: linear-gradient(135deg, #ffef60, #ffc13a);
+}
+
+.ticket-status-tag.status-fechado{
+    background: linear-gradient(135deg, rgb(148, 148, 148), #50504e); 
+}
+
+.ticket-status-tag.status-resolvido{
+    background: linear-gradient(135deg, #05bc5b, #00823c);
+}
+
+
 
 .ticket-messages-container {
     border: 1px solid #e0e0e0;
@@ -1509,17 +1538,17 @@ ul {
 }
 
 .message-bubble.sent {
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
+    color: #fff;
     align-self: flex-end;
-    background-color: #007bff;
-    color: white;
-    border-bottom-right-radius: 2px;
+    border-bottom-right-radius: 5px;
 }
 
 .message-bubble.received {
-    align-self: flex-start;
     background-color: #e9ecef;
-    color: #343a40;
-    border-bottom-left-radius: 2px;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
 }
 
 .message-bubble .message-sender {
@@ -1597,7 +1626,7 @@ ul {
 }
 
 .btn-send-reply {
-    background-color: #28a745;
+    background: linear-gradient(135deg, #05bc5b, #00823c);
     color: white;
     border: none;
 }
