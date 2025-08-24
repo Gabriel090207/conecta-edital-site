@@ -1,7 +1,7 @@
 // suporte.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    const BACKEND_URL = "http://127.0.0.1:8000";
+    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
 
     const createTicketModal = document.getElementById('create-ticket-modal');
     const openNewChamadoBtn = document.querySelector('#open-new-chamado-btn');
