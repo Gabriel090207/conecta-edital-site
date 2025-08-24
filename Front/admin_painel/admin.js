@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentViewingTicket = null;
     let allDicas = [];
     let allFaqs = [];
-    let pollInterval; // Variável para armazenar o intervalo de polling
 
     const totalUsersPlansSpan = document.getElementById('total-users-plans');
     const noPlanPercentageSpan = document.getElementById('no-plan-percentage');
@@ -105,7 +104,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (modalElement === ticketDetailModal) {
                 currentViewingTicket = null;
-                stopPolling();
             }
         }
     }
@@ -125,76 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     });
-    
-    // Funções de Polling para tickets
-    function startPolling(ticketId) {
-        // Limpa qualquer polling anterior para evitar duplicação
-        stopPolling();
-        // Inicia o novo polling, verificando a cada 5 segundos
-        pollInterval = setInterval(() => {
-            fetchAndRenderMessages(ticketId);
-        }, 5000); 
-    }
-
-    function stopPolling() {
-        clearInterval(pollInterval);
-    }
-
-    async function fetchAndRenderMessages(ticketId) {
-        if (!ticketMessagesContainer) return;
-        
-        // Mostra uma mensagem de carregamento na primeira vez
-        if (ticketMessagesContainer.innerHTML === '') {
-            ticketMessagesContainer.innerHTML = '<p class="loading-messages-message">Carregando mensagens...</p>';
-        }
-
-        try {
-            const response = await fetch(`${BACKEND_URL}/admin/tickets/${ticketId}`);
-            if (!response.ok) {
-                throw new Error(`Erro ao buscar mensagens: status ${response.status}`);
-            }
-            const ticket = await response.json();
-            
-            // Atualiza o ticket na lista local
-            const index = allTickets.findIndex(t => t.id === ticketId);
-            if (index !== -1) {
-                allTickets[index] = ticket;
-                currentViewingTicket = ticket;
-            }
-
-            // Atualiza a visualização do modal
-            ticketMessagesContainer.innerHTML = '';
-            ticket.messages.forEach(message => {
-                const messageBubble = document.createElement('div');
-                const messageClass = message.sender === 'admin' ? 'admin-message' : 'user-message';
-                messageBubble.classList.add('message-bubble', messageClass);
-                
-                let formattedMsgDate;
-                if (message.timestamp) {
-                    formattedMsgDate = new Date(message.timestamp).toLocaleString('pt-BR');
-                } else {
-                    formattedMsgDate = 'Data Desconhecida';
-                }
-
-                const senderName = message.sender === 'admin' ? 'Admin' : 'Utilizador';
-                
-                messageBubble.innerHTML = `
-                    <span class="message-sender">${senderName}</span>
-                    <p class="message-text">${message.text}</p>
-                    <span class="message-timestamp">${formattedMsgDate}</span>
-                `;
-                ticketMessagesContainer.appendChild(messageBubble);
-            });
-            ticketMessagesContainer.scrollTop = ticketMessagesContainer.scrollHeight;
-
-        } catch (error) {
-            console.error("Erro ao carregar mensagens:", error);
-            if (ticketMessagesContainer.innerHTML.includes('Carregando')) {
-                ticketMessagesContainer.innerHTML = '<p class="error-message">Erro ao carregar mensagens. Tente novamente.</p>';
-            }
-        }
-    }
-
 
     // Funções da página principal (estatísticas)
     async function fetchAdminStats() {
@@ -348,11 +276,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         ticketDetailUserEmail.textContent = ticket.user_email;
         changeStatusSelect.value = ticket.status;
 
+        ticketMessagesContainer.innerHTML = '';
+        ticket.messages.forEach(message => {
+            const messageBubble = document.createElement('div');
+            const messageClass = message.sender === 'admin' ? 'admin-message' : 'user-message';
+            messageBubble.classList.add('message-bubble', messageClass);
+            
+            let formattedMsgDate;
+            if (message.timestamp) {
+                formattedMsgDate = new Date(message.timestamp).toLocaleString('pt-BR');
+            } else {
+                formattedMsgDate = 'Data Desconhecida';
+            }
+
+            const senderName = message.sender === 'admin' ? 'Admin' : 'Utilizador';
+            
+            messageBubble.innerHTML = `
+                <span class="message-sender">${senderName}</span>
+                <p class="message-text">${message.text}</p>
+                <span class="message-timestamp">${formattedMsgDate}</span>
+            `;
+            ticketMessagesContainer.appendChild(messageBubble);
+        });
+        ticketMessagesContainer.scrollTop = ticketMessagesContainer.scrollHeight;
+
         openModal(ticketDetailModal);
-        
-        // Inicia o polling e a primeira renderização
-        await fetchAndRenderMessages(ticketId);
-        startPolling(ticketId);
     }
 
     async function sendAdminReply() {
@@ -370,7 +318,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         sendAdminReplyBtn.disabled = true;
         sendAdminReplyBtn.textContent = "Enviando...";
 
-        // Atualização otimista da UI
         const newMessage = {
             sender: 'admin',
             text: replyText,
@@ -378,7 +325,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             attachments: []
         };
         currentViewingTicket.messages.push(newMessage);
-        fetchAndRenderMessages(currentViewingTicket.id);
+        openTicketDetailAdminModal(currentViewingTicket.id);
         adminReplyMessageInput.value = '';
 
         try {
@@ -398,22 +345,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const updatedTicketData = await response.json();
             console.log("Resposta enviada, ticket atualizado:", updatedTicketData);
 
-            // Atualiza o ticket na lista global para refletir o status e a mensagem
-            const ticketIndex = allTickets.findIndex(t => t.id === currentViewingTicket.id);
-            if (ticketIndex !== -1) {
-                allTickets[ticketIndex] = updatedTicketData;
-                renderTicketsList(allTickets);
-            }
-            
-            // Re-renderiza as mensagens para garantir que tudo está sincronizado
-            await fetchAndRenderMessages(currentViewingTicket.id);
+            await loadAllTickets();
 
         } catch (error) {
             console.error("Erro ao enviar resposta do admin:", error);
             alert(`Erro ao enviar resposta: ${error.message}`);
-            // Reverte a atualização otimista em caso de erro
             currentViewingTicket.messages.pop();
-            await fetchAndRenderMessages(currentViewingTicket.id);
+            openTicketDetailAdminModal(currentViewingTicket.id);
         } finally {
             sendAdminReplyBtn.disabled = false;
             sendAdminReplyBtn.innerHTML = originalButtonHtml;
@@ -848,4 +786,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             changeTicketStatus(e.target.value);
         });
     }
+
+    // --- Lógica de Polling para Atualização em Tempo Real ---
+
+    async function checkAdminTicketsForUpdates() {
+        // Só verifica se o modal de tickets estiver aberto
+        if (!allTicketsModal || !allTicketsModal.classList.contains('show-modal')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/admin/tickets`, {
+                headers: {
+                    "ngrok-skip-browser-warning": "true"
+                }
+            });
+            if (!response.ok) {
+                console.error("Erro na verificação periódica de tickets do admin.");
+                return;
+            }
+            
+            const newTickets = await response.json();
+            
+            // Verifica se houve alguma alteração (ex: nova mensagem, status alterado)
+            if (JSON.stringify(allTickets) !== JSON.stringify(newTickets)) {
+                console.log("Detectadas atualizações nos tickets do admin. Recarregando...");
+                allTickets = newTickets; // Atualiza a lista de tickets local
+                renderTicketsList(allTickets); // Renderiza a lista principal
+
+                // Se o modal de detalhes do ticket estiver aberto, atualize ele também
+                if (ticketDetailModal.classList.contains('show-modal') && currentViewingTicket) {
+                    const updatedTicket = allTickets.find(t => t.id === currentViewingTicket.id);
+                    if (updatedTicket) {
+                        openTicketDetailAdminModal(updatedTicket.id);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Erro durante a verificação de atualizações:", error);
+        }
+    }
+
+    // Chame a função a cada 5 segundos (5000 milissegundos)
+    setInterval(checkAdminTicketsForUpdates, 5000);
 });
