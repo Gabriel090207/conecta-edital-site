@@ -13,13 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let allFaqs = [];
 
-    // FUNÇÃO AUXILIAR CORRIGIDA: Adicionada a função normalizeString
+    // FUNÇÃO AUXILIAR: Normaliza a string para comparação
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
-    // --- Lógica do Chatbot (mantida) ---
+    // --- Lógica do Chatbot ---
     const API_KEY = "AIzaSyDdc58E9UU-By8hKQOYPRhuR1arEZT2JTg";
     const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=";
     const SITE_CONTEXT = `
@@ -221,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Função para buscar os FAQs do backend
     async function fetchAndRenderFaqs() {
         if (!faqListContainer) return;
+        // CORREÇÃO: Limpa o contêiner de FAQs antes de renderizar
         faqListContainer.innerHTML = '<p class="loading-message">Carregando perguntas frequentes...</p>';
         try {
             const response = await fetch(`${BACKEND_URL}/faq`);
@@ -235,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderFaqs(faqsToRender) {
         if (!faqListContainer) return;
-        faqListContainer.innerHTML = '';
+        faqListContainer.innerHTML = ''; // Limpa o contêiner
         if (faqsToRender.length === 0) {
             faqListContainer.innerHTML = '<p class="no-results-message">Nenhuma pergunta encontrada.</p>';
             return;
@@ -246,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const popularTag = faq.popular ? `<span><i class="fas fa-fire"></i> Pergunta popular</span>` : '';
             
-            // Usando normalizeString para as categorias do filtro
             const normalizedCategory = faq.categoria ? normalizeString(faq.categoria) : '';
             faqItem.dataset.category = normalizedCategory;
 
@@ -278,12 +278,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const answer = item.querySelector('.faq-answer');
             question.addEventListener('click', () => {
                 const isActive = item.classList.contains('active');
-                
                 faqItems.forEach(otherItem => {
                     otherItem.classList.remove('active');
                     otherItem.querySelector('.faq-answer').style.maxHeight = '0';
                 });
-
                 if (!isActive) {
                     item.classList.add('active');
                     answer.style.maxHeight = answer.scrollHeight + 30 + 'px';
