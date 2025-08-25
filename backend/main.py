@@ -505,7 +505,7 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
     """
     print(f"Buscando monitoramentos para UID: {user_uid}")
     db_firestore_client = firestore.client()
-    monitorings_ref = db.collection('monitorings').where('user_uid', '==', user_uid)
+    monitorings_ref = db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid))
     monitorings_docs = monitorings_ref.stream()
     
     monitorings_list = []
@@ -522,7 +522,7 @@ async def create_personal_monitoramento(
     user_uid: str = Depends(get_current_user_uid)
 ):
     db_firestore_client = firestore.client()
-    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where('user_uid', '==', user_uid).stream()))
+    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).stream()))
     
     user_plan_for_creation = await get_user_plan_from_firestore(user_uid)
     max_slots = get_max_slots_by_plan(user_plan_for_creation)
@@ -577,7 +577,7 @@ async def create_radar_monitoramento(
     user_uid: str = Depends(get_current_user_uid)
 ):
     db_firestore_client = firestore.client()
-    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where('user_uid', '==', user_uid).stream()))
+    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).stream()))
     
     user_plan_for_creation = await get_user_plan_from_firestore(user_uid)
     max_slots = get_max_slots_by_plan(user_plan_for_creation)
@@ -744,8 +744,8 @@ async def mercadopago_webhook(request: Request):
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
     db_firestore_client = firestore.client()
     user_plan = await get_user_plan_from_firestore(user_uid)
-    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where('user_uid', '==', user_uid).stream()))
-    monitorings_active_count = len(list(db_firestore_client.collection('monitorings').where('user_uid', '==', user_uid).where('status', '==', 'active').stream()))
+    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).stream()))
+    monitorings_active_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).where(filter=FieldFilter('status', '==', 'active')).stream()))
     
     display_plan_name = "Sem Plano"
     if user_plan == 'basico':
@@ -871,7 +871,7 @@ async def test_monitoring_endpoint(
 @app.get("/api/tickets", response_model=List[Ticket])
 async def list_user_tickets(user_uid: str = Depends(get_current_user_uid)):
     db = firestore.client()
-    tickets_ref = db.collection('tickets').where('user_uid', '==', user_uid).order_by('last_updated_at', direction=firestore.Query.DESCENDING)
+    tickets_ref = db.collection('tickets').where(filter=FieldFilter('user_uid', '==', user_uid)).order_by('last_updated_at', direction=firestore.Query.DESCENDING)
     
     tickets_list = []
     for doc in tickets_ref.stream():
