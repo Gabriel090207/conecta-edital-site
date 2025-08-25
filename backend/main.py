@@ -55,7 +55,13 @@ app = FastAPI(
 )
 
 # Configuração do CORS (CORRIGIDO AQUI)
-origins = ["http://127.0.0.1:5500", "http://localhost:5500", "https://conecta-edital-site.onrender.com"]
+origins = [
+    "http://127.0.0.1:5500", 
+    "http://localhost:5500", 
+    "https://conecta-edital-site.onrender.com", 
+    "https://conectaconectaedital.netlify.app",
+    "https://siteconectaedital.netlify.app/monitoramento" # Adicione o seu domínio Netlify aqui
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -1241,8 +1247,8 @@ async def create_faq(faq: FAQ):
 @app.get("/faq", response_model=List[FAQ])
 async def list_faqs():
     db = firestore.client()
-    # CORREÇÃO AQUI: Ordena por `data_criacao` para garantir que todos os FAQs sejam encontrados.
-    faqs_ref = db.collection('faq').order_by('data_criacao', direction=firestore.Query.DESCENDING)
+    # CORREÇÃO AQUI: Ordena por `popular` e depois por `data_criacao` para exibir no topo.
+    faqs_ref = db.collection('faq').order_by('popular', direction=firestore.Query.DESCENDING).order_by('data_criacao', direction=firestore.Query.DESCENDING)
     faqs_list = []
     for doc in faqs_ref.stream():
         faqs_list.append(FAQ(id=doc.id, **doc.to_dict()))
