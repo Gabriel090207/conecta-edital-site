@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conecta Edital - Ajuda e FAQ</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="monitoramento.css"> 
-    <link rel="stylesheet" href="ajuda.css"> 
-    <link rel="stylesheet" href="planos.css"> 
+    <link rel="stylesheet" href="monitoramento.css">
+    <link rel="stylesheet" href="ajuda.css">
+    <link rel="stylesheet" href="planos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -25,15 +25,15 @@
                     <li><a href="planos.html"><i class="fas fa-clipboard-list"></i> Planos</a></li>
                     <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
                     <li><a href="suporte.html"><i class="fas fa-question-circle"></i> Suporte</a></li>
-                    <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li> 
+                    <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
                 </ul>
             </nav>
             <div class="navbar-right">
                 <a href="#" class="notification-icon"><i class="fas fa-bell"></i></a>
-                <div class="user-menu" id="user-dropdown-toggle"> 
-                    <span class="user-avatar" id="userDefaultAvatar"></span> 
-                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
-                    <span id="userNameDisplay">Carregando...</span> 
+                <div class="user-menu" id="user-dropdown-toggle">
+                    <span class="user-avatar" id="userDefaultAvatar"></span>
+                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;">
+                    <span id="userNameDisplay">Carregando...</span>
                     <i class="fas fa-chevron-down"></i>
                     <div class="dropdown-content">
                         <h3 class="olausuario">Olá, Usuário!</h3>
@@ -56,29 +56,28 @@
                 <p>Encontre respostas rápidas para suas dúvidas.</p>
             </div>
         </div>
-    
+        <div class="search-filter-section">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-faq-input" placeholder="Buscar por artigos, palavras-chave...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="todos"><i class="fas fa-list-ul"></i> Todos</button>
+                <button class="filter-btn tag-geral" data-filter="geral"><i class="fas fa-globe"></i> Geral</button>
+                <button class="filter-btn tag-monitoramento" data-filter="monitoramento"><i class="fas fa-chart-line"></i> Monitoramento</button>
+                <button class="filter-btn tag-planos" data-filter="planos"><i class="fas fa-clipboard-list"></i> Planos</button>
+            </div>
+        </div>
         <div class="main-content-wrapper">
             <section class="faq-section-ajuda">
-                <div class="search-filter-section">
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="search-faq-input" placeholder="Buscar por artigos, palavras-chave...">
-                    </div>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" data-filter="todos"><i class="fas fa-list-ul"></i> Todos</button>
-                        <button class="filter-btn tag-geral" data-filter="geral"><i class="fas fa-globe"></i> Geral</button>
-                        <button class="filter-btn tag-monitoramento" data-filter="monitoramento"><i class="fas fa-chart-line"></i> Monitoramento</button>
-                        <button class="filter-btn tag-planos" data-filter="planos"><i class="fas fa-clipboard-list"></i> Planos</button>
-                    </div>
-                </div>
                 <div class="faq-accordion" id="faq-list-container">
                     <p class="loading-message">Carregando perguntas frequentes...</p>
                 </div>
             </section>
-    
             <aside class="chatbot-section">
                 <div class="chatbot-header">
-                    <div class="chatbot-avatar-icon"><i class="fas fa-robot"></i></div> <div class="chatbot-info">
+                    <div class="chatbot-avatar-icon"><i class="fas fa-robot"></i></div>
+                    <div class="chatbot-info">
                         <h4>Conectinha</h4>
                         <span>Sua assistente de IA</span>
                     </div>
@@ -103,9 +102,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-    <script src="firebase-config.js"></script> 
+    <script src="firebase-config.js"></script>
     <script src="common-auth-ui.js"></script>
     <script src="ajuda.js"></script>
-  
+
 </body>
 </html>
