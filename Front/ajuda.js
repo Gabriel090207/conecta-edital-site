@@ -216,12 +216,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- Lógica do FAQ (NOVO) ---
-    let allFaqs = [];
+
+
+    // NOVO: Função para registrar a visualização no backend
+    async function recordFaqView(faqId) {
+        try {
+            await fetch(`${BACKEND_URL}/faq/${faqId}/visualizacao`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log(`Visualização registrada para o FAQ: ${faqId}`);
+        } catch (error) {
+            console.error("Erro ao registrar visualização:", error);
+        }
+    }
 
     // Função para buscar os FAQs do backend
     async function fetchAndRenderFaqs() {
         if (!faqListContainer) return;
-        // CORREÇÃO: Limpa o contêiner de FAQs antes de renderizar
         faqListContainer.innerHTML = '<p class="loading-message">Carregando perguntas frequentes...</p>';
         try {
             const response = await fetch(`${BACKEND_URL}/faq`);
@@ -236,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderFaqs(faqsToRender) {
         if (!faqListContainer) return;
-        faqListContainer.innerHTML = ''; // Limpa o contêiner
+        faqListContainer.innerHTML = '';
         if (faqsToRender.length === 0) {
             faqListContainer.innerHTML = '<p class="no-results-message">Nenhuma pergunta encontrada.</p>';
             return;
@@ -245,10 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const faqItem = document.createElement('div');
             faqItem.classList.add('faq-item');
             
-            const popularTag = faq.popular ? `<span><i class="fas fa-fire"></i> Pergunta popular</span>` : '';
+            const popularTagHtml = faq.popular ? `<span class="popular-tag"><i class="fas fa-star"></i> Pergunta popular</span>` : '';
             
             const normalizedCategory = faq.categoria ? normalizeString(faq.categoria) : '';
             faqItem.dataset.category = normalizedCategory;
+            faqItem.dataset.id = faq.id;
 
             faqItem.innerHTML = `
                 <div class="faq-question">
@@ -258,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="faq-meta">
                     <span><i class="fas fa-eye"></i> ${faq.visualizacoes} visualizações</span>
-                    ${popularTag}
+                    ${popularTagHtml}
                 </div>
                 <div class="faq-answer">
                     <p>${faq.resposta}</p>
@@ -278,13 +291,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const answer = item.querySelector('.faq-answer');
             question.addEventListener('click', () => {
                 const isActive = item.classList.contains('active');
+                
                 faqItems.forEach(otherItem => {
                     otherItem.classList.remove('active');
                     otherItem.querySelector('.faq-answer').style.maxHeight = '0';
                 });
+
                 if (!isActive) {
                     item.classList.add('active');
                     answer.style.maxHeight = answer.scrollHeight + 30 + 'px';
+                    
+                    // NOVO: Chama a função para registrar a visualização
+                    const faqId = item.dataset.id;
+                    if (faqId) {
+                        recordFaqView(faqId);
+                        // Atualiza a contagem localmente
+                        const viewsSpan = item.querySelector('.faq-meta span');
+                        let currentViews = parseInt(viewsSpan.textContent.match(/\d+/)[0]);
+                        viewsSpan.innerHTML = `<i class="fas fa-eye"></i> ${currentViews + 1} visualizações`;
+                    }
                 }
             });
         });
