@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchFaqInput = document.querySelector('.search-bar input');
     const filterButtons = document.querySelectorAll('.filter-buttons button');
     
-    let allFaqs = [];
+   
 
     // FUNÇÃO AUXILIAR: Normaliza a string para comparação
     function normalizeString(str) {
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- Lógica do FAQ (NOVO) ---
-
+    let allFaqs = [];
 
     // NOVO: Função para registrar a visualização no backend
     async function recordFaqView(faqId) {
@@ -239,6 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${BACKEND_URL}/faq`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             allFaqs = await response.json();
+
+            // LÓGICA DE ORDENAÇÃO: Coloca as perguntas populares no topo
+            allFaqs.sort((a, b) => {
+                if (a.popular && !b.popular) return -1; // a vem antes de b
+                if (!a.popular && b.popular) return 1; // b vem antes de a
+                return 0; // mantém a ordem relativa
+            });
+
             renderFaqs(allFaqs);
         } catch (error) {
             console.error("Erro ao carregar FAQs:", error);
@@ -257,20 +265,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const faqItem = document.createElement('div');
             faqItem.classList.add('faq-item');
             
-            const popularTagHtml = faq.popular ? `<span class="popular-tag"><i class="fas fa-star"></i> Pergunta popular</span>` : '';
+            const popularTagHtml = faq.popular ? `<span class="popular-tag"><i class="fas fa-fire"></i> Pergunta popular</span>` : '';
             
             const normalizedCategory = faq.categoria ? normalizeString(faq.categoria) : '';
             faqItem.dataset.category = normalizedCategory;
             faqItem.dataset.id = faq.id;
 
+            const iconClass = faq.popular ? 'popular-icon-bg' : 'help-icon-bg';
+            const iconElement = faq.popular ? '<i class="fas fa-fire"></i>' : '<i class="fas fa-question-circle"></i>';
+
             faqItem.innerHTML = `
                 <div class="faq-question">
-                    <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
+                    <div class="faq-icon-wrapper ${iconClass}">${iconElement}</div>
                     <h3>${faq.pergunta}</h3>
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-meta">
-                    <span><i class="fas fa-eye"></i> ${faq.visualizacoes} visualizações</span>
+                    <span class="views-counter" data-faq-id="${faq.id}"><i class="fas fa-eye"></i> ${faq.visualizacoes} visualizações</span>
                     ${popularTagHtml}
                 </div>
                 <div class="faq-answer">
@@ -280,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
             faqListContainer.appendChild(faqItem);
         });
 
-        // Re-atribui listeners após a renderização
         attachAccordionListeners();
     }
 
@@ -301,12 +311,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.classList.add('active');
                     answer.style.maxHeight = answer.scrollHeight + 30 + 'px';
                     
-                    // NOVO: Chama a função para registrar a visualização
                     const faqId = item.dataset.id;
                     if (faqId) {
                         recordFaqView(faqId);
-                        // Atualiza a contagem localmente
-                        const viewsSpan = item.querySelector('.faq-meta span');
+                        const viewsSpan = item.querySelector('.faq-meta .views-counter');
                         let currentViews = parseInt(viewsSpan.textContent.match(/\d+/)[0]);
                         viewsSpan.innerHTML = `<i class="fas fa-eye"></i> ${currentViews + 1} visualizações`;
                     }
@@ -329,7 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFaqs(filteredFaqs);
     }
 
-    // Listeners para a busca e filtros
     if (searchFaqInput) {
         searchFaqInput.addEventListener('input', filterFaqs);
     }
@@ -343,6 +350,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Carrega os FAQs quando a página é carregada
     fetchAndRenderFaqs();
 });

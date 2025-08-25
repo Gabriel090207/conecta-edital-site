@@ -1060,7 +1060,23 @@ ul { list-style: none; }
     display: block;
     font-weight: 500;
     margin-bottom: 8px;
-    color: #555;
+    color: 
+    #555;
+    
+}
+
+.oi {position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    padding: 5px 0;
+    z-index: 10;
+    display: none;
+    flex-direction: column;
 }
 .form-group input, .form-group textarea, .form-group select {
     width: 100%;
@@ -1081,13 +1097,18 @@ ul { list-style: none; }
     margin-top: 20px;
 }
 .btn-cancel {
-    background-color: #6c757d;
-    color: #fff;
+    border: none;
+    background: linear-gradient(135deg,#ff3a3a, #b31818); ; 
+    color: white; 
+    border-radius: 4px; 
 }
 .btn-submit {
-    background-color: #007bff;
-    color: #fff;
+    border: none;
+    background: linear-gradient(135deg,#3a68ff, #0427c1); ; 
+    color: white; 
+    border-radius: 4px;
 }
+
 
 
 
@@ -1142,16 +1163,31 @@ ul { list-style: none; }
     font-size: 14px;
     margin-left: 10px;
 }
-.faq-card .faq-actions .btn-edit { color: #007bff; }
-.faq-card .faq-actions .btn-delete { color: #dc3545; }
+.faq-card .faq-actions .btn-edit { background: linear-gradient(135deg,#3a68ff, #0427c1); ; 
+    color: white; 
+    border-radius: 4px;}
+
+.faq-card .faq-actions .btn-delete {    background: linear-gradient(135deg,#ff3a3a, #b31818); ; 
+    color: white; 
+    border-radius: 4px; }
 
 /* Estilos para o formulário */
-#faq-form .form-group label input[type="checkbox"] {
-    margin-right: 5px;
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adiciona um espaço entre o checkbox e o texto */
 }
 
+/* Opcional: Aumenta o tamanho do checkbox para combinar com o design */
+.form-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+
 .btn-new-faq {
-    background-color: #ffc107;
+    background: linear-gradient(135deg, #f7ed64, #d8701b);
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -1163,7 +1199,7 @@ ul { list-style: none; }
     gap: 10px;
     margin-bottom: 20px;
 }
-.btn-new-faq:hover { background-color: #e0a800; }
+.btn-new-faq:hover {   background: linear-gradient(135deg, #e0a800, #e0a800); }
 
 
 /* --- ESTILOS PARA A BARRA DE PESQUISA DO ADMIN --- */
