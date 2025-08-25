@@ -1240,7 +1240,8 @@ async def create_faq(faq: FAQ):
 @app.get("/faq", response_model=List[FAQ])
 async def list_faqs():
     db = firestore.client()
-    faqs_ref = db.collection('faq').order_by('visualizacoes', direction=firestore.Query.DESCENDING)
+    # CORREÇÃO AQUI: Ordena por `data_criacao` para garantir que todos os FAQs sejam encontrados.
+    faqs_ref = db.collection('faq').order_by('data_criacao', direction=firestore.Query.DESCENDING)
     faqs_list = []
     for doc in faqs_ref.stream():
         faqs_list.append(FAQ(id=doc.id, **doc.to_dict()))
