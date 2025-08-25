@@ -5,13 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const openNewChamadoBtn = document.querySelector('#open-new-chamado-btn');
     const createTicketForm = document.getElementById('create-ticket-form');
     const createTicketSubmitBtn = document.getElementById('create-ticket-submit-btn');
+    const newTicketCategorySelect = document.getElementById('ticket-category'); // CORRIGIDO AQUI!
 
     const ticketSubject = document.getElementById('ticket-subject');
     const ticketDescription = document.getElementById('ticket-description');
     const ticketsListContainer = document.getElementById('tickets-list-container');
     const noTicketsMessage = document.getElementById('no-tickets-message');
 
-    const ticketDetailModal = document.getElementById('ticket-detail-modal');
+    const ticketDetailModal = document = document.getElementById('ticket-detail-modal');
     const ticketDetailTitle = document.getElementById('ticket-detail-title');
     const ticketDetailCreatedAt = document.getElementById('ticket-detail-created-at');
     const ticketDetailStatusTag = document.getElementById('ticket-detail-status-tag');
@@ -155,11 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCategory = categoryMenu.querySelector('.dropdown-option.active').dataset.value;
         if (selectedCategory !== 'all') {
             const normalizedCategory = normalizeString(selectedCategory);
-            // Aqui é a parte corrigida. Assume que a categoria do ticket vem em `ticket.category`
-            // ou, como fallback, usa o subject se for uma correspondência exata.
+            // Agora usa o campo 'category' retornado pelo backend
             filteredTickets = filteredTickets.filter(ticket => {
-                const ticketCategory = ticket.category ? normalizeString(ticket.category) : normalizeString(ticket.subject);
-                return ticketCategory.includes(normalizedCategory);
+                const ticketCategory = normalizeString(ticket.category || 'Outros');
+                return ticketCategory === normalizedCategory;
             });
         }
 
@@ -347,6 +347,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            const newTicketCategory = newTicketCategorySelect ? newTicketCategorySelect.value : "Outros";
+            if (!newTicketCategory || newTicketCategory === "") {
+                 alert('Por favor, selecione uma categoria.');
+                 return;
+            }
+
             createTicketSubmitBtn.disabled = true;
             createTicketSubmitBtn.textContent = 'Enviando...';
             
@@ -360,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const newTicketData = {
                 subject: ticketSubject.value.trim(),
+                category: newTicketCategory,
                 initial_message: ticketDescription.value.trim()
             };
 

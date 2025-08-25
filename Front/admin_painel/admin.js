@@ -87,6 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const faqCategoriaSelect = document.getElementById('faq-categoria');
     const faqPopularCheckbox = document.getElementById('faq-popular');
 
+    // Referência para a nova barra de pesquisa
+    const ticketSearchAdminInput = document.getElementById('ticket-search-admin');
+
     // Funções auxiliares de modal
     function openModal(modalElement) {
         if (modalElement) {
@@ -204,13 +207,40 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             allTickets = await response.json();
+            
+            // Renderiza a lista inicial completa
             renderTicketsList(allTickets);
+
         } catch (error) {
             console.error("Erro ao carregar tickets:", error);
             if (ticketsListAdmin) {
                 ticketsListAdmin.innerHTML = '<p class="error-message">Erro ao carregar tickets. Tente novamente.</p>';
             }
         }
+    }
+    
+    function normalizeString(str) {
+        if (!str) return '';
+        return str.toLowerCase()
+                  .normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/[^a-z0-9-]/g, '')
+                  .trim();
+    }
+
+    // NOVA FUNÇÃO DE FILTRAGEM
+    function applySearchFilter(searchTerm) {
+        let filteredTickets = [...allTickets];
+        
+        if (searchTerm) {
+            const normalizedSearchTerm = normalizeString(searchTerm);
+            filteredTickets = filteredTickets.filter(ticket =>
+                normalizeString(ticket.subject).includes(normalizedSearchTerm) ||
+                normalizeString(ticket.id).includes(normalizedSearchTerm) ||
+                (ticket.messages && ticket.messages.some(msg => normalizeString(msg.text).includes(normalizedSearchTerm)))
+            );
+        }
+        renderTicketsList(filteredTickets);
     }
 
     function renderTicketsList(tickets) {
@@ -438,7 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             noAuditUsers.textContent = 'Nenhum usuário encontrado com este e-mail.';
             return;
         }
-        noAuditUsers.style.display = 'none';
+        noUsers.style.display = 'none';
         usersToRender.forEach(user => {
             const userCard = document.createElement('div');
             userCard.classList.add('user-audit-card');
@@ -656,8 +686,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            
+            // Remove o FAQ da lista local e renderiza novamente
+            allFaqs = allFaqs.filter(faq => faq.id !== id);
+            renderFaqs(allFaqs);
     
-            loadFaqs();
             alert("FAQ excluído com sucesso!");
         } catch (error) {
             console.error("Erro ao excluir FAQ:", error);
@@ -673,6 +706,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         viewTicketsBtn.addEventListener('click', () => {
             openModal(allTicketsModal);
             loadAllTickets();
+        });
+    }
+
+    if (ticketSearchAdminInput) {
+        ticketSearchAdminInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            applySearchFilter(searchTerm);
         });
     }
 
@@ -738,6 +778,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadFaqs();
         });
     }
+    
+    if (openNewFaqBtn) {
+        openNewFaqBtn.addEventListener('click', () => {
+            console.log("admin.js: Botão 'Nova Pergunta' clicado.");
+            openNewFaqModal();
+        });
+    }
 
     if (faqForm) {
         faqForm.addEventListener('submit', async (e) => {
@@ -766,8 +813,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
+                const newFaq = await response.json();
+                
                 closeModal(faqFormModal);
-                loadFaqs();
+                
+                // Atualiza a lista localmente para refletir a mudança
+                if (id) {
+                    const index = allFaqs.findIndex(f => f.id === id);
+                    if (index !== -1) allFaqs[index] = newFaq;
+                } else {
+                    allFaqs.push(newFaq);
+                }
+                renderFaqs(allFaqs);
+                
                 alert(`FAQ ${id ? 'editado' : 'criado'} com sucesso!`);
             } catch (error) {
                 console.error("Erro ao salvar FAQ:", error);
@@ -812,7 +870,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (JSON.stringify(allTickets) !== JSON.stringify(newTickets)) {
                 console.log("Detectadas atualizações nos tickets do admin. Recarregando...");
                 allTickets = newTickets; // Atualiza a lista de tickets local
-                renderTicketsList(allTickets); // Renderiza a lista principal
+                
+                // Reaplica o filtro de busca se houver algum termo
+                const searchTerm = ticketSearchAdminInput ? ticketSearchAdminInput.value.trim() : '';
+                applySearchFilter(searchTerm);
 
                 // Se o modal de detalhes do ticket estiver aberto, atualize ele também
                 if (ticketDetailModal.classList.contains('show-modal') && currentViewingTicket) {

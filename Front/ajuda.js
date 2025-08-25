@@ -1,19 +1,21 @@
-// ajuda.js
-
 document.addEventListener('DOMContentLoaded', () => {
+    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+
     const chatMessages = document.getElementById('chat-messages');
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
-    const suggestionButtons = document.querySelectorAll('.suggestion-button'); 
+    const suggestionButtons = document.querySelectorAll('.suggestion-button');
 
-    // IMPORTANTE: Para testes LOCALMENTE, sua chave de API foi inserida aqui.
-    // Quando você for implantar isso em um ambiente de produção ou no próprio ambiente Canvas,
-    // você DEVE remover a sua chave de API diretamente do código por segurança.
-    const API_KEY = "AIzaSyDdc58E9UU-By8hKQOYPRhuR1arEZT2JTg"; 
+    // Referências aos elementos do FAQ
+    const faqListContainer = document.getElementById('faq-list-container');
+    const searchFaqInput = document.querySelector('.search-bar input');
+    const filterButtons = document.querySelectorAll('.filter-buttons button');
+    
+    let allFaqs = [];
+
+    // --- Lógica do Chatbot (mantida) ---
+    const API_KEY = "AIzaSyDdc58E9UU-By8hKQOYPRhuR1arEZT2JTg";
     const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=";
-
-    // Contexto do site para a IA (Base de Conhecimento)
-    // Isso será enviado para a IA para que ela possa responder com base nessas informações.
     const SITE_CONTEXT = `
         Você é a Conectinha, a assistente de IA do Conecta Edital. Sua função é ajudar usuários com dúvidas sobre a plataforma.
         Responda de forma amigável, concisa e informativa, usando apenas as informações fornecidas. Se a pergunta estiver fora do seu conhecimento, diga que não tem essa informação.
@@ -50,25 +52,17 @@ document.addEventListener('DOMContentLoaded', () => {
         - "Vocês monitoram Diários Oficiais?" -> "Sim, a Conectinha e nossa IA varrem Diários Oficiais e sites de bancas 24/7 para você."
     `;
 
-    // Array para armazenar o histórico de mensagens para persistência
     let persistedChatHistory = [];
 
-    // Função para remover a formatação Markdown e substituir por negrito HTML
     function formatMarkdown(text) {
-        // CORREÇÃO: Usa uma regex para substituir **texto** por <strong>texto</strong>
-        // Isso garante que apenas o conteúdo entre os asteriscos seja formatado.
         let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         return formattedText;
     }
 
-    // Função para adicionar uma mensagem ao chat UI e ao histórico persistente
     function addMessage(sender, text, save = true) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', sender);
-        
-        // CORREÇÃO: Aplica a função de formatação antes de inserir no HTML
         messageElement.innerHTML = `<p>${formatMarkdown(text)}</p>`;
-        
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -78,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Função para exibir/ocultar o indicador de carregamento
     function showLoadingIndicator(show) {
         let loadingElement = document.getElementById('loading-indicator');
         if (!loadingElement) {
@@ -96,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Função para enviar a pergunta para a IA
     async function sendQuestionToAI(question) {
         addMessage('sent', question);
         userInput.value = '';
@@ -196,138 +188,135 @@ document.addEventListener('DOMContentLoaded', () => {
         loadChatHistory();
     }
 
-    // Listeners de Eventos
-    sendButton.addEventListener('click', () => {
-        const question = userInput.value.trim();
-        if (question) {
-            sendQuestionToAI(question);
-        }
-    });
-
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    // Listeners de Eventos do Chatbot
+    if (sendButton) {
+        sendButton.addEventListener('click', () => {
             const question = userInput.value.trim();
             if (question) {
                 sendQuestionToAI(question);
             }
-        }
-    });
-
-    const faqItems = document.querySelectorAll('.faq-item');
-
-    function getFaqViews(faqId, initialHtmlViews) {
-        const storedViews = localStorage.getItem(`faq_views_${faqId}`);
-        if (storedViews !== null) {
-            return parseInt(storedViews);
-        }
-        localStorage.setItem(`faq_views_${faqId}`, initialHtmlViews);
-        return initialHtmlViews;
+        });
     }
 
-    faqItems.forEach(item => {
-        const faqId = item.dataset.id;
-        const viewsSpanElement = item.querySelector('.views-counter');
-        const viewsCountTextNode = viewsSpanElement ? viewsSpanElement.querySelector('.fa-eye').nextSibling : null;
+    if (userInput) {
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const question = userInput.value.trim();
+                if (question) {
+                    sendQuestionToAI(question);
+                }
+            }
+        });
+    }
+    
+    // --- Lógica do FAQ (NOVO) ---
+    let allFaqs = [];
 
-        if (faqId && viewsCountTextNode) {
-            let initialViewsString = viewsCountTextNode.textContent.trim().split(' ')[0];
-            let initialViews = parseInt(initialViewsString) || 0;
-            let currentViews = getFaqViews(faqId, initialViews);
-            viewsCountTextNode.textContent = ` ${currentViews} visualizações`;
+    // Função para buscar os FAQs do backend
+    async function fetchAndRenderFaqs() {
+        if (!faqListContainer) return;
+        faqListContainer.innerHTML = '<p class="loading-message">Carregando perguntas frequentes...</p>';
+        try {
+            const response = await fetch(`${BACKEND_URL}/faq`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            allFaqs = await response.json();
+            renderFaqs(allFaqs);
+        } catch (error) {
+            console.error("Erro ao carregar FAQs:", error);
+            faqListContainer.innerHTML = '<p class="error-message">Erro ao carregar perguntas frequentes. Por favor, tente novamente.</p>';
         }
-    });
+    }
 
-    faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        const answer = item.querySelector('.faq-answer');
-        const faqId = item.dataset.id;
-        const viewsSpanElement = item.querySelector('.views-counter');
-        const viewsCountTextNode = viewsSpanElement ? viewsSpanElement.querySelector('.fa-eye').nextSibling : null;
-
-        question.addEventListener('click', () => {
-            const isActive = item.classList.contains('active');
+    function renderFaqs(faqsToRender) {
+        if (!faqListContainer) return;
+        faqListContainer.innerHTML = '';
+        if (faqsToRender.length === 0) {
+            faqListContainer.innerHTML = '<p class="no-results-message">Nenhuma pergunta encontrada.</p>';
+            return;
+        }
+        faqsToRender.forEach(faq => {
+            const faqItem = document.createElement('div');
+            faqItem.classList.add('faq-item');
             
-            faqItems.forEach(otherItem => {
-                if (otherItem !== item && otherItem.classList.contains('active')) {
+            const popularTag = faq.popular ? `<span><i class="fas fa-fire"></i> Pergunta popular</span>` : '';
+            
+            // Usando normalizeString para as categorias do filtro
+            const normalizedCategory = faq.categoria ? normalizeString(faq.categoria) : '';
+            faqItem.dataset.category = normalizedCategory;
+
+            faqItem.innerHTML = `
+                <div class="faq-question">
+                    <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
+                    <h3>${faq.pergunta}</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-meta">
+                    <span><i class="fas fa-eye"></i> ${faq.visualizacoes} visualizações</span>
+                    ${popularTag}
+                </div>
+                <div class="faq-answer">
+                    <p>${faq.resposta}</p>
+                </div>
+            `;
+            faqListContainer.appendChild(faqItem);
+        });
+
+        // Re-atribui listeners após a renderização
+        attachAccordionListeners();
+    }
+
+    function attachAccordionListeners() {
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            const answer = item.querySelector('.faq-answer');
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                faqItems.forEach(otherItem => {
                     otherItem.classList.remove('active');
-                    const otherAnswer = otherItem.querySelector('.faq-answer');
-                    if (otherAnswer) otherAnswer.style.maxHeight = '0px';
-                }
-            });
-
-            if (isActive) {
-                item.classList.remove('active');
-                if (answer) answer.style.maxHeight = '0px';
-            } else {
-                item.classList.add('active');
-                if (answer) answer.style.maxHeight = answer.scrollHeight + 30 + 'px';
-                if (viewsCountTextNode && faqId) {
-                    let currentViewsString = viewsCountTextNode.textContent.trim().split(' ')[0];
-                    let currentViews = parseInt(currentViewsString);
-                    if (!isNaN(currentViews)) {
-                        currentViews++;
-                        viewsCountTextNode.textContent = ` ${currentViews} visualizações`;
-                        localStorage.setItem(`faq_views_${faqId}`, currentViews);
-                    }
-                }
-            }
-        });
-    });
-
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const allFaqItems = document.querySelectorAll('.faq-item');
-
-    filterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-
-            const filterCategory = button.dataset.filter;
-
-            allFaqItems.forEach(item => {
-                const itemCategories = item.dataset.category ? item.dataset.category.split(' ') : [];
-                if (filterCategory === 'todos') {
-                    item.style.display = 'block';
-                } else {
-                    if (itemCategories.includes(filterCategory)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
-            });
-        });
-    });
-
-    const searchInput = document.querySelector('.search-bar input');
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.trim().toLowerCase();
-            allFaqItems.forEach(item => {
-                const questionText = item.querySelector('.faq-question h3').textContent.toLowerCase();
-                const answerText = item.querySelector('.faq-answer p').textContent.toLowerCase();
-                const itemCategories = item.dataset.category ? item.dataset.category.split(' ') : [];
-                const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-
-                const categoryMatch = activeFilter === 'todos' || itemCategories.includes(activeFilter);
-                const searchMatch = !searchTerm || questionText.includes(searchTerm) || answerText.includes(searchTerm);
-
-                if (categoryMatch && searchMatch) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+                    otherItem.querySelector('.faq-answer').style.maxHeight = '0';
+                });
+                if (!isActive) {
+                    item.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 30 + 'px';
                 }
             });
         });
     }
 
-    if (typeof window.firebase !== 'undefined' && typeof window.firebase.auth !== 'undefined') {
-        window.firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                loadChatHistory();
-            } else {
-                window.clearChatHistory();
-            }
+    function normalizeString(str) {
+        if (!str) return '';
+        return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function filterFaqs() {
+        const searchTerm = searchFaqInput ? normalizeString(searchFaqInput.value) : '';
+        const activeFilterBtn = document.querySelector('.filter-buttons .filter-btn.active');
+        const activeCategory = activeFilterBtn ? activeFilterBtn.dataset.filter : 'todos';
+
+        const filteredFaqs = allFaqs.filter(faq => {
+            const matchesSearch = !searchTerm || normalizeString(faq.pergunta).includes(searchTerm) || normalizeString(faq.resposta).includes(searchTerm);
+            const matchesCategory = activeCategory === 'todos' || normalizeString(faq.categoria) === activeCategory;
+            return matchesSearch && matchesCategory;
+        });
+
+        renderFaqs(filteredFaqs);
+    }
+
+    // Listeners para a busca e filtros
+    if (searchFaqInput) {
+        searchFaqInput.addEventListener('input', filterFaqs);
+    }
+    if (filterButtons) {
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                filterFaqs();
+            });
         });
     }
+
+    // Carrega os FAQs quando a página é carregada
+    fetchAndRenderFaqs();
 });

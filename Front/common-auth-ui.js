@@ -87,7 +87,7 @@ if (logoutBtn) {
             await window.auth.signOut();
             // A limpeza do chat agora é tratada principalmente pelo onAuthStateChanged
             // ao detectar que o usuário se deslogou.
-            window.location.href = 'login-cadastro.html';
+            window.location.href = 'index.html';
         } catch (error) {
             console.error('logoutBtn: Erro ao deslogar:', error);
             alert('Ocorreu um erro ao deslogar. Tente novamente.');

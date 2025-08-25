@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // URL do seu backend FastAPI
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site.onrender.com";;
 
     // 1. Funcionalidade do Acordeão (FAQ)
     const faqItems = document.querySelectorAll(".faq-item");

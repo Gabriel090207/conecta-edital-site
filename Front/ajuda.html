@@ -62,7 +62,7 @@
                 <div class="search-filter-section">
                     <div class="search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar por artigos, palavras-chave...">
+                        <input type="text" id="search-faq-input" placeholder="Buscar por artigos, palavras-chave...">
                     </div>
                     <div class="filter-buttons">
                         <button class="filter-btn active" data-filter="todos"><i class="fas fa-list-ul"></i> Todos</button>
@@ -71,94 +71,9 @@
                         <button class="filter-btn tag-planos" data-filter="planos"><i class="fas fa-clipboard-list"></i> Planos</button>
                     </div>
                 </div>
-    
-                <div class="faq-accordion">
-                    <div class="faq-item" data-id="faq-link-diario" data-category="geral">
-                        <div class="faq-question">
-                            <div class="faq-icon-wrapper star-icon-bg"><i class="fas fa-star"></i></div> <h3>Preciso saber qual é o link exato do diário oficial para usar o serviço?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-meta">
-                            <span class="views-counter" data-faq-id="faq-link-diario"><i class="fas fa-eye"></i> 27 visualizações</span>
-                            <span><i class="fas fa-fire"></i> Pergunta popular</span>
-                        </div>
-                        <div class="faq-answer">
-                            <p>Não! Você não precisa se preocupar em encontrar o link exato. Nossa inteligência artificial varre Diários Oficiais e sites de bancas 24/7 para você não perder nenhuma atualização crucial. Basta nos informar as palavras-chave.</p>
-                        </div>
-                    </div>
-                
-                    <div class="faq-item" data-id="faq-deteccao-variacoes" data-category="geral monitoramento">
-                        <div class="faq-question">
-                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
-                            <h3>O sistema detecta variações no nome ou erros de digitação nos diários?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-meta">
-                            <span class="views-counter" data-faq-id="faq-deteccao-variacoes"><i class="fas fa-eye"></i> 3 visualizações</span>
-                        </div>
-                        <div class="faq-answer">
-                            <p>Sim, nossa IA avançada é projetada para identificar variações de nomes e até pequenos erros de digitação, garantindo que você não perca sua nomeação por detalhes.</p>
-                        </div>
-                    </div>
-                
-                    <div class="faq-item" data-id="faq-monitoramento-simultaneo" data-category="monitoramento planos">
-                        <div class="faq-question">
-                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
-                            <h3>Posso monitorar mais de um edital ao mesmo tempo?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-meta">
-                            <span class="views-counter" data-faq-id="faq-monitoramento-simultaneo"><i class="fas fa-eye"></i> 6 visualizações</span>
-                        </div>
-                        <div class="faq-answer">
-                            <p>Sim, você pode monitorar múltiplos editais simultaneamente, dependendo do seu plano. O plano Essencial oferece X monitoramentos, enquanto o Premium oferece monitoramentos ilimitados.</p>
-                        </div>
-                    </div>
-                
-                    <div class="faq-item" data-id="faq-alterar-monitoramento" data-category="monitoramento">
-                        <div class="faq-question">
-                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
-                            <h3>É possível alterar os dados ou diários monitorados depois da contratação?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-meta">
-                            <span class="views-counter" data-faq-id="faq-alterar-monitoramento"><i class="fas fa-eye"></i> 5 visualizações</span>
-                        </div>
-                        <div class="faq-answer">
-                            <p>Sim, você pode ajustar suas palavras-chave e diários monitorados a qualquer momento através do seu painel de controle, de forma simples e intuitiva.</p>
-                        </div>
-                    </div>
-                
-                    <div class="faq-item" data-id="faq-como-funciona-monitoramento" data-category="geral monitoramento">
-                        <div class="faq-question">
-                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
-                            <h3>Como funciona o monitoramento?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-meta">
-                            <span class="views-counter" data-faq-id="faq-como-funciona-monitoramento"><i class="fas fa-eye"></i> 20 visualizações</span>
-                        </div>
-                        <div class="faq-answer">
-                            <p>Nosso monitoramento funciona em três passos simples: 1. Informe as palavras-chave (seu nome, CPF, edital, etc.). 2. Nossa IA varre os diários oficiais 24/7. 3. Você recebe alertas instantâneos por email e WhatsApp quando algo for encontrado.</p>
-                        </div>
-                    </div>
-                
-                    <div class="faq-item" data-id="faq-o-que-e-conecta-edital" data-category="geral">
-                        <div class="faq-question">
-                            <div class="faq-icon-wrapper help-icon-bg"><i class="fas fa-question-circle"></i></div>
-                            <h3>O que é o Conecta Edital e como funciona?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-meta">
-                            <span class="views-counter" data-faq-id="faq-o-que-e-conecta-edital"><i class="fas fa-eye"></i> 30 visualizações</span>
-                        </div>
-                        <div class="faq-answer">
-                            <p>Conecta Edital é uma plataforma inovadora de monitoramento de concursos públicos que usa inteligência artificial para encontrar sua nomeação em diários oficiais e sites de bancas. Nosso objetivo é poupar seu tempo e garantir que você não perca nenhuma oportunidade.</p>
-                        </div>
-                    </div>
+                <div class="faq-accordion" id="faq-list-container">
+                    <p class="loading-message">Carregando perguntas frequentes...</p>
                 </div>
-
-                <div id="dynamic-faq-container" class="faq-accordion"></div>
             </section>
     
             <aside class="chatbot-section">
@@ -169,10 +84,9 @@
                     </div>
                 </div>
                 <div class="chatbot-messages" id="chat-messages">
-                   
-                  
-    
-                    
+                    <div class="message received">
+                        <p>Olá! 👋 Eu sou a Conectinha, sua assistente virtual do Conecta Edital! Posso te ajudar com dúvidas sobre monitoramentos, planos, funcionalidades e muito mais. Como posso te ajudar hoje?</p>
+                    </div>
                 </div>
                 <div class="chatbot-input">
                     <input type="text" id="user-input" placeholder="Digite sua pergunta...">
