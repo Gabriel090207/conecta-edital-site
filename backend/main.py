@@ -478,7 +478,7 @@ async def periodic_monitoring_task():
     db = firestore.client()
     while True:
         print(f"\nIniciando rodada de verificações periódicas para TODOS os usuários...")
-        monitorings_stream = db.collection('monitorings').where('status', '==', 'active').stream()
+        monitorings_stream = db.collection('monitorings').where(filter=FieldFilter('status', '==', 'active')).stream()
         for doc in monitorings_stream:
             mon_data = doc.to_dict()
             mon_id = doc.id
