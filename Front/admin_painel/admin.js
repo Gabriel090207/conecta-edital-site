@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const stats = await response.json();
             console.log("Estatísticas do Admin recebidas:", stats);
 
+            // CORREÇÃO: Adiciona verificação de existência para cada elemento
             if (totalUsersPlansSpan) totalUsersPlansSpan.textContent = stats.total_users;
             
             if (noPlanPercentageSpan) noPlanPercentageSpan.textContent = `${stats.plan_distribution.no_plan.percentage.toFixed(1)}%`;
