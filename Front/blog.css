@@ -1,0 +1,415 @@
+/* Variáveis para cores */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --text-color: #ecf0f1;
+    --link-color: #3498db;
+    --background-color: #f4f5f7;
+    --card-background: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+}
+html, body {
+    overflow-x: hidden;
+  }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: white; /* Fundo geral claro */
+    color: #343A40; /* Cor de texto principal escuro */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-size: 16px; /* Base rem */
+}
+
+
+.container {
+    
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+a { 
+
+    text-decoration: none;
+    color: inherit;
+}
+
+/* --- Cabeçalho --- */
+.navbar-index {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+
+    /* --- Propriedades para o Efeito Vidro --- */
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(80px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    /* --- Propriedades para Fixar a Navbar --- */
+    position: fixed; /* Torna o elemento fixo na tela */
+    top: 0;          /* Fixa no topo (0 pixels do topo) */
+    width: 100%;     /* Garante que ocupe 100% da largura da tela */
+    z-index: 1000;   /* Garante que fique acima de outros elementos na página */
+}
+
+
+.navbar-index .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1440px;
+    padding: 0 30px;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left .logo {
+    display: flex;
+    align-items: center;
+    font-weight: 300;
+    font-size: 1.2rem;
+    color: #007bff; /* Azul Conecta Edital */
+}
+
+.navbar-left .logo img {
+    margin-right: 10px;
+    border-radius: 4px;
+    
+}
+
+.navbar-center-index {
+  flex-grow: 1; /* Allows the container to take up available space */
+  display: flex; /* Use flexbox for alignment */
+  justify-content: center; /* Horizontally center the content */
+  align-items: center; /* Vertically center the content */
+}
+
+.navbar-index .navbar-center-index ul {
+    list-style: none;
+    display: flex;
+    gap: 35px;
+}
+
+.navbar-index .navbar-center-index ul li a {
+    
+    color: #6C757D;
+    font-weight: 500;
+    font-size: 1.05rem;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+}
+
+.navbar-index .navbar-center-index ul li a:hover {
+    color: #007BFF;
+}
+
+.navbar-index .navbar-right-index .btn-entrar {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-index .navbar-right-index .btn-entrar:hover {
+    background-color: #0056b3;
+}
+
+.btn-analisar-ia 
+    {  background: linear-gradient(135deg, #9d1ee2, #6108c0); color: white;
+}
+
+.btn-analisar-ia:hover 
+    {  background: linear-gradient(135deg, #450d63, #450d63); color: white;
+}
+/* --- Seção de Destaque (Hero) --- */
+.hero-article {
+    display: none;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 130px;
+    box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+.hero-image-container {
+    flex: 1;
+    min-width: 50%; /* Garante que a imagem ocupe pelo menos metade do espaço */
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hero-content {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.breadcrumbs {
+    color: #888;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+}
+
+.hero-content h1 {
+    font-size: 2rem;
+    margin: 0 0 10px;
+    line-height: 1.2;
+}
+
+
+
+.article-meta .author {
+    font-weight: bold;
+}
+
+.separator {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 40px 0;
+}
+
+/* --- Grid de Artigos --- */
+.articles-grid {
+    margin-top: 120px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1900px;
+}
+
+.article-card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    display: flex;
+    flex-direction: column;
+    height: 105%;   /* garante altura total */
+}
+
+.article-card a {
+    
+    display: flex;
+    flex-direction: column;
+    flex: 1;        /* ocupa todo espaço */
+}
+
+.article-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+
+
+.article-footer {
+    margin-top: auto;   /* empurra pro fim */
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.article-title {
+        font-size: 2px;
+}
+
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.article-image-container {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+}
+
+.article-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+.article-content {
+    padding: 20px;
+    height: 100%;
+    /* Remova as propriedades Flexbox que havíamos adicionado aqui antes */
+}
+
+.article-meta {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: auto; /* Esta é a chave! Empurra o elemento para o fim do container flexível */
+}
+
+
+/* Adicione um seletor para os spans dentro de .article-meta */
+.article-meta span {
+    margin-right: 10px; /* Adiciona um pequeno espaço entre as infos */
+}
+
+/* Opcional: Remova a margem do último span para não ter espaço extra */
+.article-meta span:last-child {
+    margin-right: 0;
+}
+
+
+@media (max-width: 768px) {
+    .hero-article {
+        flex-direction: column;
+    }
+
+    .hero-content {
+        padding: 20px;
+    }
+}
+
+
+
+/* --- Estilos para a página do Artigo --- */
+
+.article-page-main {
+    max-width: 900px; /* Largura ideal para a leitura de texto */
+    margin-top: 130px;
+}
+
+.article-content-wrapper {
+    background-color: var(--card-background);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+.article-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.article-meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.like-count {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.article-image-main {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.article-image-main img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.article-image-main figcaption {
+    margin-top: 10px;
+    font-style: italic;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.article-body h2 {
+    font-size: 1.8rem;
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+
+.article-body p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+.article-body ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.article-body li {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .article-content-wrapper {
+        padding: 20px;
+    }
+
+    .article-title {
+        font-size: 1.8rem;
+    }
+
+    .article-body p, .article-body li {
+        font-size: 1rem;
+    }
+}
+
+.articles-grid1 {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1900px;
+}

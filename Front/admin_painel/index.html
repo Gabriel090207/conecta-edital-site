@@ -31,9 +31,9 @@
             <p>Gerencie o conteúdo e o engajamento da plataforma.</p>
             <div class="tools-grid">
                 <div class="tool-card marketing">
-                    <i class="fas fa-envelope icon"></i>
-                    <h3>Marketing</h3>
-                    <p>Campanhas de e-mail</p>
+                    <i class="fas fa-solid fa-note-sticky icon"></i>
+                    <h3>Blog</h3>
+                    <p>Gerencia Blog</p>
                 </div>
                 <div class="tool-card feedback">
                     <i class="fas fa-chart-line icon"></i>
@@ -194,6 +194,12 @@
                 <h3>Todos os Tickets de Suporte</h3>
                 <button class="modal-close-btn" data-modal-id="all-tickets-modal">&times;</button>
             </div>
+            
+            <div class="search-box-admin">
+                <i class="fas fa-search"></i>
+                <input type="text" id="ticket-search-admin" placeholder="Buscar tickets por título, ID ou descrição...">
+            </div>
+            
             <div class="tickets-list-admin" id="tickets-list-admin">
                 <p class="loading-tickets-message">Carregando tickets...</p>
             </div>
@@ -238,7 +244,7 @@
             </button>
             <h3 class="modal-title">Auditoria de Usuários</h3>
             <div class="modal-body">
-                <div class="search-bar-container">
+                <div class="search-box-admin">
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" id="user-search-input" placeholder="Pesquisar por email...">
                 </div>
