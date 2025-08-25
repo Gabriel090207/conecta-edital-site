@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let allFaqs = [];
 
+    // FUNÇÃO AUXILIAR CORRIGIDA: Adicionada a função normalizeString
+    function normalizeString(str) {
+        if (!str) return '';
+        return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
     // --- Lógica do Chatbot (mantida) ---
     const API_KEY = "AIzaSyDdc58E9UU-By8hKQOYPRhuR1arEZT2JTg";
     const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=";
@@ -272,21 +278,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const answer = item.querySelector('.faq-answer');
             question.addEventListener('click', () => {
                 const isActive = item.classList.contains('active');
+                
                 faqItems.forEach(otherItem => {
                     otherItem.classList.remove('active');
                     otherItem.querySelector('.faq-answer').style.maxHeight = '0';
                 });
+
                 if (!isActive) {
                     item.classList.add('active');
                     answer.style.maxHeight = answer.scrollHeight + 30 + 'px';
                 }
             });
         });
-    }
-
-    function normalizeString(str) {
-        if (!str) return '';
-        return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
     function filterFaqs() {
