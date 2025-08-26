@@ -657,7 +657,7 @@ async def create_preference(
         raise HTTPException(status_code=404, detail="Plano não encontrado.")
 
     YOUR_FRONTEND_BASE_URL = "https://siteconectaedital.netlify.app"
-    YOUR_BACKEND_BASE_URL = "https://siteconectaedital.netlify.app"
+    YOUR_BACKEND_BASE_URL = "https://conecta-edital-site.onrender.com"
 
     notification_url = f"{YOUR_BACKEND_BASE_URL}/webhook/mercadopago"
 
@@ -871,7 +871,7 @@ async def test_monitoring_endpoint(
         return {"message": "Palavra-chave não encontrada. Verifique se a palavra está correta ou tente outro PDF."}
 
 # ========================================================================================================
-#                                               ROTAS DE SUPORTE
+#                                            ROTAS DE SUPORTE
 # ========================================================================================================
 
 @app.get("/api/tickets", response_model=List[Ticket])
@@ -975,7 +975,7 @@ async def user_reply_to_ticket(
 
 
 # ========================================================================================================
-#                                                 ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
+#                                             ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
 # ========================================================================================================
 
 @app.get("/admin/tickets")
@@ -1163,7 +1163,7 @@ async def get_all_users_for_audit():
     return users_list
     
 # ========================================================================================================
-#                                                 ROTAS PARA DICAS
+#                                             ROTAS PARA DICAS
 # ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
 async def create_dica(dica: Dica):
@@ -1223,7 +1223,7 @@ async def record_dica_view(dica_id: str):
     return {"message": "Visualização registrada com sucesso."}
 
 # ========================================================================================================
-#                                                 ROTAS PARA FAQ
+#                                             ROTAS PARA FAQ
 # ========================================================================================================
 @app.post("/faq", response_model=FAQ, status_code=201)
 async def create_faq(faq: FAQ):
