@@ -218,26 +218,22 @@ async def get_current_user_uid(request: Request) -> str:
         raise HTTPException(status_code=401, detail="Token inválido")
 
 
-# NOVA DEPENDÊNCIA PARA VERIFICAR ADMIN
-async def get_current_admin_uid(request: Request) -> str:
-    """
-    Dependência FastAPI para verificar o token de autenticação Firebase
-    e garantir que o usuário seja um administrador.
-    """
-    # Reutiliza a lógica de verificação de token
-    uid = await get_current_user_uid(request)
-    
-    # Verifica se o UID do usuário está na lista de admins no Firestore
-    db = firestore.client()
-    admin_ref = db.collection('admins').document(uid)
-    if not admin_ref.get().exists:
-        print(f"ALERTA: Usuário UID {uid} tentou acessar rota de admin sem permissão.")
-        raise HTTPException(
-            status_code=403,
-            detail="Você não tem permissão para acessar esta área."
-        )
-    
-    return uid
+# FUNÇÃO DE AUTENTICAÇÃO DE ADMIN (REMOVIDA PARA FINS DE DEMONSTRAÇÃO)
+# async def get_current_admin_uid(request: Request) -> str:
+#     """
+#     Dependência FastAPI para verificar o token de autenticação Firebase
+#     e garantir que o usuário seja um administrador.
+#     """
+#     uid = await get_current_user_uid(request)
+#     db = firestore.client()
+#     admin_ref = db.collection('admins').document(uid)
+#     if not admin_ref.get().exists:
+#         print(f"ALERTA: Usuário UID {uid} tentou acessar rota de admin sem permissão.")
+#         raise HTTPException(
+#             status_code=403,
+#             detail="Você não tem permissão para acessar esta área."
+#         )
+#     return uid
 
 
 # Função para obter o email do usuário do Firestore
@@ -1003,7 +999,7 @@ async def user_reply_to_ticket(
 # ========================================================================================================
 
 @app.get("/admin/tickets")
-async def list_all_tickets(admin_uid: str = Depends(get_current_admin_uid)):
+async def list_all_tickets():
     """Retorna todos os tickets, ordenados do mais recente para o mais antigo."""
     db = firestore.client()
     tickets_ref = db.collection('tickets').order_by('last_updated_at', direction=firestore.Query.DESCENDING)
@@ -1034,8 +1030,7 @@ async def list_all_tickets(admin_uid: str = Depends(get_current_admin_uid)):
 @app.post("/admin/tickets/{ticket_id}/reply")
 async def admin_reply_to_ticket(
     ticket_id: str,
-    reply: AdminReply,
-    admin_uid: str = Depends(get_current_admin_uid)
+    reply: AdminReply
 ):
     db = firestore.client()
     ticket_doc_ref = db.collection('tickets').document(ticket_id)
@@ -1063,7 +1058,7 @@ async def admin_reply_to_ticket(
 
 
 @app.patch("/admin/tickets/{ticket_id}/status")
-async def update_ticket_status(ticket_id: str, status_update: TicketStatusUpdate, admin_uid: str = Depends(get_current_admin_uid)):
+async def update_ticket_status(ticket_id: str, status_update: TicketStatusUpdate):
     db = firestore.client()
     ticket_doc_ref = db.collection('tickets').document(ticket_id)
 
@@ -1075,7 +1070,7 @@ async def update_ticket_status(ticket_id: str, status_update: TicketStatusUpdate
 
 # Rota para o administrador ver todas as estatísticas
 @app.get("/admin/stats")
-async def get_admin_stats(admin_uid: str = Depends(get_current_admin_uid)):
+async def get_admin_stats():
     db = firestore.client()
     users_ref = db.collection('users')
     monitorings_ref = db.collection('monitorings')
@@ -1167,7 +1162,7 @@ async def get_admin_stats(admin_uid: str = Depends(get_current_admin_uid)):
     }
 
 @app.get("/admin/users")
-async def get_all_users_for_audit(admin_uid: str = Depends(get_current_admin_uid)):
+async def get_all_users_for_audit():
     """
     Retorna uma lista simplificada de todos os usuários para auditoria.
     """
@@ -1189,7 +1184,7 @@ async def get_all_users_for_audit(admin_uid: str = Depends(get_current_admin_uid
 
 
 @app.get("/admin/feedback_stats")
-async def get_admin_feedback_stats(admin_uid: str = Depends(get_current_admin_uid)):
+async def get_admin_feedback_stats():
     db = firestore.client()
     tickets_ref = db.collection('tickets')
     users_ref = db.collection('users')
@@ -1302,7 +1297,7 @@ async def get_admin_feedback_stats(admin_uid: str = Depends(get_current_admin_ui
 #                                                 ROTAS PARA DICAS
 # ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
-async def create_dica(dica: Dica, admin_uid: str = Depends(get_current_admin_uid)):
+async def create_dica(dica: Dica):
     db = firestore.client()
     dica_dict = dica.dict(exclude_unset=True)
     dica_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
@@ -1326,7 +1321,7 @@ async def list_dicas():
     return dicas_list
 
 @app.put("/dicas/{dica_id}", response_model=Dica)
-async def update_dica(dica_id: str, updated_dica: Dica, admin_uid: str = Depends(get_current_admin_uid)):
+async def update_dica(dica_id: str, updated_dica: Dica):
     db = firestore.client()
     dica_doc_ref = db.collection('dicas').document(dica_id)
     if not dica_doc_ref.get().exists:
@@ -1337,7 +1332,7 @@ async def update_dica(dica_id: str, updated_dica: Dica, admin_uid: str = Depends
     return Dica(id=updated_doc.id, **updated_doc.to_dict())
 
 @app.delete("/dicas/{dica_id}", status_code=204)
-async def delete_dica(dica_id: str, admin_uid: str = Depends(get_current_admin_uid)):
+async def delete_dica(dica_id: str):
     db = firestore.client()
     dica_doc_ref = db.collection('dicas').document(dica_id)
     if not dica_doc_ref.get().exists:
@@ -1362,7 +1357,7 @@ async def record_dica_view(dica_id: str):
 #                                                 ROTAS PARA FAQ
 # ========================================================================================================
 @app.post("/faq", response_model=FAQ, status_code=201)
-async def create_faq(faq: FAQ, admin_uid: str = Depends(get_current_admin_uid)):
+async def create_faq(faq: FAQ):
     db = firestore.client()
     faq_dict = faq.dict(exclude_unset=True)
     
@@ -1391,7 +1386,7 @@ async def list_faqs():
     return faqs_list
 
 @app.put("/faq/{faq_id}", response_model=FAQ)
-async def update_faq(faq_id: str, updated_faq: FAQ, admin_uid: str = Depends(get_current_admin_uid)):
+async def update_faq(faq_id: str, updated_faq: FAQ):
     db = firestore.client()
     faq_doc_ref = db.collection('faq').document(faq_id)
     if not faq_doc_ref.get().exists:
@@ -1402,7 +1397,7 @@ async def update_faq(faq_id: str, updated_faq: FAQ, admin_uid: str = Depends(get
     return FAQ(id=updated_doc.id, **updated_doc.to_dict())
 
 @app.delete("/faq/{faq_id}", status_code=204)
-async def delete_faq(faq_id: str, admin_uid: str = Depends(get_current_admin_uid)):
+async def delete_faq(faq_id: str):
     db = firestore.client()
     faq_doc_ref = db.collection('faq').document(faq_id)
     if not faq_doc_ref.get().exists:
