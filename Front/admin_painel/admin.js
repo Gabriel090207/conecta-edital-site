@@ -585,6 +585,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/dicas/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}` // ADICIONADO AQUI
+                }
             });
 
             if (!response.ok) {
@@ -605,7 +608,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         faqListContainer.innerHTML = '<p class="loading-message">Carregando FAQs...</p>';
 
         try {
-            const response = await fetch(`${BACKEND_URL}/faq`);
+            const response = await fetch(`${BACKEND_URL}/faq`, {
+                headers: {
+                    'Authorization': `Bearer ${token}` // ADICIONADO AQUI
+                }
+            });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -682,6 +689,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/faq/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}` // ADICIONADO AQUI
+                }
             });
     
             if (!response.ok) {
@@ -752,6 +762,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // ADICIONADO AQUI
                     },
                     body: JSON.stringify(dicaData),
                 });
@@ -804,6 +815,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // ADICIONADO AQUI
                     },
                     body: JSON.stringify(faqData),
                 });
