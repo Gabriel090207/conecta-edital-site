@@ -146,7 +146,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const stats = await response.json();
             console.log("Estatísticas do Admin recebidas:", stats);
 
-            // CORREÇÃO: Adiciona verificação de existência para cada elemento
             if (totalUsersPlansSpan) totalUsersPlansSpan.textContent = stats.total_users;
             
             if (noPlanPercentageSpan) noPlanPercentageSpan.textContent = `${stats.plan_distribution.no_plan.percentage.toFixed(1)}%`;
@@ -469,7 +468,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             noAuditUsers.textContent = 'Nenhum usuário encontrado com este e-mail.';
             return;
         }
-        noUsers.style.display = 'none';
         usersToRender.forEach(user => {
             const userCard = document.createElement('div');
             userCard.classList.add('user-audit-card');
@@ -585,9 +583,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/dicas/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}` // ADICIONADO AQUI
-                }
             });
 
             if (!response.ok) {
@@ -604,15 +599,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Funções para gerenciamento de FAQ
     async function loadFaqs() {
-        if (!faqListContainer) return;
-        faqListContainer.innerHTML = '<p class="loading-message">Carregando FAQs...</p>';
+        // AQUI ESTÁ A CORREÇÃO: Pega a referência do elemento DENTRO da função
+        const currentFaqListContainer = document.getElementById('faq-list-container');
+        if (!currentFaqListContainer) return;
+
+        currentFaqListContainer.innerHTML = '<p class="loading-message">Carregando FAQs...</p>';
 
         try {
-            const response = await fetch(`${BACKEND_URL}/faq`, {
-                headers: {
-                    'Authorization': `Bearer ${token}` // ADICIONADO AQUI
-                }
-            });
+            const response = await fetch(`${BACKEND_URL}/faq`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -620,14 +614,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderFaqs(allFaqs);
         } catch (error) {
             console.error("Erro ao carregar FAQs:", error);
-            faqListContainer.innerHTML = '<p class="error-message">Erro ao carregar FAQs.</p>';
+            currentFaqListContainer.innerHTML = '<p class="error-message">Erro ao carregar FAQs. Por favor, tente novamente.</p>';
         }
     }
     
     function renderFaqs(faqsToRender) {
-        faqListContainer.innerHTML = '';
+        const currentFaqListContainer = document.getElementById('faq-list-container');
+        if (!currentFaqListContainer) return;
+
+        currentFaqListContainer.innerHTML = '';
         if (faqsToRender.length === 0) {
-            faqListContainer.innerHTML = '<p class="no-dicas-message">Nenhum FAQ encontrado.</p>';
+            currentFaqListContainer.innerHTML = '<p class="no-dicas-message">Nenhum FAQ encontrado.</p>';
             return;
         }
     
@@ -643,7 +640,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <button class="btn-delete" data-id="${faq.id}">Excluir</button>
                 </div>
             `;
-            faqListContainer.appendChild(faqCard);
+            currentFaqListContainer.appendChild(faqCard);
         });
     
         document.querySelectorAll('.faq-card .btn-edit').forEach(button => {
@@ -689,16 +686,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/faq/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}` // ADICIONADO AQUI
-                }
             });
     
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            
+            // Remove o FAQ da lista local e renderiza novamente
+            allFaqs = allFaqs.filter(faq => faq.id !== id);
+            renderFaqs(allFaqs);
     
-            loadFaqs();
             alert("FAQ excluído com sucesso!");
         } catch (error) {
             console.error("Erro ao excluir FAQ:", error);
@@ -717,7 +714,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // NOVO: Adiciona o listener para a barra de pesquisa
     if (ticketSearchAdminInput) {
         ticketSearchAdminInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
@@ -762,7 +758,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // ADICIONADO AQUI
                     },
                     body: JSON.stringify(dicaData),
                 });
@@ -815,7 +810,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // ADICIONADO AQUI
                     },
                     body: JSON.stringify(faqData),
                 });
