@@ -687,11 +687,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
-            // Remove o FAQ da lista local e renderiza novamente
-            allFaqs = allFaqs.filter(faq => faq.id !== id);
-            renderFaqs(allFaqs);
     
+            loadFaqs();
             alert("FAQ excluído com sucesso!");
         } catch (error) {
             console.error("Erro ao excluir FAQ:", error);
@@ -710,6 +707,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // NOVO: Adiciona o listener para a barra de pesquisa
     if (ticketSearchAdminInput) {
         ticketSearchAdminInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
