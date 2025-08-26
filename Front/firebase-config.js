@@ -9,10 +9,11 @@ const firebaseConfig = {
     messagingSenderId: "1057915288128",
     appId: "1:1057915288128:web:30799f8972115a48173da5",
     measurementId: "G-ZG4JPW6X3B"
-    // measurementId: "SEU_MEASUREMENT_ID" // Opcional, se você tiver o Google Analytics configurado
 };
 
-// Inicializa o Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
- // Adicionado para depuração
+// Inicializa o Firebase e armazena a referência em uma variável global
+window.app = firebase.initializeApp(firebaseConfig);
+
+// Inicializa e armazena as referências do Auth e Firestore globalmente
+window.auth = firebase.auth();
+window.db = firebase.firestore();

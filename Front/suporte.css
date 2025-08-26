@@ -296,25 +296,28 @@ ul {
 /* ========================================= */
 
 .suporte-content {
-    flex-grow: 1;
+     flex-grow: 1;
     padding: 40px 30px;
     display: flex;
     flex-direction: column;
-    gap: 25px; /* Espaço entre as seções */
-    max-width: 1440px; /* Largura padrão dos conteúdos principais */
+    gap: 25px;
+    max-width: 1240px;
     margin: 30px auto;
 }
 
 /* Header do Card de Suporte (Central de Suporte) */
 .support-header-card {
+
+    margin-top: 60px;
     display: flex;
-    align-items: flex-start; /* Alinha o conteúdo à esquerda e o botão no topo */
-    justify-content: space-between; /* Espaça o bloco de conteúdo esquerdo e o botão */
+    align-items: flex-start;
+    justify-content: space-between;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    padding: 30px;
+    padding: 35px;
     border: 1px solid #e0e0e0;
+
 }
 
 .support-header-info {

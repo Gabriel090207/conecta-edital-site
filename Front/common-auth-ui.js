@@ -73,8 +73,8 @@ window.auth.onAuthStateChanged(async (user) => {
         }
 
         // Redireciona apenas se não estiver já na página de login/cadastro
-        if (!currentPath.endsWith('/login-cadastro.html')) {
-            window.location.href = 'login-cadastro.html';
+        if (!currentPath.endsWith('/index.html')) {
+            window.location.href = 'index.html';
         }
     }
 });
