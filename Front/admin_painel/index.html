@@ -35,7 +35,7 @@
                     <h3>Blog</h3>
                     <p>Gerencia Blog</p>
                 </div>
-                <div class="tool-card feedback">
+                <div class="tool-card feedback" id="view-feedback-btn">
                     <i class="fas fa-chart-line icon"></i>
                     <h3>Feedback</h3>
                     <p>Análise de tickets</p>
@@ -315,6 +315,90 @@
             </form>
         </div>
     </div>
+
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal-content modal-lg">
+            <button class="modal-close-btn" data-modal-id="feedback-modal">&times;</button>
+            <div class="feedback-dashboard">
+                <div class="dashboard-header">
+                    <i class="fas fa-chart-bar header-icon"></i>
+                    <h2>Análise Completa de Feedback do Sistema</h2>
+                    <p>Dashboard integrado com todos os dados de feedback, tickets e satisfação dos usuários.</p>
+                </div>
+                
+                <div class="stats-cards-grid">
+                    <div class="stat-card total-tickets">
+                        <i class="fas fa-ticket-alt icon"></i>
+                        <h3>Total de Tickets</h3>
+                        <span class="value" id="total-tickets">0</span>
+                        <p>Todos os tempos</p>
+                    </div>
+                    <div class="stat-card response-rate">
+                        <i class="fas fa-check-circle icon"></i>
+                        <h3>Taxa de Resposta</h3>
+                        <span class="value" id="response-rate">0%</span>
+                        <p>Tickets respondidos</p>
+                    </div>
+                    <div class="stat-card avg-time">
+                        <i class="fas fa-clock icon"></i>
+                        <h3>Tempo de Resolução</h3>
+                        <span class="value" id="avg-resolution-time">0h</span>
+                        <p>Média</p>
+                    </div>
+                    <div class="stat-card satisfaction">
+                        <i class="fas fa-smile icon"></i>
+                        <h3>Satisfação</h3>
+                        <span class="value" id="satisfaction-rate">0%</span>
+                        <p>Usuários satisfeitos</p>
+                    </div>
+                    <div class="stat-card pending">
+                        <i class="fas fa-hourglass-half icon"></i>
+                        <h3>Pendentes</h3>
+                        <span class="value" id="pending-tickets">0</span>
+                        <p>Aguardando resolução</p>
+                    </div>
+                    <div class="stat-card active-users">
+                        <i class="fas fa-users icon"></i>
+                        <h3>Usuários Ativos</h3>
+                        <span class="value" id="active-users-count">0</span>
+                        <p>de <span id="total-users-in-feedback">0</span> total</p>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Tickets por Categoria</h3>
+                        <canvas id="ticketsByCategoryChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Status dos Tickets</h3>
+                        <canvas id="ticketStatusChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Tendência Mensal</h3>
+                        <canvas id="monthlyTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="sentiment-analysis">
+                        <h3>Análise de Sentimento</h3>
+                        <p class="subtitle">Em breve</p>
+                        <div class="sentiment-buttons">
+                            <button class="sentiment-btn positive"><i class="fas fa-thumbs-up"></i></button>
+                            <button class="sentiment-btn neutral"><i class="fas fa-meh"></i></button>
+                            <button class="sentiment-btn negative"><i class="fas fa-thumbs-down"></i></button>
+                        </div>
+                    </div>
+                    <div class="most-active-users">
+                        <h3>Usuários Mais Ativos</h3>
+                        <div id="active-users-list">
+                            <p class="loading-message">Carregando usuários...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     
     <script src="admin.js"></script>
 </body>

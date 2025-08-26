@@ -89,6 +89,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Referência para a nova barra de pesquisa
     const ticketSearchAdminInput = document.getElementById('ticket-search-admin');
+    
+    // Referências para o novo modal de Feedback
+    const viewFeedbackBtn = document.getElementById('view-feedback-btn');
+    const feedbackModal = document.getElementById('feedback-modal');
+    const totalTicketsSpan = document.getElementById('total-tickets');
+    const responseRateSpan = document.getElementById('response-rate');
+    const avgResolutionTimeSpan = document.getElementById('avg-resolution-time');
+    const satisfactionRateSpan = document.getElementById('satisfaction-rate');
+    const pendingTicketsSpan = document.getElementById('pending-tickets');
+    const activeUsersFeedbackSpan = document.getElementById('active-users-count');
+    const totalUsersFeedbackSpan = document.getElementById('total-users-in-feedback');
+    const ticketsByCategoryChartCanvas = document.getElementById('ticketsByCategoryChart');
+    const ticketStatusChartCanvas = document.getElementById('ticketStatusChart');
+    const monthlyTrendChartCanvas = document.getElementById('monthlyTrendChart');
+    let ticketsByCategoryChart;
+    let ticketStatusChart;
+    let monthlyTrendChart;
 
     // Funções auxiliares de modal
     function openModal(modalElement) {
@@ -200,6 +217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/admin/tickets`, {
                 headers: {
+                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
                     "ngrok-skip-browser-warning": "true"
                 }
             });
@@ -363,6 +381,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
                     "ngrok-skip-browser-warning": "true"
                 },
                 body: JSON.stringify({ text: replyText })
@@ -403,6 +422,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
                     "ngrok-skip-browser-warning": "true"
                 },
                 body: JSON.stringify({ status: newStatus })
@@ -443,6 +463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/admin/users`, {
                 headers: {
+                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
                     "ngrok-skip-browser-warning": "true"
                 }
             });
@@ -703,6 +724,126 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Função para buscar dados do dashboard de feedback
+    async function fetchFeedbackDataAndRenderCharts() {
+        openModal(feedbackModal);
+        try {
+            const response = await fetch(`${BACKEND_URL}/admin/feedback_stats`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Proteção de rota
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`Erro na API: ${response.status}`);
+            }
+            const data = await response.json();
+            
+            // Preencher os cards de estatísticas
+            totalTicketsSpan.textContent = data.total_tickets;
+            responseRateSpan.textContent = `${data.response_rate.toFixed(1)}%`;
+            avgResolutionTimeSpan.textContent = `${data.avg_resolution_time_hours}h`;
+            satisfactionRateSpan.textContent = `${data.satisfaction_rate.toFixed(1)}%`;
+            pendingTicketsSpan.textContent = data.pending_tickets;
+            activeUsersFeedbackSpan.textContent = data.active_users_count;
+            totalUsersFeedbackSpan.textContent = data.total_users;
+
+            // Renderizar gráficos
+            renderTicketsByCategoryChart(data.tickets_by_category);
+            renderTicketStatusChart(data.ticket_status_distribution);
+            renderMonthlyTrendChart(data.monthly_ticket_trend);
+            renderActiveUsersList(data.most_active_users);
+
+        } catch (error) {
+            console.error("Erro ao buscar dados do dashboard de feedback:", error);
+            alert("Erro ao carregar o dashboard de feedback. Verifique o console para mais detalhes.");
+        }
+    }
+
+    function renderTicketsByCategoryChart(data) {
+        if (ticketsByCategoryChart) ticketsByCategoryChart.destroy();
+        const labels = data.map(item => item.category);
+        const values = data.map(item => item.count);
+        ticketsByCategoryChart = new Chart(ticketsByCategoryChartCanvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Tickets por Categoria',
+                    data: values,
+                    backgroundColor: ['#4e79a7', '#59a14f', '#e15759'],
+                    borderColor: ['#4e79a7', '#59a14f', '#e15759'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    function renderTicketStatusChart(data) {
+        if (ticketStatusChart) ticketStatusChart.destroy();
+        const labels = Object.keys(data);
+        const values = Object.values(data).map(item => item.percentage);
+        const backgroundColors = {
+            'Resolvido': '#59a14f', 'Aguardando': '#8cd140', 'Em Atendimento': '#e15759', 'Concluído': '#4e79a7'
+        };
+        ticketStatusChart = new Chart(ticketStatusChartCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: labels.map(label => backgroundColors[label] || '#999')
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    function renderMonthlyTrendChart(data) {
+        if (monthlyTrendChart) monthlyTrendChart.destroy();
+        const labels = data.map(item => item.month);
+        const values = data.map(item => item.count);
+        monthlyTrendChart = new Chart(monthlyTrendChartCanvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Tickets por Mês',
+                    data: values,
+                    fill: true,
+                    borderColor: '#4e79a7',
+                    tension: 0.1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+    
+    function renderActiveUsersList(users) {
+        const listContainer = document.getElementById('active-users-list');
+        listContainer.innerHTML = ''; // Limpa a lista
+        if (users.length === 0) {
+            listContainer.innerHTML = '<p class="no-tickets-message">Nenhum usuário ativo.</p>';
+            return;
+        }
+        users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.classList.add('active-user-item');
+            userItem.innerHTML = `
+                <span class="user-avatar">${user.name ? user.name[0].toUpperCase() : 'N/A'}</span>
+                <div class="user-info">
+                    <p class="user-name">${user.name || 'N/A'}</p>
+                    <p class="user-email">${user.email}</p>
+                </div>
+                <span class="ticket-count">${user.ticket_count} tickets</span>
+            `;
+            listContainer.appendChild(userItem);
+        });
+    }
+
     // Inicialização da página
     fetchAdminStats();
 
@@ -758,6 +899,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Proteção de rota
                     },
                     body: JSON.stringify(dicaData),
                 });
@@ -810,6 +952,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Proteção de rota
                     },
                     body: JSON.stringify(faqData),
                 });
@@ -849,7 +992,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             changeTicketStatus(e.target.value);
         });
     }
-
+    
+    // Novo Event Listener para o botão de Feedback
+    if (viewFeedbackBtn) {
+        viewFeedbackBtn.addEventListener('click', fetchFeedbackDataAndRenderCharts);
+    }
+    
     // --- Lógica de Polling para Atualização em Tempo Real ---
 
     async function checkAdminTicketsForUpdates() {
@@ -861,7 +1009,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/admin/tickets`, {
                 headers: {
-                    "ngrok-skip-browser-warning": "true"
+                    "ngrok-skip-browser-warning": "true",
+                    'Authorization': `Bearer ${token}`
                 }
             });
             if (!response.ok) {
