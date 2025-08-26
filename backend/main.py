@@ -56,11 +56,10 @@ app = FastAPI(
 
 # Configuração do CORS (CORRIGIDO AQUI)
 origins = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-    "https://conecta-edital-site.onrender.com",
-    "https://conectaconectaedital.netlify.app",
-    "https://siteconectaedital.netlify.app"
+    "http://127.0.0.1:5500", 
+    "http://localhost:5500", 
+    "https://conecta-edital-site.onrender.com", 
+    "https://conectaconectaedital.netlify.app"
 ]
 
 app.add_middleware(
@@ -120,7 +119,7 @@ class Monitoring(BaseModel):
 
 class CreatePreferenceRequest(BaseModel):
     plan_id: str
-    user_email: EmailStr
+    user_email: str
 
 # Modelos para a funcionalidade de tickets
 class Attachment(BaseModel):
@@ -141,14 +140,14 @@ class Ticket(BaseModel):
     user_email: str
     subject: str
     status: str
-    category: str
+    category: str # NOVO CAMPO
     created_at: datetime
     last_updated_at: datetime
     messages: List[TicketMessage] = []
 
 class NewTicket(BaseModel):
     subject: str
-    category: str
+    category: str # NOVO CAMPO
     initial_message: str
 
 class UserReply(BaseModel):
@@ -871,7 +870,7 @@ async def test_monitoring_endpoint(
         return {"message": "Palavra-chave não encontrada. Verifique se a palavra está correta ou tente outro PDF."}
 
 # ========================================================================================================
-#                                                 ROTAS DE SUPORTE
+#                                            ROTAS DE SUPORTE
 # ========================================================================================================
 
 @app.get("/api/tickets", response_model=List[Ticket])
@@ -918,14 +917,14 @@ async def create_ticket(
         "sender": "user",
         "text": new_ticket.initial_message,
         "timestamp": now,
-        "attachments": []
+        "attachments": [] # Campo de anexo vazio
     }
 
     ticket_data = {
         "user_uid": user_uid,
         "user_email": user_email,
         "subject": new_ticket.subject,
-        "category": new_ticket.category,
+        "category": new_ticket.category, # NOVO CAMPO ADICIONADO AQUI
         "status": "Aguardando",
         "created_at": firestore.SERVER_TIMESTAMP,
         "last_updated_at": firestore.SERVER_TIMESTAMP,
@@ -961,7 +960,7 @@ async def user_reply_to_ticket(
         "sender": "user",
         "text": reply.text,
         "timestamp": now,
-        "attachments": []
+        "attachments": [] # Campo de anexo vazio
     }
 
     ref.update({
@@ -1024,7 +1023,7 @@ async def admin_reply_to_ticket(
         "sender": "admin",
         "text": reply.text,
         "timestamp": now,
-        "attachments": []
+        "attachments": [] # Campo de anexo vazio
     }
 
     ticket_doc_ref.update({
@@ -1163,7 +1162,7 @@ async def get_all_users_for_audit():
     return users_list
     
 # ========================================================================================================
-#                                               ROTAS PARA DICAS
+#                                             ROTAS PARA DICAS
 # ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
 async def create_dica(dica: Dica):
@@ -1223,7 +1222,7 @@ async def record_dica_view(dica_id: str):
     return {"message": "Visualização registrada com sucesso."}
 
 # ========================================================================================================
-#                                               ROTAS PARA FAQ
+#                                             ROTAS PARA FAQ
 # ========================================================================================================
 @app.post("/faq", response_model=FAQ, status_code=201)
 async def create_faq(faq: FAQ):
@@ -1251,14 +1250,7 @@ async def list_faqs():
     faqs_ref = db.collection('faq').order_by('popular', direction=firestore.Query.DESCENDING).order_by('data_criacao', direction=firestore.Query.DESCENDING)
     faqs_list = []
     for doc in faqs_ref.stream():
-        faq_data = doc.to_dict()
-        
-        # Converte o Timestamp do Firestore para o formato ISO 8601
-        if 'data_criacao' in faq_data and isinstance(faq_data['data_criacao'], datetime):
-            faq_data['data_criacao'] = faq_data['data_criacao'].isoformat()
-            
-        faqs_list.append(FAQ(id=doc.id, **faq_data))
-        
+        faqs_list.append(FAQ(id=doc.id, **doc.to_dict()))
     return faqs_list
 
 @app.put("/faq/{faq_id}", response_model=FAQ)
