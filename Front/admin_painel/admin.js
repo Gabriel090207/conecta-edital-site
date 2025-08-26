@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`${BACKEND_URL}/admin/feedback_stats`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Proteção de rota
+                    // Removido o cabeçalho de 'Authorization'
                     'Content-Type': 'application/json',
                     'ngrok-skip-browser-warning': 'true'
                 }

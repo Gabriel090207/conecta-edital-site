@@ -1252,11 +1252,69 @@ ul { list-style: none; }
   Seu código existente pode precisar de pequenos ajustes.
 */
 
+/* --- Estilos do Modal de Feedback --- */
+/*
+  Este CSS foi otimizado para replicar o visual exato da imagem.
+*/
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.modal-overlay.show-modal {
+    display: flex;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 20px;
+}
+
 .modal-content.modal-lg {
     max-width: 90%;
-    width: 900px;
+    width: 1000px;
     padding: 30px;
-    background-color: #f7f9fc; /* Fundo mais claro para o modal */
+    background-color: #f7f9fc;
+    border: 1px solid #e0e6ed;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #888;
 }
 
 .feedback-dashboard {
@@ -1264,17 +1322,12 @@ ul { list-style: none; }
     display: flex;
     flex-direction: column;
     gap: 30px;
+    padding: 20px;
 }
 
 .dashboard-header {
     text-align: center;
     margin-bottom: 20px;
-}
-
-.dashboard-header .header-icon {
-    font-size: 3em;
-    color: #4e79a7;
-    margin-bottom: 10px;
 }
 
 .dashboard-header h2 {
@@ -1315,15 +1368,6 @@ ul { list-style: none; }
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.stats-cards-grid .stat-card .icon-wrapper {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 2.5em;
-    opacity: 0.1;
-    z-index: 0;
-}
-
 .stats-cards-grid .stat-card h3 {
     font-size: 1em;
     font-weight: 600;
@@ -1348,27 +1392,17 @@ ul { list-style: none; }
 
 /* Cores específicas dos cards */
 .stat-card.total-tickets { border-left: 5px solid #4e79a7; }
-.stat-card.total-tickets .icon-wrapper { color: #4e79a7; }
-
 .stat-card.response-rate { border-left: 5px solid #59a14f; }
-.stat-card.response-rate .icon-wrapper { color: #59a14f; }
-
 .stat-card.avg-time { border-left: 5px solid #f28e2b; }
-.stat-card.avg-time .icon-wrapper { color: #f28e2b; }
-
 .stat-card.satisfaction { border-left: 5px solid #76b7b2; }
-.stat-card.satisfaction .icon-wrapper { color: #76b7b2; }
-
 .stat-card.pending { border-left: 5px solid #e15759; }
-.stat-card.pending .icon-wrapper { color: #e15759; }
-
 .stat-card.active-users { border-left: 5px solid #bab0ac; }
-.stat-card.active-users .icon-wrapper { color: #bab0ac; }
 
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+    width: 100%;
 }
 
 .chart-container {
@@ -1377,17 +1411,20 @@ ul { list-style: none; }
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chart-container canvas {
+    max-width: 100% !important;
+    height: 250px;
 }
 
 .chart-container h3 {
     margin: 0 0 15px;
     font-size: 1.2em;
     color: #333;
-}
-
-.chart-container canvas {
-    max-width: 100% !important;
-    height: 250px; /* Altura fixa para manter a consistência */
 }
 
 .analytics-grid {
@@ -1430,7 +1467,7 @@ ul { list-style: none; }
     width: 60px;
     height: 60px;
     font-size: 1.8em;
-    cursor: not-allowed; /* Botões desativados */
+    cursor: not-allowed;
     opacity: 0.6;
     transition: all 0.3s ease;
 }
