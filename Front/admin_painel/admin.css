@@ -1395,12 +1395,64 @@ ul { list-style: none; }
 }
 
 /* Cores específicas dos cards */
-.stat-card.total-tickets { border-left: 5px solid #4e79a7; }
-.stat-card.response-rate { border-left: 5px solid #59a14f; }
-.stat-card.avg-time { border-left: 5px solid #f28e2b; }
-.stat-card.satisfaction { border-left: 5px solid #76b7b2; }
-.stat-card.pending { border-left: 5px solid #e15759; }
-.stat-card.active-users { border-left: 5px solid #bab0ac; }
+.stat-card.total-tickets { 
+    border-left: 5px solid #203bb4; 
+    color: #203bb4; 
+    background-color: #e6f5ff;
+}
+.stat-card.total-tickets h3{color:#203bb4;}
+.stats-cards-grid .stat-card.total-tickets  .value {color:#203bb4;}
+.stat-card.total-tickets p {color:#203bb4;}
+
+.stat-card.response-rate { 
+    border-left: 5px solid #0aac48; 
+    color: #07923d; 
+    background-color: #d2ffe3;
+}
+.stat-card.response-rate h3{color:#0aac48;}
+.stats-cards-grid .stat-card.response-rate  .value {color:#0aac48;}
+.stat-card.response-rate p {color:#0aac48;}
+
+
+.stat-card.avg-time { 
+    border-left: 5px solid #f28e2b; 
+    color: #f28e2b; 
+    background-color: #ffefdf;
+}
+.stat-card.avg-time h3{color:#f28e2b;}
+.stats-cards-grid .stat-card.avg-time  .value {color:#f28e2b;}
+.stat-card.avg-time p {color:#f28e2b;}
+
+.stat-card.satisfaction { 
+    border-left: 5px solid #8e07fd; 
+    color: #8e07fd; 
+    background-color: #f1e0ff;
+}
+.stat-card.satisfaction h3{color:#8e07fd;}
+.stats-cards-grid .stat-card.satisfactione  .value {color:#8e07fd;}
+.stat-card.satisfaction p {color:#8e07fd;}
+
+
+.stat-card.pending { 
+    border-left: 5px solid #df1616; 
+    color: #df1616; 
+    background-color: #ffd7d7;
+}
+.stat-card.pending h3{color:#df1616;}
+.stats-cards-grid .stat-card.pending  .value {color:#df1616;}
+.stat-card.pending p {color:#df1616;}
+
+.stat-card.active-users { 
+    border-left: 5px solid #4820b4; 
+    color: #4820b4; 
+    background-color: #f2eeff;
+}
+.stat-card.active-users h3{color:#4820b4;}
+.stats-cards-grid .stat-card.active-users  .value {color:#4820b4;}
+.stat-card.active-users p {color:#4820b4;}
+
+
+
 
 .charts-grid {
     display: grid;
