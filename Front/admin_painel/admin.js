@@ -87,10 +87,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const faqCategoriaSelect = document.getElementById('faq-categoria');
     const faqPopularCheckbox = document.getElementById('faq-popular');
 
-    // Referência para a nova barra de pesquisa
     const ticketSearchAdminInput = document.getElementById('ticket-search-admin');
     
-    // Referências para o novo modal de Feedback
     const viewFeedbackBtn = document.getElementById('view-feedback-btn');
     const feedbackModal = document.getElementById('feedback-modal');
     const totalTicketsSpan = document.getElementById('total-tickets');
@@ -111,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function openModal(modalElement) {
         if (modalElement) {
             modalElement.classList.add('show-modal');
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
     }
 
@@ -120,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalElement.classList.remove('show-modal');
             const anyModalOpen = document.querySelector('.modal-overlay.show-modal');
             if (!anyModalOpen) {
-                document.body.style.overflow = '';
+                document.body.classList.remove('modal-open');
             }
             if (modalElement === ticketDetailModal) {
                 currentViewingTicket = null;
@@ -240,10 +238,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase()
-                  .normalize('NFD')
-                  .replace(/[\u0300-\u036f]/g, '')
-                  .replace(/[^a-z0-9-]/g, '')
-                  .trim();
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9-]/g, '')
+                    .trim();
     }
 
     // NOVA FUNÇÃO DE FILTRAGEM
@@ -447,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ticketDetailStatusTag.textContent = newStatus;
             ticketDetailStatusTag.className = `ticket-admin-status status-${newStatus.toLowerCase().replace(/ /g, '-') || 'desconhecido'}`;
             
-            alert(`Status do ticket alterado para "${newStatus}" com sucesso!`);
+            alert(`Status do ticket alterado para "${newStatus}" com sucesso!"`);
 
         } catch (error) {
             console.error("Erro ao alterar o status do ticket:", error);
@@ -620,7 +618,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Funções para gerenciamento de FAQ
     async function loadFaqs() {
-        // AQUI ESTÁ A CORREÇÃO: Pega a referência do elemento DENTRO da função
         const currentFaqListContainer = document.getElementById('faq-list-container');
         if (!currentFaqListContainer) return;
 
@@ -713,7 +710,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            // Remove o FAQ da lista local e renderiza novamente
             allFaqs = allFaqs.filter(faq => faq.id !== id);
             renderFaqs(allFaqs);
     
@@ -731,7 +727,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`${BACKEND_URL}/admin/feedback_stats`, {
                 method: 'GET',
                 headers: {
-                    // Removido o cabeçalho de 'Authorization'
                     'Content-Type': 'application/json',
                     'ngrok-skip-browser-warning': 'true'
                 }
@@ -965,7 +960,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 closeModal(faqFormModal);
                 
-                // Atualiza a lista localmente para refletir a mudança
                 if (id) {
                     const index = allFaqs.findIndex(f => f.id === id);
                     if (index !== -1) allFaqs[index] = newFaq;
@@ -1001,7 +995,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Lógica de Polling para Atualização em Tempo Real ---
 
     async function checkAdminTicketsForUpdates() {
-        // Só verifica se o modal de tickets estiver aberto
         if (!allTicketsModal || !allTicketsModal.classList.contains('show-modal')) {
             return;
         }
@@ -1020,16 +1013,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const newTickets = await response.json();
             
-            // Verifica se houve alguma alteração (ex: nova mensagem, status alterado)
             if (JSON.stringify(allTickets) !== JSON.stringify(newTickets)) {
                 console.log("Detectadas atualizações nos tickets do admin. Recarregando...");
-                allTickets = newTickets; // Atualiza a lista de tickets local
+                allTickets = newTickets; 
                 
-                // Reaplica o filtro de busca se houver algum termo
                 const searchTerm = ticketSearchAdminInput ? ticketSearchAdminInput.value.trim() : '';
                 applySearchFilter(searchTerm);
 
-                // Se o modal de detalhes do ticket estiver aberto, atualize ele também
                 if (ticketDetailModal.classList.contains('show-modal') && currentViewingTicket) {
                     const updatedTicket = allTickets.find(t => t.id === currentViewingTicket.id);
                     if (updatedTicket) {
@@ -1042,6 +1032,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Chame a função a cada 5 segundos (5000 milissegundos)
     setInterval(checkAdminTicketsForUpdates, 5000);
 });
