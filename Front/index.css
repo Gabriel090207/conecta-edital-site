@@ -47,6 +47,16 @@ ul {
 .color-card-bg { background-color: #FFFFFF; } /* Fundo de Cards */
 .color-border { border-color: #E0E0E0; } /* Borda Padrão */
 
+
+.gradiente-texto{
+    background-image: linear-gradient(135deg, #631ee2, #3f08c0);
+    -webkit-background-clip: text; /* Para navegadores WebKit (Chrome, Safari, Edge) */
+    background-clip: text;       /* Versão padrão */
+
+    /* Torna a cor do texto transparente para que o gradiente de fundo seja visível */
+    -webkit-text-fill-color: transparent; /* Para navegadores WebKit */
+    color: transparent;  
+}
 /* Destaques de Texto */
 .highlight-blue {
     /* Define o gradiente de fundo */
