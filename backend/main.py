@@ -1067,6 +1067,42 @@ async def get_admin_stats():
         },
         "user_status_distribution": user_status_distribution
     }
+app.post("/api/tickets/{ticket_id}/reply")
+async def user_reply_to_ticket(
+    ticket_id: str,
+    reply: UserReply,
+    user_uid: str = Depends(get_current_user_uid)
+):
+    """
+    Permite que um usuário responda a um de seus próprios tickets.
+    """
+    db = firestore.client()
+    ticket_doc_ref = db.collection('tickets').document(ticket_id)
+    ticket_doc = ticket_doc_ref.get()
+
+    if not ticket_doc.exists:
+        raise HTTPException(status_code=404, detail="Ticket não encontrado.")
+
+    # Verifica se o ticket pertence ao usuário logado
+    if ticket_doc.to_dict().get('user_uid') != user_uid:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para responder a este ticket.")
+
+    now = datetime.now(timezone.utc)
+    new_message = {
+        "sender": "user",
+        "text": reply.text,
+        "timestamp": now,
+        "attachments": [] 
+    }
+
+    ticket_doc_ref.update({
+        'messages': firestore.ArrayUnion([new_message]),
+        'status': 'Respondido' if ticket_doc.to_dict().get('status') == 'Em Atendimento' else 'Aguardando Resposta',
+        'last_updated_at': firestore.SERVER_TIMESTAMP
+    })
+
+    updated_ticket_data = ticket_doc_ref.get().to_dict()
+    return {"message": "Resposta enviada com sucesso!", "ticket": updated_ticket_data}
 
 @app.get("/admin/users")
 async def get_all_users_for_audit():

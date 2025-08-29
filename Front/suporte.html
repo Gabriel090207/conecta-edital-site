@@ -72,12 +72,12 @@
                         <span id="status-display">Todos Status</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
-                    <div class="dropdown-menu" id="status-menu">
-                        <div class="dropdown-option active" data-filter="status" data-value="all">Todos Status</div>
-                        <div class="dropdown-option" data-filter="status" data-value="Aguardando">Aguardando</div>
-                        <div class="dropdown-option" data-filter="status" data-value="Em Atendimento">Em Atendimento</div>
-                        <div class="dropdown-option" data-filter="status" data-value="Respondido">Respondido</div>
-                        <div class="dropdown-option" data-filter="status" data-value="Fechado">Fechado</div>
+                    <div class="dropdown-menu" id="status-menu" data-filter="status">
+                        <div class="dropdown-option active" data-value="all">Todos Status</div>
+                        <div class="dropdown-option" data-value="Aguardando">Aguardando</div>
+                        <div class="dropdown-option" data-value="Em Atendimento">Em Atendimento</div>
+                        <div class="dropdown-option" data-value="Respondido">Respondido</div>
+                        <div class="dropdown-option" data-value="Fechado">Fechado</div>
                     </div>
                 </div>
                 <div class="dropdown-container">
@@ -85,14 +85,14 @@
                         <span id="category-display">Todas Categorias</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
-                    <div class="dropdown-menu" id="category-menu">
-                        <div class="dropdown-option active" data-filter="category" data-value="all">Todas Categorias</div>
-                        <div class="dropdown-option" data-filter="category" data-value="Suporte Técnico">Suporte Técnico</div>
-                        <div class="dropdown-option" data-filter="category" data-value="Dúvidas Gerais">Dúvidas Gerais</div>
-                        <div class="dropdown-option" data-filter="category" data-value="Reclamações">Reclamações</div>
-                        <div class="dropdown-option" data-filter="category" data-value="Feedback/Sugestões">Feedback/Sugestões</div>
-                        <div class="dropdown-option" data-filter="category" data-value="Relatório de Bugs">Relatório de Bugs</div>
-                        <div class="dropdown-option" data-filter="category" data-value="Solicitações">Solicitações</div>
+                    <div class="dropdown-menu" id="category-menu" data-filter="category">
+                        <div class="dropdown-option active" data-value="all">Todas Categorias</div>
+                        <div class="dropdown-option" data-value="Suporte Técnico">Suporte Técnico</div>
+                        <div class="dropdown-option" data-value="Dúvidas Gerais">Dúvidas Gerais</div>
+                        <div class="dropdown-option" data-value="Reclamações">Reclamações</div>
+                        <div class="dropdown-option" data-value="Feedback/Sugestões">Feedback/Sugestões</div>
+                        <div class="dropdown-option" data-value="Relatório de Bugs">Relatório de Bugs</div>
+                        <div class="dropdown-option" data-value="Solicitações">Solicitações</div>
                     </div>
                 </div>
                 <div class="dropdown-container">
@@ -100,10 +100,10 @@
                         <span id="sort-display">Mais Recentes</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
-                    <div class="dropdown-menu" id="sort-menu">
-                        <div class="dropdown-option active" data-filter="sort" data-value="recent">Mais Recentes</div>
-                        <div class="dropdown-option" data-filter="sort" data-value="oldest">Mais Antigos</div>
-                        <div class="dropdown-option" data-filter="sort" data-value="status">Por Status</div>
+                    <div class="dropdown-menu" id="sort-menu" data-filter="sort">
+                        <div class="dropdown-option active" data-value="recent">Mais Recentes</div>
+                        <div class="dropdown-option" data-value="oldest">Mais Antigos</div>
+                        <div class="dropdown-option" data-value="status">Por Status</div>
                     </div>
                 </div>
             </div>

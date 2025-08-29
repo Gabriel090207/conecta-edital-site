@@ -131,21 +131,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyFiltersAndSort() {
         let filteredTickets = [...currentUserTickets];
         
-        const searchTerm = normalizeString(ticketSearchInput.value);
-        if (searchTerm) {
-            filteredTickets = filteredTickets.filter(ticket =>
-                normalizeString(ticket.subject).includes(searchTerm) ||
-                normalizeString(ticket.id).includes(searchTerm) ||
-                (ticket.messages && ticket.messages.some(msg => normalizeString(msg.text).includes(searchTerm)))
-            );
+        // CORREÇÃO: Verifica se o elemento existe antes de tentar ler a propriedade 'value'
+        if (ticketSearchInput) {
+            const searchTerm = normalizeString(ticketSearchInput.value);
+            if (searchTerm) {
+                filteredTickets = filteredTickets.filter(ticket =>
+                    normalizeString(ticket.subject).includes(searchTerm) ||
+                    normalizeString(ticket.id).includes(searchTerm) ||
+                    (ticket.messages && ticket.messages.some(msg => normalizeString(msg.text).includes(searchTerm)))
+                );
+            }
         }
 
-        const selectedStatus = statusMenu.querySelector('.dropdown-option.active').dataset.value;
+        const selectedStatusOption = statusMenu.querySelector('.dropdown-option.active');
+        const selectedStatus = selectedStatusOption ? selectedStatusOption.dataset.value : 'all';
         if (selectedStatus !== 'all') {
             filteredTickets = filteredTickets.filter(ticket => normalizeString(ticket.status) === normalizeString(selectedStatus));
         }
 
-        const selectedCategory = categoryMenu.querySelector('.dropdown-option.active').dataset.value;
+        const selectedCategoryOption = categoryMenu.querySelector('.dropdown-option.active');
+        const selectedCategory = selectedCategoryOption ? selectedCategoryOption.dataset.value : 'all';
         if (selectedCategory !== 'all') {
             const normalizedCategory = normalizeString(selectedCategory);
             filteredTickets = filteredTickets.filter(ticket => {
@@ -154,7 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        const sortOrder = sortMenu.querySelector('.dropdown-option.active').dataset.value;
+        const sortOrderOption = sortMenu.querySelector('.dropdown-option.active');
+        const sortOrder = sortOrderOption ? sortOrderOption.dataset.value : 'recent';
         if (sortOrder === 'recent') {
             filteredTickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         } else if (sortOrder === 'oldest') {
@@ -409,24 +415,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const toggleDropdown = (button, menu) => {
             button.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isShowing = menu.classList.contains('show');
-                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-                document.querySelectorAll('.dropdown-toggle').forEach(b => b.classList.remove('active'));
                 
-                if (!isShowing) {
-                    menu.classList.add('show');
-                    button.classList.add('active');
-                }
+                document.querySelectorAll('.dropdown-menu').forEach(m => {
+                    if (m !== menu) m.classList.remove('show');
+                });
+                
+                document.querySelectorAll('.dropdown-toggle').forEach(b => {
+                    if (b !== button) b.classList.remove('active');
+                });
+                
+                const isShowing = menu.classList.toggle('show');
+                button.classList.toggle('active', isShowing);
             });
         };
         
-        if(statusToggle && statusMenu) toggleDropdown(statusToggle, statusMenu);
-        if(categoryToggle && categoryMenu) toggleDropdown(categoryToggle, categoryMenu);
-        if(sortToggle && sortMenu) toggleDropdown(sortToggle, sortMenu);
+        if (statusToggle && statusMenu) toggleDropdown(statusToggle, statusMenu);
+        if (categoryToggle && categoryMenu) toggleDropdown(categoryToggle, categoryMenu);
+        if (sortToggle && sortMenu) toggleDropdown(sortToggle, sortMenu);
 
         document.querySelectorAll('.dropdown-option').forEach(option => {
             option.addEventListener('click', (e) => {
                 const menu = e.target.closest('.dropdown-menu');
+                if (!menu) return;
+                
                 const filterType = menu.dataset.filter;
                 
                 menu.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('active'));
@@ -434,9 +445,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.target.classList.add('active');
                 
                 const displaySpan = document.getElementById(`${filterType}-display`);
-                displaySpan.textContent = e.target.textContent;
+                if (displaySpan) { // Verificação para evitar erro
+                    displaySpan.textContent = e.target.textContent;
+                }
                 
                 menu.classList.remove('show');
+                
                 const toggleButton = document.getElementById(`${filterType}-toggle`);
                 if (toggleButton) toggleButton.classList.remove('active');
                 
@@ -494,7 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                // AQUI VAMOS ADICIONAR UM LOG MAIS DETALHADO
                 console.error(`Erro na verificação periódica de tickets: ${response.status}`);
                 return;
             }
