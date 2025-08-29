@@ -923,35 +923,46 @@ async def list_all_tickets():
 
     return tickets_list
 
-@app.post("/admin/tickets/{ticket_id}/reply")
-async def admin_reply_to_ticket(
-    ticket_id: str,
-    reply: AdminReply
+# No seu arquivo main.py, procure por esta rota:
+# -----------------------------------------------
+@app.post("/api/tickets", status_code=201)
+async def create_ticket(
+    new_ticket: NewTicket,
+    user_uid: str = Depends(get_current_user_uid)
 ):
     db = firestore.client()
-    ticket_doc_ref = db.collection('tickets').document(ticket_id)
-    ticket_doc = ticket_doc_ref.get()
+    user_email = await get_user_email_from_firestore(user_uid)
 
-    if not ticket_doc.exists:
-        raise HTTPException(status_code=404, detail="Ticket não encontrado.")
-
+    if not user_email:
+        raise HTTPException(status_code=404, detail="E-mail do usuário não encontrado.")
+    
     now = datetime.now(timezone.utc)
-    new_message = {
-        "sender": "admin",
-        "text": reply.text,
+    initial_message_data = {
+        "sender": "user",
+        "text": new_ticket.initial_message,
         "timestamp": now,
-        "attachments": [] # Campo de anexo vazio
+        "attachments": []
     }
 
-    ticket_doc_ref.update({
-        'messages': firestore.ArrayUnion([new_message]),
-        'status': 'Respondido',
-        'last_updated_at': firestore.SERVER_TIMESTAMP
-    })
-
-    updated_ticket_data = ticket_doc_ref.get().to_dict()
-    return {"message": "Resposta do admin enviada com sucesso!", "ticket": updated_ticket_data}
-
+    ticket_data = {
+        "user_uid": user_uid,
+        "user_email": user_email,
+        "subject": new_ticket.subject,
+        "category": new_ticket.category,
+        "status": "Aguardando",
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "last_updated_at": firestore.SERVER_TIMESTAMP,
+        "assignee": "Não Atribuído",
+        "messages": [initial_message_data]
+    }
+    
+    update_time, doc_ref = db.collection('tickets').add(ticket_data)
+    
+    ticket_doc = doc_ref.get().to_dict()
+    ticket_doc['id'] = doc_ref.id
+    
+    return Ticket(**ticket_doc)
+# -----------------------------------------------
 
 @app.patch("/admin/tickets/{ticket_id}/status")
 async def update_ticket_status(ticket_id: str, status_update: TicketStatusUpdate):

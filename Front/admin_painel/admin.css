@@ -163,16 +163,17 @@ ul { list-style: none; }
 }
 
 .btn-primary {
-    background-color: var(--primary-blue);
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
     color: white;
 }
 .btn-primary:hover {
-    background-color: #0056b3;
+   
+    background: linear-gradient(135deg, #0056b3, #0056b3);
 }
 
 .btn-secondary {
     background-color: transparent;
-    border: 1px solid var(--border-color);
+    border: 1px solid ;
     color: var(--text-color-dark);
 }
 .btn-secondary:hover {
@@ -1618,4 +1619,8 @@ body.modal-open {
     .analytics-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.details{
+    background-color: #19d496;
 }
