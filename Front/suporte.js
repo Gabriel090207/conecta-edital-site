@@ -486,8 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // CORREÇÃO: A URL estava com um erro de sintaxe, causando o erro 404.
-            // A URL correta é apenas /api/tickets
             const response = await fetch(`${BACKEND_URL}/api/tickets`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -496,7 +494,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                console.error("Erro na verificação periódica de tickets.");
+                // AQUI VAMOS ADICIONAR UM LOG MAIS DETALHADO
+                console.error(`Erro na verificação periódica de tickets: ${response.status}`);
                 return;
             }
 
