@@ -763,8 +763,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const categoryColors = {
             'Dúvidas Gerais': '#16c98d', 
             'Suporte Técnico': '#1f63e2', 
-            'Feedback/Sugestões': '#f28e2b',
-            'Relatório de Bugs': '#b415d4',
+            'Feedback/Sugestões': '#b810ce',
+            'Relatório de Bugs': '#e4203a',
             'Outros': '#bab0ac',
             'Solicitações': '#e2871f',
             'Reclamações': '#e21f91'
