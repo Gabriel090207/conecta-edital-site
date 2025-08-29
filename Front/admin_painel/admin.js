@@ -768,8 +768,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 datasets: [{
                     label: 'Tickets por Categoria',
                     data: values,
-                    backgroundColor: ['#4e79a7', '#59a14f', '#e15759'],
+                    backgroundColor: ['#007bff', '#59a14f', '#e15759'],
                     borderColor: ['#4e79a7', '#59a14f', '#e15759'],
+                    borderRadius: 7,
                     borderWidth: 1
                 }]
             },
