@@ -238,10 +238,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9-]/g, '')
-                    .trim();
+                  .normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/[^a-z0-9-]/g, '')
+                  .trim();
     }
 
     // NOVA FUNÇÃO DE FILTRAGEM
@@ -759,8 +759,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderTicketsByCategoryChart(data) {
         if (ticketsByCategoryChart) ticketsByCategoryChart.destroy();
-        const labels = data.map(item => item.category);
-        const values = data.map(item => item.count);
+        
+        const categoryColors = {
+            'Dúvidas Gerais': '#16c98d', 
+            'Suporte Técnico': '#1f63e2', 
+            'Feedback/Sugestões': '#f28e2b',
+            'Relatório de Bugs': '#b415d4',
+            'Outros': '#bab0ac',
+            'Solicitações': '#e2871f',
+            'Reclamações': '#e21f91'
+        };
+
+        const filteredData = data.filter(item => item.category !== 'Outros');
+        
+        const labels = filteredData.map(item => item.category);
+        const values = filteredData.map(item => item.count);
+        
+        const colors = labels.map(label => categoryColors[label] || '#cccccc');
+        
         ticketsByCategoryChart = new Chart(ticketsByCategoryChartCanvas, {
             type: 'bar',
             data: {
@@ -768,13 +784,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 datasets: [{
                     label: 'Tickets por Categoria',
                     data: values,
-                    backgroundColor: ['#007bff', '#59a14f', '#e15759'],
-                    borderColor: ['#4e79a7', '#59a14f', '#e15759'],
+                    backgroundColor: colors,
+                    borderColor: colors,
                     borderRadius: 7,
                     borderWidth: 1
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
         });
     }
 
