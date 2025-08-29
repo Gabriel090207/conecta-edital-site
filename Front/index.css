@@ -281,12 +281,36 @@ ul {
     color: #007BFF;
 }
 
+.navbar-center-index ul li a i {
+    margin-right: 8px;
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+    color: white;
+    text-shadow:
+        -1px -1px 0 #6c757d,
+        1px -1px 0 #6c757d,
+        -1px 1px 0 #6c757d,
+        1px 1px 0 #6c757d;
+    
+}
+
+.navbar-center-index ul li a:hover i,
+.navbar-center-index ul li a.active i {
+    transform: scale(1.1);
+    text-shadow:
+    -1px -1px 0 #007bff,
+    1px -1px 0 #007bff,
+    -1px 1px 0 #007bff,
+    1px 1px 0 #007bff;
+    
+}
+
 .navbar-index .navbar-right-index .btn-entrar {
     background: linear-gradient(135deg, #3a68ff, #0427c1);
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 15px 20px;
+    padding: 9px 20px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;

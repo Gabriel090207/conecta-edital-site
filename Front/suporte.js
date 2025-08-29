@@ -5,14 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const openNewChamadoBtn = document.querySelector('#open-new-chamado-btn');
     const createTicketForm = document.getElementById('create-ticket-form');
     const createTicketSubmitBtn = document.getElementById('create-ticket-submit-btn');
-    const newTicketCategorySelect = document.getElementById('ticket-category'); // CORRIGIDO AQUI!
+    const newTicketCategorySelect = document.getElementById('ticket-category');
 
     const ticketSubject = document.getElementById('ticket-subject');
     const ticketDescription = document.getElementById('ticket-description');
     const ticketsListContainer = document.getElementById('tickets-list-container');
     const noTicketsMessage = document.getElementById('no-tickets-message');
 
-    const ticketDetailModal = document = document.getElementById('ticket-detail-modal');
+    const ticketDetailModal = document.getElementById('ticket-detail-modal');
     const ticketDetailTitle = document.getElementById('ticket-detail-title');
     const ticketDetailCreatedAt = document.getElementById('ticket-detail-created-at');
     const ticketDetailStatusTag = document.getElementById('ticket-detail-status-tag');
@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const replyMessageInput = document.getElementById('reply-message-input');
     const sendReplyBtn = document.getElementById('send-reply-btn');
     
-    // Elementos de filtro e busca customizados
     const ticketSearchInput = document.getElementById('ticket-search');
     const statusToggle = document.getElementById('status-toggle');
     const statusMenu = document.getElementById('status-menu');
@@ -35,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUserTickets = [];
     let currentOpenTicketId = null;
 
-    // Função auxiliar para normalizar strings (remover acentos, espaços, etc.)
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase()
@@ -46,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
                   .trim();
     }
 
-    // --- Funções de Modal ---
     function openModal(modalElement) {
         if (modalElement) {
             modalElement.classList.add('show-modal');
@@ -89,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Funções de Autenticação e Carregamento de Tickets ---
     async function getAuthToken() {
         const user = window.firebase.auth().currentUser;
         if (user) {
@@ -132,11 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Lógica de Filtros e Ordenação ---
     function applyFiltersAndSort() {
         let filteredTickets = [...currentUserTickets];
         
-        // Aplica filtro de busca (texto)
         const searchTerm = normalizeString(ticketSearchInput.value);
         if (searchTerm) {
             filteredTickets = filteredTickets.filter(ticket =>
@@ -146,24 +140,20 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // Aplica filtro de status
         const selectedStatus = statusMenu.querySelector('.dropdown-option.active').dataset.value;
         if (selectedStatus !== 'all') {
             filteredTickets = filteredTickets.filter(ticket => normalizeString(ticket.status) === normalizeString(selectedStatus));
         }
 
-        // APLICA FILTRO DE CATEGORIA (AJUSTADO)
         const selectedCategory = categoryMenu.querySelector('.dropdown-option.active').dataset.value;
         if (selectedCategory !== 'all') {
             const normalizedCategory = normalizeString(selectedCategory);
-            // Agora usa o campo 'category' retornado pelo backend
             filteredTickets = filteredTickets.filter(ticket => {
                 const ticketCategory = normalizeString(ticket.category || 'Outros');
                 return ticketCategory === normalizedCategory;
             });
         }
 
-        // Aplica ordenação
         const sortOrder = sortMenu.querySelector('.dropdown-option.active').dataset.value;
         if (sortOrder === 'recent') {
             filteredTickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -252,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(ticketDetailModal);
     }
     
-    // --- Lógica de Envio de Mensagem de Resposta (corrigido para exibição instantânea) ---
     async function addReplyToTicket() {
         const messageText = replyMessageInput.value.trim();
 
@@ -330,8 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    // --- Lógica de Criação de Ticket ---
     if (createTicketForm) {
         createTicketForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -349,8 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const newTicketCategory = newTicketCategorySelect ? newTicketCategorySelect.value : "Outros";
             if (!newTicketCategory || newTicketCategory === "") {
-                 alert('Por favor, selecione uma categoria.');
-                 return;
+                alert('Por favor, selecione uma categoria.');
+                return;
             }
 
             createTicketSubmitBtn.disabled = true;
@@ -403,7 +390,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Listeners para Interação com a Interface ---
     if (sendReplyBtn) {
         sendReplyBtn.addEventListener('click', addReplyToTicket);
     }
@@ -417,42 +403,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Listeners para os filtros customizados
     function setupFilterListeners() {
-        ticketSearchInput.addEventListener('input', applyFiltersAndSort);
+        if (ticketSearchInput) ticketSearchInput.addEventListener('input', applyFiltersAndSort);
 
-        statusToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            statusMenu.classList.toggle('show');
-            statusToggle.classList.toggle('active');
-            categoryMenu.classList.remove('show');
-            categoryToggle.classList.remove('active');
-            sortMenu.classList.remove('show');
-            sortToggle.classList.remove('active');
-        });
-        categoryToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            categoryMenu.classList.toggle('show');
-            categoryToggle.classList.toggle('active');
-            statusMenu.classList.remove('show');
-            statusToggle.classList.remove('active');
-            sortMenu.classList.remove('show');
-            sortToggle.classList.remove('active');
-        });
-        sortToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sortMenu.classList.toggle('show');
-            sortToggle.classList.toggle('active');
-            statusMenu.classList.remove('show');
-            statusToggle.classList.remove('active');
-            categoryMenu.classList.remove('show');
-            categoryToggle.classList.remove('active');
-        });
+        const toggleDropdown = (button, menu) => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isShowing = menu.classList.contains('show');
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+                document.querySelectorAll('.dropdown-toggle').forEach(b => b.classList.remove('active'));
+                
+                if (!isShowing) {
+                    menu.classList.add('show');
+                    button.classList.add('active');
+                }
+            });
+        };
+        
+        if(statusToggle && statusMenu) toggleDropdown(statusToggle, statusMenu);
+        if(categoryToggle && categoryMenu) toggleDropdown(categoryToggle, categoryMenu);
+        if(sortToggle && sortMenu) toggleDropdown(sortToggle, sortMenu);
 
         document.querySelectorAll('.dropdown-option').forEach(option => {
             option.addEventListener('click', (e) => {
                 const menu = e.target.closest('.dropdown-menu');
-                const filterType = e.target.dataset.filter;
+                const filterType = menu.dataset.filter;
                 
                 menu.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('active'));
                 
@@ -463,25 +438,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 menu.classList.remove('show');
                 const toggleButton = document.getElementById(`${filterType}-toggle`);
-                toggleButton.classList.remove('active');
+                if (toggleButton) toggleButton.classList.remove('active');
                 
                 applyFiltersAndSort();
             });
         });
         
-        window.addEventListener('click', (e) => {
-            if (statusToggle && statusMenu && !statusToggle.contains(e.target) && !statusMenu.contains(e.target)) {
-                statusMenu.classList.remove('show');
-                statusToggle.classList.remove('active');
-            }
-            if (categoryToggle && categoryMenu && !categoryToggle.contains(e.target) && !categoryMenu.contains(e.target)) {
-                categoryMenu.classList.remove('show');
-                categoryToggle.classList.remove('active');
-            }
-            if (sortToggle && sortMenu && !sortToggle.contains(e.target) && !sortMenu.contains(e.target)) {
-                sortMenu.classList.remove('show');
-                sortToggle.classList.remove('active');
-            }
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+            document.querySelectorAll('.dropdown-toggle').forEach(button => button.classList.remove('active'));
         });
     }
     
@@ -512,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!window.firebase.auth().currentUser) {
              clearInterval(pollingInterval);
              pollingInterval = null;
-            return;
+             return;
         }
 
         const token = await getAuthToken();
@@ -521,6 +486,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            // CORREÇÃO: A URL estava com um erro de sintaxe, causando o erro 404.
+            // A URL correta é apenas /api/tickets
             const response = await fetch(`${BACKEND_URL}/api/tickets`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -540,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUserTickets = newTickets;
                 applyFiltersAndSort();
                 
-                if (ticketDetailModal.classList.contains('show-modal') && currentOpenTicketId) {
+                if (ticketDetailModal && ticketDetailModal.classList.contains('show-modal') && currentOpenTicketId) {
                     const updatedTicket = currentUserTickets.find(t => t.id === currentOpenTicketId);
                     if (updatedTicket) {
                         openTicketDetailModal(updatedTicket.id);

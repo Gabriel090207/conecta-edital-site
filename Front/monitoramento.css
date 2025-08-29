@@ -96,6 +96,7 @@ ul {
     display: flex;
     align-items: center;
     color:#08ac6d;
+    
     font-weight: 500;
     padding: 5px 0;
     transition: color 0.3s ease, transform 0.3s ease;
@@ -116,11 +117,32 @@ ul {
     margin-right: 8px;
     font-size: 1rem;
     transition: transform 0.3s ease;
+    color: white;
+    text-shadow:
+        -1px -1px 0 #6c757d,
+        1px -1px 0 #6c757d,
+        -1px 1px 0 #6c757d,
+        1px 1px 0 #6c757d;
+    
 }
 
 .navbar-center ul li a:hover i,
 .navbar-center ul li a.active i {
     transform: scale(1.1);
+    text-shadow:
+    -1px -1px 0 #007bff,
+    1px -1px 0 #007bff,
+    -1px 1px 0 #007bff,
+    1px 1px 0 #007bff;
+    
+}
+
+.navbar-center ul li a.ajuda i{
+    text-shadow:
+    -1px -1px 0 #08ac6d,
+    1px -1px 0 #08ac6d,
+    -1px 1px 0 #08ac6d,
+    1px 1px 0 #08ac6d;
 }
 
 .navbar-right {
