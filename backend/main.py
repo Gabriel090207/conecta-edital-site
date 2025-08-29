@@ -60,7 +60,7 @@ origins = [
     "http://127.0.0.1:5500", 
     "http://localhost:5500", 
     "https://conecta-edital-site.onrender.com", 
-    "https://paineldeadmimconectaedital.netlify.app",
+    "https://paineldeadminconectaedital.netlify.app",
     "https://siteconectaedital.netlify.app"
 ]
 
