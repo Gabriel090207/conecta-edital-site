@@ -1422,3 +1422,29 @@ async def get_admin_feedback_stats():
         "most_active_users": most_active_users
     }
 # ... código seguinte ...
+@app.get("/api/tickets", response_model=List[Ticket])
+async def get_user_tickets(user_uid: str = Depends(get_current_user_uid)):
+    """
+    Retorna a lista de todos os tickets do usuário atual.
+    """
+    db = firestore.client()
+    # Filtra os tickets para que apenas os do usuário logado sejam retornados
+    tickets_ref = db.collection('tickets').where(filter=FieldFilter('user_uid', '==', user_uid)).order_by('last_updated_at', direction=firestore.Query.DESCENDING)
+
+    tickets_list = []
+    for doc in tickets_ref.stream():
+        ticket_data = doc.to_dict()
+        if 'created_at' in ticket_data and isinstance(ticket_data['created_at'], datetime):
+            ticket_data['created_at'] = ticket_data['created_at'].isoformat()
+        if 'last_updated_at' in ticket_data and isinstance(ticket_data['last_updated_at'], datetime):
+            ticket_data['last_updated_at'] = ticket_data['last_updated_at'].isoformat()
+        if 'messages' in ticket_data:
+            for msg in ticket_data['messages']:
+                if isinstance(msg.get('timestamp'), datetime):
+                    msg['timestamp'] = msg['timestamp'].isoformat()
+        if 'category' not in ticket_data:
+            ticket_data['category'] = 'Outros'
+
+        tickets_list.append(Ticket(id=doc.id, **ticket_data))
+
+    return tickets_list
