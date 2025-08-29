@@ -60,7 +60,7 @@ origins = [
     "http://127.0.0.1:5500", 
     "http://localhost:5500", 
     "https://conecta-edital-site.onrender.com", 
-    "https://paineldeadminconectaedital.netlify.app",
+    "https://paineldeadmimconectaedital.netlify.app",
     "https://siteconectaedital.netlify.app"
 ]
 
@@ -889,36 +889,38 @@ async def test_monitoring_endpoint(
         return {"message": "Palavra-chave encontrada! O resultado foi enviado para o seu e-mail."}
     else:
         return {"message": "Palavra-chave não encontrada. Verifique se a palavra está correta ou tente outro PDF."}
-#...
-# Adicionando a rota de tickets para o usuário no lugar correto
-#...
-@app.get("/api/tickets", response_model=List[Ticket])
-async def get_user_tickets(user_uid: str = Depends(get_current_user_uid)):
-    """
-    Retorna a lista de todos os tickets do usuário atual.
-    """
-    db = firestore.client()
-    # Filtra os tickets para que apenas os do usuário logado sejam retornados
-    tickets_ref = db.collection('tickets').where(filter=FieldFilter('user_uid', '==', user_uid)).order_by('last_updated_at', direction=firestore.Query.DESCENDING)
 
+# ========================================================================================================
+#                                                 ROTAS DE SUPORTE
+# ========================================================================================================
+
+@app.get("/api/tickets", response_model=List[Ticket])
+async def list_user_tickets(user_uid: str = Depends(get_current_user_uid)):
+    db = firestore.client()
+    tickets_ref = db.collection('tickets').where(filter=FieldFilter('user_uid', '==', user_uid)).order_by('last_updated_at', direction=firestore.Query.DESCENDING)
+    
     tickets_list = []
     for doc in tickets_ref.stream():
         ticket_data = doc.to_dict()
-        if 'created_at' in ticket_data and isinstance(ticket_data['created_at'], datetime):
+        
+        # Converte o timestamp do Firestore para o formato ISO
+        if 'created_at' in ticket_data and ticket_data['created_at']:
             ticket_data['created_at'] = ticket_data['created_at'].isoformat()
-        if 'last_updated_at' in ticket_data and isinstance(ticket_data['last_updated_at'], datetime):
+        if 'last_updated_at' in ticket_data and ticket_data['last_updated_at']:
             ticket_data['last_updated_at'] = ticket_data['last_updated_at'].isoformat()
-        if 'messages' in ticket_data:
-            for msg in ticket_data['messages']:
-                if isinstance(msg.get('timestamp'), datetime):
-                    msg['timestamp'] = msg['timestamp'].isoformat()
+        
+        if 'messages' in ticket_data and isinstance(ticket_data['messages'], list):
+            for message in ticket_data['messages']:
+                if isinstance(message.get('timestamp'), datetime):
+                    message['timestamp'] = message['timestamp'].isoformat()
+
+        # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
         if 'category' not in ticket_data:
             ticket_data['category'] = 'Outros'
 
         tickets_list.append(Ticket(id=doc.id, **ticket_data))
 
     return tickets_list
-
 
 @app.post("/api/tickets", status_code=201)
 async def create_ticket(
@@ -936,14 +938,14 @@ async def create_ticket(
         "sender": "user",
         "text": new_ticket.initial_message,
         "timestamp": now,
-        "attachments": []
+        "attachments": [] # Campo de anexo vazio
     }
 
     ticket_data = {
         "user_uid": user_uid,
         "user_email": user_email,
         "subject": new_ticket.subject,
-        "category": new_ticket.category,
+        "category": new_ticket.category, # NOVO CAMPO ADICIONADO AQUI
         "status": "Aguardando",
         "created_at": firestore.SERVER_TIMESTAMP,
         "last_updated_at": firestore.SERVER_TIMESTAMP,
@@ -958,24 +960,20 @@ async def create_ticket(
     
     return Ticket(**ticket_doc)
 
+
 @app.post("/api/tickets/{ticket_id}/reply")
 async def user_reply_to_ticket(
     ticket_id: str,
     reply: UserReply,
     user_uid: str = Depends(get_current_user_uid)
 ):
-    """
-    Permite que um usuário responda a um de seus próprios tickets.
-    """
     db = firestore.client()
-    ticket_doc_ref = db.collection('tickets').document(ticket_id)
-    ticket_doc = ticket_doc_ref.get()
-
-    if not ticket_doc.exists:
+    ref = db.collection('tickets').document(ticket_id)
+    doc = ref.get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Ticket não encontrado.")
 
-    # Verifica se o ticket pertence ao usuário logado
-    if ticket_doc.to_dict().get('user_uid') != user_uid:
+    if doc.to_dict().get('user_uid') != user_uid:
         raise HTTPException(status_code=403, detail="Você não tem permissão para responder a este ticket.")
 
     now = datetime.now(timezone.utc)
@@ -983,20 +981,21 @@ async def user_reply_to_ticket(
         "sender": "user",
         "text": reply.text,
         "timestamp": now,
-        "attachments": [] 
+        "attachments": [] # Campo de anexo vazio
     }
 
-    ticket_doc_ref.update({
+    ref.update({
         'messages': firestore.ArrayUnion([new_message]),
-        'status': 'Respondido' if ticket_doc.to_dict().get('status') == 'Em Atendimento' else 'Aguardando Resposta',
+        'status': 'Em Atendimento',
         'last_updated_at': firestore.SERVER_TIMESTAMP
     })
-
-    updated_ticket_data = ticket_doc_ref.get().to_dict()
-    return {"message": "Resposta enviada com sucesso!", "ticket": updated_ticket_data}
     
+    updated_ticket_data = ref.get().to_dict()
+    return {"message": "Resposta enviada", "ticket": updated_ticket_data}
+
+
 # ========================================================================================================
-#                                     ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
+#                                                 ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
 # ========================================================================================================
 
 @app.get("/admin/tickets")
@@ -1219,7 +1218,11 @@ async def get_admin_feedback_stats():
         
         if status in ['Aguardando', 'Em Atendimento']:
             pending_tickets_count += 1
-        
+
+        if status == 'Respondido' or status == 'Resolvido':
+            # Contagem de tickets que receberam resposta, sem ser duplicado
+            pass
+
         if created_at:
             month_year = created_at.strftime('%b. %y')
             tickets_by_month[month_year] += 1
@@ -1292,7 +1295,7 @@ async def get_admin_feedback_stats():
     }
 
 # ========================================================================================================
-#                                     ROTAS PARA DICAS
+#                                                 ROTAS PARA DICAS
 # ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
 async def create_dica(dica: Dica):
@@ -1352,7 +1355,7 @@ async def record_dica_view(dica_id: str):
     return {"message": "Visualização registrada com sucesso."}
 
 # ========================================================================================================
-#                                     ROTAS PARA FAQ
+#                                                 ROTAS PARA FAQ
 # ========================================================================================================
 @app.post("/faq", response_model=FAQ, status_code=201)
 async def create_faq(faq: FAQ):
@@ -1415,509 +1418,3 @@ async def record_faq_view(faq_id: str):
     
     faq_doc_ref.update({'visualizacoes': firestore.Increment(1)})
     return {"message": "Visualização registrada com sucesso."}
-    
-@app.get("/admin/feedback_stats")
-async def get_admin_feedback_stats():
-    db = firestore.client()
-    tickets_ref = db.collection('tickets')
-    users_ref = db.collection('users')
-    
-    all_tickets = list(tickets_ref.stream())
-    total_tickets = len(all_tickets)
-    
-    # Estatísticas de Tickets
-    tickets_by_status = defaultdict(int)
-    tickets_by_category = defaultdict(int)
-    tickets_by_month = defaultdict(int)
-    total_resolved_time = 0
-    resolved_tickets_count = 0
-    pending_tickets_count = 0
-    
-    for ticket in all_tickets:
-        ticket_data = ticket.to_dict()
-        status = ticket_data.get('status', 'Desconhecido')
-        category = ticket_data.get('category', 'Outros')
-        created_at = ticket_data.get('created_at')
-        
-        tickets_by_status[status] += 1
-        tickets_by_category[category] += 1
-        
-        if status == 'Resolvido':
-            last_updated_at = ticket_data.get('last_updated_at')
-            if created_at and last_updated_at:
-                resolved_time = (last_updated_at - created_at).total_seconds()
-                total_resolved_time += resolved_time
-            resolved_tickets_count += 1
-        
-        if status in ['Aguardando', 'Em Atendimento']:
-            pending_tickets_count += 1
-        
-        if created_at:
-            month_year = created_at.strftime('%b. %y')
-            tickets_by_month[month_year] += 1
-    
-    # Cálculo da média de tempo de resolução
-    avg_resolution_time_hours = (total_resolved_time / resolved_tickets_count / 3600) if resolved_tickets_count > 0 else 0
-    response_rate = (tickets_by_status.get('Respondido', 0) + tickets_by_status.get('Resolvido', 0)) / total_tickets * 100 if total_tickets > 0 else 0
-    
-    # Distribuição de Status
-    ticket_status_distribution = {}
-    for status, count in tickets_by_status.items():
-        percentage = (count / total_tickets) * 100 if total_tickets > 0 else 0
-        ticket_status_distribution[status] = {'count': count, 'percentage': percentage}
-    
-    # Distribuição de Categoria
-    tickets_by_category_list = [{'category': cat, 'count': count} for cat, count in tickets_by_category.items()]
-    
-    # Tendência Mensal (preenche meses sem tickets)
-    now = datetime.now()
-    monthly_trend = []
-    for i in range(6, -1, -1):  # Últimos 7 meses
-        month_ago = now - relativedelta(months=i)
-        month_year_label = month_ago.strftime('%b. %y')
-        monthly_trend.append({
-            'month': month_year_label,
-            'count': tickets_by_month.get(month_year_label, 0)
-        })
-    
-    # Usuários Mais Ativos
-    tickets_by_user = defaultdict(int)
-    for ticket in all_tickets:
-        user_uid = ticket.to_dict().get('user_uid')
-        if user_uid:
-            tickets_by_user[user_uid] += 1
-    
-    most_active_users = []
-    # Busca apenas os top 5 usuários mais ativos com uma query otimizada
-    users_with_tickets = [uid for uid, count in sorted(tickets_by_user.items(), key=lambda item: item[1], reverse=True)[:5]]
-    
-    if users_with_tickets:
-        docs = users_ref.stream()
-        user_data_map = {doc.id: doc.to_dict() for doc in docs if doc.id in users_with_tickets}
-        
-        for uid in users_with_tickets:
-            user_data = user_data_map.get(uid, {})
-            user_name = user_data.get('fullName', 'Usuário Desconhecido')
-            user_email = user_data.get('email', 'email@desconhecido.com')
-            most_active_users.append({
-                'name': user_name,
-                'email': user_email,
-                'ticket_count': tickets_by_user[uid]
-            })
-    
-    # Contagem de usuários ativos e totais
-    all_users_count = len(list(users_ref.stream()))
-    active_users_count = len(list(users_ref.where(filter=FieldFilter('status', '==', 'ativo')).stream()))
-
-    return {
-        "total_tickets": total_tickets,
-        "response_rate": response_rate,
-        "avg_resolution_time_hours": round(avg_resolution_time_hours, 1),
-        "satisfaction_rate": 0, # Placeholder
-        "pending_tickets": pending_tickets_count,
-        "active_users_count": active_users_count,
-        "total_users": all_users_count,
-        "tickets_by_category": tickets_by_category_list,
-        "ticket_status_distribution": ticket_status_distribution,
-        "monthly_ticket_trend": monthly_trend,
-        "most_active_users": most_active_users
-    }
-
-# ========================================================================================================
-#                                     ROTAS PARA DICAS
-# ========================================================================================================
-@app.post("/dicas", response_model=Dica, status_code=201)
-async def create_dica(dica: Dica):
-    db = firestore.client()
-    dica_dict = dica.dict(exclude_unset=True)
-    dica_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
-    _, doc_ref = db.collection('dicas').add(dica_dict)
-    
-    new_doc = doc_ref.get()
-    
-    if new_doc.exists:
-        new_dica = Dica(id=new_doc.id, **new_doc.to_dict())
-        return new_dica
-    else:
-        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
-
-@app.get("/dicas", response_model=List[Dica])
-async def list_dicas():
-    db = firestore.client()
-    dicas_ref = db.collection('dicas').order_by('data_criacao', direction=firestore.Query.DESCENDING)
-    dicas_list = []
-    for doc in dicas_ref.stream():
-        dicas_list.append(Dica(id=doc.id, **doc.to_dict()))
-    return dicas_list
-
-@app.put("/dicas/{dica_id}", response_model=Dica)
-async def update_dica(dica_id: str, updated_dica: Dica):
-    db = firestore.client()
-    dica_doc_ref = db.collection('dicas').document(dica_id)
-    if not dica_doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="Dica não encontrada")
-
-    dica_doc_ref.update(updated_dica.dict(exclude_unset=True, exclude={'id', 'data_criacao'}))
-    updated_doc = dica_doc_ref.get()
-    return Dica(id=updated_doc.id, **updated_doc.to_dict())
-
-@app.delete("/dicas/{dica_id}", status_code=204)
-async def delete_dica(dica_id: str):
-    db = firestore.client()
-    dica_doc_ref = db.collection('dicas').document(dica_id)
-    if not dica_doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="Dica não encontrada")
-    
-    dica_doc_ref.delete()
-    return
-
-@app.post("/dicas/{dica_id}/visualizacao")
-async def record_dica_view(dica_id: str):
-    db = firestore.client()
-    dica_doc_ref = db.collection('dicas').document(dica_id)
-    dica_doc = dica_doc_ref.get()
-    
-    if not dica_doc.exists:
-        raise HTTPException(status_code=404, detail="Dica não encontrada")
-    
-    dica_doc_ref.update({'visualizacoes': firestore.Increment(1)})
-    return {"message": "Visualização registrada com sucesso."}
-    
-# ========================================================================================================
-#                                     ROTAS PARA FAQ
-# ========================================================================================================
-@app.post("/faq", response_model=FAQ, status_code=201)
-async def create_faq(faq: FAQ):
-    db = firestore.client()
-    faq_dict = faq.dict(exclude_unset=True)
-    
-    # Use firestore.SERVER_TIMESTAMP para a data de criação
-    faq_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
-    
-    _, doc_ref = db.collection('faq').add(faq_dict)
-    
-    # Obtenha o documento recém-criado para ter a data real do servidor
-    new_doc = doc_ref.get()
-    
-    if new_doc.exists:
-        new_faq = FAQ(id=new_doc.id, **new_doc.to_dict())
-        return new_faq
-    else:
-        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
-
-@app.get("/faq", response_model=List[FAQ])
-async def list_faqs():
-    db = firestore.client()
-    # CORREÇÃO AQUI: Ordena por `popular` e depois por `data_criacao` para exibir no topo.
-    faqs_ref = db.collection('faq').order_by('popular', direction=firestore.Query.DESCENDING).order_by('data_criacao', direction=firestore.Query.DESCENDING)
-    faqs_list = []
-    for doc in faqs_ref.stream():
-        faqs_list.append(FAQ(id=doc.id, **doc.to_dict()))
-    return faqs_list
-
-@app.put("/faq/{faq_id}", response_model=FAQ)
-async def update_faq(faq_id: str, updated_faq: FAQ):
-    db = firestore.client()
-    faq_doc_ref = db.collection('faq').document(faq_id)
-    if not faq_doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="FAQ não encontrado")
-
-    faq_doc_ref.update(updated_faq.dict(exclude_unset=True, exclude={'id', 'data_criacao'}))
-    updated_doc = faq_doc_ref.get()
-    return FAQ(id=updated_doc.id, **updated_doc.to_dict())
-
-@app.delete("/faq/{faq_id}", status_code=204)
-async def delete_faq(faq_id: str):
-    db = firestore.client()
-    faq_doc_ref = db.collection('faq').document(faq_id)
-    if not faq_doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="FAQ não encontrado")
-    
-    faq_doc_ref.delete()
-    return
-
-@app.post("/faq/{faq_id}/visualizacao")
-async def record_faq_view(faq_id: str):
-    db = firestore.client()
-    faq_doc_ref = db.collection('faq').document(faq_id)
-    faq_doc = faq_doc_ref.get()
-    
-    if not faq_doc.exists:
-        raise HTTPException(status_code=404, detail="FAQ não encontrado")
-    
-    faq_doc_ref.update({'visualizacoes': firestore.Increment(1)})
-    return {"message": "Visualização registrada com sucesso."}
-    
-@app.get("/admin/feedback_stats")
-async def get_admin_feedback_stats():
-    db = firestore.client()
-    tickets_ref = db.collection('tickets')
-    users_ref = db.collection('users')
-    
-    all_tickets = list(tickets_ref.stream())
-    total_tickets = len(all_tickets)
-    
-    # Estatísticas de Tickets
-    tickets_by_status = defaultdict(int)
-    tickets_by_category = defaultdict(int)
-    tickets_by_month = defaultdict(int)
-    total_resolved_time = 0
-    resolved_tickets_count = 0
-    pending_tickets_count = 0
-    
-    for ticket in all_tickets:
-        ticket_data = ticket.to_dict()
-        status = ticket_data.get('status', 'Desconhecido')
-        category = ticket_data.get('category', 'Outros')
-        created_at = ticket_data.get('created_at')
-        
-        tickets_by_status[status] += 1
-        tickets_by_category[category] += 1
-        
-        if status == 'Resolvido':
-            last_updated_at = ticket_data.get('last_updated_at')
-            if created_at and last_updated_at:
-                resolved_time = (last_updated_at - created_at).total_seconds()
-                total_resolved_time += resolved_time
-            resolved_tickets_count += 1
-        
-        if status in ['Aguardando', 'Em Atendimento']:
-            pending_tickets_count += 1
-        
-        if created_at:
-            month_year = created_at.strftime('%b. %y')
-            tickets_by_month[month_year] += 1
-    
-    # Cálculo da média de tempo de resolução
-    avg_resolution_time_hours = (total_resolved_time / resolved_tickets_count / 3600) if resolved_tickets_count > 0 else 0
-    response_rate = (tickets_by_status.get('Respondido', 0) + tickets_by_status.get('Resolvido', 0)) / total_tickets * 100 if total_tickets > 0 else 0
-    
-    # Distribuição de Status
-    ticket_status_distribution = {}
-    for status, count in tickets_by_status.items():
-        percentage = (count / total_tickets) * 100 if total_tickets > 0 else 0
-        ticket_status_distribution[status] = {'count': count, 'percentage': percentage}
-    
-    # Distribuição de Categoria
-    tickets_by_category_list = [{'category': cat, 'count': count} for cat, count in tickets_by_category.items()]
-    
-    # Tendência Mensal (preenche meses sem tickets)
-    now = datetime.now()
-    monthly_trend = []
-    for i in range(6, -1, -1):  # Últimos 7 meses
-        month_ago = now - relativedelta(months=i)
-        month_year_label = month_ago.strftime('%b. %y')
-        monthly_trend.append({
-            'month': month_year_label,
-            'count': tickets_by_month.get(month_year_label, 0)
-        })
-    
-    # Usuários Mais Ativos
-    tickets_by_user = defaultdict(int)
-    for ticket in all_tickets:
-        user_uid = ticket.to_dict().get('user_uid')
-        if user_uid:
-            tickets_by_user[user_uid] += 1
-    
-    most_active_users = []
-    # Busca apenas os top 5 usuários mais ativos com uma query otimizada
-    users_with_tickets = [uid for uid, count in sorted(tickets_by_user.items(), key=lambda item: item[1], reverse=True)[:5]]
-    
-    if users_with_tickets:
-        docs = users_ref.stream()
-        user_data_map = {doc.id: doc.to_dict() for doc in docs if doc.id in users_with_tickets}
-        
-        for uid in users_with_tickets:
-            user_data = user_data_map.get(uid, {})
-            user_name = user_data.get('fullName', 'Usuário Desconhecido')
-            user_email = user_data.get('email', 'email@desconhecido.com')
-            most_active_users.append({
-                'name': user_name,
-                'email': user_email,
-                'ticket_count': tickets_by_user[uid]
-            })
-    
-    # Contagem de usuários ativos e totais
-    all_users_count = len(list(users_ref.stream()))
-    active_users_count = len(list(users_ref.where(filter=FieldFilter('status', '==', 'ativo')).stream()))
-
-    return {
-        "total_tickets": total_tickets,
-        "response_rate": response_rate,
-        "avg_resolution_time_hours": round(avg_resolution_time_hours, 1),
-        "satisfaction_rate": 0, # Placeholder
-        "pending_tickets": pending_tickets_count,
-        "active_users_count": active_users_count,
-        "total_users": all_users_count,
-        "tickets_by_category": tickets_by_category_list,
-        "ticket_status_distribution": ticket_status_distribution,
-        "monthly_ticket_trend": monthly_trend,
-        "most_active_users": most_active_users
-    }
-
-# ========================================================================================================
-#                                     ROTAS PARA DICAS
-# ========================================================================================================
-@app.post("/dicas", response_model=Dica, status_code=201)
-async def create_dica(dica: Dica):
-    db = firestore.client()
-    dica_dict = dica.dict(exclude_unset=True)
-    dica_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
-    _, doc_ref = db.collection('dicas').add(dica_dict)
-    
-    new_doc = doc_ref.get()
-    
-    if new_doc.exists:
-        new_dica = Dica(id=new_doc.id, **new_doc.to_dict())
-        return new_dica
-    else:
-        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
-
-@app.get("/dicas", response_model=List[Dica])
-async def list_dicas():
-    db = firestore.client()
-    dicas_ref = db.collection('dicas').order_by('data_criacao', direction=firestore.Query.DESCENDING)
-    dicas_list = []
-    for doc in dicas_ref.stream():
-        dicas_list.append(Dica(id=doc.id, **doc.to_dict()))
-    return dicas_list
-
-@app.put("/dicas/{dica_id}", response_model=Dica)
-async def update_dica(dica_id: str, updated_dica: Dica):
-    db = firestore.client()
-    dica_doc_ref = db.collection('dicas').document(dica_id)
-    if not dica_doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="Dica não encontrada")
-
-    dica_doc_ref.update(updated_dica.dict(exclude_unset=True, exclude={'id', 'data_criacao'}))
-    updated_doc = dica_doc_ref.get()
-    return Dica(id=updated_doc.id, **updated_doc.to_dict())
-
-@app.delete("/dicas/{dica_id}", status_code=204)
-async def delete_dica(dica_id: str):
-    db = firestore.client()
-    dica_doc_ref = db.collection('dicas').document(dica_id)
-    if not dica_doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="Dica não encontrada")
-    
-    dica_doc_ref.delete()
-    return
-
-@app.post("/dicas/{dica_id}/visualizacao")
-async def record_dica_view(dica_id: str):
-    db = firestore.client()
-    dica_doc_ref = db.collection('dicas').document(dica_id)
-    dica_doc = dica_doc_ref.get()
-    
-    if not dica_doc.exists:
-        raise HTTPException(status_code=404, detail="Dica não encontrada")
-    
-    dica_doc_ref.update({'visualizacoes': firestore.Increment(1)})
-    return {"message": "Visualização registrada com sucesso."}
-    
-@app.get("/admin/feedback_stats")
-async def get_admin_feedback_stats():
-    db = firestore.client()
-    tickets_ref = db.collection('tickets')
-    users_ref = db.collection('users')
-    
-    all_tickets = list(tickets_ref.stream())
-    total_tickets = len(all_tickets)
-    
-    # Estatísticas de Tickets
-    tickets_by_status = defaultdict(int)
-    tickets_by_category = defaultdict(int)
-    tickets_by_month = defaultdict(int)
-    total_resolved_time = 0
-    resolved_tickets_count = 0
-    pending_tickets_count = 0
-    
-    for ticket in all_tickets:
-        ticket_data = ticket.to_dict()
-        status = ticket_data.get('status', 'Desconhecido')
-        category = ticket_data.get('category', 'Outros')
-        created_at = ticket_data.get('created_at')
-        
-        tickets_by_status[status] += 1
-        tickets_by_category[category] += 1
-        
-        if status == 'Resolvido':
-            last_updated_at = ticket_data.get('last_updated_at')
-            if created_at and last_updated_at:
-                resolved_time = (last_updated_at - created_at).total_seconds()
-                total_resolved_time += resolved_time
-            resolved_tickets_count += 1
-        
-        if status in ['Aguardando', 'Em Atendimento']:
-            pending_tickets_count += 1
-        
-        if created_at:
-            month_year = created_at.strftime('%b. %y')
-            tickets_by_month[month_year] += 1
-    
-    # Cálculo da média de tempo de resolução
-    avg_resolution_time_hours = (total_resolved_time / resolved_tickets_count / 3600) if resolved_tickets_count > 0 else 0
-    response_rate = (tickets_by_status.get('Respondido', 0) + tickets_by_status.get('Resolvido', 0)) / total_tickets * 100 if total_tickets > 0 else 0
-    
-    # Distribuição de Status
-    ticket_status_distribution = {}
-    for status, count in tickets_by_status.items():
-        percentage = (count / total_tickets) * 100 if total_tickets > 0 else 0
-        ticket_status_distribution[status] = {'count': count, 'percentage': percentage}
-    
-    # Distribuição de Categoria
-    tickets_by_category_list = [{'category': cat, 'count': count} for cat, count in tickets_by_category.items()]
-    
-    # Tendência Mensal (preenche meses sem tickets)
-    now = datetime.now()
-    monthly_trend = []
-    for i in range(6, -1, -1):  # Últimos 7 meses
-        month_ago = now - relativedelta(months=i)
-        month_year_label = month_ago.strftime('%b. %y')
-        monthly_trend.append({
-            'month': month_year_label,
-            'count': tickets_by_month.get(month_year_label, 0)
-        })
-    
-    # Usuários Mais Ativos
-    tickets_by_user = defaultdict(int)
-    for ticket in all_tickets:
-        user_uid = ticket.to_dict().get('user_uid')
-        if user_uid:
-            tickets_by_user[user_uid] += 1
-    
-    most_active_users = []
-    # Busca apenas os top 5 usuários mais ativos com uma query otimizada
-    users_with_tickets = [uid for uid, count in sorted(tickets_by_user.items(), key=lambda item: item[1], reverse=True)[:5]]
-    
-    if users_with_tickets:
-        docs = users_ref.stream()
-        user_data_map = {doc.id: doc.to_dict() for doc in docs if doc.id in users_with_tickets}
-        
-        for uid in users_with_tickets:
-            user_data = user_data_map.get(uid, {})
-            user_name = user_data.get('fullName', 'Usuário Desconhecido')
-            user_email = user_data.get('email', 'email@desconhecido.com')
-            most_active_users.append({
-                'name': user_name,
-                'email': user_email,
-                'ticket_count': tickets_by_user[uid]
-            })
-    
-    # Contagem de usuários ativos e totais
-    all_users_count = len(list(users_ref.stream()))
-    active_users_count = len(list(users_ref.where(filter=FieldFilter('status', '==', 'ativo')).stream()))
-
-    return {
-        "total_tickets": total_tickets,
-        "response_rate": response_rate,
-        "avg_resolution_time_hours": round(avg_resolution_time_hours, 1),
-        "satisfaction_rate": 0, # Placeholder
-        "pending_tickets": pending_tickets_count,
-        "active_users_count": active_users_count,
-        "total_users": all_users_count,
-        "tickets_by_category": tickets_by_category_list,
-        "ticket_status_distribution": ticket_status_distribution,
-        "monthly_ticket_trend": monthly_trend,
-        "most_active_users": most_active_users
-    }
