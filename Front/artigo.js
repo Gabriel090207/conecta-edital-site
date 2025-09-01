@@ -30,7 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('article-date').textContent = new Date(article.data_criacao).toLocaleDateString('pt-BR');
             document.getElementById('article-read-time').textContent = `${Math.ceil(article.conteudo.split(' ').length / 200)} min. de leitura`;
             
-            document.getElementById('article-body-content').innerHTML = article.conteudo;
+            // --- INÍCIO DA SOLUÇÃO PARA QUEBRA DE LINHA ---
+            const conteudoBruto = article.conteudo;
+            // Divide o texto em um array de linhas, usando a quebra de linha como separador.
+            const linhas = conteudoBruto.split('\n');
+
+            let htmlConteudo = '';
+            linhas.forEach(linha => {
+                // Para cada linha, cria um novo parágrafo (<p>)
+                // A verificação 'trim() !== ''' impede que parágrafos vazios sejam criados
+                if (linha.trim() !== '') {
+                    htmlConteudo += `<p>${linha}</p>`;
+                }
+            });
+
+            document.getElementById('article-body-content').innerHTML = htmlConteudo;
+            // --- FIM DA SOLUÇÃO PARA QUEBRA DE LINHA ---
             
         } catch (error) {
             console.error("Erro ao carregar o artigo:", error);
