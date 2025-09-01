@@ -1622,5 +1622,130 @@ body.modal-open {
 }
 
 .details{
-    background-color: #b810ce;
+    background-color: #cedefa;
+}
+
+/* --- Estilos do Modal de Artigos do Blog --- */
+
+#blog-modal .modal-content {
+    max-width: 800px;
+}
+
+.btn-new-article {
+    background-color: #5cb85c;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+
+.btn-new-article:hover {
+    background-color: #4cae4c;
+}
+
+.articles-list-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.article-admin-card {
+    background-color: #f0f2f5;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.article-admin-card .article-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.article-admin-card h4 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.article-admin-card .tags {
+    background-color: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.article-admin-card p {
+    margin: 0;
+    color: #888;
+    font-size: 0.9em;
+}
+
+.article-admin-card .article-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* --- Estilos do Formulário de Artigos do Blog --- */
+#blog-form-modal .modal-content {
+    max-width: 600px;
+}
+
+#blog-form .form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+#blog-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+#blog-form input[type="text"],
+#blog-form textarea,
+#blog-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+#blog-form textarea {
+    resize: vertical;
+}
+
+#blog-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-submit {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
 }

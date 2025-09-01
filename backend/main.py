@@ -60,7 +60,7 @@ origins = [
     "http://127.0.0.1:5500", 
     "http://localhost:5500", 
     "https://conecta-edital-site.onrender.com", 
-    "https://paineldeadminconectaedital.netlify.app",
+    "https://paineldeadmimconectaedital.netlify.app",
     "https://siteconectaedital.netlify.app"
 ]
 
@@ -1321,6 +1321,18 @@ async def list_dicas():
         dicas_list.append(Dica(id=doc.id, **doc.to_dict()))
     return dicas_list
 
+@app.get("/dicas/{dica_id}", response_model=Dica)
+async def get_dica(dica_id: str):
+    db = firestore.client()
+    dica_doc_ref = db.collection('dicas').document(dica_id)
+    dica_doc = dica_doc_ref.get()
+    if not dica_doc.exists:
+        raise HTTPException(status_code=404, detail="Dica não encontrada")
+
+    dica_doc_ref.update({'visualizacoes': firestore.Increment(1)})
+    
+    return Dica(id=dica_doc.id, **dica_doc.to_dict())
+
 @app.put("/dicas/{dica_id}", response_model=Dica)
 async def update_dica(dica_id: str, updated_dica: Dica):
     db = firestore.client()
@@ -1418,3 +1430,62 @@ async def record_faq_view(faq_id: str):
     
     faq_doc_ref.update({'visualizacoes': firestore.Increment(1)})
     return {"message": "Visualização registrada com sucesso."}
+
+    @app.post("/dicas", status_code=201)
+async def create_dica(dica: Dica):
+    db = firestore.client()
+    dica_dict = dica.dict(exclude_unset=True)
+    dica_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
+    _, doc_ref = db.collection('dicas').add(dica_dict)
+    
+    new_doc = doc_ref.get()
+    
+    if new_doc.exists:
+        new_dica = Dica(id=new_doc.id, **new_doc.to_dict())
+        return new_dica
+    else:
+        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
+
+@app.get("/dicas", response_model=List[Dica])
+async def list_dicas():
+    db = firestore.client()
+    dicas_ref = db.collection('dicas').order_by('data_criacao', direction=firestore.Query.DESCENDING)
+    dicas_list = []
+    for doc in dicas_ref.stream():
+        dicas_list.append(Dica(id=doc.id, **doc.to_dict()))
+    return dicas_list
+
+@app.get("/dicas/{dica_id}", response_model=Dica)
+async def get_dica(dica_id: str):
+    db = firestore.client()
+    dica_doc_ref = db.collection('dicas').document(dica_id)
+    dica_doc = dica_doc_ref.get()
+    if not dica_doc.exists:
+        raise HTTPException(status_code=404, detail="Dica não encontrada")
+
+    # Aumenta o contador de visualizações
+    dica_doc_ref.update({'visualizacoes': firestore.Increment(1)})
+    
+    return Dica(id=dica_doc.id, **dica_doc.to_dict())
+
+
+@app.put("/dicas/{dica_id}", response_model=Dica)
+async def update_dica(dica_id: str, updated_dica: Dica):
+    db = firestore.client()
+    dica_doc_ref = db.collection('dicas').document(dica_id)
+    if not dica_doc_ref.get().exists:
+        raise HTTPException(status_code=404, detail="Dica não encontrada")
+
+    dica_doc_ref.update(updated_dica.dict(exclude_unset=True, exclude={'id', 'data_criacao'}))
+    updated_doc = dica_doc_ref.get()
+    return Dica(id=updated_doc.id, **updated_doc.to_dict())
+
+@app.delete("/dicas/{dica_id}", status_code=204)
+async def delete_dica(dica_id: str):
+    db = firestore.client()
+    dica_doc_ref = db.collection('dicas').document(dica_id)
+    if not dica_doc_ref.get().exists:
+        raise HTTPException(status_code=404, detail="Dica não encontrada")
+    
+    dica_doc_ref.delete()
+    return

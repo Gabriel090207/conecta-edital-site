@@ -30,10 +30,10 @@
             <h2>Ferramentas Administrativas</h2>
             <p>Gerencie o conteúdo e o engajamento da plataforma.</p>
             <div class="tools-grid">
-                <div class="tool-card marketing">
+                <div class="tool-card marketing" id="manage-blog-btn">
                     <i class="fas fa-solid fa-note-sticky icon"></i>
                     <h3>Blog</h3>
-                    <p>Gerencia Blog</p>
+                    <p>Gerenciar Blog</p>
                 </div>
                 <div class="tool-card feedback" id="view-feedback-btn">
                     <i class="fas fa-chart-line icon"></i>
@@ -43,7 +43,7 @@
                 <div class="tool-card tips" id="manage-dicas-btn">
                     <i class="fas fa-lightbulb icon"></i>
                     <h3>Gerenciar Dicas</h3>
-                    <p>Criar e editar artigos</p>
+                    <p>Criar e editar dicas</p>
                 </div>
                 <div class="tool-card faq" id="manage-faq-btn">
                     <i class="fas fa-question-circle icon"></i>
@@ -321,7 +321,7 @@
             <button class="modal-close-btn" data-modal-id="feedback-modal">&times;</button>
             <div class="feedback-dashboard">
                 <div class="dashboard-header">
-                    <i class="fas fa-chart-line icon"></i>
+                    <i class="fas fa-chart-bar header-icon"></i>
                     <h2>Análise Completa de Feedback do Sistema</h2>
                     <p>Dashboard integrado com todos os dados de feedback, tickets e satisfação dos usuários.</p>
                 </div>
@@ -399,9 +399,63 @@
                 </div>
             </div>
         </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </div>
     
+    <div class="modal-overlay" id="blog-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Gerenciar Artigos do Blog</h3>
+                <button class="modal-close-btn" data-modal-id="blog-modal">&times;</button>
+            </div>
+            
+            <button class="btn-new-article" id="open-new-article-btn">
+                <i class="fas fa-plus"></i> Novo Artigo
+            </button>
+
+            <div id="articles-list-container" class="articles-list-admin">
+                <p class="loading-message">Carregando artigos...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="blog-form-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="blog-modal-title">Criar Novo Artigo</h3>
+                <button class="modal-close-btn" data-modal-id="blog-form-modal">&times;</button>
+            </div>
+            <form id="blog-form">
+                <input type="hidden" id="blog-id">
+                <div class="form-group">
+                    <label for="blog-title">Título *</label>
+                    <input type="text" id="blog-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="blog-author">Autor *</label>
+                    <input type="text" id="blog-author" required>
+                </div>
+                <div class="form-group">
+                    <label for="blog-topic">Tópico (Tag) *</label>
+                    <select id="blog-topic" required>
+                        <option value="">Selecione um tópico</option>
+                        <option value="Notícias">Notícias</option>
+                        <option value="Dicas">Dicas</option>
+                        <option value="Tutoriais">Tutoriais</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="blog-content">Conteúdo *</label>
+                    <textarea id="blog-content" rows="10" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" data-modal-id="blog-form-modal">Cancelar</button>
+                    <button type="submit" class="btn-submit" id="blog-submit-btn">Salvar Artigo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

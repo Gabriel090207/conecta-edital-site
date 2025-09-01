@@ -282,26 +282,26 @@ ul {
 }
 
 .navbar-center-index ul li a i {
+    font-size: 17px;
     margin-right: 8px;
-    font-size: 1rem;
     transition: transform 0.3s ease;
-    color: white;
-    text-shadow:
-        -1px -1px 0 #6c757d,
-        1px -1px 0 #6c757d,
-        -1px 1px 0 #6c757d,
-        1px 1px 0 #6c757d;
-    
+
+    /* deixa o preenchimento transparente */
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #6c757d; /* largura e cor da borda */
 }
+
 
 .navbar-center-index ul li a:hover i,
 .navbar-center-index ul li a.active i {
     transform: scale(1.1);
-    text-shadow:
-    -1px -1px 0 #007bff,
-    1px -1px 0 #007bff,
-    -1px 1px 0 #007bff,
-    1px 1px 0 #007bff;
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #007bff;
+  
     
 }
 
