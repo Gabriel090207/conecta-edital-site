@@ -252,10 +252,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase()
-                  .normalize('NFD')
-                  .replace(/[\u0300-\u036f]/g, '')
-                  .replace(/[^a-z0-9-]/g, '')
-                  .trim();
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9-]/g, '')
+                .trim();
     }
 
     function applySearchFilter(searchTerm) {
@@ -1041,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!articlesListContainer) return;
         articlesListContainer.innerHTML = '<p class="loading-message">Carregando artigos...</p>';
         try {
-            const response = await fetch(`${BACKEND_URL}/dicas`, { // A rota `/dicas` funciona para buscar artigos também
+            const response = await fetch(`${BACKEND_URL}/articles`, { 
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -1122,7 +1122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const response = await fetch(`${BACKEND_URL}/dicas/${id}`, {
+            const response = await fetch(`${BACKEND_URL}/articles/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -1150,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const id = blogIdInput.value;
             const method = id ? 'PUT' : 'POST';
-            const url = id ? `${BACKEND_URL}/dicas/${id}` : `${BACKEND_URL}/dicas`;
+            const url = id ? `${BACKEND_URL}/articles/${id}` : `${BACKEND_URL}/articles`;
             
             const articleData = {
                 titulo: blogTitleInput.value,
