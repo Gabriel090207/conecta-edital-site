@@ -80,10 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataCriacao = new Date(dica.data_criacao).toLocaleDateString('pt-BR');
             const tagClass = `tag-${dica.topico.toLowerCase().replace(/ /g, '-')}`;
 
+            // --- INÍCIO DA SOLUÇÃO PARA QUEBRA DE LINHA NO CARD ---
+            // Substitui as quebras de linha (`\n`) por <br> e corta para 150 caracteres.
+            const conteudoFormatadoParaCard = dica.conteudo.replace(/\n/g, '<br>').substring(0, 150);
+            
+            // Adiciona "..." somente se o conteúdo for maior que 150 caracteres.
+            const exibirPontos = dica.conteudo.length > 150 ? '...' : '';
+            // --- FIM DA SOLUÇÃO ---
+
             dicaCard.innerHTML = `
                 <span class="tags ${tagClass}">${dica.topico}</span>
                 <h3>${dica.titulo}</h3>
-                <p>${dica.conteudo.substring(0, 150)}...</p>
+                <p>${conteudoFormatadoParaCard}${exibirPontos}</p>
                 <div class="card-footer">
                     <span class="autor">Por: ${dica.autor}</span>
                     <span class="data">${dataCriacao}</span>
@@ -125,12 +133,24 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDicas(filteredDicas);
     }
     
-    // --- Lógica do Modal de Visualização ---
+    // --- Lógica do Modal de Visualização (já corrigida anteriormente) ---
     function openDicaViewerModal(dica) {
         dicaViewerTitle.textContent = dica.titulo;
         dicaViewerAutor.textContent = `Por: ${dica.autor}`;
         dicaViewerDate.textContent = new Date(dica.data_criacao).toLocaleDateString('pt-BR');
-        dicaViewerConteudo.textContent = dica.conteudo;
+
+        // --- SOLUÇÃO PARA QUEBRA DE LINHA NO MODAL ---
+        const conteudoBruto = dica.conteudo;
+        const linhas = conteudoBruto.split('\n');
+        let htmlConteudo = '';
+        linhas.forEach(linha => {
+            if (linha.trim() !== '') {
+                htmlConteudo += `<p>${linha}</p>`;
+            }
+        });
+        dicaViewerConteudo.innerHTML = htmlConteudo;
+        // --- FIM DA SOLUÇÃO ---
+
         openModal(dicaViewerModal);
     }
 
