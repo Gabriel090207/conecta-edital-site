@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentViewingTicket = null;
     let allDicas = [];
     let allFaqs = [];
+    let allArticles = [];
 
     const totalUsersPlansSpan = document.getElementById('total-users-plans');
     const noPlanPercentageSpan = document.getElementById('no-plan-percentage');
@@ -104,6 +105,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     let ticketsByCategoryChart;
     let ticketStatusChart;
     let monthlyTrendChart;
+    
+    const manageBlogBtn = document.getElementById('manage-blog-btn');
+    const blogModal = document.getElementById('blog-modal');
+    const articlesListContainer = document.getElementById('articles-list-container');
+    const blogFormModal = document.getElementById('blog-form-modal');
+    const openNewArticleBtn = document.getElementById('open-new-article-btn');
+    const blogForm = document.getElementById('blog-form');
+    const blogModalTitle = document.getElementById('blog-modal-title');
+    const blogIdInput = document.getElementById('blog-id');
+    const blogTitleInput = document.getElementById('blog-title');
+    const blogAuthorInput = document.getElementById('blog-author');
+    const blogTopicSelect = document.getElementById('blog-topic');
+    const blogContentTextarea = document.getElementById('blog-content');
+
 
     // Funções auxiliares de modal
     function openModal(modalElement) {
@@ -215,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/admin/tickets`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
+                    'Authorization': `Bearer ${token}`,
                     "ngrok-skip-browser-warning": "true"
                 }
             });
@@ -224,7 +239,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             allTickets = await response.json();
             
-            // Renderiza a lista inicial completa
             renderTicketsList(allTickets);
 
         } catch (error) {
@@ -244,7 +258,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                   .trim();
     }
 
-    // NOVA FUNÇÃO DE FILTRAGEM
     function applySearchFilter(searchTerm) {
         let filteredTickets = [...allTickets];
         
@@ -379,7 +392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
+                    'Authorization': `Bearer ${token}`,
                     "ngrok-skip-browser-warning": "true"
                 },
                 body: JSON.stringify({ text: replyText })
@@ -420,7 +433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
+                    'Authorization': `Bearer ${token}`,
                     "ngrok-skip-browser-warning": "true"
                 },
                 body: JSON.stringify({ status: newStatus })
@@ -461,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/admin/users`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Adicionando token aqui
+                    'Authorization': `Bearer ${token}`,
                     "ngrok-skip-browser-warning": "true"
                 }
             });
@@ -523,7 +536,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         dicasListContainer.innerHTML = '<p class="loading-message">Carregando dicas...</p>';
 
         try {
-            const response = await fetch(`${BACKEND_URL}/dicas`);
+            const response = await fetch(`${BACKEND_URL}/dicas`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -811,7 +828,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const labels = Object.keys(data);
         const values = Object.values(data).map(item => item.percentage);
         const backgroundColors = {
-            'Resolvido': '#59a14f', 'Aguardando': '#8cd140', 'Em Atendimento': '#e15759', 'Concluído': '#4e79a7'
+            'Resolvido': '#e2871f', 'Aguardando': '#1f63e2', 'Respondido': '#16c98d', 'Em Atendimento': '#e4203a', 'Concluído': '#e2871f'
         };
         ticketStatusChart = new Chart(ticketStatusChartCanvas, {
             type: 'doughnut',
@@ -838,8 +855,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     label: 'Tickets por Mês',
                     data: values,
                     fill: true,
-                    borderColor: '#4e79a7',
-                    tension: 0.1
+                    borderColor: '#1f63e2',
+                    tension: 0.4,
+                    backgroundColor: '#cedefa'
                 }]
             },
             options: { responsive: true, maintainAspectRatio: false }
@@ -923,7 +941,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // Proteção de rota
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(dicaData),
                 });
@@ -976,7 +994,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // Proteção de rota
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(faqData),
                 });
@@ -1005,24 +1023,173 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Novos Event Listeners para o modal de ticket
-    if (sendAdminReplyBtn) {
-        sendAdminReplyBtn.addEventListener('click', sendAdminReply);
-    }
-    
-    if (changeStatusSelect) {
-        changeStatusSelect.addEventListener('change', (e) => {
-            changeTicketStatus(e.target.value);
-        });
-    }
-    
-    // Novo Event Listener para o botão de Feedback
     if (viewFeedbackBtn) {
         viewFeedbackBtn.addEventListener('click', fetchFeedbackDataAndRenderCharts);
     }
     
-    // --- Lógica de Polling para Atualização em Tempo Real ---
+    // NOVO: Adicionando o event listener para o botão Blog
+    if (manageBlogBtn) {
+        manageBlogBtn.addEventListener('click', () => {
+            openModal(blogModal);
+            // Chama a função para carregar os artigos do blog
+            loadArticles();
+        });
+    }
 
+    // Funções para gerenciamento de artigos do blog
+    async function loadArticles() {
+        if (!articlesListContainer) return;
+        articlesListContainer.innerHTML = '<p class="loading-message">Carregando artigos...</p>';
+        try {
+            const response = await fetch(`${BACKEND_URL}/dicas`, { // A rota `/dicas` funciona para buscar artigos também
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            allArticles = await response.json();
+            renderArticles(allArticles);
+        } catch (error) {
+            console.error("Erro ao carregar artigos:", error);
+            articlesListContainer.innerHTML = '<p class="error-message">Erro ao carregar artigos.</p>';
+        }
+    }
+
+    function renderArticles(articlesToRender) {
+        if (!articlesListContainer) return;
+        articlesListContainer.innerHTML = '';
+        if (articlesToRender.length === 0) {
+            articlesListContainer.innerHTML = '<p class="no-articles-message">Nenhum artigo encontrado.</p>';
+            return;
+        }
+        articlesToRender.forEach(article => {
+            const articleCard = document.createElement('div');
+            articleCard.classList.add('article-admin-card');
+            articleCard.innerHTML = `
+                <div class="article-card-header">
+                    <h4>${article.titulo}</h4>
+                    <span class="tags">${article.topico}</span>
+                </div>
+                <p>Por: ${article.autor}</p>
+                <div class="article-actions">
+                    <button class="btn-edit" data-id="${article.id}">Editar</button>
+                    <button class="btn-delete" data-id="${article.id}">Excluir</button>
+                </div>
+            `;
+            articlesListContainer.appendChild(articleCard);
+        });
+    
+        document.querySelectorAll('.article-admin-card .btn-edit').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                openEditArticleModal(id);
+            });
+        });
+    
+        document.querySelectorAll('.article-admin-card .btn-delete').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                deleteArticle(id);
+            });
+        });
+    }
+
+    function openNewArticleModal() {
+        blogModalTitle.textContent = "Criar Novo Artigo";
+        blogForm.reset();
+        blogIdInput.value = '';
+        openModal(blogFormModal);
+    }
+
+    function openEditArticleModal(id) {
+        const article = allArticles.find(d => d.id === id);
+        if (article) {
+            blogModalTitle.textContent = "Editar Artigo";
+            blogIdInput.value = article.id;
+            blogTitleInput.value = article.titulo;
+            blogAuthorInput.value = article.autor;
+            blogTopicSelect.value = article.topico;
+            blogContentTextarea.value = article.conteudo;
+            openModal(blogFormModal);
+        }
+    }
+
+    async function deleteArticle(id) {
+        if (!confirm("Tem certeza que deseja excluir este artigo?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/dicas/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            loadArticles();
+            alert("Artigo excluído com sucesso!");
+        } catch (error) {
+            console.error("Erro ao excluir artigo:", error);
+            alert("Erro ao excluir artigo. Tente novamente.");
+        }
+    }
+
+    if (openNewArticleBtn) {
+        openNewArticleBtn.addEventListener('click', openNewArticleModal);
+    }
+    
+    if (blogForm) {
+        blogForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = blogIdInput.value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${BACKEND_URL}/dicas/${id}` : `${BACKEND_URL}/dicas`;
+            
+            const articleData = {
+                titulo: blogTitleInput.value,
+                autor: blogAuthorInput.value,
+                topico: blogTopicSelect.value,
+                conteudo: blogContentTextarea.value,
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(articleData),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                closeModal(blogFormModal);
+                loadArticles();
+                alert(`Artigo ${id ? 'editado' : 'criado'} com sucesso!`);
+            } catch (error) {
+                console.error("Erro ao salvar artigo:", error);
+                alert("Erro ao salvar artigo. Tente novamente.");
+            }
+        });
+    }
+
+
+    // Iniciar carregamento de estatísticas e tickets ao carregar a página
+    fetchAdminStats();
+    loadAllTickets();
+
+    // Lógica de Polling
+    let pollingInterval;
     async function checkAdminTicketsForUpdates() {
         if (!allTicketsModal || !allTicketsModal.classList.contains('show-modal')) {
             return;
