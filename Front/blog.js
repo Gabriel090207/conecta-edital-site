@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchAndRenderArticles() {
         articlesContainer.innerHTML = '<p class="loading-message">Carregando artigos...</p>';
         try {
-            const response = await fetch(`${BACKEND_URL}/dicas`);
+            // ROTA CORRIGIDA AQUI
+            const response = await fetch(`${BACKEND_URL}/articles`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

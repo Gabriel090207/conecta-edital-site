@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${BACKEND_URL}/dicas/${articleId}`);
+            // ROTA CORRIGIDA AQUI
+            const response = await fetch(`${BACKEND_URL}/articles/${articleId}`);
             if (!response.ok) {
                 if (response.status === 404) {
                     throw new Error("Artigo não encontrado.");
