@@ -43,76 +43,107 @@
     padding: 15px 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border-bottom: 1px solid rgba(224, 224, 224, 0.3);
-    /* --- Propriedades para o Efeito Vidro --- */
     background-color: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(80px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    /* --- Propriedades para Fixar a Navbar --- */
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
-  }
-  
-  .navbar-index .navbar-container {
+}
+
+.navbar-index .navbar-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    height: 40px;
     max-width: 1440px;
     padding: 0 30px;
-  }
-  
-  .navbar-left {
+    position: relative; /* CRUCIAL: define este como o ponto de referência para a centralização */
+}
+
+/* O menu central agora é posicionado de forma absoluta */
+.navbar-center-index {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.navbar-left {
     display: flex;
     align-items: center;
-  }
-  
-  .navbar-left .logo {
+    z-index: 1; /* Garante que o logo fique na frente */
+}
+
+/* Os estilos do logo e do botão permanecem os mesmos */
+.navbar-left .logo {
     display: flex;
     align-items: center;
     font-weight: 300;
-    font-size: 1.2rem;
-    color: #007bff; /* Azul Conecta Edital */
-  }
-  
-  .navbar-left .logo img {
-    margin-right: 10px;
+    color: #007bff;
+}
+
+.navbar-left .logo img {
+    margin-right: 80px;
     border-radius: 4px;
-  }
-  
-  .navbar-center-index {
-    flex-grow: 1; /* Permite que o container ocupe o espaço disponível */
-    display: flex; /* Usa flexbox para alinhamento */
-    justify-content: center; /* Centraliza o conteúdo horizontalmente */
-    align-items: center; /* Centraliza o conteúdo verticalmente */
-  }
-  
-  .navbar-index .navbar-center-index ul {
+}
+
+.navbar-index .navbar-center-index ul {
     list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     gap: 35px;
-  }
-  
-  .navbar-index .navbar-center-index ul li a {
+}
+
+.navbar-index .navbar-center-index ul li a {
     color: #6C757D;
     font-weight: 500;
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     padding: 5px 0;
     transition: color 0.3s ease;
-  }
-  
-  .navbar-index .navbar-center-index ul li a:hover {
+}
+
+.navbar-index .navbar-center-index ul li a:hover {
     color: #007BFF;
-  }
+}
+
+.navbar-center-index ul li a i {
+    font-size: 17px;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+
+    /* deixa o preenchimento transparente */
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #6c757d; /* largura e cor da borda */
+}
+
+
+.navbar-center-index ul li a:hover i,
+.navbar-center-index ul li a.active i {
+    transform: scale(1.1);
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #007bff;
   
-  .navbar-index .navbar-right-index .btn-entrar {
-    background-color: #007BFF;
+    
+}
+
+.navbar-index .navbar-right-index .btn-entrar {
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 15px 20px;
+    padding: 9px 20px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -120,21 +151,13 @@
     align-items: center;
     gap: 8px;
     transition: background-color 0.3s ease;
-  }
-  
-  .navbar-index .navbar-right-index .btn-entrar:hover {
+    z-index: 1; /* Garante que o botão fique na frente */
+}
+
+.navbar-index .navbar-right-index .btn-entrar:hover {
     background-color: #0056b3;
-  }
-  
-  .btn-analisar-ia {
-    background: linear-gradient(135deg, #9d1ee2, #6108c0);
-    color: white;
-  }
-  
-  .btn-analisar-ia:hover {
-    background: linear-gradient(135deg, #450d63, #450d63);
-    color: white;
-  }
+}
+
   
   /* --- Seção de Destaque (Hero) --- */
   .hero-article {
@@ -398,3 +421,17 @@
     gap: 20px;
     max-width: 1900px;
   }
+
+  /* Estilos para a nova seção de sugestões */
+.suggested-articles-section {
+  margin-top: 50px; /* Reduz a margem superior para a distância desejada */
+}
+
+/* Ajusta a margem do título da seção */
+.suggested-articles-section .section-title {
+  font-size: 1.5rem;
+  margin-bottom: -100px;
+  margin-top: 0; /* Remove a margem superior padrão do H2 para controle total do espaçamento */
+  color: #333;
+  font-weight: 600;
+}

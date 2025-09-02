@@ -1015,6 +1015,16 @@ ul { list-style: none; }
     flex-direction: column;
     gap: 15px;
 }
+
+.dica-card-content {
+    /* Permite que o conteúdo de texto ocupe o espaço disponível */
+    flex-grow: 1;
+    /* Adiciona um pequeno espaçamento entre os grupos de texto */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
 .dica-card {
     background-color: #f8f9fa;
     padding: 15px;
@@ -1717,6 +1727,7 @@ body.modal-open {
 .article-admin-card .article-actions .btn-delete:hover {
     opacity: 0.8;
 }
+
 
 
 /* --- Estilos do Formulário de Artigos do Blog --- */
