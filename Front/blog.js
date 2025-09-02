@@ -2,10 +2,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
     const articlesContainer = document.getElementById('articles-container');
 
+    // --- FUNÇÃO AUXILIAR PARA CALCULAR O TEMPO DE LEITURA (COMO SEGURANÇA) ---
+    function calcularTempoDeLeitura(texto) {
+        const palavrasPorMinuto = 100;
+        const numeroDePalavras = texto.split(/\s+/).length;
+        return Math.ceil(numeroDePalavras / palavrasPorMinuto);
+    }
+    // --- FIM DA FUNÇÃO AUXILIAR ---
+
     async function fetchAndRenderArticles() {
         articlesContainer.innerHTML = '<p class="loading-message">Carregando artigos...</p>';
         try {
-            // ROTA CORRIGIDA AQUI
             const response = await fetch(`${BACKEND_URL}/articles`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -22,7 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const articleCard = document.createElement('div');
                 articleCard.classList.add('article-card');
                 
-                // Mapeia os dados do artigo para a estrutura HTML
+                // --- INÍCIO DA SOLUÇÃO ---
+                // Verifica se o tempo de leitura existe no objeto, caso contrário, calcula.
+                const tempoLeitura = article.tempo_leitura || calcularTempoDeLeitura(article.conteudo);
+
                 articleCard.innerHTML = `
                     <a href="artigo.html?id=${article.id}">
                         <div class="article-image-container">
@@ -33,11 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="article-footer">
                                 <span class="author">${article.autor}</span>
                                 <span class="date">${new Date(article.data_criacao).toLocaleDateString('pt-BR')}</span>
-                                <span class="read-time">6 min. de leitura</span>
+                                <span class="read-time">${tempoLeitura} min. de leitura</span>
                             </div>
                         </div>
                     </a>
                 `;
+                // --- FIM DA SOLUÇÃO ---
                 articlesContainer.appendChild(articleCard);
             });
         } catch (error) {

@@ -4,6 +4,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
     const token = localStorage.getItem("adminToken");
 
+    // --- FUNÇÃO AUXILIAR PARA CALCULAR TEMPO DE LEITURA ---
+    function calcularTempoDeLeitura(texto) {
+        const palavrasPorMinuto = 100;
+        const numeroDePalavras = texto.split(/\s+/).length;
+        return Math.ceil(numeroDePalavras / palavrasPorMinuto);
+    }
+    // --- FIM DA FUNÇÃO AUXILIAR ---
+
     let allUsers = [];
     let allTickets = [];
     let currentViewingTicket = null;
@@ -116,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const blogIdInput = document.getElementById('blog-id');
     const blogTitleInput = document.getElementById('blog-title');
     const blogAuthorInput = document.getElementById('blog-author');
-    const blogTopicSelect = document.getElementById('blog-topic');
+
     const blogContentTextarea = document.getElementById('blog-content');
 
 
@@ -1067,12 +1075,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         articlesToRender.forEach(article => {
             const articleCard = document.createElement('div');
             articleCard.classList.add('article-admin-card');
+
+            const tempoLeitura = article.tempo_leitura || calcularTempoDeLeitura(article.conteudo);
+            const tagClass = `tag-${article.topico.toLowerCase().replace(/ /g, '-')}`;
+
             articleCard.innerHTML = `
                 <div class="article-card-header">
                     <h4>${article.titulo}</h4>
-                    <span class="tags">${article.topico}</span>
+                    <span class="tags ${tagClass}">${article.topico}</span>
                 </div>
-                <p>Por: ${article.autor}</p>
+                <div class="article-card-body">
+                    <div class="article-footer">
+                        <span class="author">Por: ${article.autor}</span>
+                        <span class="read-time">${tempoLeitura} min. de leitura</span>
+                    </div>
+                </div>
                 <div class="article-actions">
                     <button class="btn-edit" data-id="${article.id}">Editar</button>
                     <button class="btn-delete" data-id="${article.id}">Excluir</button>
@@ -1097,6 +1114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function openNewArticleModal() {
+        const blogTopicGroup = document.querySelector('#blog-topic');
+        if (blogTopicGroup) {
+            blogTopicGroup.parentNode.remove();
+        }
+
         blogModalTitle.textContent = "Criar Novo Artigo";
         blogForm.reset();
         blogIdInput.value = '';
@@ -1104,13 +1126,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function openEditArticleModal(id) {
+        const blogTopicGroup = document.querySelector('#blog-topic');
+        if (blogTopicGroup) {
+            blogTopicGroup.parentNode.remove();
+        }
+
         const article = allArticles.find(d => d.id === id);
         if (article) {
             blogModalTitle.textContent = "Editar Artigo";
             blogIdInput.value = article.id;
             blogTitleInput.value = article.titulo;
             blogAuthorInput.value = article.autor;
-            blogTopicSelect.value = article.topico;
             blogContentTextarea.value = article.conteudo;
             openModal(blogFormModal);
         }
@@ -1152,11 +1178,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${BACKEND_URL}/articles/${id}` : `${BACKEND_URL}/articles`;
             
+            const conteudo = blogContentTextarea.value;
+            const tempoLeitura = calcularTempoDeLeitura(conteudo);
+
             const articleData = {
                 titulo: blogTitleInput.value,
                 autor: blogAuthorInput.value,
-                topico: blogTopicSelect.value,
-                conteudo: blogContentTextarea.value,
+                topico: "Notícias", // Valor fixo
+                conteudo: conteudo,
+                tempo_leitura: tempoLeitura, // Adiciona o tempo de leitura
             };
 
             try {

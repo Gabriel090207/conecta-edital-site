@@ -19,7 +19,7 @@
             </div>
             <nav class="navbar-center-index">
                 <ul>
-                    <li><a href="blog.html">Voltar</a></li>
+                    <li><a href="blog.html"><i class="fas fa-arrow-left"></i>Voltar</a></li>
                 </ul>
             </nav>
             <div class="navbar-right-index">
@@ -29,15 +29,13 @@
             </div>
         </div>
     </header>
-
+    
     <main class="container article-page-main">
         <article class="article-content-wrapper">
             <div class="breadcrumbs">
                 <span>Início</span> > <span>Blog</span> > <span id="article-category">Carregando...</span>
             </div>
-
             <h1 class="article-title" id="article-title">Carregando...</h1>
-
             <div class="article-meta-header">
                 <div class="author-info">
                     <img src="capa.png" alt="Avatar do Autor" class="author-avatar">
@@ -49,16 +47,20 @@
                     <span class="like-count">7 curtidas(s)</span>
                 </div>
             </div>
-
             <figure class="article-image-main">
                 <img src="capa.png" alt="Imagem do artigo" id="article-image-main">
                 <figcaption id="article-image-caption"></figcaption>
             </figure>
-
             <section class="article-body" id="article-body-content">
                 <p class="loading-message">Carregando conteúdo do artigo...</p>
             </section>
         </article>
+        <section class="suggested-articles-section">
+            <h2 class="section-title">Sugestões de Leitura</h2>
+            <div class="articles-grid" id="suggested-articles-container">
+                <p class="loading-message" id="loading-suggested-articles">Carregando sugestões...</p>
+            </div>
+        </section>
     </main>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
