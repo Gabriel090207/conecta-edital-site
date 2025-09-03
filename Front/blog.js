@@ -41,9 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="article-body">
                             <h3>${article.titulo}</h3>
                             <div class="article-footer">
-                                <span class="author">${article.autor}</span>
-                                <span class="date">${new Date(article.data_criacao).toLocaleDateString('pt-BR')}</span>
-                                <span class="read-time">${tempoLeitura} min. de leitura</span>
+                                <span class="author" >Por: ${article.autor}</span>
+                                <p>
+                                <span class="read-time" ></p> ${tempoLeitura} min. de leitura</span>
+                                <span class="date" style="margin-left: 50px"> ${new Date(article.data_criacao).toLocaleDateString('pt-BR')}</span>
                             </div>
                         </div>
                     </a>

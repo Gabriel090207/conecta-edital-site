@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
 
     const currentPlanCard = document.getElementById('current-plan-card');
-    const plansContainer = document.querySelector('.plans-grid');
+    const plansContainer = document.querySelector('.plans-grid-index');
     const welcomeUserNameSpan = document.getElementById('welcome-user-name');
 
     // Função para obter o token de autenticação
@@ -21,13 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!token || !user) {
             console.log("Usuário não autenticado. O card de plano atual não será exibido.");
-            currentPlanCard.style.display = 'none';
-            if(welcomeUserNameSpan) welcomeUserNameSpan.textContent = "Usuário";
+            if (currentPlanCard) {
+                currentPlanCard.style.display = 'none';
+            }
+            if (welcomeUserNameSpan) welcomeUserNameSpan.textContent = "Usuário";
             return;
         }
 
         if (welcomeUserNameSpan && user.displayName) {
-            // CORREÇÃO: Apenas insere o nome, sem o espaço extra
             welcomeUserNameSpan.textContent = user.displayName;
         }
 
@@ -46,9 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             const userPlan = data.user_plan;
 
-            document.querySelectorAll('.plan-card').forEach(card => {
-                const button = card.querySelector('.choose-plan-btn');
-                const signedDiv = card.querySelector('.plan-status-signed');
+            document.querySelectorAll('.plan-card-index').forEach(card => {
+                const button = card.querySelector('.choose-plan-btn-index');
+                const signedDiv = card.querySelector('.plan-status-signed-index');
                 
                 const userPlanNormalized = userPlan.toLowerCase().replace(/plano /g, '');
                 
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         button.style.display = 'none';
                         if (!signedDiv) {
                             let newSignedDiv = document.createElement('div');
-                            newSignedDiv.className = 'plan-status-signed';
+                            newSignedDiv.className = 'plan-status-signed-index';
                             newSignedDiv.innerHTML = '<i class="fas fa-check-circle"></i> Assinado';
                             card.appendChild(newSignedDiv);
                         }
@@ -70,16 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            if (userPlan && userPlan !== 'Sem Plano') {
+            if (userPlan && userPlan !== 'Sem Plano' && currentPlanCard) {
                 currentPlanCard.style.display = 'flex';
                 currentPlanNameSpan.textContent = userPlan;
-            } else {
+            } else if (currentPlanCard) {
                 currentPlanCard.style.display = 'none';
             }
 
         } catch (error) {
             console.error('Erro ao carregar o plano do usuário:', error);
-            currentPlanCard.style.display = 'none';
+            if (currentPlanCard) {
+                currentPlanCard.style.display = 'none';
+            }
         }
     }
 
@@ -120,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (plansContainer) {
         plansContainer.addEventListener('click', (e) => {
-            const button = e.target.closest('.choose-plan-btn');
+            const button = e.target.closest('.choose-plan-btn-index');
             if (button) {
                 const planId = button.dataset.planId;
                 handlePlanButtonClick(planId);
@@ -133,7 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (user) {
                 loadUserPlanStatus();
             } else {
-                currentPlanCard.style.display = 'none';
+                if (currentPlanCard) {
+                    currentPlanCard.style.display = 'none';
+                }
             }
         });
     } else {
