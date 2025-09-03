@@ -763,6 +763,7 @@ ul { list-style: none; }
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
+    margin-right: 20px;
 }
 
 .btn-send-reply:hover {

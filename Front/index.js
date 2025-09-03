@@ -319,8 +319,30 @@ document.addEventListener("DOMContentLoaded", () => {
     attachPasswordToggleListeners();
     
     // ===============================================
-    // Lógica do FAQ (Perguntas Frequentes) - NOVO CÓDIGO AQUI
+    // Lógica do FAQ (Perguntas Frequentes)
     // ===============================================
+
+    // Função assíncrona para registrar a visualização do FAQ no backend
+    async function recordFaqView(faqId) {
+        try {
+            const response = await fetch(`${BACKEND_URL}/faq/${faqId}/visualizacao`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                console.error(`Erro ao registrar visualização: status ${response.status}`);
+            } else {
+                console.log(`Visualização para o FAQ ${faqId} registrada com sucesso.`);
+            }
+        } catch (error) {
+            console.error("Erro na requisição para registrar visualização:", error);
+        }
+    }
+    
+    // Lógica para alternar a visibilidade da resposta do FAQ e registrar a visualização
     const faqItems = document.querySelectorAll('.faq-item');
 
     faqItems.forEach(item => {
@@ -345,10 +367,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 answer.style.maxHeight = null;
                 icon.style.transform = 'rotate(0deg)';
             } else {
-                // Se não estiver ativo, abre
+                // Se não estiver ativo, abre e registra a visualização
                 item.classList.add('active');
                 answer.style.maxHeight = answer.scrollHeight + 'px';
                 icon.style.transform = 'rotate(180deg)';
+
+                const faqId = item.dataset.faqId;
+                if (faqId) {
+                    recordFaqView(faqId);
+                }
             }
         });
     });
