@@ -1632,6 +1632,7 @@ ul {
     background: linear-gradient(135deg, #05bc5b, #00823c);
     color: white;
     border: none;
+    margin-right: 20px;
 }
 .btn-send-reply:hover {
     background-color: #218838;
