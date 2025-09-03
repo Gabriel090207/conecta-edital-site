@@ -13,7 +13,7 @@
 
 html, body {
     overflow-x: hidden;
-  }
+}
 
 body {
     font-family: 'Poppins', sans-serif;
@@ -47,51 +47,29 @@ ul {
 .color-card-bg { background-color: #FFFFFF; } /* Fundo de Cards */
 .color-border { border-color: #E0E0E0; } /* Borda Padrão */
 
-
 .gradiente-texto{
-    background-image: linear-gradient(135deg, #631ee2, #3f08c0);
-    -webkit-background-clip: text; /* Para navegadores WebKit (Chrome, Safari, Edge) */
-    background-clip: text;       /* Versão padrão */
-
-    /* Torna a cor do texto transparente para que o gradiente de fundo seja visível */
-    -webkit-text-fill-color: transparent; /* Para navegadores WebKit */
-    color: transparent;  
+    background-image: linear-gradient(135deg, #007BFF, #0056B3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: bold;
 }
 /* Destaques de Texto */
 .highlight-blue {
-    /* Define o gradiente de fundo */
-    background-image: linear-gradient(135deg, #631ee2, #3f08c0);
-
-    /* Recorta o fundo para que ele só apareça onde o texto está */
-    -webkit-background-clip: text; /* Para navegadores WebKit (Chrome, Safari, Edge) */
-    background-clip: text;       /* Versão padrão */
-
-    /* Torna a cor do texto transparente para que o gradiente de fundo seja visível */
-    -webkit-text-fill-color: transparent; /* Para navegadores WebKit */
-    color: transparent;                /* Versão padrão */
-
-    /* Opcional: Cor de fallback para navegadores muito antigos que não suportam */
-    /* color: #05bc5b; */ /* Por exemplo, um dos tons de verde do gradiente */
-
-    /* Opcional: Garanta que o texto seja negrito o suficiente para o degradê ser visível */
+    background-image: linear-gradient(135deg, #007BFF, #0056B3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     font-weight: bold;
 }
 .highlight-green {
-    /* Define o gradiente de fundo */
     background-image: linear-gradient(135deg, #05bc5b, #00823c);
-
-    /* Recorta o fundo para que ele só apareça onde o texto está */
-    -webkit-background-clip: text; /* Para navegadores WebKit (Chrome, Safari, Edge) */
-    background-clip: text;       /* Versão padrão */
-
-    /* Torna a cor do texto transparente para que o gradiente de fundo seja visível */
-    -webkit-text-fill-color: transparent; /* Para navegadores WebKit */
-    color: transparent;                /* Versão padrão */
-
-    /* Opcional: Cor de fallback para navegadores muito antigos que não suportam */
-    /* color: #05bc5b; */ /* Por exemplo, um dos tons de verde do gradiente */
-
-    /* Opcional: Garanta que o texto seja negrito o suficiente para o degradê ser visível */
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     font-weight: bold;
 }
 .highlight-purple { color: #8E24AA; }
@@ -99,9 +77,9 @@ ul {
 /* Fundos e Cores de Ícones (Variações Específicas por Seção/Elemento) */
 
 /* Seção Como Funciona (Steps 1, 2, 3) */
-.blue-bg-light {  background: linear-gradient(135deg, #429aff, #0163c5); color: white; } /* Diário Oficial */
-.purple-bg-light {  background: linear-gradient(135deg, #9d1ee2, #6108c0); color: white; } /* Palavras Chave */
-.green-bg-light { background: linear-gradient(135deg, #05bc5b, #00823c); color: white;  } /* Alerta Criado */
+.blue-bg-light { background: linear-gradient(135deg, #429aff, #0163c5); color: white; } /* Diário Oficial */
+.purple-bg-light { background: linear-gradient(135deg, #9d1ee2, #6108c0); color: white; } /* Palavras Chave */
+.green-bg-light { background: linear-gradient(135deg, #05bc5b, #00823c); color: white; } /* Alerta Criado */
 
 /* Seção Por Que Escolher (Benefícios) */
 .blue-bg-light-2 { background: linear-gradient(135deg, #429aff, #0163c5); color: white; } /* Alertas Instantâneos (azul) */
@@ -110,13 +88,13 @@ ul {
 .orange-bg-light-2 { background: linear-gradient(135deg, #ff6d33, #dd2110); color: white; } /* Cobertura Nacional (laranja) */
 
 /* Seção Números que Comprovam (Resultados) */
-.purple-bg-light-3 {  background: linear-gradient(135deg, #429aff, #0163c5);color: white; } /* Concurseiros (roxo) */
+.purple-bg-light-3 { background: linear-gradient(135deg, #429aff, #0163c5);color: white; } /* Concurseiros (roxo) */
 .green-bg-light-3 { background: linear-gradient(135deg, #05bc5b, #00823c); color: white; } /* Publicações (verde) */
 .blue-bg-light-3 {background: linear-gradient(135deg, #9d1ee2, #6108c0); color: white; } /* Taxa Precisão (azul) */
 .orange-bg-light-3 { background: linear-gradient(135deg, #ff6d33, #dd2110); color: white; } /* Tempo Notificação (laranja) */
 
 /* Seção Planos (Landing Page) */
-.blue-bg-light-4 {  background: linear-gradient(135deg, #429aff, #0163c5); color: white; } /* Básico */
+.blue-bg-light-4 { background: linear-gradient(135deg, #429aff, #0163c5); color: white; } /* Básico */
 .purple-bg-light-4 {background: linear-gradient(135deg, #9d1ee2, #6108c0); color: white; } /* Premium */
 
 /* Seção FAQ */
@@ -125,19 +103,18 @@ ul {
 .blue-bg-light-5 { background-color: #e3f2fd; color: #2196F3; } /* FAQ 3 */
 
 /* Cores específicas para a DEMONSTRAÇÃO DO MONITORAMENTO */
-.grey-bg-light-state {  color: #8C98A7; } /* Cinza neutro para ícones inativos */
+.grey-bg-light-state { color: #8C98A7; } /* Cinza neutro para ícones inativos */
 .blue-bg-light-state { color: #007BFF; } /* Azul claro para o ícone de carregamento */
 .purple-bg-light-state {color: #8E24AA; } /* Roxo claro para o ícone de análise */
 .orange-bg-light-state { color: #FF9800; } /* Laranja claro para o ícone de busca */
 .green-bg-state { color: #28A745; } /* Verde claro para o ícone de sucesso */
-
 
 /* ========================================= */
 /* ESTILOS DE BOTÕES GERAIS */
 /* ========================================= */
 
 .btn-primary {
-  background: linear-gradient(135deg, #3a68ff, #0427c1);
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
     color: white;
     border: none;
     border-radius: 18px;
@@ -228,7 +205,7 @@ ul {
     height: 40px;
     max-width: 1440px;
     padding: 0 30px;
-    position: relative; /* CRUCIAL: define este como o ponto de referência para a centralização */
+    position: relative;
 }
 
 /* O menu central agora é posicionado de forma absoluta */
@@ -285,24 +262,15 @@ ul {
     font-size: 17px;
     margin-right: 8px;
     transition: transform 0.3s ease;
-
-    /* deixa o preenchimento transparente */
     color: transparent;
-
-    /* cria apenas o traço (contorno) */
-    -webkit-text-stroke: 1px #6c757d; /* largura e cor da borda */
+    -webkit-text-stroke: 1px #6c757d;
 }
-
 
 .navbar-center-index ul li a:hover i,
 .navbar-center-index ul li a.active i {
     transform: scale(1.1);
     color: transparent;
-
-    /* cria apenas o traço (contorno) */
     -webkit-text-stroke: 1px #007bff;
-  
-    
 }
 
 .navbar-index .navbar-right-index .btn-entrar {
@@ -325,9 +293,6 @@ ul {
     background-color: #0056b3;
 }
 
-
-
-
 /* ========================================= */
 /* SEÇÕES DA PÁGINA INDEX */
 /* ========================================= */
@@ -337,16 +302,16 @@ ul {
     padding: 60px 0;
     display: flex;
     flex-direction: column;
-    gap: 100px; /* Espaçamento entre as grandes seções */
+    gap: 100px;
     margin: 0 auto;
 }
 
 /* Estilo Base para Todas as Seções (h1, subtitle) */
 section {
     width: 100%;
-    max-width: 1200px; /* Largura padrão para o conteúdo das seções */
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 30px; /* Padding lateral para o conteúdo */
+    padding: 0 30px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -366,9 +331,8 @@ section {
     font-size: 1.05rem;
     color: #6C757D;
     max-width: 700px;
-    margin: 0 auto 50px auto; /* Espaço abaixo do subtítulo antes dos elementos */
+    margin: 0 auto 50px auto;
 }
-
 
 /* Hero Section - Sua Nomeação Nunca Mais Passará Despercebida */
 .hero-section-index {
@@ -387,13 +351,13 @@ section {
     padding: 30px;
     border: 1px solid #E0E0E0;
     width: 100%;
-    max-width: 600px; /* Reduzido para caber nos prints */
+    max-width: 600px;
     margin-top: 40px;
-    text-align: left; /* Conteúdo interno alinhado à esquerda */
+    text-align: left;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow: hidden; /* Garante que elementos com position:absolute não saiam */
+    overflow: hidden;
 }
 
 .demo-header {
@@ -401,8 +365,6 @@ section {
     justify-content: flex-end;
     margin-bottom: 10px;
 }
-
-/* btn-demo-action-tag já deve estar definido na seção de .btn-tag */
 
 .demo-content-area {
     display: flex;
@@ -414,64 +376,64 @@ section {
     font-size: 1.55rem;
     font-weight: 600;
     color: #343A40;
-    text-align: center; /* Título centralizado no card */
+    text-align: center;
     margin-bottom: 5px;
 }
 
 .demo-subtitle-inner {
     font-size: 0.9rem;
     color: #6C757D;
-    text-align: center; /* Subtítulo centralizado no card */
+    text-align: center;
     margin-bottom: 15px;
 }
 
 /* Estilos para o wrapper dos estados da demonstração */
 .demo-states-wrapper {
-    position: relative; /* Pai para os estados 'absolute' */
+    position: relative;
     width: 100%;
-    min-height: 250px; /* Altura mínima para o wrapper do conteúdo da demo */
+    min-height: 250px;
     display: flex;
-    justify-content: center; /* Centraliza horizontalmente o estado ativo */
-    align-items: center; /* Centraliza verticalmente o estado ativo */
-    padding: 20px 0; /* Padding vertical para o conteúdo dos estados */
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
 }
 
 .demo-state {
-    position: absolute; /* Empilha os estados um sobre o outro */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0; /* Escondido por padrão */
-    visibility: hidden; /* Escondido por padrão (para leitores de tela) */
-    transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; /* Transição de fade */
-    display: flex; /* Para o layout interno de cada estado */
-    flex-direction: column; /* Empilha os itens de passo */
-    align-items: center; /* Centraliza os itens de passo horizontalmente */
-    justify-content: center; /* Centraliza verticalmente o conteúdo do estado */
-    gap: 15px; /* Espaço entre os items de passo */
-    padding: 0 20px; /* Padding lateral para os items de passo */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 0 20px;
 }
 
 /* Estado Ativo (visível) */
 .demo-state.active-state {
-    opacity: 1; /* Torna visível */
-    visibility: visible; /* Torna visível */
-    position: static; /* Ocupa espaço no layout quando ativo, permitindo que o wrapper se ajuste */
+    opacity: 1;
+    visibility: visible;
+    position: static;
 }
 
 /* Estilo para o estado inicial (Aguardando nova publicação...) */
 .initial-state {
     text-align: center;
     gap: 10px;
-    padding-top: 0; /* Reinicia padding para este estado específico */
+    padding-top: 0;
 }
 
 .initial-state .demo-state-icon-wrapper {
     width: 80px;
     height: 80px;
     font-size: 2.8rem;
-    border-radius: 8px; /* Cantos quadrados para o ícone Aguardando */
+    border-radius: 8px;
 }
 
 .initial-state .demo-state-text {
@@ -485,76 +447,72 @@ section {
     color: #6C757D;
 }
 
-
-/* Estilos para os passos individuais (Carregando, Analisando, Procurando, Encontrado) */
+/* Estilos para os passos individuais */
 .demo-step-item {
     display: flex;
     align-items: center;
     gap: 15px;
     padding: 12px 20px;
     border-radius: 8px;
-    background-color: #F8F9FA; /* Fundo cinza claro padrão */
+    background-color: #F8F9FA;
     width: 100%;
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
-    border: 1px solid #E0E0E0; /* Borda sutil */
-    opacity: 1; /* Todos os items do passo são visíveis (opacidade 1) por padrão no seu estado */
+    border: 1px solid #E0E0E0;
+    opacity: 1;
 }
 
-/* Estilo para o ícone de seta ou check no final de cada demo-step-item */
 .demo-step-item .step-content > i {
-    font-size: 1rem; /* Tamanho padrão da seta ou check */
-    color: #6C757D; /* Cor cinza para inativo */
-    flex-shrink: 0; /* Garante que o ícone não encolha */
-    width: 20px; /* Largura fixa para manter alinhamento */
-    text-align: right; /* Alinha o ícone à direita dentro do seu espaço */
+    font-size: 1rem;
+    color: #6C757D;
+    flex-shrink: 0;
+    width: 20px;
+    text-align: right;
 }
-
 
 /* Passo Ativo */
 .demo-step-item.active {
-    background-color: #E6F3FF; /* Azul mais claro para o item ativo */
-    border-color: #007BFF; /* Borda azul para o ativo */
-    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.1); /* Sombra azul suave */
+    background-color: #E6F3FF;
+    border-color: #007BFF;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.1);
 }
 
 .demo-step-item.active .spin {
-    color: #007BFF; /* Cor do ícone de giro no estado ativo */
+    color: #007BFF;
 }
 
 /* Passo Concluído */
 .demo-step-item.completed {
-    background-color: #F8F9FA; /* Volta para o cinza claro padrão */
-    border-color: #E0E0E0; /* Volta para a borda padrão */
-    box-shadow: none; /* Remove a sombra quando completo */
+    background-color: #F8F9FA;
+    border-color: #E0E0E0;
+    box-shadow: none;
 }
-.demo-step-item.completed .checkmark-green { /* Apenas para ícones de check */
-    color: #28A745; /* Cor verde para o ícone de check */
+.demo-step-item.completed .checkmark-green {
+    color: #28A745;
 }
-
 
 /* Passo Final "Encontrado!" - Ajustes para o layout da imagem */
 .demo-step-item.found {
-    background-color: #D4EDDA; /* Fundo verde claro */
-    border-color: #28A745; /* Borda verde */
-    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.1); /* Sombra verde */
-    align-items: flex-start; /* Alinha o conteúdo à esquerda no card encontrado */
-    padding: 20px; /* Reduz padding para o item final */
+    background-color: #D4EDDA;
+    border-color: #28A745;
+    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.1);
+    align-items: flex-start;
+    padding: 20px;
 }
 
 /* Ícone principal grande de check para "Encontrado!" */
-.demo-step-item.found .demo-state-icon-wrapper { /* Reutiliza demo-state-icon-wrapper que é maior */
-    background-color: #28A745; /* Fundo verde escuro */
-    color: white; /* Ícone branco */
-    border-radius: 50%; /* Circular */
-    width: 60px; /* Tamanho do círculo maior */
+.demo-step-item.found .demo-state-icon-wrapper {
+    background-color: #28A745;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
     height: 60px;
-    font-size: 2rem; /* Ícone de check grande */
-    margin-right: 15px; /* Espaço à direita do ícone */
+    font-size: 2rem;
+    margin-right: 15px;
 }
 
 /* Esconder o ícone de giro/seta no estado "found" */
 .demo-step-item.found .step-content > i {
-    display: none; /* Remove o ícone de giro/seta do lado direito no estado encontrado */
+    display: none;
 }
 
 .step-content {
@@ -562,7 +520,7 @@ section {
     align-items: center;
     justify-content: space-between;
     flex-grow: 1;
-    gap: 10px; /* Espaço entre o texto e o ícone final */
+    gap: 10px;
 }
 
 .step-text {
@@ -583,13 +541,13 @@ section {
 }
 
 /* Detalhes do "Encontrado!" */
-.found-details-layout { /* NOVO: Agrupador para o layout da direita */
+.found-details-layout {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Alinha o conteúdo à esquerda dentro deste div */
-    gap: 5px; /* Espaço entre a tag e a mensagem */
+    align-items: flex-start;
+    gap: 5px;
     flex-grow: 1;
-    margin-left: 20px; /* Desloca para a direita do texto principal */
+    margin-left: 20px;
 }
 
 .found-tag {
@@ -678,7 +636,6 @@ section {
     font-size: 0.95rem;
 }
 
-
 /* Precisao Section (Formulário de Teste) */
 .precisao-section {
     padding-top: 60px;
@@ -712,7 +669,6 @@ section {
     position: absolute;
     left: 0;
     top: 0;
-
     color: white;
     border-radius: 50%;
     width: 28px;
@@ -745,7 +701,7 @@ section {
 
 .upload-box i {
     font-size: 3.2rem;
-    color:  #0427c1;
+    color:  #0427c1;
     margin-bottom: 10px;
 }
 
@@ -803,7 +759,7 @@ section {
 }
 
 .btn-analisar-ia {
-  background: linear-gradient(135deg, #3a68ff, #0427c1);
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
     color: white;
     border: none;
     border-radius: 8px;
@@ -818,7 +774,6 @@ section {
     width: fit-content;
     margin: 30px auto 0 auto;
 }
-
 
 /* How It Works Section */
 .how-it-works-section {
@@ -895,7 +850,6 @@ section {
 
 /* Why Choose Us Section (Benefícios) */
 .why-choose-us-section {
-    
     padding-top: 0px;
     padding-bottom: 20px;
 }
@@ -1154,33 +1108,19 @@ section {
     align-items: center;
     gap: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
 }
 
 /* ========================================= */
 /* PALETA DE CORES - APENAS OS NOVOS GRADIENTES PARA FAQ */
 /* ========================================= */
 
-/* ... Mantenha todas as suas outras classes de cores aqui ... */
-
-/* NOVOS Gradientes para os ícones da FAQ */
-/* ========================================= */
-/* PALETA DE CORES - APENAS OS NOVOS GRADIENTES PARA FAQ */
-/* ========================================= */
-
-/* ... Mantenha todas as suas outras classes de cores aqui ... */
-
-/* NOVOS Gradientes para os ícones da FAQ */
-.purple-to-blue-gradient 
-    { background: linear-gradient(135deg, #429aff, #0163c5); color: white; } 
+.purple-to-blue-gradient { background: linear-gradient(135deg, #429aff, #0163c5); color: white; } 
 
 .green-gradient-faq { background: linear-gradient(135deg, #05bc5b, #00823c); color: white; }
 
 .orange-to-purple-gradient { background: linear-gradient(135deg, #9d1ee2, #6108c0); color: white; }
 
 .red-to-orange-gradient{ background: linear-gradient(135deg, #ff6d33, #dd2110); color: white; }
-/* Cobertura Nacional (laranja) */
-
 
 /* ========================================= */
 /* FAQ Section */
@@ -1201,7 +1141,7 @@ section {
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Espaço entre os itens da FAQ */
+    gap: 15px;
 }
 
 .faq-item {
@@ -1209,7 +1149,7 @@ section {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border: 1px solid #E0E0E0;
-    overflow: hidden; /* CRUCIAL para a animação de max-height */
+    overflow: hidden;
     cursor: pointer;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -1219,16 +1159,14 @@ section {
 }
 
 .faq-item.active {
-    border-color: #007BFF; /* Borda azul quando o item está ativo/aberto */
+    border-color: #007BFF;
 }
 
 .faq-question {
     display: flex;
     align-items: center;
-    /* Reduzir o gap entre o ícone e o texto/seta */
-    gap: 12px; /* Era 15px. Ajuste para 10px, 12px... */
-    /* Reduzir o padding interno do faq-question */
-    padding: 15px 20px; /* Era 20px 25px. Ajuste para um valor menor. */
+    gap: 12px;
+    padding: 15px 20px;
     font-size: 1.1rem;
     font-weight: 600;
     color: #343A40;
@@ -1237,7 +1175,6 @@ section {
     flex-wrap: nowrap;
 }
 
-/* faq-icon-wrapper (mantenha, mas o tamanho pode precisar de leve ajuste se o padding mudou muito) */
 .faq-icon-wrapper {
     border-radius: 8px;
     width: 40px;
@@ -1249,33 +1186,29 @@ section {
     flex-shrink: 0;
 }
 
-/* faq-question h3 (mantenha, mas o flex-grow é importante) */
 .faq-question h3 {
     font-size: 1.1rem;
     font-weight: 600;
     color: #343A40;
     text-align: left;
-    flex-grow: 1; /* Essencial para o texto ocupar o espaço e empurrar a seta */
+    flex-grow: 1;
 }
 
-/* faq-question i.fa-chevron-down (seta) */
 .faq-question i.fa-chevron-down {
     transition: transform 0.3s ease;
     font-size: 1rem;
     color: #6C757D;
     flex-shrink: 0;
-    margin-left: 8px; /* Era 10px. Reduzir para aproximar da pergunta */
+    margin-left: 8px;
 }
 
 .faq-meta {
     display: flex;
     align-items: center;
-    gap: 15px; /* Reduzir o espaçamento entre visualizações e popular. Era 20px. */
+    gap: 15px;
     font-size: 0.85rem;
     color: #6C757D;
-    /* Ajusta padding para alinhar com o texto da pergunta, considerando o novo padding do faq-question */
-    /* 20px (padding lateral faq-question) + 12px (gap) + 48px (ícone) = 80px */
-    padding: 0 20px 10px 80px; /* Era 0 25px 15px 88px. Ajustado. */
+    padding: 0 20px 10px 80px;
     text-align: left;
 }
 
@@ -1290,16 +1223,11 @@ section {
     opacity: 0;
     visibility: hidden;
     transition: max-height 0.4s ease-out, opacity 0.4s ease-out, visibility 0.4s; 
-
     background-color: #F8F9FA;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-
-    /* O padding da resposta interna: alinhado com o padding do faq-question */
-    padding: 0 20px; /* Era 0 25px. Ajustado para 20px. */
-    
-    margin: 0 20px; /* Margem lateral para descolar do faq-item. Era 25px. */
-
+    padding: 0 20px;
+    margin: 0 20px;
     font-size: 0.95rem;
     color: #495057;
     text-align: left;
@@ -1309,14 +1237,11 @@ section {
     max-height: 500px;
     opacity: 1;
     visibility: visible;
-    /* Ajuste de padding-top/bottom para o bloco da resposta aberta */
-    padding-top: 15px; /* Era 15px. Mantenha ou ajuste. */
-    padding-bottom: 15px; /* Era 15px. Mantenha ou ajuste. */
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 /* Support Section */
 .support-section {
-    
-
     display: flex;
     justify-content: center;
     width: 100%;
@@ -1386,55 +1311,56 @@ section {
 /* ========================================= */
 
 .main-page-footer {
-    background-color: #121725; /* Fundo escuro do footer */
-    color: #e0e0e0; /* Cor de texto padrão para o footer */
-    padding: 60px 30px 20px 30px; /* Padding superior, lateral e inferior */
+    background-color: #121725;
+    color: #e0e0e0;
+    padding: 60px 30px 20px 30px;
     font-size: 0.95rem;
     line-height: 1.6;
-    width: 100%; /* Ocupa a largura total */
+    width: 100%;
 }
 
 .footer-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que as colunas quebrem linha em telas menores */
-    justify-content: space-between; /* Espaça as colunas */
-    gap: 40px; /* Espaço entre as colunas quando quebram */
-    max-width: 1200px; /* Mesma largura do conteúdo principal */
-    margin: 0 auto; /* Centraliza o conteúdo do footer */
-    padding-bottom: 40px; /* Espaço antes da linha divisória */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Linha divisória sutil */
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-column {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Espaço entre elementos dentro da coluna */
-    min-width: 250px; /* Largura mínima para as colunas */
-    flex: 1; /* Permite que as colunas cresçam e encolham */
+    gap: 15px;
+    min-width: 250px;
+    flex: 1;
 }
 
 .footer-column.about-us {
-    flex: 1.5; /* Faz a primeira coluna um pouco maior */
+    flex: 1.5;
     max-width: 350px;
 }
 
-.footer-logo img {
-    max-width: 120px; /* Tamanho do logo no footer */
+.footer-logo  {
+    max-width: 190px;
     height: auto;
-    margin-bottom: 15px;
+    margin-top: -18px;
+    margin-bottom: 0px;
 }
 
 .footer-column p {
-    color: #b0b0b0; /* Cor de texto para os parágrafos */
+    color: #b0b0b0;
     font-size: 0.9rem;
 }
 
 .footer-column h3 {
-    color: white; /* Títulos das colunas em branco */
+    color: white;
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 20px;
-    white-space: nowrap; /* Não quebra linha */
+    white-space: nowrap;
 }
 
 .footer-column ul {
@@ -1443,15 +1369,15 @@ section {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Espaço entre os itens da lista */
+    gap: 10px;
 }
 
 .footer-column ul li a {
-    color: #b0b0b0; /* Cor dos links */
+    color: #b0b0b0;
     text-decoration: none;
     font-size: 0.9rem;
     transition: color 0.2s ease;
-    display: flex; /* Para alinhar ícone e texto */
+    display: flex;
     align-items: center;
     gap: 10px;
 }
@@ -1462,14 +1388,13 @@ section {
 
 .footer-column ul li a i {
     font-size: 1rem;
-    color: #b0b0b0; /* Cor dos ícones nos links */
+    color: #b0b0b0;
     transition: color 0.2s ease;
 }
 
 .footer-column ul li a:hover i {
     color: white;
 }
-
 
 /* Badges de Segurança (Sistema Online, Dados Seguros) */
 .security-badges {
@@ -1480,8 +1405,8 @@ section {
 }
 
 .badge {
-    background-color: rgba(40, 167, 69, 0.1); /* Fundo verde transparente */
-    color: #28a745; /* Texto verde */
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 0.8rem;
@@ -1503,13 +1428,13 @@ section {
     justify-content: space-between;
     align-items: center;
     max-width: 1200px;
-    margin: 20px auto 0 auto; /* Espaço acima da linha divisória */
+    margin: 20px auto 0 auto;
     color: #b0b0b0;
     font-size: 0.85rem;
 }
 
 .footer-bottom p {
-    margin: 0; /* Zera margem padrão do p */
+    margin: 0;
 }
 
 .footer-links {
@@ -1526,62 +1451,10 @@ section {
     color: white;
 }
 
-
 /* ========================================= */
-/* RESPONSIVIDADE DO FOOTER */
+/* RESPONSIVIDADE (NOVO CÓDIGO) */
 /* ========================================= */
-@media (max-width: 992px) {
-    .footer-container {
-        flex-direction: column; /* Colunas empilhadas em tablets */
-        align-items: center; /* Centraliza as colunas */
-        text-align: center;
-        gap: 30px;
-    }
-    .footer-column {
-        min-width: unset;
-        width: 100%; /* Colunas ocupam largura total */
-        max-width: 400px; /* Limita a largura para leitura */
-    }
-    .footer-column.about-us {
-        order: -1; /* Move a coluna "about us" para o topo */
-        max-width: 400px;
-    }
-    .footer-column h3, .footer-column p, .security-badges {
-        text-align: center;
-        margin: 0 auto;
-    }
-    .footer-bottom {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-    .footer-links {
-        justify-content: center;
-    }
-}
-
-@media (max-width: 576px) {
-    .main-page-footer {
-        padding: 40px 15px 15px 15px; /* Reduz padding em mobile */
-    }
-    .footer-container {
-        gap: 20px;
-    }
-    .footer-column h3 {
-        margin-bottom: 15px;
-    }
-    .footer-bottom {
-        font-size: 0.8rem;
-    }
-    .footer-links {
-        flex-direction: column;
-        gap: 5px;
-    }
-}
-
-/* ========================================= */
-/* RESPONSIVIDADE */
-/* ========================================= */
+/* Desktop de Largura Média (até 1440px) */
 @media (max-width: 1440px) {
     .navbar-index .navbar-container,
     section {
@@ -1589,16 +1462,7 @@ section {
     }
 }
 
-@media (max-width: 1200px) {
-    .navbar-index .navbar-container,
-    section {
-        max-width: 960px;
-    }
-    .plans-grid-index {
-        max-width: 800px;
-    }
-}
-
+/* Tablets e Desktops Menores (até 992px) */
 @media (max-width: 992px) {
     .index-content {
         padding: 40px 0;
@@ -1639,8 +1503,37 @@ section {
     .step-card, .benefit-card, .stat-card-index {
         padding: 25px;
     }
+    /* Footer */
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 30px;
+    }
+    .footer-column {
+        min-width: unset;
+        width: 100%;
+        max-width: 400px;
+    }
+    .footer-column.about-us {
+        order: -1;
+        max-width: 400px;
+    }
+    .footer-column h3, .footer-column p, .security-badges {
+        text-align: center;
+        margin: 0 auto;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    .footer-links {
+        justify-content: center;
+    }
 }
 
+/* Celulares e Tablets em Modo Paisagem (até 768px) */
 @media (max-width: 768px) {
     .index-content {
         padding: 30px 0;
@@ -1649,47 +1542,50 @@ section {
     section {
         padding: 0 15px;
     }
+    /* Navbar */
+    .navbar-index {
+        height: auto;
+    }
     .navbar-index .navbar-container {
         flex-direction: column;
         align-items: center;
         gap: 15px;
-        padding: 0 15px;
+        padding: 15px;
+    }
+    .navbar-center-index {
+        position: static;
+        transform: none;
+        width: 100%;
+        display: none; /* Esconde o menu de navegação central por padrão */
+    }
+    /* HACK para mostrar o menu em telas pequenas. Ideal seria um botão de menu hamburguer. */
+    .navbar-index:hover .navbar-center-index {
+        display: flex;
     }
     .navbar-index .navbar-center-index ul {
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
         gap: 10px;
     }
-    .navbar-index .btn-entrar {
+    .navbar-left .logo img {
+        margin-right: 0;
+    }
+    .navbar-index .navbar-right-index .btn-entrar {
         margin-top: 10px;
     }
+    
+    /* Hero Section */
     .hero-section-index h1 {
         font-size: 2rem;
     }
     .hero-section-index .subtitle {
         font-size: 0.95rem;
     }
-    .demo-steps-container { /* Adicionado para responsividade do demo */
-        gap: 15px;
-    }
-    .demo-step-icon-wrapper { /* Adicionado para responsividade do demo */
-        width: 40px;
-        height: 40px;
-        font-size: 1.3rem;
-    }
-    .share-options {
-        flex-direction: column;
-        width: 100%;
-    }
-    .share-options button {
-        width: 100%;
-        justify-content: center;
-    }
     .demo-actions {
         flex-direction: column;
         width: 100%;
     }
-    .demo-actions button {
+    .demo-actions .btn-primary, .demo-actions .btn-secondary {
         width: 100%;
         justify-content: center;
     }
@@ -1697,6 +1593,8 @@ section {
         flex-direction: column;
         gap: 10px;
     }
+    
+    /* Grids das Seções */
     .steps-grid, .benefits-grid, .stats-grid {
         grid-template-columns: 1fr;
     }
@@ -1707,6 +1605,8 @@ section {
     .faq-section .subtitle {
         max-width: 100%;
     }
+    
+    /* Planos */
     .plan-card-index {
         max-width: 380px;
         margin-left: auto;
@@ -1718,8 +1618,11 @@ section {
     .plan-card-index h3 {
         font-size: 1.5rem;
     }
+    
+    /* Suporte */
     .support-card {
         padding: 30px 20px;
+        width: 90%;
     }
     .support-header {
         font-size: 1.5rem;
@@ -1731,7 +1634,9 @@ section {
         padding: 10px 20px;
         font-size: 0.9rem;
     }
-    .faq-item .faq-question {
+    
+    /* FAQ */
+    .faq-question {
         flex-wrap: wrap;
         padding: 15px 20px;
         gap: 10px;
@@ -1751,16 +1656,13 @@ section {
     }
 }
 
+/* Celulares (até 480px) */
 @media (max-width: 480px) {
     .index-content h1 {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
     }
     .index-content .subtitle {
         font-size: 0.85rem;
-    }
-    .navbar-index .navbar-center-index ul {
-        flex-direction: column;
-        align-items: center;
     }
     .btn-tag {
         padding: 8px 18px;
@@ -1827,11 +1729,17 @@ section {
         padding: 8px 15px;
         font-size: 0.85rem;
     }
+    .footer-bottom {
+        font-size: 0.75rem;
+        flex-direction: column;
+        gap: 5px;
+    }
 }
+
 
 /* --- ESTILOS DO MODAL DE SUCESSO DE DEMONSTRAÇÃO --- */
 .modal-overlay {
-    display: none; /* Escondido por padrão */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -1909,28 +1817,26 @@ section {
     margin-right: 5px;
 }
 
-
 /* Adicione este código ao seu arquivo index.css */
 
 /* Estilização do Modal (Pop-up) */
 .modal {
-    display: none; /* Escondido por padrão */
-    position: fixed; /* Posição fixa sobre todo o conteúdo */
-    z-index: 1000; /* Garante que ele fique no topo */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Fundo semi-transparente */
-    backdrop-filter: blur(8px); /* Efeito de Fundo de Vidro */
-    -webkit-backdrop-filter: blur(8px); /* Compatibilidade para Safari */
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     justify-content: center;
     align-items: center;
     padding-top: 50px;
     overflow-y: auto;
 }
 .modal-overlay {
-    /* Mantenha as propriedades de posicionamento e fundo */
     position: fixed;
     top: 0;
     left: 0;
@@ -1956,20 +1862,19 @@ section {
     top: 50px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10; /* Z-index baixo para ficar atrás do modal-content */
+    z-index: 10;
     animation: bounce 2s infinite;
 }
 
 .logo-robo-dentro {
     position: absolute;
-    width: 110px; /* Mantém a largura que você usou */
-    top: -140px; /* Valor negativo para subir a imagem acima do modal */
+    width: 110px;
+    top: -140px;
     left: 50%;
-    transform: translateX(-50%); /* Centraliza a imagem horizontalmente */
-    z-index: 10; /* Garante que fique acima de outros elementos do modal, mas não do modal inteiro */
+    transform: translateX(-50%);
+    z-index: 10;
     animation: bounce 2s infinite;
 }
-
 
 /* Conteúdo do Modal (o pop-up branco) */
 .modal-content {
@@ -1977,24 +1882,24 @@ section {
     background: #fff;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    width: 90%;
-    max-width: 350px;
+    width: 120%;
+    max-width: 400px;
     padding: 10px 30px;
     box-sizing: border-box;
     text-align: center;
-    z-index: 20; /* Z-index alto para ficar na frente do robô */
+    z-index: 20;
 }
 
 .close-btn {
     position: absolute;
-    top: 10px; /* Distância do topo */
-    right: 15px; /* Distância da direita */
-    font-size: 1.5em; /* Tamanho do ícone 'x' */
-    color: #888; /* Cor do ícone */
+    top: 10px;
+    right: 15px;
+    font-size: 1.5em;
+    color: #888;
     cursor: pointer;
     background: none;
     border: none;
-    z-index: 10; /* Garante que o botão fique na frente de outros elementos */
+    z-index: 10;
 }
 
 .form-header {
@@ -2004,7 +1909,6 @@ section {
 .logo-robo {
     width: 170px;
     height: auto;
-    
     margin-bottom: 720px;
 }
 .close.btn {

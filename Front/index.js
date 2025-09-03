@@ -317,4 +317,39 @@ document.addEventListener("DOMContentLoaded", () => {
     startDemo();
     updateUIMode();
     attachPasswordToggleListeners();
+    
+    // ===============================================
+    // Lógica do FAQ (Perguntas Frequentes) - NOVO CÓDIGO AQUI
+    // ===============================================
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        question.addEventListener('click', () => {
+            // Fecha todos os outros itens abertos
+            faqItems.forEach(otherItem => {
+                if (otherItem !== item && otherItem.classList.contains('active')) {
+                    otherItem.classList.remove('active');
+                    otherItem.querySelector('.faq-answer').style.maxHeight = null;
+                    otherItem.querySelector('.faq-question .fa-chevron-down').style.transform = 'rotate(0deg)';
+                }
+            });
+
+            // Alterna a classe 'active' no item clicado
+            const answer = item.querySelector('.faq-answer');
+            const icon = item.querySelector('.faq-question .fa-chevron-down');
+            
+            if (item.classList.contains('active')) {
+                // Se já estiver ativo, fecha
+                item.classList.remove('active');
+                answer.style.maxHeight = null;
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                // Se não estiver ativo, abre
+                item.classList.add('active');
+                answer.style.maxHeight = answer.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        });
+    });
 });

@@ -36,28 +36,25 @@ ul {
     padding: 15px 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border-bottom: 1px solid rgba(224, 224, 224, 0.3);
-
-    /* --- Propriedades para o Efeito Vidro --- */
     background-color: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(80px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-
-    /* --- Propriedades para Fixar a Navbar --- */
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
 }
 
-
 .navbar-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    height: 40px;
     max-width: 1440px;
     padding: 0 30px;
+    position: relative;
 }
 
 .navbar-left {
@@ -96,7 +93,6 @@ ul {
     display: flex;
     align-items: center;
     color:#08ac6d;
-    
     font-weight: 500;
     padding: 5px 0;
     transition: color 0.3s ease, transform 0.3s ease;
@@ -114,35 +110,25 @@ ul {
 }
 
 .navbar-center ul li a i {
+    font-size: 17px;
     margin-right: 8px;
-    font-size: 1rem;
     transition: transform 0.3s ease;
-    color: white;
-    text-shadow:
-        -1px -1px 0 #6c757d,
-        1px -1px 0 #6c757d,
-        -1px 1px 0 #6c757d,
-        1px 1px 0 #6c757d;
-    
-}
-
-.navbar-center ul li a:hover i,
-.navbar-center ul li a.active i {
+    color: transparent !important; /* Adicione !important aqui */
+    -webkit-text-stroke: 1px #6c757d;
+  }
+  
+  .navbar-center ul li a:hover i,
+  .navbar-center ul li a.active i {
     transform: scale(1.1);
-    text-shadow:
-    -1px -1px 0 #007bff,
-    1px -1px 0 #007bff,
-    -1px 1px 0 #007bff,
-    1px 1px 0 #007bff;
-    
-}
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #007bff;
+  }
 
 .navbar-center ul li a.ajuda i{
-    text-shadow:
-    -1px -1px 0 #08ac6d,
-    1px -1px 0 #08ac6d,
-    -1px 1px 0 #08ac6d,
-    1px 1px 0 #08ac6d;
+    transform: scale(1.1);
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #08ac6d;
+  
 }
 
 .navbar-right {
