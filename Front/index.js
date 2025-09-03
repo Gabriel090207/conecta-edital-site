@@ -323,7 +323,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // ===============================================
 
     // Função assíncrona para registrar a visualização do FAQ no backend
-    async function recordFaqView(faqId) {
+    // e atualizar a contagem na interface do usuário
+    async function recordFaqView(faqId, viewsElement) {
         try {
             const response = await fetch(`${BACKEND_URL}/faq/${faqId}/visualizacao`, {
                 method: 'POST',
@@ -336,6 +337,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error(`Erro ao registrar visualização: status ${response.status}`);
             } else {
                 console.log(`Visualização para o FAQ ${faqId} registrada com sucesso.`);
+                // Novo: Lógica para atualizar a contagem de visualizações na página
+                const data = await response.json();
+                if (data.visualizacoes !== undefined) {
+                    viewsElement.textContent = data.visualizacoes + ' visualizações';
+                }
             }
         } catch (error) {
             console.error("Erro na requisição para registrar visualização:", error);
@@ -374,7 +380,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const faqId = item.dataset.faqId;
                 if (faqId) {
-                    recordFaqView(faqId);
+                    // Encontre o elemento de visualizações e passe-o para a função
+                    const viewsElement = item.querySelector('.faq-meta span:first-child');
+                    recordFaqView(faqId, viewsElement);
                 }
             }
         });
