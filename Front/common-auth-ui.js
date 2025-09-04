@@ -1,5 +1,3 @@
-// Front/common-auth-ui.js
-
 window.auth = firebase.auth(); 
 
 const userDropdownToggle = document.getElementById('user-dropdown-toggle');
@@ -10,14 +8,11 @@ const logoutBtn = document.getElementById('logout-btn');
 const userEmailSpan = document.getElementById('user-email');
 const userFullNameSpan = document.getElementById('user-fullname');
 const userUsernameSpan = document.getElementById('user-username');
-
-// Adicionei novas variáveis para o plano do usuário no HTML
 const userPlanDisplay = document.getElementById('user-plan-display');
 const upgradePlanButton = document.getElementById('upgrade-plan-button');
 
 
-// Função para buscar e renderizar os dados do dashboard
-// Agora esta função é chamada apenas para carregar os dados no cabeçalho
+// Função para buscar e renderizar os dados do cabeçalho
 async function fetchAndRenderHeaderData(user) {
     if (!user) return;
 
@@ -30,25 +25,64 @@ async function fetchAndRenderHeaderData(user) {
     } else {
         if (userDefaultAvatar) userDefaultAvatar.style.display = 'block';
         if (userProfilePicture) userProfilePicture.style.display = 'none';
-        if (userDefaultAvatar && user.displayName) {
-            userDefaultAvatar.textContent = user.displayName.charAt(0).toUpperCase();
-        } else if (userDefaultAvatar && user.email) {
-            userDefaultAvatar.textContent = user.email.charAt(0).toUpperCase();
+        
+        // Pega o nome de exibição do Firebase ou do e-mail
+        const displayName = user.displayName || user.email.split('@')[0];
+        if (userDefaultAvatar) {
+            userDefaultAvatar.textContent = displayName.charAt(0).toUpperCase();
         }
     }
+    
+    // Usa o nome de exibição para o menu
     const displayName = user.displayName || user.email.split('@')[0];
     if (userNameDisplay) userNameDisplay.textContent = displayName;
-    if (userEmailSpan) userEmailSpan.textContent = user.email;
-    if (userFullNameSpan) userFullNameSpan.textContent = user.displayName || 'Nome Completo';
-    if (userUsernameSpan) userUsernameSpan.textContent = user.email.split('@')[0];
+    
+    // Essas variáveis não parecem ter um elemento correspondente no seu HTML atual, 
+    // mas a lógica está aqui caso você adicione os elementos depois.
+    // if (userEmailSpan) userEmailSpan.textContent = user.email;
+    // if (userFullNameSpan) userFullNameSpan.textContent = user.displayName || 'Nome Completo';
+    // if (userUsernameSpan) userUsernameSpan.textContent = user.email.split('@')[0];
 }
 
 
 window.auth.onAuthStateChanged(async (user) => {
     const currentPath = window.location.pathname;
+    const BACKEND_URL = "https://conecta-edital-site.onrender.com"; // Defina a URL do seu backend aqui
 
     if (user) {
-        fetchAndRenderHeaderData(user);
+        // --- NOVO: Sincroniza dados do Firebase com o Firestore ---
+        try {
+            const idToken = await user.getIdToken();
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                headers: { 'Authorization': `Bearer ${idToken}` }
+            });
+
+            if (response.ok) {
+                const firestoreUserData = await response.json();
+                
+                // Se o nome no Firestore não estiver definido, mas o displayName do Firebase existir, atualize o Firestore.
+                // Isso resolve o problema de usuários que logaram com o Google mas não tiveram o nome salvo.
+                if (!firestoreUserData.fullName && user.displayName) {
+                    await fetch(`${BACKEND_URL}/api/users/update_profile`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                        body: JSON.stringify({ fullName: user.displayName })
+                    });
+                    console.log('Nome do Google sincronizado com o Firestore.');
+                    // Após a sincronização, recarregue os dados para refletir a mudança
+                    await window.loadDashboardDataAndRender();
+                } else {
+                     // Se o nome já existe, apenas atualiza a UI
+                     fetchAndRenderHeaderData(user);
+                }
+
+            } else {
+                console.error('Erro ao buscar dados do usuário do Firestore:', response.status);
+            }
+        } catch (error) {
+            console.error('Erro na requisição para sincronizar dados do usuário:', error);
+        }
+        // --- FIM DA SINCRONIZAÇÃO ---
 
         // AQUI: Chamamos a função principal que fará toda a mágica no painel
         if (typeof window.loadDashboardDataAndRender === 'function') {
@@ -63,6 +97,16 @@ window.auth.onAuthStateChanged(async (user) => {
         // Se o usuário está logado, garante que o chat carregue o histórico dele
         if (typeof window.loadChatHistory === 'function') {
             window.loadChatHistory();
+        }
+
+        const openProfileModalLink = document.getElementById('open-profile-modal-btn');
+        if (openProfileModalLink) {
+            openProfileModalLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (typeof window.loadUserProfile === 'function') {
+                    window.loadUserProfile();
+                }
+            });
         }
 
     } else {
@@ -85,8 +129,6 @@ if (logoutBtn) {
         console.log('logoutBtn: Clique no botão de logout detectado.');
         try {
             await window.auth.signOut();
-            // A limpeza do chat agora é tratada principalmente pelo onAuthStateChanged
-            // ao detectar que o usuário se deslogou.
             window.location.href = 'index.html';
         } catch (error) {
             console.error('logoutBtn: Erro ao deslogar:', error);
