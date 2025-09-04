@@ -326,7 +326,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // e atualizar a contagem na interface do usuário
     async function recordFaqView(faqId, viewsElement) {
         try {
-            const response = await fetch(`${BACKEND_URL}/faq/${faqId}/visualizacao`, {
+            // AQUI ESTÁ A MUDANÇA - A URL agora aponta para a nova rota de FAQs populares
+            const response = await fetch(`${BACKEND_URL}/popular_faqs/${faqId}/visualizacao`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -337,10 +338,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error(`Erro ao registrar visualização: status ${response.status}`);
             } else {
                 console.log(`Visualização para o FAQ ${faqId} registrada com sucesso.`);
-                // Novo: Lógica para atualizar a contagem de visualizações na página
                 const data = await response.json();
                 if (data.visualizacoes !== undefined) {
-                    viewsElement.textContent = data.visualizacoes + ' visualizações';
+                    const eyeIconHtml = '<i class="fas fa-eye"></i>';
+                    viewsElement.innerHTML = `${eyeIconHtml} ${data.visualizacoes} visualizações`;
                 }
             }
         } catch (error) {
