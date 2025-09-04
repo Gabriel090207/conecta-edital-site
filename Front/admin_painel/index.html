@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Conecta Edital</title>
-   <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -164,7 +164,7 @@
                     <label for="dica-autor">Autor *</label>
                     <input type="text" id="dica-autor" required>
                 </div>
-             
+              
                 
                 <div class="form-group">
                     <label for="dica-conteudo">Conteúdo *</label>
@@ -185,16 +185,35 @@
                 <button class="modal-close-btn" data-modal-id="all-tickets-modal">&times;</button>
             </div>
             
-            <div class="search-box-admin">
-                <i class="fas fa-search"></i>
-                <input type="text" id="ticket-search-admin" placeholder="Buscar tickets por título, ID ou descrição...">
-            </div>
+            <div class="tickets-controls">
+                <div class="search-box-admin">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="ticket-search-admin" placeholder="Buscar tickets por título, ID ou descrição...">
+                </div>
+                
+                <div class="custom-select-container">
+                    <label for="ticket-status-filter-custom">Filtrar por Status:</label>
+                    <div class="custom-select-wrapper">
+                        <div class="select-selected" id="ticket-status-filter-custom" data-value="Todos">
+                            Todos Status <i class="fas fa-chevron-down dropdown-icon"></i>
+                        </div>
+                        <div class="select-items select-hide">
+                            <div data-value="Todos" class="select-item selected">Todos Status <i class="fas fa-check"></i></div>
+                            <div data-value="Aguardando" class="select-item">Aguardando</div>
+                            <div data-value="Em Atendimento" class="select-item">Em Atendimento</div>
+                            <div data-value="Respondido" class="select-item">Respondido</div>
+                            <div data-value="Resolvido" class="select-item">Resolvido</div>
+                        </div>
+                    </div>
+                </div>
+                </div>
             
             <div class="tickets-list-admin" id="tickets-list-admin">
                 <p class="loading-tickets-message">Carregando tickets...</p>
             </div>
         </div>
     </div>
+    
     <div class="modal-overlay" id="ticket-detail-modal">
         <div class="modal-content ticket-detail-content">
             <button class="modal-close-btn" data-modal-id="ticket-detail-modal">&times;</button>

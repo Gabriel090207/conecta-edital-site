@@ -1645,3 +1645,264 @@ ul {
     height: 32px;
     box-sizing: border-box;
 }
+
+.main-page-footer {
+    background-color: #121725;
+    color: #e0e0e0;
+    padding: 60px 30px 20px 30px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    width: 100%;
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 250px;
+    flex: 1;
+}
+
+.footer-column.about-us {
+    flex: 1.5;
+    max-width: 350px;
+}
+
+.footer-logo  {
+    max-width: 190px;
+    height: auto;
+    margin-top: -18px;
+    margin-bottom: 0px;
+}
+
+.footer-column p {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+}
+
+.footer-column h3 {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    white-space: nowrap;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-column ul li a {
+    color: #b0b0b0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-column ul li a:hover {
+    color: white;
+}
+
+.footer-column ul li a i {
+    font-size: 1rem;
+    color: #b0b0b0;
+    transition: color 0.2s ease;
+}
+
+.footer-column ul li a:hover i {
+    color: white;
+}
+
+.security-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.badge {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.badge i {
+    font-size: 0.8em;
+}
+
+/* Base do Footer (Copyright e Links de Políticas) */
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 20px auto 0 auto;
+    color: #b0b0b0;
+    font-size: 0.85rem;
+}
+
+.footer-bottom p {
+    margin: 0;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: #b0b0b0;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.footer-links a:hover {
+    color: white;
+}
+
+/* Estilos para o Modal de Perfil do Usuário */
+#profile-modal .modal-content.profile-content {
+    max-width: 500px;
+    padding: 30px;
+    text-align: center;
+}
+
+.profile-header {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-avatar-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    font-size: 3em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+#profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #eee;
+}
+
+#profile-full-name {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 600;
+    color: #333;
+}
+
+.profile-username-tag {
+    font-size: 1em;
+    color: #888;
+    margin-top: -5px;
+    display: block;
+}
+
+.profile-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.detail-card {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: left;
+}
+
+.detail-icon {
+    font-size: 1.5em;
+    color: #007bff;
+    margin-right: 15px;
+}
+
+.detail-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-text span {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.detail-text p {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Estilos para o texto do plano */
+.detail-text p.premium-plan-text { color: #f9a825; font-weight: bold; }
+.detail-text p.essencial-plan-text { color: #1e88e5; font-weight: bold; }
+.detail-text p.no-plan-text { color: #6c757d; font-weight: bold; }
+
+.profile-actions {
+    margin-top: 20px;
+}
+
+.btn-upgrade-plan {
+    background: linear-gradient(135deg, #1e88e5, #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-upgrade-plan:hover {
+    background: linear-gradient(135deg, #0056b3, #003a70);
+}

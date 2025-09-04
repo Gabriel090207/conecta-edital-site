@@ -531,6 +531,150 @@ ul { list-style: none; }
     color: #fff;
 }
 
+/* Container para a barra de pesquisa e o filtro */
+/* Container para a barra de pesquisa e o filtro */
+.tickets-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Alinha o filtro no centro vertical */
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+/* Ajuste para a barra de busca */
+.search-box-admin {
+    margin: 0;
+    flex-grow: 1;
+}
+
+/* ESTILOS PARA O SELETOR CUSTOMIZADO */
+.custom-select-container {
+    position: relative;
+    display: flex;
+    align-items: center; /* Alinha a label e o wrapper */
+    gap: 10px;
+    z-index: 10; /* Garante que o dropdown fique por cima de outros elementos */
+}
+
+.custom-select-container label {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.custom-select-wrapper {
+    position: relative;
+    min-width: 180px; /* Largura mínima para o seletor */
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9em;
+}
+
+.select-selected {
+    background-color: #fff;
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.select-selected:hover {
+    border-color: #c0c0c0;
+}
+
+.select-selected.select-arrow-active {
+    border-color: #1a73e8; /* Cor da borda quando ativo */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.select-selected .dropdown-icon {
+    transition: transform 0.2s ease;
+}
+
+.select-selected.select-arrow-active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.select-items {
+    position: absolute;
+    background-color: #fff;
+    top: 100%; /* Abaixo do cabeçalho selecionado */
+    left: 0;
+    right: 0;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 9; /* Um pouco abaixo do cabeçalho */
+}
+
+.select-hide {
+    display: none;
+}
+
+.select-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.1s ease;
+}
+
+.select-item:hover, .select-item.hover {
+    background-color: #f2f2f2; /* Fundo cinza claro ao passar o mouse */
+}
+
+.select-item.selected {
+    color: #1a73e8; /* Cor azul para o item selecionado */
+    font-weight: 600;
+    background-color: #e8f0fe; /* Fundo azul claro para o item selecionado */
+}
+
+.select-item .fas.fa-check {
+    color: #1a73e8;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+/* Esconder o ícone de check por padrão, mostrar apenas no selecionado */
+.select-item:not(.selected) .fas.fa-check {
+    display: none;
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .tickets-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .custom-select-container {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .custom-select-container label {
+        margin-bottom: 5px;
+    }
+    .custom-select-wrapper {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
 .status-aguardando { background-color: #ffc107; color: #333;}
 .status-em-atendimento { background-color: #007bff; }
 .status-respondido { background-color: #28a745; }

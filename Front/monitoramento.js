@@ -7,11 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const monitoringListSection = document.getElementById('monitoring-list');
     const initialNoMonitoramentoMessage = document.getElementById('initial-no-monitoramento-message');
 
-    // NOVAS REFERÊNCIAS PARA OS SPANS DENTRO DA SEÇÃO PRINCIPAL (SE EXISTIREM)
-    const userEmailSpan = document.getElementById('user-email');
-    const userFullNameSpan = document.getElementById('user-fullname');
-    const userUsernameSpan = document.getElementById('user-username');
-
     // Referências para os elementos do card "Plano Atual"
     const planValue = document.getElementById('plan-value');
     const planStatus = document.getElementById('plan-status');
@@ -45,6 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressPercentage = document.getElementById('progress-percentage');
     const activationSteps = document.querySelectorAll('.activation-step');
     const activationCompletedMessage = document.querySelector('.activation-completed-message');
+
+    // NOVO: Referências aos elementos do modal de perfil
+    const profileModal = document.getElementById('profile-modal');
+    const profilePicture = document.getElementById('profile-picture');
+    const profileDefaultAvatar = document.getElementById('profile-default-avatar');
+    const profileFullName = document.getElementById('profile-full-name');
+    const profileUsername = document.getElementById('profile-username');
+    const profileEmail = document.getElementById('profile-email');
+    const profilePlan = document.getElementById('profile-plan');
+    const openProfileModalLink = document.querySelector('.dropdown-content a[href="#"][style*="user"]');
 
     // --- URL base do seu backend FastAPI ---
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
@@ -162,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         1px 1px 0 #009479ff;"></i><span>Ocorrências</span><p class="occurrences-count"><strong>${mon.occurrences || 0} ocorrência(s)</strong> <a href="#" class="view-history-link">Ver Histórico</a></p></div>
 
                 <div class="detail-item"><i class="fas fa-bell" style="text-shadow:
-                       -1px -1px 0 #a600e8ff,
+                        -1px -1px 0 #a600e8ff,
         1px -1px 0 #a600e8ff,
         -1px 1px 0 #a600e8ff,
         1px 1px 0 #a600e8ff;"></i><span>Status das Notificações</span><div class="notification-status"><span class="notification-tag email-enabled">Email</span><span class="notification-tag whatsapp-enabled">WhatsApp</span></div></div>
@@ -190,14 +195,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseMonitorings = await fetch(`${BACKEND_URL}/api/monitoramentos`, { 
                 headers: { 'Authorization': `Bearer ${idToken}` } 
             });
+            
+            const responseUserData = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                headers: { 'Authorization': `Bearer ${idToken}` }
+            });
 
-            if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings)) return;
-            if (!responseStatus.ok || !responseMonitorings.ok) {
+            if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings) || await handleApiAuthError(responseUserData)) return;
+            if (!responseStatus.ok || !responseMonitorings.ok || !responseUserData.ok) {
                 throw new Error("Erro ao buscar dados do dashboard.");
             }
 
             const statusData = await responseStatus.json();
             const monitoramentosList = await responseMonitorings.json();
+            const userData = await responseUserData.json();
 
             // Armazena os dados localmente para o polling
             currentStatusData = statusData;
@@ -208,6 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Renderiza a lista de monitoramentos
             loadMonitorings(monitoramentosList);
+
+            // Preenche os dados do menu de usuário
+            updateUserProfileUI(userData);
             
         } catch (error) {
             console.error("Erro ao carregar dados do dashboard:", error);
@@ -219,7 +232,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (initialNoMonitoramentoMessage) initialNoMonitoramentoMessage.style.display = 'flex';
         }
     };
+    
+    // NOVO: Função para preencher os dados do perfil do usuário na UI
+    function updateUserProfileUI(userData) {
+        if (userData.photoURL) {
+            userProfilePicture.src = userData.photoURL;
+            userProfilePicture.style.display = 'block';
+            userDefaultAvatar.style.display = 'none';
+        } else {
+            userDefaultAvatar.textContent = userData.fullName ? userData.fullName[0] : 'U';
+            userDefaultAvatar.style.display = 'flex';
+            userProfilePicture.style.display = 'none';
+        }
 
+        userNameDisplay.textContent = userData.fullName || 'Usuário';
+
+        // Atualiza o texto do menu dropdown
+        const olaUsuarioElement = document.querySelector('.dropdown-content .olausuario');
+        if (olaUsuarioElement) {
+            olaUsuarioElement.textContent = `Olá, ${userData.fullName ? userData.fullName.split(' ')[0] : 'Usuário'}!`;
+        }
+    }
 
     /**
      * SIMPLIFICADA: Atualiza os cards de resumo no topo da página.
@@ -454,23 +487,65 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao testar monitoramento:", error); alert(`Falha ao testar monitoramento: ${error.message}`); }
     };
 
+    // --- FUNÇÕES DO MODAL DE PERFIL ---
+    async function loadUserProfile() {
+        const user = window.auth.currentUser;
+        if (!user) {
+            console.error("Usuário não autenticado.");
+            return;
+        }
+
+        try {
+            const idToken = await user.getIdToken();
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                headers: { 'Authorization': `Bearer ${idToken}` }
+            });
+
+            if (await handleApiAuthError(response)) return;
+            if (!response.ok) {
+                throw new Error(`Erro ao buscar dados do perfil: ${response.status}`);
+            }
+
+            const userData = await response.json();
+            fillProfileModal(userData);
+            openModal(profileModal);
+
+        } catch (error) {
+            console.error("Erro ao carregar perfil do usuário:", error);
+            alert("Ocorreu um erro ao carregar os dados do seu perfil.");
+        }
+    }
+
+    function fillProfileModal(userData) {
+        if (userData.photoURL) {
+            profilePicture.src = userData.photoURL;
+            profilePicture.style.display = 'block';
+            profileDefaultAvatar.style.display = 'none';
+        } else {
+            profileDefaultAvatar.textContent = userData.fullName ? userData.fullName[0].toUpperCase() : 'U';
+            profileDefaultAvatar.style.display = 'flex';
+            profilePicture.style.display = 'none';
+        }
+
+        profileFullName.textContent = userData.fullName || 'Usuário';
+        profileUsername.textContent = userData.username ? `@${userData.username}` : '';
+        profileEmail.textContent = userData.email || 'N/A';
+        profilePlan.textContent = userData.plan_type || 'Sem Plano';
+        profilePlan.classList.add(getPlanClass(userData.plan_type));
+    }
+    
+    function getPlanClass(plan_type) {
+        switch (plan_type) {
+            case 'premium':
+                return 'premium-plan-text';
+            case 'essencial':
+                return 'essencial-plan-text';
+            default:
+                return 'no-plan-text';
+        }
+    }
+
     // --- Listeners de Eventos Globais (Modais e Formulários) ---
-
-    // A lógica de autenticação inicial e carregamento de monitoramentos/cards de resumo
-    // que estava aqui, agora será chamada pelo common-auth-ui.js
-    // que garantirá que o usuário está logado antes de chamar as funções específicas.
-
-    // Removendo listeners diretos que duplicam a lógica de updateSummaryCards
-    if (openNewMonitoramentoModalBtn) {
-        openNewMonitoramentoModalBtn.removeEventListener('click', showUpgradeAlert);
-        openNewMonitoramentoModalBtn.removeEventListener('click', () => openModal(chooseTypeModal));
-        // O listener correto será adicionado DENTRO da função updateSummaryCards
-    }
-    if (createFirstMonitoramentoBtn) {
-        createFirstMonitoramentoBtn.removeEventListener('click', showUpgradeAlert);
-        createFirstMonitoramentoBtn.removeEventListener('click', () => openModal(chooseTypeModal));
-        // O listener correto será adicionado DENTRO da função updateSummaryCards
-    }
 
     modalCloseButtons.forEach(btn => { btn.addEventListener('click', (e) => { const modalId = e.currentTarget.dataset.modalId; const modalToClose = document.getElementById(modalId); closeModal(modalToClose); }); });
     if (btnCancelModal) { btnCancelModal.addEventListener('click', () => { closeModal(chooseTypeModal); }); }
@@ -483,9 +558,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const handleTypeSelection = async (e) => {
             e.stopPropagation();
 
-            // Obtém o plano do usuário do Firestore (o valor real do backend)
             const user = window.auth.currentUser;
-            let userPlanFromFirestore = 'sem plano'; // Padrão
+            let userPlanFromFirestore = 'sem plano'; 
             if (user) {
                 try {
                     const idToken = await user.getIdToken();
@@ -494,9 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     if (response.ok) {
                         const data = await response.json();
-                        // Pega o nome de exibição do plano diretamente do backend
                         userPlanFromFirestore = data.user_plan; 
-                        console.log("handleTypeSelection: Plano do usuário do Firestore:", userPlanFromFirestore); // Log de depuração
+                        console.log("handleTypeSelection: Plano do usuário do Firestore:", userPlanFromFirestore);
                     } else {
                         console.error('handleTypeSelection: Erro ao buscar status do plano do usuário:', response.status);
                     }
@@ -504,28 +577,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('handleTypeSelection: Erro na requisição de status do plano:', error);
                 }
             }
-
-            // A lógica de permissão agora usa o NOME DE EXIBIÇÃO do plano
-            if (userPlanFromFirestore === 'Plano Premium' || userPlanFromFirestore === 'Plano Essencial') { // 'Plano Básico' foi removido da condição
-                console.log("handleTypeSelection: Plano permite criar monitoramento. Abrindo modal."); // Log de depuração
+            if (userPlanFromFirestore === 'Plano Premium' || userPlanFromFirestore === 'Plano Essencial') {
+                console.log("handleTypeSelection: Plano permite criar monitoramento. Abrindo modal.");
                 closeModal(chooseTypeModal);
-                const type = card.dataset.type; // Obtenha o tipo ANTES do if/else
+                const type = card.dataset.type; 
                 if (type === 'personal') {
                     openModal(personalMonitoramentoModal);
                 } else if (type === 'radar') {
                     openModal(radarMonitoramentoModal);
                 }
             } else {
-                console.log("handleTypeSelection: Plano não permite criar monitoramento. Redirecionando para planos."); // Log de depuração
-                // Redireciona para a página de planos se não tiver permissão
+                console.log("handleTypeSelection: Plano não permite criar monitoramento. Redirecionando para planos.");
                 window.location.href = 'planos.html';
-                closeModal(chooseTypeModal); // Fecha o modal de escolha de tipo
+                closeModal(chooseTypeModal); 
             }
         };
-        // Os listeners são adicionados uma vez e a função handleTypeSelection fará a verificação
         if (btnSelectType) btnSelectType.addEventListener('click', handleTypeSelection);
         if (btnSelectType1) btnSelectType1.addEventListener('click', handleTypeSelection);
     });
+
+    // Event listener para o link "Perfil"
+    if (openProfileModalLink) {
+        openProfileModalLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadUserProfile();
+        });
+    }
 
     // Enviar formulários de Monitoramento para o Backend
     if (personalMonitoringForm) {
