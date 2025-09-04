@@ -322,11 +322,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // Lógica do FAQ (Perguntas Frequentes)
     // ===============================================
 
+    // NOVO: Função para carregar as visualizações do backend
+    async function loadFaqViews() {
+        try {
+            const response = await fetch(`${BACKEND_URL}/popular_faqs/stats`);
+            if (response.ok) {
+                const stats = await response.json();
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const faqId = item.dataset.faqId;
+                    if (stats[faqId] !== undefined) {
+                        const viewsElement = item.querySelector('.faq-meta span:first-child');
+                        const eyeIconHtml = '<i class="fas fa-eye"></i>';
+                        viewsElement.innerHTML = `${eyeIconHtml} ${stats[faqId]} visualizações`;
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("Erro ao carregar visualizações de FAQ:", error);
+        }
+    }
+    
+    // NOVO: Chamar a função ao carregar a página
+    loadFaqViews();
+
     // Função assíncrona para registrar a visualização do FAQ no backend
     // e atualizar a contagem na interface do usuário
     async function recordFaqView(faqId, viewsElement) {
         try {
-            // AQUI ESTÁ A MUDANÇA - A URL agora aponta para a nova rota de FAQs populares
             const response = await fetch(`${BACKEND_URL}/popular_faqs/${faqId}/visualizacao`, {
                 method: 'POST',
                 headers: {
@@ -337,7 +359,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!response.ok) {
                 console.error(`Erro ao registrar visualização: status ${response.status}`);
             } else {
-                console.log(`Visualização para o FAQ ${faqId} registrada com sucesso.`);
                 const data = await response.json();
                 if (data.visualizacoes !== undefined) {
                     const eyeIconHtml = '<i class="fas fa-eye"></i>';

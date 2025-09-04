@@ -1692,3 +1692,15 @@ async def record_popular_faq_view(faq_id: str):
     except Exception as e:
         print(f"ERRO: Falha ao atualizar visualização do FAQ popular. Erro: {e}")
         raise HTTPException(status_code=500, detail="Erro interno do servidor.")
+
+# ========================================================================================================
+#                                             NOVA ROTA PARA OBTER ESTATÍSTICAS
+# ========================================================================================================
+@app.get("/popular_faqs/stats")
+async def get_popular_faqs_stats():
+    db = firestore.client()
+    stats_docs = db.collection('popular_faqs_stats').stream()
+    stats = {}
+    for doc in stats_docs:
+        stats[doc.id] = doc.to_dict().get('visualizacoes', 0)
+    return stats
