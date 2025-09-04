@@ -49,7 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileUsername = document.getElementById('profile-username');
     const profileEmail = document.getElementById('profile-email');
     const profilePlan = document.getElementById('profile-plan');
-    const openProfileModalLink = document.querySelector('.dropdown-content a[href="#"][style*="user"]');
+    
+    // NOVO: Referência pelo ID específico
+    
+
 
     // --- URL base do seu backend FastAPI ---
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
@@ -235,12 +238,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // NOVO: Função para preencher os dados do perfil do usuário na UI
     function updateUserProfileUI(userData) {
+        const userProfilePicture = document.getElementById('userProfilePicture');
+        const userDefaultAvatar = document.getElementById('userDefaultAvatar');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const olaUsuarioElement = document.querySelector('.dropdown-content .olausuario');
+
         if (userData.photoURL) {
             userProfilePicture.src = userData.photoURL;
             userProfilePicture.style.display = 'block';
             userDefaultAvatar.style.display = 'none';
         } else {
-            userDefaultAvatar.textContent = userData.fullName ? userData.fullName[0] : 'U';
+            userDefaultAvatar.textContent = userData.fullName ? userData.fullName[0].toUpperCase() : 'U';
             userDefaultAvatar.style.display = 'flex';
             userProfilePicture.style.display = 'none';
         }
@@ -248,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
         userNameDisplay.textContent = userData.fullName || 'Usuário';
 
         // Atualiza o texto do menu dropdown
-        const olaUsuarioElement = document.querySelector('.dropdown-content .olausuario');
         if (olaUsuarioElement) {
             olaUsuarioElement.textContent = `Olá, ${userData.fullName ? userData.fullName.split(' ')[0] : 'Usuário'}!`;
         }
@@ -428,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function startActivationProgress() {
         const steps = document.querySelectorAll(".activation-step");
         const progressBar = document.getElementById("progress-bar");
-        const progressText = document.getElementById("progress-percentage");
+        const progressPercentage = document.getElementById("progress-percentage");
     
         let step = 0;
         const totalSteps = steps.length;
@@ -438,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 steps[step].classList.add("active");
                 let progress = ((step + 1) / totalSteps) * 100;
                 progressBar.style.width = progress + "%";
-                progressText.textContent = Math.round(progress) + "%";
+                progressPercentage.textContent = Math.round(progress) + "%";
                 step++;
                 setTimeout(nextStep, 1500); // tempo entre passos
             } else {
@@ -488,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- FUNÇÕES DO MODAL DE PERFIL ---
-    async function loadUserProfile() {
+    window.loadUserProfile = async function() {
         const user = window.auth.currentUser;
         if (!user) {
             console.error("Usuário não autenticado.");
@@ -531,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
         profileUsername.textContent = userData.username ? `@${userData.username}` : '';
         profileEmail.textContent = userData.email || 'N/A';
         profilePlan.textContent = userData.plan_type || 'Sem Plano';
-        profilePlan.classList.add(getPlanClass(userData.plan_type));
+        profilePlan.className = getPlanClass(userData.plan_type);
     }
     
     function getPlanClass(plan_type) {
@@ -543,6 +550,22 @@ document.addEventListener('DOMContentLoaded', () => {
             default:
                 return 'no-plan-text';
         }
+    }
+    
+    // NOVO: Adiciona um listener para o botão de perfil
+    const openProfileModalLink = document.getElementById('open-profile-modal-btn');
+    if (openProfileModalLink) {
+        openProfileModalLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // A função loadUserProfile é definida no monitoramento.js
+            if (typeof window.loadUserProfile === 'function') {
+                window.loadUserProfile();
+            }
+        });
+        console.log("Listener para o botão 'Perfil' adicionado com sucesso.");
+    }
+    else {
+        console.warn("Elemento com ID 'open-profile-modal-btn' não encontrado. O listener não foi adicionado.");
     }
 
     // --- Listeners de Eventos Globais (Modais e Formulários) ---
@@ -595,14 +618,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnSelectType) btnSelectType.addEventListener('click', handleTypeSelection);
         if (btnSelectType1) btnSelectType1.addEventListener('click', handleTypeSelection);
     });
-
-    // Event listener para o link "Perfil"
-    if (openProfileModalLink) {
-        openProfileModalLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadUserProfile();
-        });
-    }
 
     // Enviar formulários de Monitoramento para o Backend
     if (personalMonitoringForm) {

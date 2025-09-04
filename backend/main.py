@@ -205,6 +205,11 @@ class UserData(BaseModel):
     photoURL: Optional[str] = None
     contact: Optional[str] = None
     
+# NOVO MODELO PARA ATUALIZAÇÃO DO USUÁRIO
+class UserProfileUpdate(BaseModel):
+    fullName: str | None = None
+    photoURL: str | None = None
+    
 # Dependência de Autenticação Firebase
 async def get_current_user_uid(request: Request) -> str:
     """
@@ -1045,10 +1050,34 @@ async def get_user_data(user_uid: str, current_user_uid: str = Depends(get_curre
     user_data['contact'] = user_data.get('contact', None)
     
     return UserData(**user_data)
+# ========================================================================================================
+# --- NOVA ROTA PARA ATUALIZAR O PERFIL DO USUÁRIO ---
+# ========================================================================================================
+@app.patch("/api/users/update_profile")
+async def update_user_profile(
+    update_data: UserProfileUpdate,
+    current_user_uid: str = Depends(get_current_user_uid)
+):
+    """
+    Atualiza o perfil do usuário logado no Firestore.
+    Permite atualizar o nome e a URL da foto.
+    """
+    db = firestore.client()
+    user_doc_ref = db.collection('users').document(current_user_uid)
+    
+    # Prepara o payload de dados para o Firestore
+    update_payload = update_data.model_dump(exclude_unset=True)
+    
+    # Se houver dados para atualizar, faça o update
+    if update_payload:
+        user_doc_ref.update(update_payload)
+        return {"message": "Perfil atualizado com sucesso!"}
+    
+    return {"message": "Nenhum dado fornecido para atualização."}
 
 
 # ========================================================================================================
-#                                               ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
+#                                              ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
 # ========================================================================================================
 
 @app.get("/admin/tickets")
@@ -1607,7 +1636,7 @@ async def record_popular_faq_view(faq_id: str):
         raise HTTPException(status_code=500, detail="Erro interno do servidor.")
 
 # ========================================================================================================
-#                                             NOVA ROTA PARA OBTER ESTATÍSTICAS
+#                                               NOVA ROTA PARA OBTER ESTATÍSTICAS
 # ========================================================================================================
 @app.get("/popular_faqs/stats")
 async def get_popular_faqs_stats():
