@@ -100,7 +100,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const faqPopularCheckbox = document.getElementById('faq-popular');
 
     const ticketSearchAdminInput = document.getElementById('ticket-search-admin');
-    
+
+    // NOVO: Referências aos elementos do seletor customizado
+    const customSelectWrapper = document.querySelector('.custom-select-wrapper');
+    const selectSelected = document.getElementById('ticket-status-filter-custom');
+    const selectItemsContainer = document.querySelector('.select-items');
+    let ticketStatusFilterValue = selectSelected ? selectSelected.dataset.value : 'Todos';
+
     const viewFeedbackBtn = document.getElementById('view-feedback-btn');
     const feedbackModal = document.getElementById('feedback-modal');
     const totalTicketsSpan = document.getElementById('total-tickets');
@@ -249,7 +255,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             allTickets = await response.json();
             
-            renderTicketsList(allTickets);
+            // Chama a função de filtro ao carregar os tickets
+            applyFilters();
 
         } catch (error) {
             console.error("Erro ao carregar tickets:", error);
@@ -258,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     }
-    
+
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase()
@@ -268,9 +275,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .trim();
     }
 
-    function applySearchFilter(searchTerm) {
+    // Função para aplicar todos os filtros (busca e status)
+    function applyFilters() {
+        const searchTerm = ticketSearchAdminInput ? ticketSearchAdminInput.value.trim() : '';
+        // NOVO: Pega o valor do seletor customizado
+        const selectedStatus = ticketStatusFilterValue; 
+        
         let filteredTickets = [...allTickets];
         
+        // Aplica o filtro de busca
         if (searchTerm) {
             const normalizedSearchTerm = normalizeString(searchTerm);
             filteredTickets = filteredTickets.filter(ticket =>
@@ -279,9 +292,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 (ticket.messages && ticket.messages.some(msg => normalizeString(msg.text).includes(normalizedSearchTerm)))
             );
         }
+
+        // Aplica o filtro de status
+        if (selectedStatus !== 'Todos') {
+            filteredTickets = filteredTickets.filter(ticket => ticket.status === selectedStatus);
+        }
+        
         renderTicketsList(filteredTickets);
     }
-
+    
     function renderTicketsList(tickets) {
         if (ticketsListAdmin) {
             ticketsListAdmin.innerHTML = '';
@@ -572,6 +591,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         dicasToRender.forEach(dica => {
             const dicaCard = document.createElement('div');
             dicaCard.classList.add('dica-card');
+            const popularTag = dica.popular ? `<span class="popular-tag">Pergunta Popular</span>` : '';
             dicaCard.innerHTML = `
                 <div class="dica-card-header">
                     <h4>${dica.titulo}</h4>
@@ -909,8 +929,57 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ticketSearchAdminInput) {
         ticketSearchAdminInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.trim();
-            applySearchFilter(searchTerm);
+            // NOVO: Chama a função unificada de filtros
+            applyFilters();
+        });
+    }
+
+    // NOVO: Lógica do seletor customizado
+    if (customSelectWrapper) {
+        selectSelected.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede que o clique se propague para o document
+            selectItemsContainer.classList.toggle('select-hide');
+            selectSelected.classList.toggle('select-arrow-active');
+        });
+
+        // Adiciona um listener para cada item da lista
+        selectItemsContainer.querySelectorAll('.select-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const newValue = this.dataset.value;
+                const newText = this.textContent.trim().replace('✔', ''); // Remove o check para exibir
+                
+                // Remove a classe 'selected' e o ícone de check do item anterior
+                selectItemsContainer.querySelectorAll('.select-item').forEach(li => {
+                    li.classList.remove('selected');
+                    const checkIcon = li.querySelector('.fas.fa-check');
+                    if (checkIcon) checkIcon.remove();
+                });
+
+                // Adiciona a classe 'selected' e o ícone de check ao item clicado
+                this.classList.add('selected');
+                const checkIcon = document.createElement('i');
+                checkIcon.classList.add('fas', 'fa-check');
+                this.appendChild(checkIcon);
+
+                // Atualiza o texto e o valor do cabeçalho do seletor
+                selectSelected.textContent = newText + ' '; // Adiciona espaço antes do ícone
+                selectSelected.appendChild(document.createElement('i')).classList.add('fas', 'fa-chevron-down', 'dropdown-icon');
+                selectSelected.dataset.value = newValue;
+                ticketStatusFilterValue = newValue; // Atualiza a variável global
+
+                selectItemsContainer.classList.add('select-hide'); // Esconde a lista
+                selectSelected.classList.remove('select-arrow-active'); // Remove a classe de ativo do cabeçalho
+                
+                applyFilters(); // Aplica o filtro após a seleção
+            });
+        });
+
+        // Fecha o seletor se clicar em qualquer lugar fora dele
+        document.addEventListener('click', (e) => {
+            if (!customSelectWrapper.contains(e.target)) {
+                selectItemsContainer.classList.add('select-hide');
+                selectSelected.classList.remove('select-arrow-active');
+            }
         });
     }
 
@@ -1256,8 +1325,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log("Detectadas atualizações nos tickets do admin. Recarregando...");
                 allTickets = newTickets; 
                 
-                const searchTerm = ticketSearchAdminInput ? ticketSearchAdminInput.value.trim() : '';
-                applySearchFilter(searchTerm);
+                // NOVO: Chama a função unificada de filtros
+                applyFilters();
 
                 if (ticketDetailModal.classList.contains('show-modal') && currentViewingTicket) {
                     const updatedTicket = allTickets.find(t => t.id === currentViewingTicket.id);

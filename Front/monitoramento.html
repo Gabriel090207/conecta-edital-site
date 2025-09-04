@@ -6,6 +6,7 @@
     <title>Conecta Edital - Meus Monitoramentos</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="monitoramento.css"> 
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -262,6 +263,83 @@
             </div>
         </div>
     </div>
+
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content profile-content">
+            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
+            <div class="profile-header">
+                <div class="profile-avatar-wrapper">
+                    <img id="profile-picture" src="" alt="Foto de Perfil" style="display:none;">
+                    <span id="profile-default-avatar" class="profile-avatar"></span>
+                </div>
+                <h2 id="profile-full-name">Nome Completo</h2>
+                <span id="profile-username" class="profile-username-tag">@username</span>
+            </div>
+            <div class="profile-details-grid">
+                <div class="detail-card">
+                    <i class="fas fa-envelope detail-icon"></i>
+                    <div class="detail-text">
+                        <span>Email</span>
+                        <p id="profile-email">email@exemplo.com</p>
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <i class="fas fa-credit-card detail-icon"></i>
+                    <div class="detail-text">
+                        <span>Plano Atual</span>
+                        <p id="profile-plan">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <button class="btn-upgrade-plan" id="upgrade-plan-btn"><i class="fas fa-arrow-up"></i> Fazer Upgrade de Plano</button>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="main-page-footer">
+        <div class="footer-container">
+            <div class="footer-column about-us">
+                <a href="#" class="footer-logo">
+                    <img src="Captura de tela 2025-07-16 145658.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+                <p>O Conecta Edital é a plataforma líder em monitoramento inteligente para concurseiros. Transformamos a forma como você acompanha editais e convocações.</p>
+                <div class="security-badges">
+                    <span class="badge online"><i class="fas fa-circle"></i> Sistema Online</span>
+                    <span class="badge secure"><i class="fas fa-lock"></i> Dados Seguros</span>
+                </div>
+            </div>
+            <div class="footer-column navigation">
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="monitoramento.html">Meus Monitoramentos</a></li>
+                    <li><a href="planos.html">Planos </a></li>
+                    <li><a href="dicas.html">Dicas</a></li>
+                    <li><a href="suporte.html">Suporte</a></li>
+                    <li><a href="ajuda.html">Ajuda</a></li>
+                </ul>
+            </div>
+            <div class="footer-column support-contact">
+                <h3>Suporte</h3>
+                <ul>
+                    <li><a href="mailto:contato@conectaedital.com"><i class="fas fa-envelope"></i> contato@conectaedital.com</a></li>
+                    <li><a href="https://wa.me/seunumerodowhatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp 24/7</a></li>
+                    <li><a href="ajuda.html"><i class="fas fa-headset"></i> Central de Ajuda</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Conecta Edital. Todos os direitos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Termos de Uso</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">LGPD</a>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
