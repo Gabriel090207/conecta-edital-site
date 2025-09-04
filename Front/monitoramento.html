@@ -23,7 +23,7 @@
                     <li><a href="#l" class="active"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
                     <li><a href="planos.html" ><i class="fas fa-credit-card"></i> Planos </a></li> 
                     <li><a href="dicas.html" ><i class="fas fa-lightbulb"></i> Dicas</a></li> 
-                    <li><a href="suporte.html"><i class="fas  fa-headphones" ></i> Suporte       </a></li>
+                    <li><a href="suporte.html"><i class="fas fa-headphones" ></i> Suporte     </a></li>
                     <li style="margin-top: 4px;"> | </li>
                     <li ><a href="ajuda.html" class="ajuda">      <i class="fas fa-info-circle"></i>   Ajuda</a></li>
                 </ul>
@@ -105,7 +105,6 @@
                 </div>
                 <h3>Comece a Monitorar Seus Concursos Agora!</h3>
                 <p>Você ainda não possui monitoramentos.
-
                     Parece que você também não tem slots disponíveis. Visite a página de planos para mais opções.</p>
                 <a href="planos.html" class="btn-create-first-monitoramento" id="create-first-monitoramento-btn">
                     Ver planos
@@ -209,7 +208,7 @@
             <h2>Monitoramento Ativado!</h2>
             <p class="modal-subtitle" style="margin-top: -20px; margin-bottom: -20px;">Seu monitoramento está ativo e funcionando</p>
             <span class="progress-text" style="margin-left: 15px; margin-top: -40px;">Progresso</span>
-                    
+                     
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div> 
                 <span class="progress-percentage" id="progress-percentage" style="color:black">0%</span> 
@@ -272,10 +271,14 @@
                     <img id="profile-picture" src="" alt="Foto de Perfil" style="display:none;">
                     <span id="profile-default-avatar" class="profile-avatar"></span>
                 </div>
-                <h2 id="profile-full-name">Nome Completo</h2>
-                <span id="profile-username" class="profile-username-tag">@username</span>
+                <h2 id="profile-username" class="profile-username-tag">@username</h2>
+                <div class="profile-name-and-edit">
+                    <span id="profile-full-name">Nome Completo</span>
+                    <button id="edit-profile-btn" class="icon-btn"><i class="fas fa-pencil-alt"></i></button>
+                </div>
             </div>
-            <div class="profile-details-grid">
+            
+            <div class="profile-details-grid" id="profile-display-view">
                 <div class="detail-card">
                     <i class="fas fa-envelope detail-icon"></i>
                     <div class="detail-text">
@@ -291,12 +294,31 @@
                     </div>
                 </div>
             </div>
+            
+            <form id="profile-edit-form" class="profile-details-grid" style="display:none;">
+                <div class="detail-card">
+                    <i class="fas fa-user-tag detail-icon"></i>
+                    <div class="detail-text">
+                        <label for="edit-username">Nome de Usuário</label>
+                        <input type="text" id="edit-username" class="edit-input" placeholder="@usuario">
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <i class="fas fa-id-badge detail-icon"></i>
+                    <div class="detail-text">
+                        <label for="edit-full-name">Nome Completo</label>
+                        <input type="text" id="edit-full-name" class="edit-input" placeholder="Nome Completo">
+                    </div>
+                </div>
+            </form>
+    
             <div class="profile-actions">
+                <button class="btn-secondary" id="cancel-edit-btn" style="display:none;">Cancelar</button>
+                <button class="btn-primary" id="save-profile-btn" style="display:none;">Salvar</button>
                 <button class="btn-upgrade-plan" id="upgrade-plan-btn"><i class="fas fa-arrow-up"></i> Fazer Upgrade de Plano</button>
             </div>
         </div>
     </div>
-
 
     <footer class="main-page-footer">
         <div class="footer-container">
@@ -339,11 +361,10 @@
             </div>
         </div>
     </footer>
-
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
     <script src="firebase-config.js"></script> 
-    <script src="common-auth-ui.js"></script> <script src="monitoramento.js"></script> </body>
+    <script src="common-auth-ui.js"></script> <script src="monitoramento.js"></script> 
+</body>
 </html>
