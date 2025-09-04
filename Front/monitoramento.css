@@ -1830,16 +1830,41 @@ ul {
 
 #profile-full-name {
     margin: 0;
-    font-size: 1.8em;
-    font-weight: 600;
+    font-size: 1.1em;
+    font-weight: 400;
     color: #333;
 }
 
 .profile-username-tag {
-    font-size: 1em;
+    font-size: 1.8em;
+    font-weight: 600;
     color: #888;
     margin-top: -5px;
     display: block;
+}
+
+/* NOVO: Estilo para agrupar o nome e o ícone de edição */
+.profile-name-and-edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: -5px; /* Para alinhar melhor com o username */
+}
+
+/* NOVO: Estilo para o botão de ícone */
+.icon-btn {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 5px;
+    transition: color 0.2s ease;
+}
+
+.icon-btn:hover {
+    color: #007bff;
 }
 
 .profile-details-grid {
@@ -1868,6 +1893,7 @@ ul {
 .detail-text {
     display: flex;
     flex-direction: column;
+    flex-grow: 1; /* Permite que o texto preencha o espaço */
 }
 
 .detail-text span {
@@ -1882,13 +1908,33 @@ ul {
     color: #333;
 }
 
+.edit-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
 /* Estilos para o texto do plano */
-.detail-text p.premium-plan-text { color: #f9a825; font-weight: bold; }
-.detail-text p.essencial-plan-text { color: #1e88e5; font-weight: bold; }
-.detail-text p.no-plan-text { color: #6c757d; font-weight: bold; }
+.detail-text p.premium-plan-text { 
+    color: #f9a825; 
+    font-weight: bold; 
+}
+.detail-text p.essencial-plan-text { 
+    color: #1e88e5; 
+    font-weight: bold; 
+}
+.detail-text p.no-plan-text { 
+    color: #6c757d; 
+    font-weight: bold; 
+}
 
 .profile-actions {
     margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 .btn-upgrade-plan {

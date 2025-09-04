@@ -50,9 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileEmail = document.getElementById('profile-email');
     const profilePlan = document.getElementById('profile-plan');
     
+    // NOVO: Referências para a edição do perfil
+    const profileDisplayView = document.getElementById('profile-display-view');
+    const profileEditForm = document.getElementById('profile-edit-form');
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const saveProfileBtn = document.getElementById('save-profile-btn');
+    const editUsernameInput = document.getElementById('edit-username');
+    const editFullNameInput = document.getElementById('edit-full-name');
+    
     // NOVO: Referência pelo ID específico
     
-
 
     // --- URL base do seu backend FastAPI ---
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
@@ -127,25 +135,25 @@ document.addEventListener('DOMContentLoaded', () => {
             titleIconClass = 'fas fa-bell';
             typeBadgeText = 'Pessoal';
             detailsHtml = `
-                        <div class="detail-item"><i class="fas fa-user" style="text-shadow:
-        -1px -1px 0 #a600e8ff,
-        1px -1px 0 #a600e8ff,
-        -1px 1px 0 #a600e8ff,
-        1px 1px 0 #a600e8ff;"></i><span>Nome do Candidato(a)</span><p><strong>${mon.candidate_name || 'N/A'}</strong></p></div>
-                        <div class="detail-item"><i class="fas fa-book-open" style=" text-shadow:
-        -1px -1px 0 #07a8ff,
-        1px -1px 0 #07a8ff,
-        -1px 1px 0 #07a8ff,
-        1px 1px 0 #07a8ff;"></i><span>Diário Oficial</span><p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p></div>
+                    <div class="detail-item"><i class="fas fa-user" style="text-shadow:
+            -1px -1px 0 #a600e8ff,
+            1px -1px 0 #a600e8ff,
+            -1px 1px 0 #a600e8ff,
+            1px 1px 0 #a600e8ff;"></i><span>Nome do Candidato(a)</span><p><strong>${mon.candidate_name || 'N/A'}</strong></p></div>
+                    <div class="detail-item"><i class="fas fa-book-open" style=" text-shadow:
+            -1px -1px 0 #07a8ff,
+            1px -1px 0 #07a8ff,
+            -1px 1px 0 #07a8ff,
+            1px 1px 0 #07a8ff;"></i><span>Diário Oficial</span><p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p></div>
 
-                        <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p ><strong >${mon.edital_identifier || 'N/A'}</strong></p></div>`;
+                    <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p ><strong >${mon.edital_identifier || 'N/A'}</strong></p></div>`;
         } else if (mon.monitoring_type === 'radar') {
             titleIconClass = 'fas fa-bell';
             typeBadgeText = 'Radar';
             detailsHtml = `
-                        <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p><strong>${mon.edital_identifier || 'N/A'}</strong></p></div>
+                    <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p><strong>${mon.edital_identifier || 'N/A'}</strong></p></div>
 
-                    `;
+                `;
         }
         const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo'; // Corrigido aqui
         const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo'; // Corrigido aqui
@@ -153,27 +161,27 @@ document.addEventListener('DOMContentLoaded', () => {
         itemCard.innerHTML = `
             <div class="item-header"><div class="item-header-title"><i class="${titleIconClass}"></i><h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3><button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button><button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button></div><span class="status-tag ${statusTagClass}">${mon.status === 'active' ? 'Monitorando' : 'Inativo'}</span></div>
             <div class="item-details-grid">${detailsHtml}
-                        <div class="detail-item"><i class="fas fa-clock" style=" text-shadow:
-        -1px -1px 0 #230094ff,
-        1px -1px 0 #230094ff,
-        -1px 1px 0 #230094ff,
-        1px 1px 0 #230094ff;"></i><span>Última Verificação</span><p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p></div>
-                <div class="detail-item"><i class="fas fa-key"  style=" text-shadow:
-        -1px -1px 0 #656766ff,
-        1px -1px 0 #656766ff,
-        -1px 1px 0 #656766ff,
-        1px 1px 0 #656766ff;"></i><span>Palavras-chave Monitoradas</span><div class="keyword-tags"  > ${(mon.keywords || mon.candidate_name || '').split(',').map(k => `<span class="keyword-tag">${k.trim()}</span>`).join('')}</div></div>
+                <div class="detail-item"><i class="fas fa-clock" style=" text-shadow:
+            -1px -1px 0 #230094ff,
+            1px -1px 0 #230094ff,
+            -1px 1px 0 #230094ff,
+            1px 1px 0 #230094ff;"></i><span>Última Verificação</span><p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p></div>
+                <div class="detail-item"><i class="fas fa-key"  style=" text-shadow:
+            -1px -1px 0 #656766ff,
+            1px -1px 0 #656766ff,
+            -1px 1px 0 #656766ff,
+            1px 1px 0 #656766ff;"></i><span>Palavras-chave Monitoradas</span><div class="keyword-tags"  > ${(mon.keywords || mon.candidate_name || '').split(',').map(k => `<span class="keyword-tag">${k.trim()}</span>`).join('')}</div></div>
                 <div class="detail-item"><i class="fas fa-history" style=" text-shadow:
-        -1px -1px 0 #009479ff,
-        1px -1px 0 #009479ff,
-        -1px 1px 0 #009479ff,
-        1px 1px 0 #009479ff;"></i><span>Ocorrências</span><p class="occurrences-count"><strong>${mon.occurrences || 0} ocorrência(s)</strong> <a href="#" class="view-history-link">Ver Histórico</a></p></div>
+            -1px -1px 0 #009479ff,
+            1px -1px 0 #009479ff,
+            -1px 1px 0 #009479ff,
+            1px 1px 0 #009479ff;"></i><span>Ocorrências</span><p class="occurrences-count"><strong>${mon.occurrences || 0} ocorrência(s)</strong> <a href="#" class="view-history-link">Ver Histórico</a></p></div>
 
                 <div class="detail-item"><i class="fas fa-bell" style="text-shadow:
-                        -1px -1px 0 #a600e8ff,
-        1px -1px 0 #a600e8ff,
-        -1px 1px 0 #a600e8ff,
-        1px 1px 0 #a600e8ff;"></i><span>Status das Notificações</span><div class="notification-status"><span class="notification-tag email-enabled">Email</span><span class="notification-tag whatsapp-enabled">WhatsApp</span></div></div>
+                                        -1px -1px 0 #a600e8ff,
+            1px -1px 0 #a600e8ff,
+            -1px 1px 0 #a600e8ff,
+            1px 1px 0 #a600e8ff;"></i><span>Status das Notificações</span><div class="notification-status"><span class="notification-tag email-enabled">Email</span><span class="notification-tag whatsapp-enabled">WhatsApp</span></div></div>
             </div>
             <div class="item-actions"><div class="toggle-switch"><input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}"><label for="toggle-monitoramento-${mon.id}">${toggleLabelText}</label></div><div class="action-buttons"><button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button><button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button><button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button></div></div>
         `;
@@ -188,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.loadDashboardDataAndRender = async function() {
         const user = window.auth.currentUser;
         if (!user) { return; }
-    
+
         try {
             const idToken = await user.getIdToken();
             const responseStatus = await fetch(`${BACKEND_URL}/api/status`, {
@@ -242,22 +250,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const userDefaultAvatar = document.getElementById('userDefaultAvatar');
         const userNameDisplay = document.getElementById('userNameDisplay');
         const olaUsuarioElement = document.querySelector('.dropdown-content .olausuario');
-
-        if (userData.photoURL) {
-            userProfilePicture.src = userData.photoURL;
+        
+        // Adicionei aqui a lógica para pegar os dados do Google
+        const user = window.auth.currentUser;
+        
+        // Priorizar a foto do Google, se existir
+        if (user && user.photoURL) {
+            userProfilePicture.src = user.photoURL;
             userProfilePicture.style.display = 'block';
             userDefaultAvatar.style.display = 'none';
         } else {
-            userDefaultAvatar.textContent = userData.fullName ? userData.fullName[0].toUpperCase() : 'U';
+            userDefaultAvatar.textContent = (user && user.displayName) ? user.displayName[0].toUpperCase() : (userData.fullName ? userData.fullName[0].toUpperCase() : 'U');
             userDefaultAvatar.style.display = 'flex';
             userProfilePicture.style.display = 'none';
         }
 
-        userNameDisplay.textContent = userData.fullName || 'Usuário';
+        // Priorizar o nome do Google, se existir
+        const displayName = (user && user.displayName) ? user.displayName : (userData.fullName || 'Usuário');
+        userNameDisplay.textContent = displayName;
 
         // Atualiza o texto do menu dropdown
         if (olaUsuarioElement) {
-            olaUsuarioElement.textContent = `Olá, ${userData.fullName ? userData.fullName.split(' ')[0] : 'Usuário'}!`;
+            const firstName = displayName.split(' ')[0];
+            olaUsuarioElement.textContent = `Olá, ${firstName}!`;
         }
     }
 
@@ -436,10 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const steps = document.querySelectorAll(".activation-step");
         const progressBar = document.getElementById("progress-bar");
         const progressPercentage = document.getElementById("progress-percentage");
-    
+
         let step = 0;
         const totalSteps = steps.length;
-    
+
         function nextStep() {
             if (step < totalSteps) {
                 steps[step].classList.add("active");
@@ -461,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1000); // 1 segundo de espera
             }
         }
-    
+
         nextStep();
     }
 
@@ -524,8 +539,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function fillProfileModal(userData) {
-        if (userData.photoURL) {
-            profilePicture.src = userData.photoURL;
+        const user = window.auth.currentUser;
+        
+        // Prioriza a foto de perfil do Google, se disponível
+        if (user && user.photoURL) {
+            profilePicture.src = user.photoURL;
             profilePicture.style.display = 'block';
             profileDefaultAvatar.style.display = 'none';
         } else {
@@ -534,11 +552,16 @@ document.addEventListener('DOMContentLoaded', () => {
             profilePicture.style.display = 'none';
         }
 
-        profileFullName.textContent = userData.fullName || 'Usuário';
+        // Prioriza o nome de exibição do Google, se disponível
+        profileFullName.textContent = (user && user.displayName) ? user.displayName : (userData.fullName || 'Nome Completo');
         profileUsername.textContent = userData.username ? `@${userData.username}` : '';
         profileEmail.textContent = userData.email || 'N/A';
         profilePlan.textContent = userData.plan_type || 'Sem Plano';
         profilePlan.className = getPlanClass(userData.plan_type);
+
+        // Preenche o formulário de edição
+        editUsernameInput.value = userData.username || '';
+        editFullNameInput.value = userData.fullName || '';
     }
     
     function getPlanClass(plan_type) {
@@ -569,7 +592,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Listeners de Eventos Globais (Modais e Formulários) ---
-
     modalCloseButtons.forEach(btn => { btn.addEventListener('click', (e) => { const modalId = e.currentTarget.dataset.modalId; const modalToClose = document.getElementById(modalId); closeModal(modalToClose); }); });
     if (btnCancelModal) { btnCancelModal.addEventListener('click', () => { closeModal(chooseTypeModal); }); }
     btnCancelForms.forEach(btn => { btn.addEventListener('click', () => { closeModal(personalMonitoramentoModal); closeModal(radarMonitoramentoModal); openModal(chooseTypeModal); }); });
@@ -626,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const link = document.getElementById('personal-link').value;
             const id = document.getElementById('personal-id').value;
             const name = document.getElementById('personal-name').value;
-    
+
             if (!link || !id || !name) {
                 alert('Por favor, preencha todos os campos obrigatórios para Monitoramento Pessoal.');
                 return;
@@ -643,7 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                     body: JSON.stringify({ link_diario: link, id_edital: id, nome_completo: name })
                 });
-    
+
                 if (await handleApiAuthError(response)) return;
                 
                 if (response.status === 201) {
@@ -757,6 +779,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicia o polling apenas se não estiver rodando
     if (!pollingInterval) {
-      pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+        pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+    }
+    
+    // --- Lógica de Edição de Perfil ---
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => {
+            profileDisplayView.style.display = 'none';
+            profileEditForm.style.display = 'flex';
+            editProfileBtn.style.display = 'none';
+            cancelEditBtn.style.display = 'inline-block';
+            saveProfileBtn.style.display = 'inline-block';
+        });
+    }
+
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', () => {
+            profileDisplayView.style.display = 'flex';
+            profileEditForm.style.display = 'none';
+            editProfileBtn.style.display = 'inline-block';
+            cancelEditBtn.style.display = 'none';
+            saveProfileBtn.style.display = 'none';
+        });
+    }
+
+    if (saveProfileBtn) {
+        saveProfileBtn.addEventListener('click', async () => {
+            const user = window.auth.currentUser;
+            if (!user) {
+                alert("Você não está logado.");
+                return;
+            }
+
+            const newUsername = editUsernameInput.value.trim();
+            const newFullName = editFullNameInput.value.trim();
+
+            if (!newUsername || !newFullName) {
+                alert("Nome de usuário e nome completo são obrigatórios.");
+                return;
+            }
+
+            try {
+                const idToken = await user.getIdToken();
+                const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ 
+                        username: newUsername,
+                        fullName: newFullName
+                    })
+                });
+
+                if (await handleApiAuthError(response)) return;
+                
+                if (response.ok) {
+                    const updatedUserData = await response.json();
+                    alert("Perfil atualizado com sucesso!");
+                    
+                    // Atualiza a UI com os novos dados
+                    fillProfileModal(updatedUserData);
+                    updateUserProfileUI(updatedUserData);
+
+                    // Volta para a visualização de exibição
+                    profileDisplayView.style.display = 'flex';
+                    profileEditForm.style.display = 'none';
+                    editProfileBtn.style.display = 'inline-block';
+                    cancelEditBtn.style.display = 'none';
+                    saveProfileBtn.style.display = 'none';
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Erro desconhecido ao atualizar perfil.');
+                }
+
+            } catch (error) {
+                console.error("Erro ao salvar perfil:", error);
+                alert(`Falha ao salvar perfil: ${error.message}`);
+            }
+        });
     }
 });
