@@ -210,6 +210,7 @@ class UserProfileUpdate(BaseModel):
     fullName: str | None = None
     username: str | None = None # NOVO CAMPO
     photoURL: str | None = None
+    contact: str | None = None 
     
 # Dependência de Autenticação Firebase
 async def get_current_user_uid(request: Request) -> str:

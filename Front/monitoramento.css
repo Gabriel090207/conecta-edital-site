@@ -130,6 +130,14 @@ ul {
     -webkit-text-stroke: 1px #08ac6d;
   
 }
+    
+  .navbar-center ul li a.ajuda:hover i {
+    transform: scale(1.1);
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #08ac6d;
+  }
+
+
 
 .navbar-right {
     display: flex;
@@ -363,20 +371,6 @@ ul {
 }
 
 /* Corrigindo a cor do botão cancelar no modal */
-.btn-cancel-form {
-    background-color: #f01c31; 
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-.btn-cancel-form:hover {
-    background-color: #c82333;
-}
 
 
 .monitoramento-content {
@@ -1787,168 +1781,338 @@ ul {
 }
 
 /* Estilos para o Modal de Perfil do Usuário */
-#profile-modal .modal-content.profile-content {
-    max-width: 500px;
-    padding: 30px;
-    text-align: center;
+/* ========================================================================== */
+/* --- Estilos do Modal de Perfil --- */
+/* --- Estilos do Modal de Perfil --- */
+.modal-overlay .large-modal {
+    max-width: 600px;
+    padding: 2.5rem;
+    display: flex; /* Transforma o modal em um container flexível */
+    flex-direction: column; /* Organiza os itens em coluna */
+    max-height: 73vh; /* Limita a altura do modal à altura da tela, prevenindo rolagem excessiva da página */
 }
 
-.profile-header {
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-}
-
-.profile-avatar-wrapper {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 15px;
-}
-
-.profile-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #007bff;
-    color: white;
-    font-size: 3em;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-transform: uppercase;
-}
-
-#profile-picture {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #eee;
-}
-
-#profile-full-name {
-    margin: 0;
-    font-size: 1.1em;
-    font-weight: 400;
+.modal-overlay .modal-content h2 {
+    font-size: 1.5rem;
     color: #333;
+    margin-top: 10px;
 }
 
-.profile-username-tag {
-    font-size: 1.8em;
-    font-weight: 600;
+.modal-overlay .modal-content .modal-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+/* Abas */
+.tabs-container {
+    display: flex; /* Usa flexbox para o container de abas */
+    flex-direction: column; /* Coloca os cabeçalhos e o conteúdo em coluna */
+    height: 100%; /* Permite que o conteúdo se expanda */
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 15px; /* Reduzi a margem para liberar espaço */
+    flex-shrink: 0; /* Impede que o cabeçalho das abas diminua */
+}
+
+.tab-button {
+    flex: 1;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
     color: #888;
-    margin-top: -5px;
+    cursor: pointer;
+    transition: color 0.3s, border-bottom 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+    color: #0747a8;
+    border-bottom: 2px solid #0747a8;
+}
+
+/* Conteúdo das Abas */
+.tab-content-container {
+    flex-grow: 1; /* Permite que o container de conteúdo preencha o espaço restante */
+    overflow-y: auto; /* Oculta a barra de rolagem do contêiner principal do modal, mas a permite dentro do conteúdo */
+    padding-top: 10px;
+    margin-bottom: 20px; /* Adiciona um espaço para o rodapé do modal */
+}
+
+.tab-content {
+    display: none;
+    /* Remove a rolagem e a altura fixa para que o conteúdo se ajuste ao espaço flexível */
+    overflow-y: visible;
+    max-height: none;
+}
+
+.tab-content.active {
     display: block;
 }
 
-/* NOVO: Estilo para agrupar o nome e o ícone de edição */
-.profile-name-and-edit {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: -5px; /* Para alinhar melhor com o username */
+/* Formulário de Informações */
+.profile-avatar-container {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: -20px auto 20px;
+    border-radius: 50%;
+    overflow: hidden; /* Mantemos o recorte para a foto ficar redonda */
+    background-color: #f0f2f5;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
-/* NOVO: Estilo para o botão de ícone */
-.icon-btn {
+.profile-avatar-placeholder,
+#profileImagePreview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    color: #aaa;
+    object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+    font-weight: bold;
+}
+
+.edit-avatar-btn {
+    position: absolute;
+    /* Ajustes para posicionar o botão mais para a direita e sem corte */
+    bottom: -10px; 
+    right: -10px;  
+    width: 35px;
+    height: 35px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    z-index: 2000;
+}
+
+.edit-avatar-btn i {
+    color: #0747a8;
+    font-size: 1rem;
+}
+
+.edit-avatar-btn:hover {
+    transform: scale(1.1);
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.toggle-password i {
+    margin-top: 25px;
+    color: white;
+/* Adicione !important aqui */
+    -webkit-text-stroke: 1px #6c757d;
+    margin-right: 14px;
+}
+
+.form-group label i {
+    color: white;
+/* Adicione !important aqui */
+    -webkit-text-stroke: 1px #6c757d;
+    margin-right: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: calc(100% - 10px);
+    padding: 12px;
+    padding-right: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: #333;
+    background-color: #f9f9f9;
+}
+
+.form-group input[disabled] {
+    background-color: #eee;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.form-note {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px; /* Reduzi a margem */
+    flex-shrink: 0; /* Impede que os botões diminuam */
+}
+
+/* Formulário de Segurança (Ícone de olho) */
+.form-group .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
     background: none;
     border: none;
-    color: #999;
     cursor: pointer;
-    font-size: 1.1em;
-    padding: 5px;
-    transition: color 0.2s ease;
+    color: #888;
+    font-size: 1rem;
+    z-index: 10;
 }
 
-.icon-btn:hover {
-    color: #007bff;
-}
-
-.profile-details-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.detail-card {
+/* Botões de Ação */
+.btn-save-changes, .btn-change-password, .btn-manage-subscription {
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    background: linear-gradient(135deg, #05bc5b, #00823c);
+    color: #fff;
     display: flex;
     align-items: center;
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
+    gap: 8px;
+    margin-top: 30px;
+}
+
+.btn-manage-subscription {
+    background: linear-gradient(135deg, #05bc5b, #00823c);
+}
+
+.btn-cancel-form {
+    margin-top: 30px;
+    background: linear-gradient(135deg, #e23333, #ac0513);
+    color: #ffffff;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
     border-radius: 8px;
-    padding: 15px;
-    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-.detail-icon {
-    font-size: 1.5em;
-    color: #007bff;
-    margin-right: 15px;
+.btn-cancel-form:hover {
+    transform: translateY(-2px);
+    background-color: #d0d0d0;
 }
 
-.detail-text {
+.btn-save-changes:hover, .btn-change-password:hover, .btn-manage-subscription:hover {
+    transform: translateY(-2px);
+    background-color: #218838;
+}
+
+/* Conteúdo da Assinatura */
+.subscription-status-card {
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Permite que o texto preencha o espaço */
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    flex-grow: 1; /* Permite que o card de assinatura se estique para ocupar o espaço */
+    justify-content: center; /* Centraliza o conteúdo verticalmente */
 }
 
-.detail-text span {
-    font-size: 0.9em;
-    color: #666;
-}
-
-.detail-text p {
-    margin: 0;
-    font-size: 1.1em;
-    font-weight: 500;
-    color: #333;
-}
-
-.edit-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-/* Estilos para o texto do plano */
-.detail-text p.premium-plan-text { 
-    color: #f9a825; 
-    font-weight: bold; 
-}
-.detail-text p.essencial-plan-text { 
-    color: #1e88e5; 
-    font-weight: bold; 
-}
-.detail-text p.no-plan-text { 
-    color: #6c757d; 
-    font-weight: bold; 
-}
-
-.profile-actions {
-    margin-top: 20px;
+.subscription-status-card .plan-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.btn-upgrade-plan {
-    background: linear-gradient(135deg, #1e88e5, #0056b3);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-size: 1em;
+.subscription-status-card .plan-icon-wrapper i {
+    color: #fff;
+}
+
+.subscription-status-card .plan-title {
+    font-size: 1.5rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease;
+    color: #333;
+    margin-bottom: 5px;
 }
 
-.btn-upgrade-plan:hover {
-    background: linear-gradient(135deg, #0056b3, #003a70);
+.subscription-status-card .plan-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+/* Cores de fundo para os ícones */
+.gold-summary-bg { background-color: #FFC107; }
+
+/* Para evitar rolagem no modal principal em telas menores */
+@media (max-width: 768px) {
+    .modal-overlay .large-modal {
+        max-width: 95%;
+        max-height: 95vh;
+        padding: 1.5rem;
+    }
+}
+
+
+/* Para o Plano Premium (Cor Dourada/Amarela) */
+.gold-summary-bg {
+    background: linear-gradient(135deg, #ffef60, #ffc13a);/* Cor de fundo */
+}
+
+/* Para o ícone do plano Premium */
+.gold-summary-bg i {
+    color: #fff; /* Cor do ícone, geralmente branco para contraste */
+}
+
+/* Para os Planos Essencial e Básico (Cor Laranja) */
+.orange-summary-bg {
+    background: linear-gradient(135deg, #609FFF, #3A66FF);
+}
+
+/* Para o ícone dos planos Essencial e Básico */
+.orange-summary-bg i {
+    color: #fff;
+}
+
+/* Para o Plano Gratuito (Cor Cinza) */
+.grey-summary-bg {
+    background: linear-gradient(135deg, rgb(148, 148, 148), #50504e); 
+}
+
+/* Para o ícone do plano Gratuito */
+.grey-summary-bg i {
+    color: #fff;
 }
