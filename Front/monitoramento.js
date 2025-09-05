@@ -6,18 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const monitorsActiveStatus = document.getElementById('monitors-active-status');
     const monitoringListSection = document.getElementById('monitoring-list');
     const initialNoMonitoramentoMessage = document.getElementById('initial-no-monitoramento-message');
-
-    // Referências para os elementos do card "Plano Atual"
     const planValue = document.getElementById('plan-value');
     const planStatus = document.getElementById('plan-status');
     const planIconWrapper = document.querySelector('.summary-card.current-plan .summary-icon-wrapper');
     const planIcon = planIconWrapper ? planIconWrapper.querySelector('i') : null;
     const currentPlanCard = document.querySelector('.summary-card.current-plan');
-
-    // NOVAS REFERÊNCIAS para o ícone e wrapper do card "Slots Disponíveis"
     const slotsIconWrapper = document.querySelector('.summary-card.available-slots .summary-icon-wrapper');
     const slotsIcon = slotsIconWrapper ? slotsIconWrapper.querySelector('i') : null;
-
 
     // Modais e Botões
     const openNewMonitoramentoModalBtn = document.getElementById('open-new-monitoramento-modal');
@@ -30,6 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancelModal = document.querySelector('#choose-type-modal .btn-cancel-modal');
     const btnCancelForms = document.querySelectorAll('.modal-form .btn-cancel-form');
     const typeOptionCards = document.querySelectorAll('.type-option-card');
+    
+    // NOVO: Modal de Perfil e seus elementos
+    const profileModal = document.getElementById('profile-modal');
+    const openProfileModalBtn = document.getElementById('open-profile-modal-btn');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const profileInfoForm = document.getElementById('profile-info-form');
+    const profileSecurityForm = document.getElementById('profile-security-form');
+    const profileFullNameInput = document.getElementById('profile-full-name');
+    const profileUsernameInput = document.getElementById('profile-username');
+    const profileContactInput = document.getElementById('profile-contact');
+    const profileEmailInput = document.getElementById('profile-email');
+    const profileImagePreview = document.getElementById('profileImagePreview');
+    const profileDefaultAvatar = document.getElementById('profileDefaultAvatar');
+    const dropdownUserName = document.getElementById('dropdownUserName');
+    const currentPasswordInput = document.getElementById('current-password');
+    const newPasswordInput = document.getElementById('new-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+
+    // NOVO: Referências para o upload da foto de perfil
+    const profileImageUploadInput = document.getElementById('profileImageUpload');
+    const editAvatarBtn = document.querySelector('.edit-avatar-btn');
+    const passwordToggleButtons = document.querySelectorAll('.toggle-password');
+
 
     // Formulários
     const personalMonitoringForm = document.getElementById('personal-monitoring-form');
@@ -40,28 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressPercentage = document.getElementById('progress-percentage');
     const activationSteps = document.querySelectorAll('.activation-step');
     const activationCompletedMessage = document.querySelector('.activation-completed-message');
-
-    // NOVO: Referências aos elementos do modal de perfil
-    const profileModal = document.getElementById('profile-modal');
-    const profilePicture = document.getElementById('profile-picture');
-    const profileDefaultAvatar = document.getElementById('profile-default-avatar');
-    const profileFullName = document.getElementById('profile-full-name');
-    const profileUsername = document.getElementById('profile-username');
-    const profileEmail = document.getElementById('profile-email');
-    const profilePlan = document.getElementById('profile-plan');
     
-    // NOVO: Referências para a edição do perfil
-    const profileDisplayView = document.getElementById('profile-display-view');
-    const profileEditForm = document.getElementById('profile-edit-form');
-    const editProfileBtn = document.getElementById('edit-profile-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const saveProfileBtn = document.getElementById('save-profile-btn');
-    const editUsernameInput = document.getElementById('edit-username');
-    const editFullNameInput = document.getElementById('edit-full-name');
-    
-    // NOVO: Referência pelo ID específico
-    
-
     // --- URL base do seu backend FastAPI ---
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
 
@@ -73,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(modalElement) {
         if (modalElement) {
             modalElement.classList.add('show-modal');
-            document.body.style.overflow = 'hidden'; // Evita rolagem do body
+            document.body.style.overflow = 'hidden'; 
         } else {
             console.error("Erro: Tentativa de abrir um modal nulo.");
         }
@@ -87,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const anyModalOpen = document.querySelector('.modal-overlay.show-modal');
             if (!anyModalOpen) {
-                document.body.style.overflow = ''; // Restaura rolagem do body
+                document.body.style.overflow = ''; 
             }
         } else {
             console.error("Erro: Tentativa de fechar um modal nulo.");
@@ -103,14 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
     }
 
-    /**
-     * Função auxiliar para lidar com erros de autenticação da API.
-     */
     async function handleApiAuthError(response) {
         if (response.status === 401 || response.status === 403) {
             console.error("Token de autenticação inválido ou expirado. Redirecionando para login.");
-            if (typeof window.auth !== 'undefined') { // Usando window.auth
-                await window.auth.signOut(); // Usando window.auth
+            if (typeof window.auth !== 'undefined') {
+                await window.auth.signOut();
             }
             window.location.href = 'login-cadastro.html';
             return true;
@@ -118,12 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
     }
 
-    // --- FUNÇÃO showUpgradeAlert ---
     function showUpgradeAlert() {
         window.location.href = 'planos.html';
     }
 
-    /** Cria o elemento HTML de um item de monitoramento */
     function createMonitoringItemHTML(mon) {
         const itemCard = document.createElement('div');
         itemCard.classList.add('monitoramento-item-card');
@@ -135,68 +127,266 @@ document.addEventListener('DOMContentLoaded', () => {
             titleIconClass = 'fas fa-bell';
             typeBadgeText = 'Pessoal';
             detailsHtml = `
-                    <div class="detail-item"><i class="fas fa-user" style="text-shadow:
-            -1px -1px 0 #a600e8ff,
-            1px -1px 0 #a600e8ff,
-            -1px 1px 0 #a600e8ff,
-            1px 1px 0 #a600e8ff;"></i><span>Nome do Candidato(a)</span><p><strong>${mon.candidate_name || 'N/A'}</strong></p></div>
-                    <div class="detail-item"><i class="fas fa-book-open" style=" text-shadow:
-            -1px -1px 0 #07a8ff,
-            1px -1px 0 #07a8ff,
-            -1px 1px 0 #07a8ff,
-            1px 1px 0 #07a8ff;"></i><span>Diário Oficial</span><p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p></div>
-
-                    <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p ><strong >${mon.edital_identifier || 'N/A'}</strong></p></div>`;
+                        <div class="detail-item"><i class="fas fa-user" style="text-shadow:
+        -1px -1px 0 #a600e8ff,
+        1px -1px 0 #a600e8ff,
+        -1px 1px 0 #a600e8ff,
+        1px 1px 0 #a600e8ff;"></i><span>Nome do Candidato(a)</span><p><strong>${mon.candidate_name || 'N/A'}</strong></p></div>
+                        <div class="detail-item"><i class="fas fa-book-open" style=" text-shadow:
+        -1px -1px 0 #07a8ff,
+        1px -1px 0 #07a8ff,
+        -1px 1px 0 #07a8ff,
+        1px 1px 0 #07a8ff;"></i><span>Diário Oficial</span><p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p></div>
+                        <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p ><strong >${mon.edital_identifier || 'N/A'}</strong></p></div>`;
         } else if (mon.monitoring_type === 'radar') {
             titleIconClass = 'fas fa-bell';
             typeBadgeText = 'Radar';
             detailsHtml = `
-                    <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p><strong>${mon.edital_identifier || 'N/A'}</strong></p></div>
-
-                `;
+                        <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p><strong>${mon.edital_identifier || 'N/A'}</strong></p></div>
+                    `;
         }
-        const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo'; // Corrigido aqui
-        const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo'; // Corrigido aqui
+        const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo';
+        const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo';
 
         itemCard.innerHTML = `
             <div class="item-header"><div class="item-header-title"><i class="${titleIconClass}"></i><h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3><button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button><button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button></div><span class="status-tag ${statusTagClass}">${mon.status === 'active' ? 'Monitorando' : 'Inativo'}</span></div>
             <div class="item-details-grid">${detailsHtml}
                 <div class="detail-item"><i class="fas fa-clock" style=" text-shadow:
-            -1px -1px 0 #230094ff,
-            1px -1px 0 #230094ff,
-            -1px 1px 0 #230094ff,
-            1px 1px 0 #230094ff;"></i><span>Última Verificação</span><p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p></div>
-                <div class="detail-item"><i class="fas fa-key"  style=" text-shadow:
-            -1px -1px 0 #656766ff,
-            1px -1px 0 #656766ff,
-            -1px 1px 0 #656766ff,
-            1px 1px 0 #656766ff;"></i><span>Palavras-chave Monitoradas</span><div class="keyword-tags"  > ${(mon.keywords || mon.candidate_name || '').split(',').map(k => `<span class="keyword-tag">${k.trim()}</span>`).join('')}</div></div>
+        -1px -1px 0 #230094ff,
+        1px -1px 0 #230094ff,
+        -1px 1px 0 #230094ff,
+        1px 1px 0 #230094ff;"></i><span>Última Verificação</span><p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p></div>
+                <div class="detail-item"><i class="fas fa-key" style=" text-shadow:
+        -1px -1px 0 #656766ff,
+        1px -1px 0 #656766ff,
+        -1px 1px 0 #656766ff,
+        1px 1px 0 #656766ff;"></i><span>Palavras-chave Monitoradas</span><div class="keyword-tags"> ${(mon.keywords || mon.candidate_name || '').split(',').map(k => `<span class="keyword-tag">${k.trim()}</span>`).join('')}</div></div>
                 <div class="detail-item"><i class="fas fa-history" style=" text-shadow:
-            -1px -1px 0 #009479ff,
-            1px -1px 0 #009479ff,
-            -1px 1px 0 #009479ff,
-            1px 1px 0 #009479ff;"></i><span>Ocorrências</span><p class="occurrences-count"><strong>${mon.occurrences || 0} ocorrência(s)</strong> <a href="#" class="view-history-link">Ver Histórico</a></p></div>
-
+        -1px -1px 0 #009479ff,
+        1px -1px 0 #009479ff,
+        -1px 1px 0 #009479ff,
+        1px 1px 0 #009479ff;"></i><span>Ocorrências</span><p class="occurrences-count"><strong>${mon.occurrences || 0} ocorrência(s)</strong> <a href="#" class="view-history-link">Ver Histórico</a></p></div>
                 <div class="detail-item"><i class="fas fa-bell" style="text-shadow:
-                                        -1px -1px 0 #a600e8ff,
-            1px -1px 0 #a600e8ff,
-            -1px 1px 0 #a600e8ff,
-            1px 1px 0 #a600e8ff;"></i><span>Status das Notificações</span><div class="notification-status"><span class="notification-tag email-enabled">Email</span><span class="notification-tag whatsapp-enabled">WhatsApp</span></div></div>
+        -1px -1px 0 #a600e8ff,
+        1px -1px 0 #a600e8ff,
+        -1px 1px 0 #a600e8ff,
+        1px 1px 0 #a600e8ff;"></i><span>Status das Notificações</span><div class="notification-status"><span class="notification-tag email-enabled">Email</span><span class="notification-tag whatsapp-enabled">WhatsApp</span></div></div>
             </div>
             <div class="item-actions"><div class="toggle-switch"><input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}"><label for="toggle-monitoramento-${mon.id}">${toggleLabelText}</label></div><div class="action-buttons"><button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button><button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button><button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button></div></div>
         `;
         return itemCard;
     }
 
+    // NOVA FUNÇÃO: Gerencia a exibição da foto ou do placeholder
+    function updateProfilePictureUI(photoURL) {
+        if (!profileImagePreview || !profileDefaultAvatar) {
+            console.error("Erro: Elementos de foto de perfil não encontrados.");
+            return;
+        }
 
-    /**
-     * NOVA FUNÇÃO PRINCIPAL: Carrega todos os dados do dashboard e renderiza a interface.
-     * Chamada por common-auth-ui.js quando o usuário está logado.
-     */
+        if (photoURL) {
+            profileImagePreview.src = photoURL;
+            profileImagePreview.style.display = 'block';
+            profileDefaultAvatar.style.display = 'none';
+        } else {
+            profileImagePreview.style.display = 'none';
+            profileDefaultAvatar.style.display = 'flex';
+            // As iniciais são definidas em common-auth-ui.js
+        }
+    }
+
+    // NOVO: Função para obter e preencher os dados do perfil
+    async function fetchUserProfile() {
+        const user = window.auth.currentUser;
+        if (!user) { return; }
+        const idToken = await user.getIdToken();
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                headers: { 'Authorization': `Bearer ${idToken}` }
+            });
+            if (await handleApiAuthError(response)) return;
+            if (!response.ok) {
+                throw new Error('Erro ao carregar dados do perfil.');
+            }
+            const userData = await response.json();
+            
+            // Preenche os campos do formulário de informações
+            profileFullNameInput.value = userData.fullName || '';
+            profileUsernameInput.value = userData.username || '';
+            profileContactInput.value = userData.contact || '';
+            profileEmailInput.value = userData.email || '';
+            
+            // Corrige a exibição da foto de perfil
+            updateProfilePictureUI(userData.photoURL);
+
+            // Preenche a aba de Assinatura
+            const subscriptionPlanValue = document.getElementById('subscription-plan-value');
+            const subscriptionPlanDescription = document.getElementById('subscription-plan-description');
+            const planIconWrapperModal = document.querySelector('.subscription-status-card .plan-icon-wrapper');
+            const planIconModal = planIconWrapperModal ? planIconWrapperModal.querySelector('i') : null;
+            const planType = userData.plan_type.toLowerCase();
+
+            if (subscriptionPlanValue) {
+                subscriptionPlanValue.textContent = planType === 'gratuito' ? 'Sem Plano' : planType.charAt(0).toUpperCase() + planType.slice(1);
+            }
+            if (subscriptionPlanDescription) {
+                subscriptionPlanDescription.textContent = getPlanDescription(planType);
+            }
+
+            if (planIconWrapperModal) {
+                planIconWrapperModal.classList.remove('gold-summary-bg', 'orange-summary-bg', 'blue-summary-bg', 'green-summary-bg', 'red-summary-bg', 'grey-summary-bg');
+                
+                if (planType === 'premium') {
+                    planIconWrapperModal.classList.add('gold-summary-bg');
+                    if (planIconModal) planIconModal.className = 'fas fa-crown';
+                } else if (planType === 'essencial' || planType === 'basico') {
+                    planIconWrapperModal.classList.add('orange-summary-bg');
+                    if (planIconModal) planIconModal.className = 'fas fa-shield-alt';
+                } else { // Plano Gratuito / Sem Plano
+                    planIconWrapperModal.classList.add('grey-summary-bg');
+                    if (planIconModal) planIconModal.className = 'fas fa-times-circle';
+                }
+            }
+
+
+            // Atualiza a foto e o nome no dropdown
+            const userProfilePicture = document.getElementById('userProfilePicture');
+            const userDefaultAvatar = document.getElementById('userDefaultAvatar');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+
+            if (userData.photoURL) {
+                userProfilePicture.src = userData.photoURL;
+                userProfilePicture.style.display = 'block';
+                userDefaultAvatar.style.display = 'none';
+            } else {
+                userProfilePicture.style.display = 'none';
+                userDefaultAvatar.style.display = 'block';
+                userDefaultAvatar.textContent = userData.fullName ? userData.fullName.charAt(0) : 'U';
+            }
+            userNameDisplay.textContent = userData.fullName || userData.username || 'Usuário';
+            dropdownUserName.textContent = `Olá, ${userData.fullName || 'Usuário'}!`;
+
+        } catch (error) {
+            console.error('Erro ao buscar perfil do usuário:', error);
+            alert('Erro ao carregar os dados do seu perfil.');
+        }
+    }
+
+    function getPlanDescription(planType) {
+        switch(planType) {
+            case 'premium':
+                return 'Plano premium com todos os recursos.';
+            case 'essencial':
+                return 'Plano essencial com 3 monitoramentos inclusos.';
+            case 'basico':
+                return 'Plano básico com 5 monitoramentos inclusos.';
+            default:
+                return 'Você não possui um plano ativo. Faça upgrade para mais recursos.';
+        }
+    }
+
+    // NOVO: Função para atualizar as informações do perfil
+    async function updateProfileInfo() {
+        const user = window.auth.currentUser;
+        if (!user) { alert("Você não está logado."); return; }
+        const idToken = await user.getIdToken();
+
+        const username = profileUsernameInput.value.trim();
+        const contact = profileContactInput.value.trim();
+
+        if (!username && !contact) {
+            alert('Por favor, preencha pelo menos um campo para atualizar (Nome de Usuário ou Telefone).');
+            return;
+        }
+        
+        const updateData = {};
+        if (username) {
+            updateData.username = username;
+        }
+        if (contact) {
+            updateData.contact = contact;
+        }
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                body: JSON.stringify(updateData)
+            });
+            if (await handleApiAuthError(response)) return;
+            if (response.ok) {
+                alert('Perfil atualizado com sucesso!');
+                fetchUserProfile();
+            } else {
+                const errorData = await response.json();
+                alert(`Erro ao atualizar o perfil: ${errorData.detail || 'Erro desconhecido.'}`);
+            }
+        } catch (error) {
+            console.error('Erro na requisição para atualizar o perfil:', error);
+            alert('Ocorreu um erro ao se conectar com o servidor.');
+        }
+    }
+
+    // NOVO: Função para alterar a senha
+    async function changePassword() {
+        const user = window.auth.currentUser;
+        if (!user) { alert("Você não está logado."); return; }
+
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (newPassword !== confirmPassword) {
+            alert('A nova senha e a confirmação não correspondem.');
+            return;
+        }
+        if (newPassword.length < 6) {
+            alert('A senha deve ter no mínimo 6 caracteres.');
+            return;
+        }
+        
+        // Reautenticação do usuário (requer uma UI de login recente)
+        try {
+            await user.updatePassword(newPassword);
+            alert('Senha alterada com sucesso!');
+            profileSecurityForm.reset();
+        } catch (error) {
+            console.error('Erro ao alterar senha:', error.message);
+            alert(`Erro ao alterar a senha: ${error.message}`);
+        }
+    }
+    
+    // NOVO: Função para fazer o upload da foto de perfil para o Firebase Storage
+    async function uploadProfilePicture(file) {
+        const user = window.auth.currentUser;
+        if (!user) return;
+
+        const storageRef = firebase.storage().ref();
+        const fileRef = storageRef.child(`profile-pictures/${user.uid}/${file.name}`);
+
+        try {
+            await fileRef.put(file);
+            const photoURL = await fileRef.getDownloadURL();
+            await user.updateProfile({ photoURL });
+            
+            // Envia a URL da foto para o backend para sincronização
+            const idToken = await user.getIdToken();
+            await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                body: JSON.stringify({ photo_url: photoURL })
+            });
+            alert('Foto de perfil atualizada com sucesso!');
+            fetchUserProfile(); 
+        } catch (error) {
+            console.error('Erro ao fazer upload da foto:', error);
+            alert('Erro ao atualizar a foto de perfil. Tente novamente.');
+        }
+    }
+
     window.loadDashboardDataAndRender = async function() {
         const user = window.auth.currentUser;
         if (!user) { return; }
-
+    
         try {
             const idToken = await user.getIdToken();
             const responseStatus = await fetch(`${BACKEND_URL}/api/status`, {
@@ -206,36 +396,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseMonitorings = await fetch(`${BACKEND_URL}/api/monitoramentos`, { 
                 headers: { 'Authorization': `Bearer ${idToken}` } 
             });
-            
-            const responseUserData = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
-                headers: { 'Authorization': `Bearer ${idToken}` }
-            });
 
-            if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings) || await handleApiAuthError(responseUserData)) return;
-            if (!responseStatus.ok || !responseMonitorings.ok || !responseUserData.ok) {
+            if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings)) return;
+            if (!responseStatus.ok || !responseMonitorings.ok) {
                 throw new Error("Erro ao buscar dados do dashboard.");
             }
 
             const statusData = await responseStatus.json();
             const monitoramentosList = await responseMonitorings.json();
-            const userData = await responseUserData.json();
 
-            // Armazena os dados localmente para o polling
             currentStatusData = statusData;
             currentMonitorings = monitoramentosList;
 
-            // Renderiza os cards de resumo com os dados obtidos
             updateSummaryCards(statusData);
-            
-            // Renderiza a lista de monitoramentos
             loadMonitorings(monitoramentosList);
-
-            // Preenche os dados do menu de usuário
-            updateUserProfileUI(userData);
+            fetchUserProfile(); // Adiciona a chamada para carregar os dados do perfil
             
         } catch (error) {
             console.error("Erro ao carregar dados do dashboard:", error);
-            // Lida com erros na UI
             if (monitorsCountValue) monitorsCountValue.textContent = 'N/A';
             if (monitorsActiveStatus) monitorsActiveStatus.textContent = 'Erro';
             if (slotsAvailableValue) slotsAvailableValue.textContent = 'N/A';
@@ -243,57 +421,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (initialNoMonitoramentoMessage) initialNoMonitoramentoMessage.style.display = 'flex';
         }
     };
-    
-    // NOVO: Função para preencher os dados do perfil do usuário na UI
-    function updateUserProfileUI(userData) {
-        const userProfilePicture = document.getElementById('userProfilePicture');
-        const userDefaultAvatar = document.getElementById('userDefaultAvatar');
-        const userNameDisplay = document.getElementById('userNameDisplay');
-        const olaUsuarioElement = document.querySelector('.dropdown-content .olausuario');
-        
-        // Adicionei aqui a lógica para pegar os dados do Google
-        const user = window.auth.currentUser;
-        
-        // Priorizar a foto do Google, se existir
-        if (user && user.photoURL) {
-            userProfilePicture.src = user.photoURL;
-            userProfilePicture.style.display = 'block';
-            userDefaultAvatar.style.display = 'none';
-        } else {
-            userDefaultAvatar.textContent = (user && user.displayName) ? user.displayName[0].toUpperCase() : (userData.fullName ? userData.fullName[0].toUpperCase() : 'U');
-            userDefaultAvatar.style.display = 'flex';
-            userProfilePicture.style.display = 'none';
-        }
 
-        // Priorizar o nome do Google, se existir
-        const displayName = (user && user.displayName) ? user.displayName : (userData.fullName || 'Usuário');
-        userNameDisplay.textContent = displayName;
 
-        // Atualiza o texto do menu dropdown
-        if (olaUsuarioElement) {
-            const firstName = displayName.split(' ')[0];
-            olaUsuarioElement.textContent = `Olá, ${firstName}!`;
-        }
-    }
-
-    /**
-     * SIMPLIFICADA: Atualiza os cards de resumo no topo da página.
-     * Recebe 'data' como parâmetro e NÃO FAZ mais chamadas de API.
-     */
     function updateSummaryCards(data) {
-        // Log para verificação do objeto de dados completo
-        console.log("updateSummaryCards() foi chamada. Dados recebidos:", data);
-
-        // O backend agora envia o nome de exibição do plano (ex: "Plano Premium", "Plano Essencial", "Sem Plano")
         const actualUserPlan = data.user_plan; 
-
-        // Log para verificação do valor final do plano e da condição
-        console.log("updateSummaryCards: Plano de usuário processado (nome de exibição):", actualUserPlan);
-        console.log("updateSummaryCards: Resultado da verificação do plano (actualUserPlan === 'Plano Premium'):", actualUserPlan === 'Plano Premium');
-
         let canCreateNewMonitoring = true;
 
-        // Lógica de adaptação dos cards baseada no nome de exibição do plano
         if (actualUserPlan === 'Plano Premium') {
             if (slotsAvailableValue) slotsAvailableValue.textContent = 'Ilimitado';
             if (slotsFreeStatus) slotsFreeStatus.textContent = 'Sempre disponíveis';
@@ -308,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Crie seu primeiro monitoramento para começar e aproveite seus slots ilimitados!';
-                if (createFirstMonitoramentoBtn) { // Usando a const global
+                if (createFirstMonitoramentoBtn) { 
                     createFirstMonitoramentoBtn.href = '#';
                     createFirstMonitoramentoBtn.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
                     createFirstMonitoramentoBtn.style.opacity = '1';
@@ -317,8 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             canCreateNewMonitoring = true;
-
-        } else if (actualUserPlan === 'Plano Essencial') { // Alterado para o nome de exibição
+        } else if (actualUserPlan === 'Plano Essencial') { 
             if (slotsAvailableValue) slotsAvailableValue.textContent = `${data.slots_livres}`;
             if (slotsFreeStatus) slotsFreeStatus.textContent = 'Slots disponíveis';
             if (slotsIcon) { slotsIcon.className = 'fas fa-check-circle'; slotsIcon.style.color = 'white'; }
@@ -328,11 +460,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (planIcon) { planIcon.className = 'fas fa-shield-alt'; planIcon.style.color = 'white'; }
             if (planIconWrapper) { planIconWrapper.classList.remove('gold-summary-bg', 'green-summary-bg', 'blue-summary-bg', 'red-summary-bg', 'grey-summary-bg'); planIconWrapper.classList.add('orange-summary-bg'); }
             if (currentPlanCard) { currentPlanCard.classList.remove('premium-plan-card', 'basic-plan-card', 'no-plan-card'); currentPlanCard.classList.add('essencial-plan-card'); }
-
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Crie seu primeiro monitoramento e aproveite seus 3 slots!';
-                if (createFirstMonitoramentoBtn) { // Usando a const global
+                if (createFirstMonitoramentoBtn) {
                     createFirstMonitoramentoBtn.href = '#';
                     createFirstMonitoramentoBtn.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
                     createFirstMonitoramentoBtn.style.opacity = '1';
@@ -340,10 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     createFirstMonitoramentoBtn.disabled = false;
                 }
             }
-            // LÓGICA DE VERIFICAÇÃO DE SLOTS DISPONÍVEIS
             canCreateNewMonitoring = data.slots_livres > 0;
-            
-        } else if (actualUserPlan === 'Plano Básico') { // Mantido para compatibilidade, mas pode ser removido se não for um plano ativo
+        } else if (actualUserPlan === 'Plano Básico') {
             if (slotsAvailableValue) slotsAvailableValue.textContent = `${data.slots_livres}`;
             if (slotsFreeStatus) slotsFreeStatus.textContent = 'Slots disponíveis';
             if (slotsIcon) { slotsIcon.className = 'fas fa-check-circle'; slotsIcon.style.color = 'white'; }
@@ -353,11 +482,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (planIcon) { planIcon.className = 'fas fa-shield-alt'; planIcon.style.color = 'white'; }
             if (planIconWrapper) { planIconWrapper.classList.remove('gold-summary-bg', 'green-summary-bg', 'blue-summary-bg', 'red-summary-bg', 'grey-summary-bg'); planIconWrapper.classList.add('orange-summary-bg'); }
             if (currentPlanCard) { currentPlanCard.classList.remove('premium-plan-card', 'essencial-plan-card', 'no-plan-card'); currentPlanCard.classList.add('basic-plan-card'); }
-
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Crie seu primeiro monitoramento e aproveite seus 5 slots!';
-                if (createFirstMonitoramentoBtn) { // Usando a const global
+                if (createFirstMonitoramentoBtn) {
                     createFirstMonitoramentoBtn.href = '#';
                     createFirstMonitoramentoBtn.innerHTML = '<i class="fas fa-plus"></i> Criar Meu Primeiro Monitoramento';
                     createFirstMonitoramentoBtn.style.opacity = '1';
@@ -365,25 +493,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     createFirstMonitoramentoBtn.disabled = false;
                 }
             }
-            // LÓGICA DE VERIFICAÇÃO DE SLOTS DISPONÍVEIS
             canCreateNewMonitoring = data.slots_livres > 0;
-            
-        } else { // Este bloco é para o "Sem Plano" (gratuito no backend, "Sem Plano" na UI)
-            if (slotsAvailableValue) slotsAvailableValue.textContent = 0; // Corrigido para 0 slots
+        } else {
+            if (slotsAvailableValue) slotsAvailableValue.textContent = 0;
             if (slotsFreeStatus) slotsFreeStatus.textContent = 'Slots indisponíveis';
-            if (slotsIcon) { slotsIcon.className = 'fas fa-times-circle'; slotsIcon.style.color = 'white'; } // Ícone de "X" para slots indisponíveis
+            if (slotsIcon) { slotsIcon.className = 'fas fa-times-circle'; slotsIcon.style.color = 'white'; }
             if (slotsIconWrapper) { slotsIconWrapper.classList.remove('gold-summary-bg', 'blue-summary-bg', 'green-summary-bg', 'orange-summary-bg'); slotsIconWrapper.classList.add('red-summary-bg'); }
             canCreateNewMonitoring = false;
             if (planValue) planValue.textContent = 'Sem Plano';
             if (planStatus) planStatus.textContent = 'Faça upgrade para criar monitoramentos'; 
-            if (planIcon) { planIcon.className = 'fas fa-shield-alt'; planIcon.style.color = 'white'; } // Ícone de escudo
+            if (planIcon) { planIcon.className = 'fas fa-shield-alt'; planIcon.style.color = 'white'; }
             if (planIconWrapper) { planIconWrapper.classList.remove('gold-summary-bg', 'green-summary-bg', 'blue-summary-bg', 'red-summary-bg'); planIconWrapper.classList.add('grey-summary-bg'); }
             if (currentPlanCard) { currentPlanCard.classList.remove('premium-plan-card', 'essencial-plan-card', 'basic-plan-card'); currentPlanCard.classList.add('no-plan-card'); }
-            
             if (initialNoMonitoramentoMessage && initialNoMonitoramentoMessage.querySelector('p')) {
                 const pElement = initialNoMonitoramentoMessage.querySelector('p');
                 pElement.textContent = 'Você ainda não possui monitoramentos. Seus slots estão indisponíveis. Visite a página de planos para mais opções.';
-                if (createFirstMonitoramentoBtn) { // Usando a const global
+                if (createFirstMonitoramentoBtn) {
                     createFirstMonitoramentoBtn.href = 'planos.html';
                     createFirstMonitoramentoBtn.innerHTML = 'Ver planos';
                     createFirstMonitoramentoBtn.style.opacity = '1';
@@ -403,7 +528,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (openNewMonitoramentoModalBtn) {
             openNewMonitoramentoModalBtn.removeEventListener('click', showUpgradeAlert);
             openNewMonitoramentoModalBtn.removeEventListener('click', () => openModal(chooseTypeModal));
-            // O listener correto será adicionado DENTRO da função updateSummaryCards
             if (canCreateNewMonitoring) { 
                 openNewMonitoramentoModalBtn.disabled = false; openNewMonitoramentoModalBtn.style.opacity = '1'; openNewMonitoramentoModalBtn.style.cursor = 'pointer'; 
                 openNewMonitoramentoModalBtn.addEventListener('click', () => openModal(chooseTypeModal));
@@ -415,7 +539,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (createFirstMonitoramentoBtn) {
             createFirstMonitoramentoBtn.removeEventListener('click', showUpgradeAlert);
             createFirstMonitoramentoBtn.removeEventListener('click', () => openModal(chooseTypeModal));
-            // O listener correto será adicionado DENTRO da função updateSummaryCards
             if (canCreateNewMonitoring) { 
                 createFirstMonitoramentoBtn.disabled = false; createFirstMonitoramentoBtn.style.opacity = '1'; createFirstMonitoramentoBtn.style.cursor = 'pointer'; 
                 createFirstMonitoramentoBtn.addEventListener('click', () => openModal(chooseTypeModal));
@@ -426,10 +549,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    /**
-     * SIMPLIFICADA: Carrega a lista de monitoramentos.
-     * Recebe a lista como parâmetro e NÃO FAZ mais chamadas de API.
-     */
     function loadMonitorings(monitoramentos) {
         if (monitoringListSection) { 
             Array.from(monitoringListSection.children).forEach(child => {
@@ -450,38 +569,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function startActivationProgress() {
         const steps = document.querySelectorAll(".activation-step");
         const progressBar = document.getElementById("progress-bar");
-        const progressPercentage = document.getElementById("progress-percentage");
-
+        const progressText = document.getElementById("progress-percentage");
         let step = 0;
         const totalSteps = steps.length;
-
         function nextStep() {
             if (step < totalSteps) {
                 steps[step].classList.add("active");
                 let progress = ((step + 1) / totalSteps) * 100;
                 progressBar.style.width = progress + "%";
-                progressPercentage.textContent = Math.round(progress) + "%";
+                progressText.textContent = Math.round(progress) + "%";
                 step++;
-                setTimeout(nextStep, 1500); // tempo entre passos
+                setTimeout(nextStep, 1500);
             } else {
                 const modalAtivado = document.getElementById('monitoramento-ativado-modal');
-                
-                // Recarrega os dados do dashboard para mostrar o novo monitoramento
                 window.loadDashboardDataAndRender();
-                
-                // Fecha o modal após um pequeno atraso para que o usuário veja a conclusão.
                 setTimeout(() => {
                     modalAtivado.classList.remove('show-modal');
                     document.body.style.overflow = '';
-                }, 1000); // 1 segundo de espera
+                }, 1000);
             }
         }
-
         nextStep();
     }
 
-
-    /** Exclui um monitoramento via API e recarrega a lista */
     const deleteMonitoring = async (id) => {
         if (!confirm('Tem certeza que deseja excluir este monitoramento?')) { return; }
         const user = window.auth.currentUser;
@@ -491,7 +601,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao excluir monitoramento:", error); alert(`Falha ao excluir monitoramento: ${error.message}`); }
     };
 
-    /** Alterna o status (ativo/inativo) de um monitoramento via API */
     const toggleMonitoringStatus = async (id, isActive) => {
         const user = window.auth.currentUser;
         if (!user) { alert("Você não está logado."); return; } const idToken = await user.getIdToken();
@@ -500,7 +609,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao alternar status do monitoramento:", error); alert(`Falha ao alternar status: ${error.message}`); const checkbox = document.getElementById(`toggle-monitoramento-${id}`); if (checkbox) { checkbox.checked = !isActive; } }
     };
 
-    /** Dispara uma verificação de teste para um monitoramento via API */
     const testMonitoring = async (id) => {
         const user = window.auth.currentUser;
         if (!user) { alert("Você não está logado."); return; } const idToken = await user.getIdToken();
@@ -509,89 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao testar monitoramento:", error); alert(`Falha ao testar monitoramento: ${error.message}`); }
     };
 
-    // --- FUNÇÕES DO MODAL DE PERFIL ---
-    window.loadUserProfile = async function() {
-        const user = window.auth.currentUser;
-        if (!user) {
-            console.error("Usuário não autenticado.");
-            return;
-        }
-
-        try {
-            const idToken = await user.getIdToken();
-            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
-                headers: { 'Authorization': `Bearer ${idToken}` }
-            });
-
-            if (await handleApiAuthError(response)) return;
-            if (!response.ok) {
-                throw new Error(`Erro ao buscar dados do perfil: ${response.status}`);
-            }
-
-            const userData = await response.json();
-            fillProfileModal(userData);
-            openModal(profileModal);
-
-        } catch (error) {
-            console.error("Erro ao carregar perfil do usuário:", error);
-            alert("Ocorreu um erro ao carregar os dados do seu perfil.");
-        }
-    }
-
-    function fillProfileModal(userData) {
-        const user = window.auth.currentUser;
-        
-        // Prioriza a foto de perfil do Google, se disponível
-        if (user && user.photoURL) {
-            profilePicture.src = user.photoURL;
-            profilePicture.style.display = 'block';
-            profileDefaultAvatar.style.display = 'none';
-        } else {
-            profileDefaultAvatar.textContent = userData.fullName ? userData.fullName[0].toUpperCase() : 'U';
-            profileDefaultAvatar.style.display = 'flex';
-            profilePicture.style.display = 'none';
-        }
-
-        // Prioriza o nome de exibição do Google, se disponível
-        profileFullName.textContent = (user && user.displayName) ? user.displayName : (userData.fullName || 'Nome Completo');
-        profileUsername.textContent = userData.username ? `@${userData.username}` : '';
-        profileEmail.textContent = userData.email || 'N/A';
-        profilePlan.textContent = userData.plan_type || 'Sem Plano';
-        profilePlan.className = getPlanClass(userData.plan_type);
-
-        // Preenche o formulário de edição
-        editUsernameInput.value = userData.username || '';
-        editFullNameInput.value = userData.fullName || '';
-    }
-    
-    function getPlanClass(plan_type) {
-        switch (plan_type) {
-            case 'premium':
-                return 'premium-plan-text';
-            case 'essencial':
-                return 'essencial-plan-text';
-            default:
-                return 'no-plan-text';
-        }
-    }
-    
-    // NOVO: Adiciona um listener para o botão de perfil
-    const openProfileModalLink = document.getElementById('open-profile-modal-btn');
-    if (openProfileModalLink) {
-        openProfileModalLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            // A função loadUserProfile é definida no monitoramento.js
-            if (typeof window.loadUserProfile === 'function') {
-                window.loadUserProfile();
-            }
-        });
-        console.log("Listener para o botão 'Perfil' adicionado com sucesso.");
-    }
-    else {
-        console.warn("Elemento com ID 'open-profile-modal-btn' não encontrado. O listener não foi adicionado.");
-    }
-
-    // --- Listeners de Eventos Globais (Modais e Formulários) ---
+    // --- Listeners de Eventos Globais ---
     modalCloseButtons.forEach(btn => { btn.addEventListener('click', (e) => { const modalId = e.currentTarget.dataset.modalId; const modalToClose = document.getElementById(modalId); closeModal(modalToClose); }); });
     if (btnCancelModal) { btnCancelModal.addEventListener('click', () => { closeModal(chooseTypeModal); }); }
     btnCancelForms.forEach(btn => { btn.addEventListener('click', () => { closeModal(personalMonitoramentoModal); closeModal(radarMonitoramentoModal); openModal(chooseTypeModal); }); });
@@ -599,10 +625,8 @@ document.addEventListener('DOMContentLoaded', () => {
     typeOptionCards.forEach(card => {
         const btnSelectType = card.querySelector('.btn-select-type');
         const btnSelectType1 = card.querySelector('.btn-select-type1');
-
         const handleTypeSelection = async (e) => {
             e.stopPropagation();
-
             const user = window.auth.currentUser;
             let userPlanFromFirestore = 'sem plano'; 
             if (user) {
@@ -614,7 +638,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         const data = await response.json();
                         userPlanFromFirestore = data.user_plan; 
-                        console.log("handleTypeSelection: Plano do usuário do Firestore:", userPlanFromFirestore);
                     } else {
                         console.error('handleTypeSelection: Erro ao buscar status do plano do usuário:', response.status);
                     }
@@ -622,8 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('handleTypeSelection: Erro na requisição de status do plano:', error);
                 }
             }
-            if (userPlanFromFirestore === 'Plano Premium' || userPlanFromFirestore === 'Plano Essencial') {
-                console.log("handleTypeSelection: Plano permite criar monitoramento. Abrindo modal.");
+            if (userPlanFromFirestore === 'Plano Premium' || userPlanFromFirestore === 'Plano Essencial' || userPlanFromFirestore === 'Plano Básico') { 
                 closeModal(chooseTypeModal);
                 const type = card.dataset.type; 
                 if (type === 'personal') {
@@ -632,23 +654,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     openModal(radarMonitoramentoModal);
                 }
             } else {
-                console.log("handleTypeSelection: Plano não permite criar monitoramento. Redirecionando para planos.");
                 window.location.href = 'planos.html';
-                closeModal(chooseTypeModal); 
+                closeModal(chooseTypeModal);
             }
         };
         if (btnSelectType) btnSelectType.addEventListener('click', handleTypeSelection);
         if (btnSelectType1) btnSelectType1.addEventListener('click', handleTypeSelection);
     });
 
-    // Enviar formulários de Monitoramento para o Backend
     if (personalMonitoringForm) {
         personalMonitoringForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             const link = document.getElementById('personal-link').value;
             const id = document.getElementById('personal-id').value;
             const name = document.getElementById('personal-name').value;
-
             if (!link || !id || !name) {
                 alert('Por favor, preencha todos os campos obrigatórios para Monitoramento Pessoal.');
                 return;
@@ -665,24 +684,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                     body: JSON.stringify({ link_diario: link, id_edital: id, nome_completo: name })
                 });
-
                 if (await handleApiAuthError(response)) return;
-                
                 if (response.status === 201) {
-                    console.log('Monitoramento pessoal criado com sucesso!');
                     closeModal(personalMonitoramentoModal);
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress({ message: "Monitoramento ativado com sucesso." });
                 } else if (response.ok) {
                     const result = await response.json();
-                    console.log('Monitoramento pessoal criado com sucesso:', result);
                     closeModal(personalMonitoramentoModal);
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress(result);
                 } else {
                     const errorData = await response.json();
                     alert(`Erro ao criar monitoramento pessoal: ${errorData.detail || 'Erro desconhecido.'}`);
-                    console.error('Erro ao criar monitoramento pessoal:', errorData);
                 }
             } catch (error) {
                 console.error('Erro na requisição para criar monitoramento pessoal:', error);
@@ -712,24 +726,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                     body: JSON.stringify({ link_diario: link, id_edital: id })
                 });
-
                 if (await handleApiAuthError(response)) return;
-                
                 if (response.status === 201) {
-                    console.log('Monitoramento radar criado com sucesso!');
                     closeModal(radarMonitoramentoModal); 
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress({ message: "Monitoramento ativado com sucesso." });
                 } else if (response.ok) {
                     const result = await response.json();
-                    console.log('Monitoramento radar criado com sucesso:', result);
-                    closeModal(radarMonitoramentoModal); 
+                    closeModal(radarMonitoringForm); 
                     openModal(monitoramentoAtivadoModal);
                     startActivationProgress(result);
                 } else {
                     const errorData = await response.json();
                     alert(`Erro ao criar monitoramento radar: ${errorData.detail || 'Erro desconhecido.'}`);
-                    console.error('Erro ao criar monitoramento radar:', errorData);
                 }
             } catch (error) {
                 console.error('Erro na requisição para criar monitoramento radar:', error);
@@ -737,36 +746,113 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // NOVO: Listeners para o Modal de Perfil
+    if (openProfileModalBtn) {
+        openProfileModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeAllModals();
+            openModal(profileModal);
+            fetchUserProfile(); // Carrega os dados do perfil ao abrir
+        });
+    }
+    
+    if (tabButtons) {
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+                
+                // Remove a classe 'active' de todos os botões e conteúdos
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Adiciona a classe 'active' apenas ao botão e conteúdo clicados
+                button.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+    }
 
-    // Delegação de Eventos para Itens de Monitoramento Criados Dinamicamente
+    if (profileInfoForm) {
+        profileInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            updateProfileInfo();
+        });
+    }
+    
+    if (profileSecurityForm) {
+        profileSecurityForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            changePassword();
+        });
+    }
+    
+    // NOVO: Listeners para as novas funcionalidades
+    if (editAvatarBtn && profileImageUploadInput) {
+        editAvatarBtn.addEventListener('click', () => {
+            profileImageUploadInput.click();
+        });
+    }
+
+    if (profileImageUploadInput) {
+        profileImageUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Pré-visualiza a imagem
+                    profileImagePreview.src = event.target.result;
+                    profileImagePreview.style.display = 'block';
+                    profileDefaultAvatar.style.display = 'none';
+
+                    // Chama a função de upload
+                    uploadProfilePicture(file); 
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (passwordToggleButtons) {
+        passwordToggleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const input = button.previousElementSibling;
+                const icon = button.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+    }
+
     if (monitoringListSection) { monitoringListSection.addEventListener('change', (e) => { if (e.target.matches('input[type="checkbox"][id^="toggle-monitoramento-"]')) { const monitoringId = e.target.dataset.id; const isActive = e.target.checked; toggleMonitoringStatus(monitoringId, isActive); } });
         monitoringListSection.addEventListener('click', (e) => { const targetButton = e.target.closest('.btn-action'); if (targetButton) { const monitoringId = targetButton.dataset.id; if (targetButton.classList.contains('btn-delete')) { deleteMonitoring(monitoringId); } else if (targetButton.classList.contains('btn-configure')) { console.log(`Botão "Configurar" clicado para ${monitoringId}! (Ainda não implementado)`); alert(`Configurar monitoramento ${monitoringId} - Funcionalidade em desenvolvimento.`); } else if (targetButton.classList.contains('btn-test')) { testMonitoring(monitoringId); } } }); }
 
-    // --- Lógica de Polling para Atualização em Tempo Real ---
     let pollingInterval;
-
     async function checkMonitoringsForUpdates() {
         const user = window.auth.currentUser;
         if (!user) {
-            // Se o usuário não estiver logado, para o polling
             clearInterval(pollingInterval);
             pollingInterval = null;
             return;
         }
-
         try {
             const idToken = await user.getIdToken();
             const response = await fetch(`${BACKEND_URL}/api/monitoramentos`, {
                 headers: { 'Authorization': `Bearer ${idToken}` }
             });
-
             if (!response.ok) {
                 console.error("Erro na verificação periódica de monitoramentos.");
                 return;
             }
-            
             const newMonitorings = await response.json();
-            
             if (JSON.stringify(currentMonitorings) !== JSON.stringify(newMonitorings)) {
                 console.log("Detectadas atualizações nos monitoramentos. Recarregando...");
                 currentMonitorings = newMonitorings;
@@ -776,88 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Erro durante a verificação de atualizações:", error);
         }
     }
-
-    // Inicia o polling apenas se não estiver rodando
     if (!pollingInterval) {
         pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
-    }
-    
-    // --- Lógica de Edição de Perfil ---
-    if (editProfileBtn) {
-        editProfileBtn.addEventListener('click', () => {
-            profileDisplayView.style.display = 'none';
-            profileEditForm.style.display = 'flex';
-            editProfileBtn.style.display = 'none';
-            cancelEditBtn.style.display = 'inline-block';
-            saveProfileBtn.style.display = 'inline-block';
-        });
-    }
-
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', () => {
-            profileDisplayView.style.display = 'flex';
-            profileEditForm.style.display = 'none';
-            editProfileBtn.style.display = 'inline-block';
-            cancelEditBtn.style.display = 'none';
-            saveProfileBtn.style.display = 'none';
-        });
-    }
-
-    if (saveProfileBtn) {
-        saveProfileBtn.addEventListener('click', async () => {
-            const user = window.auth.currentUser;
-            if (!user) {
-                alert("Você não está logado.");
-                return;
-            }
-
-            const newUsername = editUsernameInput.value.trim();
-            const newFullName = editFullNameInput.value.trim();
-
-            if (!newUsername || !newFullName) {
-                alert("Nome de usuário e nome completo são obrigatórios.");
-                return;
-            }
-
-            try {
-                const idToken = await user.getIdToken();
-                const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
-                    method: 'PATCH',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${idToken}`
-                    },
-                    body: JSON.stringify({ 
-                        username: newUsername,
-                        fullName: newFullName
-                    })
-                });
-
-                if (await handleApiAuthError(response)) return;
-                
-                if (response.ok) {
-                    const updatedUserData = await response.json();
-                    alert("Perfil atualizado com sucesso!");
-                    
-                    // Atualiza a UI com os novos dados
-                    fillProfileModal(updatedUserData);
-                    updateUserProfileUI(updatedUserData);
-
-                    // Volta para a visualização de exibição
-                    profileDisplayView.style.display = 'flex';
-                    profileEditForm.style.display = 'none';
-                    editProfileBtn.style.display = 'inline-block';
-                    cancelEditBtn.style.display = 'none';
-                    saveProfileBtn.style.display = 'none';
-                } else {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Erro desconhecido ao atualizar perfil.');
-                }
-
-            } catch (error) {
-                console.error("Erro ao salvar perfil:", error);
-                alert(`Falha ao salvar perfil: ${error.message}`);
-            }
-        });
     }
 });

@@ -23,9 +23,9 @@
                     <li><a href="#l" class="active"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
                     <li><a href="planos.html" ><i class="fas fa-credit-card"></i> Planos </a></li> 
                     <li><a href="dicas.html" ><i class="fas fa-lightbulb"></i> Dicas</a></li> 
-                    <li><a href="suporte.html"><i class="fas fa-headphones" ></i> Suporte     </a></li>
+                    <li><a href="suporte.html"><i class="fas fa-headphones" ></i> Suporte </a></li>
                     <li style="margin-top: 4px;"> | </li>
-                    <li ><a href="ajuda.html" class="ajuda">      <i class="fas fa-info-circle"></i>   Ajuda</a></li>
+                    <li ><a href="ajuda.html" class="ajuda"> <i class="fas fa-info-circle"></i> Ajuda</a></li>
                 </ul>
             </nav>
             <div class="navbar-right">
@@ -36,9 +36,9 @@
                     <span id="userNameDisplay">Carregando...</span> 
                     <i class="fas fa-chevron-down"></i>
                     <div class="dropdown-content">
-                        <h3 class="olausuario" >Olá, Usuário!</h3>
-                        <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil"  style="color:white"></i> Perfil</a>
-                        <a href="#"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                        <h3 class="olausuario" id="dropdownUserName">Olá, Usuário!</h3>
+                        <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                        <a href="planos.html"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
                         <hr>
                         <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
                     </div>
@@ -208,7 +208,6 @@
             <h2>Monitoramento Ativado!</h2>
             <p class="modal-subtitle" style="margin-top: -20px; margin-bottom: -20px;">Seu monitoramento está ativo e funcionando</p>
             <span class="progress-text" style="margin-left: 15px; margin-top: -40px;">Progresso</span>
-                     
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div> 
                 <span class="progress-percentage" id="progress-percentage" style="color:black">0%</span> 
@@ -219,7 +218,6 @@
                         <i class="fas fa-sync-alt icon-spinning"></i> 
                         <i class="fas fa-check icon-check"></i> 
                     </div>
-                    
                     <div class="step-text-content">
                         <h4>Configurando monitoramento</h4>
                         <p>Preparando as configurações iniciais...</p>
@@ -256,70 +254,100 @@
                     </div>
                 </div>
             </div>
-
             <div class="activation-completed-message" >
                 <p>Configuração Concluída, Você receberá notificações sempre que houver atualizações relevantes.</p>
             </div>
         </div>
     </div>
-
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-content profile-content">
-            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
-            <div class="profile-header">
-                <div class="profile-avatar-wrapper">
-                    <img id="profile-picture" src="" alt="Foto de Perfil" style="display:none;">
-                    <span id="profile-default-avatar" class="profile-avatar"></span>
-                </div>
-                <h2 id="profile-username" class="profile-username-tag">@username</h2>
-                <div class="profile-name-and-edit">
-                    <span id="profile-full-name">Nome Completo</span>
-                    <button id="edit-profile-btn" class="icon-btn"><i class="fas fa-pencil-alt"></i></button>
-                </div>
-            </div>
-            
-            <div class="profile-details-grid" id="profile-display-view">
-                <div class="detail-card">
-                    <i class="fas fa-envelope detail-icon"></i>
-                    <div class="detail-text">
-                        <span>Email</span>
-                        <p id="profile-email">email@exemplo.com</p>
-                    </div>
-                </div>
-                <div class="detail-card">
-                    <i class="fas fa-credit-card detail-icon"></i>
-                    <div class="detail-text">
-                        <span>Plano Atual</span>
-                        <p id="profile-plan">Carregando...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <form id="profile-edit-form" class="profile-details-grid" style="display:none;">
-                <div class="detail-card">
-                    <i class="fas fa-user-tag detail-icon"></i>
-                    <div class="detail-text">
-                        <label for="edit-username">Nome de Usuário</label>
-                        <input type="text" id="edit-username" class="edit-input" placeholder="@usuario">
-                    </div>
-                </div>
-                <div class="detail-card">
-                    <i class="fas fa-id-badge detail-icon"></i>
-                    <div class="detail-text">
-                        <label for="edit-full-name">Nome Completo</label>
-                        <input type="text" id="edit-full-name" class="edit-input" placeholder="Nome Completo">
-                    </div>
-                </div>
-            </form>
     
-            <div class="profile-actions">
-                <button class="btn-secondary" id="cancel-edit-btn" style="display:none;">Cancelar</button>
-                <button class="btn-primary" id="save-profile-btn" style="display:none;">Salvar</button>
-                <button class="btn-upgrade-plan" id="upgrade-plan-btn"><i class="fas fa-arrow-up"></i> Fazer Upgrade de Plano</button>
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content large-modal">
+            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
+            
+            <div class="profile-avatar-container">
+                <span class="profile-avatar-placeholder" id="profileDefaultAvatar">GB</span>
+                <img id="profileImagePreview" src="" alt="Foto de Perfil" style="display:none;">
+                <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
+                <button type="button" class="edit-avatar-btn" id="editAvatarBtn">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="info-tab">Informações</button>
+                    <button class="tab-button" data-tab="security-tab">Segurança</button>
+                    <button class="tab-button" data-tab="subscription-tab">Assinatura</button>
+                </div>
+    
+                <div class="tab-content-container">
+                    <div id="info-tab" class="tab-content active">
+                        <form id="profile-info-form">
+                            <div class="form-group">
+                                <label for="profile-full-name"><i class="fas fa-user-tag"></i> Nome Completo</label>
+                                <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
+                                <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-username"><i class="fas fa-at"></i> Nome de Usuário</label>
+                                <input type="text" id="profile-username" placeholder="@seu-usuario">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-contact"><i class="fas fa-phone"></i> Telefone</label>
+                                <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email"><i class="fas fa-envelope"></i> E-mail</label>
+                                <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
+                                <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-save-changes">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+    
+                    <div id="security-tab" class="tab-content">
+                        <form id="profile-security-form">
+                            <div class="form-group">
+                                <label for="current-password"><i class="fas fa-lock"></i> Senha Atual</label>
+                                <input type="password" id="current-password" placeholder="********">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
+                                <input type="password" id="new-password" placeholder="Nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                                <input type="password" id="confirm-password" placeholder="Confirme sua nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-change-password">Alterar Senha</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div id="subscription-tab" class="tab-content">
+                        <div class="subscription-status-card">
+                            <div class="plan-icon-wrapper">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <span class="plan-title">Seu Plano Atual: <span id="subscription-plan-value"></span></span>
+                            <span class="plan-description" id="subscription-plan-description"></span>
+                            <a href="planos.html" class="btn-manage-subscription">
+                                <i class="fas fa-credit-card"></i> Gerenciar Assinatura
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
     <footer class="main-page-footer">
         <div class="footer-container">
             <div class="footer-column about-us">
@@ -361,10 +389,13 @@
             </div>
         </div>
     </footer>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
     <script src="firebase-config.js"></script> 
-    <script src="common-auth-ui.js"></script> <script src="monitoramento.js"></script> 
+    <script src="common-auth-ui.js"></script> 
+    <script src="monitoramento.js"></script> 
 </body>
 </html>

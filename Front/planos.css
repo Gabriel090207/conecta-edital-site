@@ -229,7 +229,7 @@ ul {
 }
 
 .hero-section h1 .highlight {
-    background-image: linear-gradient(135deg, #4b66fc, #3008c0);
+    background-image: linear-gradient(135deg, #007BFF, #0056B3);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -669,7 +669,7 @@ ul {
 }
 
 .differentials-section h2 .highlight-purple {
-    background-image: linear-gradient(135deg, #b24bfc, #c803a4);
+    background-image: linear-gradient(135deg, #007BFF, #0056B3);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -827,4 +827,44 @@ ul {
 
 .exclamacao {
     margin-left: -10px;
+}
+
+
+.btn-secondary1 {
+    background: linear-gradient(135deg, #e51e39, #b30000);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-secondary1:hover {
+    background: linear-gradient(135deg, #b30018, #b30018);
+}
+
+/* Estilo para o botão de upgrade */
+.btn-primary1 {
+    /* Gradiente de cores para o fundo do botão */
+    background: linear-gradient(135deg, #1e88e5, #0056b3);
+    
+    color: white; /* Cor do texto */
+    border: none; /* Remove a borda padrão do botão */
+    padding: 12px 25px; /* Espaçamento interno */
+    border-radius: 8px; /* Cantos arredondados */
+    font-size: 1em; /* Tamanho da fonte */
+    font-weight: 600; /* Peso da fonte (negrito) */
+    cursor: pointer; /* Muda o cursor para "mãozinha" ao passar por cima */
+    
+    /* Transição suave para o efeito de hover */
+    transition: background 0.2s ease;
+}
+
+/* Efeito ao passar o mouse sobre o botão */
+.btn-primary1:hover {
+    /* Mude o gradiente ao passar o mouse para dar um efeito de profundidade */
+    background: linear-gradient(135deg, #0056b3, #003a70);
 }
