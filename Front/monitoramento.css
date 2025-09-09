@@ -352,7 +352,7 @@ ul {
 
 /* Gradiente para o botão de criar monitoramento nos modais */
 .btn-create-monitoramento {
-    background: #1EB35B; /* Verde */
+    background: linear-gradient(135deg, #0cff85, #00823c); /* Verde */
     color: white;
     border: none;
     border-radius: 8px;
@@ -363,6 +363,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 10px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 .btn-create-monitoramento:hover {
@@ -695,18 +696,7 @@ ul {
 }
 
 
-.fa-id-card{
-    font-size: 1rem;
-    
-    margin-right: 5px;
-      color: white;
-    text-shadow:
-        -1px -1px 0 black,
-        1px -1px 0 black,
-        -1px 1px 0 black,
-        1px 1px 0 black;
-    
-}
+
 
 .detail-item span {
     margin-left: 25px;
@@ -964,10 +954,6 @@ ul {
     background-color: #0056b3;
 }
 
-
-/* ========================================= */
-/* ESTILOS DOS MODAIS */
-/* ========================================= */
 
 .modal-overlay {
     position: fixed;
@@ -1263,8 +1249,11 @@ ul {
     outline: none;
     transition: border-color 0.2s ease;
 }
+
 .form-group input:focus {
-    border-color: #007bff;
+    outline: none; /* remove o contorno padrão do navegador */
+    border-color: #0747a8; /* Esta linha pode estar causando a cor azul */
+    box-shadow: 0 0 0 2px rgba(7, 71, 168, 0.2); /* Esta linha também pode causar a cor azul */
 }
 
 .required-tag {
@@ -1649,6 +1638,21 @@ ul {
     width: 100%;
 }
 
+
+.form-group label i {
+    
+    margin-top: 10px;
+}
+
+.fa-user-tag.i{
+    margin-top: 1px;
+
+}
+
+.fa-envelope.i{
+    margin-top: 1px;
+
+}
 .footer-container {
     display: flex;
     flex-wrap: wrap;
@@ -1782,14 +1786,12 @@ ul {
 
 /* Estilos para o Modal de Perfil do Usuário */
 /* ========================================================================== */
-/* --- Estilos do Modal de Perfil --- */
-/* --- Estilos do Modal de Perfil --- */
 .modal-overlay .large-modal {
     max-width: 600px;
     padding: 2.5rem;
-    display: flex; /* Transforma o modal em um container flexível */
-    flex-direction: column; /* Organiza os itens em coluna */
-    max-height: 73vh; /* Limita a altura do modal à altura da tela, prevenindo rolagem excessiva da página */
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
 }
 
 .modal-overlay .modal-content h2 {
@@ -1806,9 +1808,9 @@ ul {
 
 /* Abas */
 .tabs-container {
-    display: flex; /* Usa flexbox para o container de abas */
-    flex-direction: column; /* Coloca os cabeçalhos e o conteúdo em coluna */
-    height: 100%; /* Permite que o conteúdo se expanda */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .tab-header {
@@ -1816,8 +1818,8 @@ ul {
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid #ddd;
-    margin-bottom: 15px; /* Reduzi a margem para liberar espaço */
-    flex-shrink: 0; /* Impede que o cabeçalho das abas diminua */
+    margin-bottom: 15px;
+    flex-shrink: 0;
 }
 
 .tab-button {
@@ -1840,15 +1842,14 @@ ul {
 
 /* Conteúdo das Abas */
 .tab-content-container {
-    flex-grow: 1; /* Permite que o container de conteúdo preencha o espaço restante */
-    overflow-y: auto; /* Oculta a barra de rolagem do contêiner principal do modal, mas a permite dentro do conteúdo */
+    flex-grow: 1;
+    overflow-y: auto;
     padding-top: 10px;
-    margin-bottom: 20px; /* Adiciona um espaço para o rodapé do modal */
+    margin-bottom: 20px;
 }
 
 .tab-content {
     display: none;
-    /* Remove a rolagem e a altura fixa para que o conteúdo se ajuste ao espaço flexível */
     overflow-y: visible;
     max-height: none;
 }
@@ -1858,13 +1859,20 @@ ul {
 }
 
 /* Formulário de Informações */
+.profile-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
 .profile-avatar-container {
     position: relative;
     width: 90px;
     height: 90px;
     margin: -20px auto 20px;
     border-radius: 50%;
-    overflow: hidden; /* Mantemos o recorte para a foto ficar redonda */
+    overflow: hidden;
     background-color: #f0f2f5;
     border: 3px solid #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -1887,9 +1895,40 @@ ul {
     font-weight: bold;
 }
 
+/* Novo wrapper para alinhar o nome de usuário e o botão de edição */
+.profile-username-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaço entre o nome e o botão */
+    margin-bottom: 2rem;
+}
+
+/* Estilo para o nome de usuário centralizado */
+.profile-username-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    display: block;
+}
+
+/* Estilo para o botão de edição do nome de usuário */
+.edit-username-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.edit-username-btn:hover {
+    color: #0747a8;
+}
+
 .edit-avatar-btn {
     position: absolute;
-    /* Ajustes para posicionar o botão mais para a direita e sem corte */
     bottom: -10px; 
     right: -10px;  
     width: 35px;
@@ -1916,40 +1955,35 @@ ul {
     transform: scale(1.1);
 }
 
-.form-group label {
-    display: block;
-    font-weight: 500;
-    color: #555;
-    margin-bottom: 5px;
+/* NOVO: Wrapper para o ícone e input */
+.form-group {
+    position: relative; /* Adiciona a posição relativa ao contêiner pai */
+    margin-bottom: 1.5rem; /* Espaço entre os campos */
 }
 
-.toggle-password i {
-    margin-top: 25px;
-    color: white;
-/* Adicione !important aqui */
-    -webkit-text-stroke: 1px #6c757d;
-    margin-right: 14px;
-}
-
+/* Correção para o ícone dentro do label */
 .form-group label i {
-    color: white;
-/* Adicione !important aqui */
-    -webkit-text-stroke: 1px #6c757d;
-    margin-right: 14px;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.1rem;
+    z-index: 2;
+    -webkit-text-stroke: 0;
 }
 
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="password"] {
-    width: calc(100% - 10px);
-    padding: 12px;
-    padding-right: 40px;
+/* Correção para o input, ajustando o padding para não sobrepor o ícone */
+.form-group input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* Aumenta o padding-left */
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 1rem;
     margin-bottom: 4px;
     color: #333;
     background-color: #f9f9f9;
+    box-sizing: border-box;
 }
 
 .form-group input[disabled] {
@@ -1969,8 +2003,8 @@ ul {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 15px; /* Reduzi a margem */
-    flex-shrink: 0; /* Impede que os botões diminuam */
+    margin-top: 15px;
+    flex-shrink: 0;
 }
 
 /* Formulário de Segurança (Ícone de olho) */
@@ -1988,7 +2022,7 @@ ul {
 }
 
 /* Botões de Ação */
-.btn-save-changes, .btn-change-password, .btn-manage-subscription {
+.btn-save-changes, .btn-change-password, .btn-manage-subscription, .btn-create-password {
     padding: 12px 25px;
     font-size: 1rem;
     font-weight: 600;
@@ -2001,15 +2035,15 @@ ul {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
 .btn-manage-subscription {
-    background: linear-gradient(135deg, #05bc5b, #00823c);
+    background: linear-gradient(135deg, #0cff85, #00823c);
 }
 
 .btn-cancel-form {
-    margin-top: 30px;
+    margin-top: 15px;
     background: linear-gradient(135deg, #e23333, #ac0513);
     color: #ffffff;
     padding: 12px 25px;
@@ -2026,7 +2060,7 @@ ul {
     background-color: #d0d0d0;
 }
 
-.btn-save-changes:hover, .btn-change-password:hover, .btn-manage-subscription:hover {
+.btn-save-changes:hover, .btn-change-password:hover, .btn-manage-subscription:hover, .btn-create-password:hover {
     transform: translateY(-2px);
     background-color: #218838;
 }
@@ -2041,8 +2075,8 @@ ul {
     background-color: #ffffff;
     border-radius: 12px;
     border: 1px solid #ddd;
-    flex-grow: 1; /* Permite que o card de assinatura se estique para ocupar o espaço */
-    justify-content: center; /* Centraliza o conteúdo verticalmente */
+    flex-grow: 1;
+    justify-content: center;
 }
 
 .subscription-status-card .plan-icon-wrapper {
@@ -2115,4 +2149,85 @@ ul {
 /* Para o ícone do plano Gratuito */
 .grey-summary-bg i {
     color: #fff;
+}
+
+.fa-eye{
+    margin-top: 23px;
+}
+
+.fa-phone{
+    margin-top: 13px;
+}
+
+.fa-lock{
+    margin-top: 13px;
+}
+
+.fa-unlock{
+    margin-top: 13px;
+}
+
+.fa-key{
+    margin-top: 13px;
+}
+
+/* Estilo para o wrapper que contém o nome de usuário e os botões */
+.profile-username-wrapper {
+    display: flex;
+    align-items: center; /* Centraliza verticalmente o nome e os botões */
+    justify-content: center;
+    gap: 8px; /* Espaçamento entre os elementos */
+    margin-bottom: 2rem;
+}
+
+/* Estilo para o input de edição do nome de usuário */
+.profile-username-wrapper .edit-username-input {
+    flex-grow: 1; /* Permite que o input ocupe o espaço disponível */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+    width: 250px; /* Largura fixa para manter o layout */
+    text-align: center;
+}
+
+/* Foco no input */
+.profile-username-wrapper .edit-username-input:focus {
+    border-color: #0747a8;
+    outline: none;
+}
+
+/* Estilo para o botão de salvar (ícone de check) */
+.profile-username-wrapper .save-username-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #05bc5b; /* Verde para confirmar */
+    font-size: 1.5rem;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.profile-username-wrapper .save-username-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Estilo para o botão de cancelar (ícone de X) */
+.profile-username-wrapper .cancel-username-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ac0513; /* Vermelho para cancelar */
+    font-size: 1.5rem;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.profile-username-wrapper .cancel-username-btn:hover {
+    transform: scale(1.1);
 }
