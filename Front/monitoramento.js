@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabButtons = document.querySelectorAll('.tab-button');
     const profileInfoForm = document.getElementById('profile-info-form');
     const profileSecurityForm = document.getElementById('profile-security-form');
+    const changePasswordForm = document.getElementById('change-password-form');
+    const createPasswordContainer = document.getElementById('create-password-container');
+    const createPasswordForm = document.getElementById('create-password-form');
     const profileFullNameInput = document.getElementById('profile-full-name');
     const profileUsernameInput = document.getElementById('profile-username');
     const profileContactInput = document.getElementById('profile-contact');
@@ -42,11 +45,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentPasswordInput = document.getElementById('current-password');
     const newPasswordInput = document.getElementById('new-password');
     const confirmPasswordInput = document.getElementById('confirm-password');
+    const createNewPasswordInput = document.getElementById('create-new-password');
+    const createConfirmPasswordInput = document.getElementById('create-confirm-password');
+    // CORREÇÃO: Adicionando referência ao campo de nome completo do formulário de monitoramento pessoal
+    const personalNameInput = document.getElementById('personal-name');
 
     // NOVO: Referências para o upload da foto de perfil
     const profileImageUploadInput = document.getElementById('profileImageUpload');
     const editAvatarBtn = document.querySelector('.edit-avatar-btn');
     const passwordToggleButtons = document.querySelectorAll('.toggle-password');
+
+    // NOVO: Referência ao botão de edição do nome de usuário
+    const editUsernameBtn = document.getElementById('editUsernameBtn');
 
 
     // Formulários
@@ -212,30 +222,43 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Preenche os campos do formulário de informações
             profileFullNameInput.value = userData.fullName || '';
-            profileUsernameInput.value = userData.username || '';
             profileContactInput.value = userData.contact || '';
             profileEmailInput.value = userData.email || '';
+            
+            // CORREÇÃO: Fixa o nome completo no campo do modal de monitoramento pessoal
+            if (personalNameInput && userData.fullName) {
+                personalNameInput.value = userData.fullName;
+                personalNameInput.disabled = true; 
+            } else if (personalNameInput) {
+                personalNameInput.disabled = false;
+            }
+
+            // Atualiza o display do nome de usuário com @
+            const profileUsernameDisplay = document.getElementById('profile-username-display');
+            if (profileUsernameDisplay) {
+                profileUsernameDisplay.textContent = userData.username ? `@${userData.username}` : '@Usuário não informado';
+            }
             
             // Corrige a exibição da foto de perfil
             updateProfilePictureUI(userData.photoURL);
 
-            // Preenche a aba de Assinatura
-            const subscriptionPlanValue = document.getElementById('subscription-plan-value');
-            const subscriptionPlanDescription = document.getElementById('subscription-plan-description');
-            const planIconWrapperModal = document.querySelector('.subscription-status-card .plan-icon-wrapper');
+            // Preenche a aba de Assinatura dinamicamente
+            const planTitleModal = document.querySelector('#subscription-tab .plan-title');
+            const planDescriptionModal = document.querySelector('#subscription-tab .plan-description');
+            const planIconWrapperModal = document.querySelector('#subscription-tab .plan-icon-wrapper');
             const planIconModal = planIconWrapperModal ? planIconWrapperModal.querySelector('i') : null;
-            const planType = userData.plan_type.toLowerCase();
 
-            if (subscriptionPlanValue) {
-                subscriptionPlanValue.textContent = planType === 'gratuito' ? 'Sem Plano' : planType.charAt(0).toUpperCase() + planType.slice(1);
+            const planType = (userData.plan_type || 'gratuito').toLowerCase();
+
+            if (planTitleModal) {
+                planTitleModal.textContent = planType === 'gratuito' ? 'Sem Plano' : planType.charAt(0).toUpperCase() + planType.slice(1);
             }
-            if (subscriptionPlanDescription) {
-                subscriptionPlanDescription.textContent = getPlanDescription(planType);
+            if (planDescriptionModal) {
+                planDescriptionModal.textContent = getPlanDescription(planType);
             }
 
             if (planIconWrapperModal) {
-                planIconWrapperModal.classList.remove('gold-summary-bg', 'orange-summary-bg', 'blue-summary-bg', 'green-summary-bg', 'red-summary-bg', 'grey-summary-bg');
-                
+                planIconWrapperModal.className = 'plan-icon-wrapper'; // Reseta a classe
                 if (planType === 'premium') {
                     planIconWrapperModal.classList.add('gold-summary-bg');
                     if (planIconModal) planIconModal.className = 'fas fa-crown';
@@ -244,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (planIconModal) planIconModal.className = 'fas fa-shield-alt';
                 } else { // Plano Gratuito / Sem Plano
                     planIconWrapperModal.classList.add('grey-summary-bg');
-                    if (planIconModal) planIconModal.className = 'fas fa-times-circle';
+                    if (planIconModal) planIconModal.className = 'fas fa-shield-alt';
                 }
             }
 
@@ -263,8 +286,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 userDefaultAvatar.style.display = 'block';
                 userDefaultAvatar.textContent = userData.fullName ? userData.fullName.charAt(0) : 'U';
             }
-            userNameDisplay.textContent = userData.fullName || userData.username || 'Usuário';
-            dropdownUserName.textContent = `Olá, ${userData.fullName || 'Usuário'}!`;
+
+            // CORREÇÃO: Altera a prioridade de exibição do nome para usar o username ou o primeiro nome do fullName
+            const nomeParaExibir = userData.username 
+                ? userData.username.split(' ')[0] 
+                : (userData.fullName ? userData.fullName.split(' ')[0] : 'Usuário');
+
+            userNameDisplay.textContent = nomeParaExibir;
+            dropdownUserName.textContent = `Olá, ${nomeParaExibir}!`;
 
         } catch (error) {
             console.error('Erro ao buscar perfil do usuário:', error);
@@ -291,20 +320,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!user) { alert("Você não está logado."); return; }
         const idToken = await user.getIdToken();
 
-        const username = profileUsernameInput.value.trim();
         const contact = profileContactInput.value.trim();
-
-        if (!username && !contact) {
-            alert('Por favor, preencha pelo menos um campo para atualizar (Nome de Usuário ou Telefone).');
-            return;
-        }
         
         const updateData = {};
-        if (username) {
-            updateData.username = username;
-        }
         if (contact) {
             updateData.contact = contact;
+        } else {
+            alert('Por favor, preencha o campo de Telefone para atualizar.');
+            return;
         }
 
         try {
@@ -327,34 +350,92 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // NOVO: Função para alterar a senha
+    // NOVO: Função para alterar a senha (CORRIGIDA)
     async function changePassword() {
         const user = window.auth.currentUser;
-        if (!user) { alert("Você não está logado."); return; }
+        if (!user) {
+            alert("Você não está logado.");
+            return;
+        }
 
+        const currentPassword = currentPasswordInput.value;
         const newPassword = newPasswordInput.value;
         const confirmPassword = confirmPasswordInput.value;
+
+        if (!currentPassword) {
+            alert('Por favor, digite a sua senha atual para confirmar.');
+            return;
+        }
 
         if (newPassword !== confirmPassword) {
             alert('A nova senha e a confirmação não correspondem.');
             return;
         }
         if (newPassword.length < 6) {
-            alert('A senha deve ter no mínimo 6 caracteres.');
+            alert('A nova senha deve ter no mínimo 6 caracteres.');
             return;
         }
         
-        // Reautenticação do usuário (requer uma UI de login recente)
         try {
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+            await user.reauthenticateWithCredential(credential);
+
             await user.updatePassword(newPassword);
+            
             alert('Senha alterada com sucesso!');
-            profileSecurityForm.reset();
+            // Limpa os campos do formulário após o sucesso
+            if (changePasswordForm) {
+                changePasswordForm.reset();
+            }
         } catch (error) {
-            console.error('Erro ao alterar senha:', error.message);
-            alert(`Erro ao alterar a senha: ${error.message}`);
+            console.error('Erro ao alterar senha:', error.code, error.message);
+            let errorMessage = 'Erro desconhecido ao alterar a senha.';
+
+            if (error.code === 'auth/wrong-password') {
+                errorMessage = 'A senha atual está incorreta. Tente novamente.';
+            } else if (error.code === 'auth/requires-recent-login') {
+                errorMessage = 'Esta é uma operação sensível. Por favor, saia e entre novamente para confirmar sua identidade antes de alterar a senha.';
+            } else {
+                errorMessage = `Erro: ${error.message}`;
+            }
+            
+            alert(errorMessage);
         }
     }
     
+    // NOVA FUNÇÃO: Função para criar uma senha para usuários com login social
+    async function createPassword() {
+        const user = window.auth.currentUser;
+        if (!user) {
+            alert("Você não está logado.");
+            return;
+        }
+
+        const newPassword = createNewPasswordInput.value;
+        const confirmPassword = createConfirmPasswordInput.value;
+
+        if (newPassword !== confirmPassword) {
+            alert('A nova senha e a confirmação não correspondem.');
+            return;
+        }
+        if (newPassword.length < 6) {
+            alert('A nova senha deve ter no mínimo 6 caracteres.');
+            return;
+        }
+
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, newPassword);
+            await user.linkWithCredential(credential);
+            
+            alert('Senha criada com sucesso! Agora você pode fazer login com e-mail e senha.');
+            createPasswordForm.reset();
+            checkAuthProviderAndRenderSecurityTab(); // Re-renderiza a aba de segurança
+        } catch (error) {
+            console.error('Erro ao criar senha:', error.code, error.message);
+            alert(`Erro ao criar a senha: ${error.message}`);
+        }
+    }
+
     // NOVO: Função para fazer o upload da foto de perfil para o Firebase Storage
     async function uploadProfilePicture(file) {
         const user = window.auth.currentUser;
@@ -618,7 +699,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Listeners de Eventos Globais ---
-    modalCloseButtons.forEach(btn => { btn.addEventListener('click', (e) => { const modalId = e.currentTarget.dataset.modalId; const modalToClose = document.getElementById(modalId); closeModal(modalToClose); }); });
+    // Listener unificado para os botões de fechar modal (X) e botões "Cancelar" dentro dos formulários
+    document.querySelectorAll('.modal-close-btn, .btn-cancel-form').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const modalId = e.currentTarget.dataset.modalId || 'profile-modal';
+            const modalToClose = document.getElementById(modalId);
+            closeModal(modalToClose);
+    
+            // Se for o botão de cancelamento dos formulários de monitoramento, reabre a modal de escolha de tipo
+            if (modalToClose.id !== 'profile-modal' && modalId === 'profile-modal') {
+                // Esta condição nunca será verdadeira, mas a lógica para os formulários de monitoramento está aqui
+            }
+        });
+    });
+
     if (btnCancelModal) { btnCancelModal.addEventListener('click', () => { closeModal(chooseTypeModal); }); }
     btnCancelForms.forEach(btn => { btn.addEventListener('click', () => { closeModal(personalMonitoramentoModal); closeModal(radarMonitoramentoModal); openModal(chooseTypeModal); }); });
     document.querySelectorAll('.modal-overlay').forEach(overlay => { overlay.addEventListener('click', (e) => { if (e.target === overlay) { closeAllModals(); } }); });
@@ -746,6 +841,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // NOVA FUNÇÃO: VERIFICAÇÃO ATUALIZADA DO PROVEDOR DE LOGIN
+    function checkAuthProviderAndRenderSecurityTab() {
+        const user = window.auth.currentUser;
+        if (!user) return;
+        
+        // Verificamos diretamente se o provedor 'password' está na lista de provedores da conta.
+        const hasPasswordProvider = user.providerData.some(provider => provider.providerId === 'password');
+        
+        if (hasPasswordProvider) {
+            // Se tem o provedor de senha, mostra o formulário de alteração.
+            if (changePasswordForm) changePasswordForm.style.display = 'block';
+            if (createPasswordContainer) createPasswordContainer.style.display = 'none';
+        } else {
+            // Se não tem, mostra o formulário de criação.
+            if (changePasswordForm) changePasswordForm.style.display = 'none';
+            if (createPasswordContainer) createPasswordContainer.style.display = 'block';
+        }
+    }
     
     // NOVO: Listeners para o Modal de Perfil
     if (openProfileModalBtn) {
@@ -753,7 +867,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             closeAllModals();
             openModal(profileModal);
-            fetchUserProfile(); // Carrega os dados do perfil ao abrir
+            fetchUserProfile(); 
+            // A verificação da aba de segurança foi movida para o listener das abas
         });
     }
     
@@ -769,6 +884,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Adiciona a classe 'active' apenas ao botão e conteúdo clicados
                 button.classList.add('active');
                 document.getElementById(targetTab).classList.add('active');
+
+                // Chama a função de verificação do provedor de login somente se a aba de segurança for a selecionada
+                if (targetTab === 'security-tab') {
+                    checkAuthProviderAndRenderSecurityTab();
+                }
             });
         });
     }
@@ -780,10 +900,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    if (profileSecurityForm) {
-        profileSecurityForm.addEventListener('submit', (e) => {
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', (e) => {
             e.preventDefault();
             changePassword();
+        });
+    }
+    
+    if (createPasswordForm) {
+        createPasswordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            createPassword();
         });
     }
     
@@ -864,5 +991,99 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (!pollingInterval) {
         pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+    }
+    
+    // NOVA LÓGICA: Edição de nome de usuário no local
+    function handleEditUsername() {
+        const usernameDisplay = document.getElementById('profile-username-display');
+        const usernameWrapper = document.querySelector('.profile-username-wrapper');
+        const currentUsername = usernameDisplay.textContent.replace('@', '').trim();
+    
+        // Cria um campo de input
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentUsername;
+        input.className = 'edit-username-input';
+    
+        // Substitui o span pelo input
+        usernameWrapper.replaceChild(input, usernameDisplay);
+        input.focus();
+    
+        // Cria botões de salvar e cancelar
+        const saveBtn = document.createElement('button');
+        saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+        saveBtn.className = 'save-username-btn';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+        cancelBtn.className = 'cancel-username-btn';
+        
+        // Esconde o botão do lápis e adiciona os botões de salvar/cancelar
+        const editBtn = document.getElementById('editUsernameBtn');
+        editBtn.style.display = 'none';
+        usernameWrapper.appendChild(saveBtn);
+        usernameWrapper.appendChild(cancelBtn);
+    
+        // Salva a alteração
+        saveBtn.addEventListener('click', async () => {
+            const newUsername = input.value.trim();
+            if (newUsername && newUsername !== currentUsername) {
+                await updateUsername(newUsername);
+            }
+            // Restaura a visualização
+            restoreUsernameView(newUsername || currentUsername);
+        });
+    
+        // Cancela a alteração
+        cancelBtn.addEventListener('click', () => {
+            restoreUsernameView(currentUsername);
+        });
+        
+        // Salva ao pressionar 'Enter'
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                saveBtn.click();
+            }
+        });
+        
+        // Restaura a visualização para o span original
+        function restoreUsernameView(username) {
+            usernameDisplay.textContent = `@${username}`;
+            usernameWrapper.replaceChild(usernameDisplay, input);
+            usernameWrapper.removeChild(saveBtn);
+            usernameWrapper.removeChild(cancelBtn);
+            editBtn.style.display = 'block';
+        }
+    }
+    
+    // NOVA LÓGICA: Função para atualizar o nome de usuário no backend
+    async function updateUsername(newUsername) {
+        const user = window.auth.currentUser;
+        if (!user) { alert("Você não está logado."); return; }
+        const idToken = await user.getIdToken();
+    
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                body: JSON.stringify({ username: newUsername })
+            });
+            if (await handleApiAuthError(response)) return;
+            if (response.ok) {
+                alert('Nome de usuário atualizado com sucesso!');
+                fetchUserProfile(); // Atualiza a tela com os dados mais recentes
+            } else {
+                const errorData = await response.json();
+                alert(`Erro ao atualizar o nome de usuário: ${errorData.detail || 'Erro desconhecido.'}`);
+            }
+        } catch (error) {
+            console.error('Erro na requisição para atualizar o nome de usuário:', error);
+            alert('Ocorreu um erro ao se conectar com o servidor.');
+        }
+    }
+    
+    // Novo: Listener para o botão de edição do nome de usuário
+    if (editUsernameBtn) {
+        editUsernameBtn.addEventListener('click', handleEditUsername);
     }
 });
