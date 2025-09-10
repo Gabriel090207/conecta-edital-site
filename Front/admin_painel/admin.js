@@ -3,9 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const BACKEND_URL = "https://conecta-edital-site.onrender.com";
     
-    // O painel de admin não tem login, então o token não existe.
-    // Para evitar erros no frontend, defina-o como null.
-    const token = null;
+    // Removido: A variável 'token' foi removida para desabilitar a autenticação no painel de admin.
 
     // --- FUNÇÃO AUXILIAR PARA CALCULAR TEMPO DE LEITURA ---
     function calcularTempoDeLeitura(texto) {
@@ -188,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`${BACKEND_URL}/admin/stats`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    // Removido cabeçalho de autorização para esta rota
                     "ngrok-skip-browser-warning": "true"
                 }
             });
@@ -254,7 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/admin/tickets`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    // Removido cabeçalho de autorização para esta rota
                     "ngrok-skip-browser-warning": "true"
                 }
             });
@@ -429,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Autenticação removida daqui
+                    // Removido cabeçalho de autorização para esta rota
                     "ngrok-skip-browser-warning": "true"
                 },
                 body: JSON.stringify({ text: replyText })
@@ -470,7 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Autenticação removida daqui
+                    // Removido cabeçalho de autorização para esta rota
                     "ngrok-skip-browser-warning": "true"
                 },
                 body: JSON.stringify({ status: newStatus })
@@ -511,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/admin/users`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    // Removido cabeçalho de autorização para esta rota
                     "ngrok-skip-browser-warning": "true"
                 }
             });
@@ -600,7 +598,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
+                        // Removido cabeçalho de autorização para esta rota
                     },
                     body: JSON.stringify(updateData)
                 });
@@ -639,7 +637,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/dicas`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    // Removido cabeçalho de autorização para esta rota
                 }
             });
             if (!response.ok) {
@@ -848,6 +846,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'ngrok-skip-browser-warning': 'true'
+                    // Removido cabeçalho de autorização para esta rota
                 }
             });
             if (!response.ok) {
@@ -1092,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        // Removido cabeçalho de autorização para esta rota
                     },
                     body: JSON.stringify(dicaData),
                 });
@@ -1145,7 +1144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        // Removido cabeçalho de autorização para esta rota
                     },
                     body: JSON.stringify(faqData),
                 });
@@ -1194,7 +1193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${BACKEND_URL}/articles`, { 
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    // Removido cabeçalho de autorização para esta rota
                 }
             });
             if (!response.ok) {
@@ -1294,7 +1293,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`${BACKEND_URL}/articles/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    // Removido cabeçalho de autorização para esta rota
                 },
             });
 
@@ -1337,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        // Removido cabeçalho de autorização para esta rota
                     },
                     body: JSON.stringify(articleData),
                 });
@@ -1384,7 +1383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`${BACKEND_URL}/admin/tickets`, {
                 headers: {
                     "ngrok-skip-browser-warning": "true",
-                    'Authorization': `Bearer ${token}`
+                    // Removido cabeçalho de autorização para esta rota
                 }
             });
             if (!response.ok) {
