@@ -135,6 +135,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const blogAuthorInput = document.getElementById('blog-author');
     const blogContentTextarea = document.getElementById('blog-content');
 
+    // NOVAS REFERÊNCIAS DO MODAL DE EDIÇÃO DE USUÁRIO
+    const userEditModal = document.getElementById('user-edit-modal');
+    const userEditForm = document.getElementById('user-edit-form');
+    const editUserUidInput = document.getElementById('edit-user-uid');
+    const editUserFullnameInput = document.getElementById('edit-user-fullname');
+    const editUserEmailInput = document.getElementById('edit-user-email');
+    const editUserPlanSelect = document.getElementById('edit-user-plan');
+
 
     // Funções auxiliares de modal
     function openModal(modalElement) {
@@ -544,10 +552,74 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p><strong>Nome:</strong> ${user.full_name}</p>
                 <p><strong>Email:</strong> ${user.email}</p>
                 <p><strong>Plano:</strong> <span class="plan-tag tag-${planTagClass}">${planText}</span></p>
+                <button class="btn-edit-user" data-uid="${user.uid}">Editar</button>
             `;
             usersAuditList.appendChild(userCard);
         });
+
+        if(usersAuditList) {
+            usersAuditList.querySelectorAll('.btn-edit-user').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const userUid = e.target.dataset.uid;
+                    openEditUserModal(userUid);
+                });
+            });
+        }
     }
+    
+    // NOVO: Função para abrir o modal de edição de usuário
+    function openEditUserModal(userUid) {
+        const userToEdit = allUsers.find(u => u.uid === userUid);
+        if (!userToEdit) {
+            alert('Usuário não encontrado.');
+            return;
+        }
+        
+        editUserUidInput.value = userToEdit.uid;
+        editUserFullnameInput.value = userToEdit.full_name;
+        editUserEmailInput.value = userToEdit.email;
+        editUserPlanSelect.value = userToEdit.plan_type;
+
+        openModal(userEditModal);
+    }
+    
+    // NOVO: Listener para o formulário de edição de usuário
+    if (userEditForm) {
+        userEditForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userUid = editUserUidInput.value;
+            
+            const updateData = {
+                fullName: editUserFullnameInput.value,
+                email: editUserEmailInput.value,
+                plan_type: editUserPlanSelect.value
+            };
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/admin/users/${userUid}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Erro ao atualizar: ${errorData.detail || response.statusText}`);
+                }
+
+                alert('Perfil do usuário atualizado com sucesso!');
+                closeModal(userEditModal);
+                loadAllUsersForAudit(); // Recarrega a lista para mostrar as mudanças
+            } catch (error) {
+                console.error("Erro ao atualizar o perfil do usuário:", error);
+                alert(`Erro ao atualizar o perfil: ${error.message}`);
+            }
+        });
+    }
+
 
     if (userSearchInput) {
         userSearchInput.addEventListener('input', (e) => {
@@ -1271,6 +1343,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (!response.ok) {
+                    const errorData = await response.json();
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 

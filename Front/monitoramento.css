@@ -1823,6 +1823,7 @@ ul {
 }
 
 .tab-button {
+    margin-top: -40px;
     flex: 1;
     padding: 12px 20px;
     background: none;
@@ -1911,6 +1912,7 @@ ul {
     color: #333;
     text-align: center;
     display: block;
+   
 }
 
 /* Estilo para o botão de edição do nome de usuário */
