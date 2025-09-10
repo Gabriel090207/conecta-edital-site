@@ -1292,141 +1292,11 @@ async def get_all_users_for_audit():
         
     return users_list
 
-
-@app.get("/admin/feedback_stats")
-async def get_admin_feedback_stats():
-    db = firestore.client()
-    tickets_ref = db.collection('tickets')
-    users_ref = db.collection('users')
-    
-    all_tickets = list(tickets_ref.stream())
-    total_tickets = len(all_tickets)
-    
-    # Estatísticas de Tickets
-    tickets_by_status = defaultdict(int)
-    tickets_by_category = defaultdict(int)
-    tickets_by_month = defaultdict(int)
-    total_resolved_time = 0
-    resolved_tickets_count = 0
-    pending_tickets_count = 0
-    
-    for ticket in all_tickets:
-        ticket_data = ticket.to_dict()
-        status = ticket_data.get('status', 'Desconhecido')
-        category = ticket_data.get('category', 'Outros')
-        created_at = ticket_data.get('created_at')
-        
-        tickets_by_status[status] += 1
-        tickets_by_category[category] += 1
-        
-        if status == 'Resolvido':
-            last_updated_at = ticket_data.get('last_updated_at')
-            if created_at and last_updated_at:
-                resolved_time = (last_updated_at - created_at).total_seconds()
-                total_resolved_time += resolved_time
-            resolved_tickets_count += 1
-        
-        if status in ['Aguardando', 'Em Atendimento']:
-            pending_tickets_count += 1
-
-        if created_at:
-            month_year = created_at.strftime('%b. %y')
-            tickets_by_month[month_year] += 1
-    
-    # Cálculo da média de tempo de resolução
-    avg_resolution_time_hours = (total_resolved_time / resolved_tickets_count / 3600) if resolved_tickets_count > 0 else 0
-    response_rate = (tickets_by_status.get('Respondido', 0) + tickets_by_status.get('Resolvido', 0)) / total_tickets * 100 if total_tickets > 0 else 0
-    
-    # Distribuição de Status
-    ticket_status_distribution = {}
-    for status, count in tickets_by_status.items():
-        percentage = (count / total_tickets) * 100 if total_tickets > 0 else 0
-        ticket_status_distribution[status] = {'count': count, 'percentage': percentage}
-    
-    # Distribuição de Categoria
-    tickets_by_category_list = [{'category': cat, 'count': count} for cat, count in tickets_by_category.items()]
-    
-    # Tendência Mensal (preenche meses sem tickets)
-    now = datetime.now()
-    monthly_trend = []
-    for i in range(6, -1, -1):  # Últimos 7 meses
-        month_ago = now - relativedelta(months=i)
-        month_year_label = month_ago.strftime('%b. %y')
-        monthly_trend.append({
-            'month': month_year_label,
-            'count': tickets_by_month.get(month_year_label, 0)
-        })
-    
-    # Usuários Mais Ativos
-    tickets_by_user = defaultdict(int)
-    for ticket in all_tickets:
-        user_uid = ticket.to_dict().get('user_uid')
-        if user_uid:
-            tickets_by_user[user_uid] += 1
-    
-    most_active_users = []
-    # Busca apenas os top 5 usuários mais ativos com uma query otimizada
-    users_with_tickets = [uid for uid, count in sorted(tickets_by_user.items(), key=lambda item: item[1], reverse=True)[:5]]
-    
-    if users_with_tickets:
-        docs = users_ref.stream()
-        user_data_map = {doc.id: doc.to_dict() for doc in docs if doc.id in users_with_tickets}
-        
-        for uid in users_with_tickets:
-            user_data = user_data_map.get(uid, {})
-            user_name = user_data.get('fullName', 'Usuário Desconhecido')
-            user_email = user_data.get('email', 'email@desconhecido.com')
-            most_active_users.append({
-                'name': user_name,
-                'email': user_email,
-                'ticket_count': tickets_by_user[uid]
-            })
-    
-    # Contagem de usuários ativos e totais
-    all_users_count = len(list(users_ref.stream()))
-    active_users_count = len(list(users_ref.where(filter=FieldFilter('status', '==', 'ativo')).stream()))
-
-    return {
-        "total_tickets": total_tickets,
-        "response_rate": response_rate,
-        "avg_resolution_time_hours": round(avg_resolution_time_hours, 1),
-        "satisfaction_rate": 0, # Placeholder
-        "pending_tickets": pending_tickets_count,
-        "active_users_count": active_users_count,
-        "total_users": all_users_count,
-        "tickets_by_category": tickets_by_category_list,
-        "ticket_status_distribution": ticket_status_distribution,
-        "monthly_ticket_trend": monthly_trend,
-        "most_active_users": most_active_users
-    }
-
-@app.get("/admin/users")
-async def get_all_users_for_audit():
-    """
-    Retorna uma lista simplificada de todos os usuários para auditoria.
-    """
-    db = firestore.client()
-    users_stream = db.collection('users').stream()
-    
-    users_list = []
-    for doc in users_stream:
-        user_data = doc.to_dict()
-        users_list.append({
-            "uid": doc.id,
-            "email": user_data.get("email", "N/A"),
-            "plan_type": user_data.get("plan_type", "gratuito"),
-            "full_name": user_data.get("fullName", "N/A"),
-            "status": user_data.get("status", "ativo")
-        })
-        
-    return users_list
-
 # NOVO ENDPOINT DE ADMIN
 @app.patch("/admin/users/{user_uid}")
 async def admin_update_user_profile(
     user_uid: str,
     update_data: AdminProfileUpdate,
-    admin_uid: str = Depends(get_current_admin_uid)
 ):
     """
     Permite que um administrador atualize os dados de perfil de qualquer usuário.
@@ -1448,7 +1318,7 @@ async def admin_update_user_profile(
             auth.update_user(user_uid, email=update_payload['email'])
         
         user_doc_ref.update(update_payload)
-        print(f"Admin {admin_uid} atualizou o perfil do usuário {user_uid}.")
+        print(f"Admin atualizou o perfil do usuário {user_uid}.")
         
         updated_doc = user_doc_ref.get().to_dict()
         return {"message": "Perfil atualizado com sucesso!", "user": updated_doc}
