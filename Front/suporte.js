@@ -34,14 +34,45 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUserTickets = [];
     let currentOpenTicketId = null;
 
+    // --- NOVO: Referências para o modal de perfil (Integrado) ---
+    const profileModal = document.getElementById('profile-modal');
+    const openProfileModalBtn = document.getElementById('open-profile-modal-btn');
+    const modalCloseButtons = document.querySelectorAll('.modal-close-btn');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const profileInfoForm = document.getElementById('profile-info-form');
+    const profileSecurityForm = document.getElementById('profile-security-form');
+    const changePasswordForm = document.getElementById('change-password-form');
+    const createPasswordContainer = document.getElementById('create-password-container');
+    const createPasswordForm = document.getElementById('create-password-form');
+    const profileFullNameInput = document.getElementById('profile-full-name');
+    const profileUsernameInput = document.getElementById('profile-username');
+    const profileContactInput = document.getElementById('profile-contact');
+    const profileEmailInput = document.getElementById('profile-email');
+    const profileImagePreview = document.getElementById('profileImagePreview');
+    const profileDefaultAvatar = document.getElementById('profileDefaultAvatar');
+    const dropdownUserName = document.getElementById('dropdownUserName');
+    const currentPasswordInput = document.getElementById('current-password');
+    const newPasswordInput = document.getElementById('new-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const createNewPasswordInput = document.getElementById('create-new-password');
+    const createConfirmPasswordInput = document.getElementById('create-confirm-password');
+    const profileImageUploadInput = document.getElementById('profileImageUpload');
+    const editAvatarBtn = document.querySelector('.edit-avatar-btn');
+    const passwordToggleButtons = document.querySelectorAll('.toggle-password');
+    const editUsernameBtn = document.getElementById('editUsernameBtn');
+    
+    let currentUserName = '';
+
+
+    // --- Funções Auxiliares de UI ---
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase()
-                  .normalize('NFD')
-                  .replace(/[\u0300-\u036f]/g, '')
-                  .replace(/[^a-z0-9-]/g, '-')
-                  .replace(/--+/g, '-')
-                  .trim();
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9-]/g, '-')
+                    .replace(/--+/g, '-')
+                    .trim();
     }
 
     function openModal(modalElement) {
@@ -69,22 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    document.querySelectorAll('.modal-close-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const modalId = e.currentTarget.dataset.modalId;
-            const modalToClose = document.getElementById(modalId);
-            closeModal(modalToClose);
+    
+    function closeAllModals() {
+        document.querySelectorAll('.modal-overlay.show-modal').forEach(modal => {
+            modal.classList.remove('show-modal');
         });
-    });
+        document.body.style.overflow = '';
+    }
 
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                closeModal(overlay);
-            }
-        });
-    });
+    // --- FUNÇÕES DE TICKETS ---
 
     async function getAuthToken() {
         const user = window.firebase.auth().currentUser;
@@ -92,6 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return await user.getIdToken();
         }
         return null;
+    }
+
+    async function handleApiAuthError(response) {
+        if (response.status === 401 || response.status === 403) {
+            console.error("Token de autenticação inválido ou expirado. Redirecionando para login.");
+            await window.firebase.auth().signOut();
+            window.location.href = 'login-cadastro.html';
+            return true;
+        }
+        return false;
     }
 
     async function loadTicketsForCurrentUser() {
@@ -131,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyFiltersAndSort() {
         let filteredTickets = [...currentUserTickets];
         
-        // CORREÇÃO: Verifica se o elemento existe antes de tentar ler a propriedade 'value'
         if (ticketSearchInput) {
             const searchTerm = normalizeString(ticketSearchInput.value);
             if (searchTerm) {
@@ -325,81 +358,437 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (createTicketForm) {
-        createTicketForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+    async function createNewTicket() {
+        if (!ticketSubject.value.trim()) {
+            alert('Por favor, preencha o assunto do ticket.');
+            ticketSubject.focus();
+            return;
+        }
+        if (!ticketDescription.value.trim()) {
+            alert('Por favor, preencha a descrição do problema.');
+            ticketDescription.focus();
+            return;
+        }
 
-            if (!ticketSubject.value.trim()) {
-                alert('Por favor, preencha o assunto do ticket.');
-                ticketSubject.focus();
-                return;
-            }
-            if (!ticketDescription.value.trim()) {
-                alert('Por favor, preencha a descrição do problema.');
-                ticketDescription.focus();
-                return;
-            }
+        const newTicketCategory = newTicketCategorySelect ? newTicketCategorySelect.value : "Outros";
+        if (!newTicketCategory || newTicketCategory === "") {
+            alert('Por favor, selecione uma categoria.');
+            return;
+        }
 
-            const newTicketCategory = newTicketCategorySelect ? newTicketCategorySelect.value : "Outros";
-            if (!newTicketCategory || newTicketCategory === "") {
-                alert('Por favor, selecione uma categoria.');
-                return;
-            }
+        createTicketSubmitBtn.disabled = true;
+        createTicketSubmitBtn.textContent = 'Enviando...';
+        
+        const token = await getAuthToken();
+        if (!token) {
+            alert('Você precisa estar logado para criar um ticket.');
+            createTicketSubmitBtn.disabled = false;
+            createTicketSubmitBtn.textContent = 'Criar Ticket';
+            return;
+        }
 
-            createTicketSubmitBtn.disabled = true;
-            createTicketSubmitBtn.textContent = 'Enviando...';
+        const newTicketData = {
+            subject: ticketSubject.value.trim(),
+            category: newTicketCategory,
+            initial_message: ticketDescription.value.trim()
+        };
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/tickets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    "ngrok-skip-browser-warning": "true"
+                },
+                body: JSON.stringify(newTicketData)
+            });
             
-            const token = await getAuthToken();
-            if (!token) {
-                alert('Você precisa estar logado para criar um ticket.');
-                createTicketSubmitBtn.disabled = false;
-                createTicketSubmitBtn.textContent = 'Criar Ticket';
-                return;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const createdTicket = await response.json();
+            console.log('Ticket criado com sucesso:', createdTicket);
+
+            alert('Ticket criado com sucesso! Em breve você receberá um e-mail de confirmação.');
+
+            await loadTicketsForCurrentUser();
+            closeModal(createTicketModal);
+            
+        } catch (error) {
+            console.error('Erro ao criar ticket:', error);
+            alert(`Erro ao criar ticket: ${error.message || 'Ocorreu um erro inesperado.'}`);
+        } finally {
+            createTicketSubmitBtn.disabled = false;
+            createTicketSubmitBtn.textContent = 'Criar Ticket';
+        }
+    }
+
+
+    // --- FUNÇÕES DA MODAL DE PERFIL --- (Integradas)
+
+    function getPlanDescription(planType) {
+        switch(planType) {
+            case 'premium':
+                return 'Plano premium com todos os recursos.';
+            case 'essencial':
+                return 'Plano essencial com 3 monitoramentos inclusos.';
+            case 'basico':
+                return 'Plano básico com 5 monitoramentos inclusos.';
+            default:
+                return 'Você não possui um plano ativo. Faça upgrade para mais recursos.';
+        }
+    }
+
+    function updateProfilePictureUI(photoURL) {
+        const profileImagePreview = document.getElementById('profileImagePreview');
+        const profileDefaultAvatar = document.getElementById('profileDefaultAvatar');
+
+        if (!profileImagePreview || !profileDefaultAvatar) {
+            console.error("Erro: Elementos de foto de perfil não encontrados.");
+            return;
+        }
+        if (photoURL) {
+            profileImagePreview.src = photoURL;
+            profileImagePreview.style.display = 'block';
+            profileDefaultAvatar.style.display = 'none';
+        } else {
+            profileImagePreview.style.display = 'none';
+            profileDefaultAvatar.style.display = 'flex';
+        }
+    }
+
+    async function fetchUserProfile() {
+        const user = window.firebase.auth().currentUser;
+        if (!user) { return; }
+        const idToken = await user.getIdToken();
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                headers: { 'Authorization': `Bearer ${idToken}` }
+            });
+            if (await handleApiAuthError(response)) return;
+            if (!response.ok) {
+                throw new Error('Erro ao carregar dados do perfil.');
+            }
+            const userData = await response.json();
+            
+            profileFullNameInput.value = userData.fullName || '';
+            profileContactInput.value = userData.contact || '';
+            profileEmailInput.value = userData.email || '';
+
+            currentUserName = userData.fullName || '';
+
+            const profileUsernameDisplay = document.getElementById('profile-username-display');
+            if (profileUsernameDisplay) {
+                profileUsernameDisplay.textContent = userData.username ? `@${userData.username}` : '@Usuário não informado';
+            }
+            
+            updateProfilePictureUI(userData.photoURL);
+
+            const planTitleModal = document.querySelector('#subscription-tab .plan-title');
+            const planDescriptionModal = document.querySelector('#subscription-tab .plan-description');
+            const planIconWrapperModal = document.querySelector('#subscription-tab .plan-icon-wrapper');
+            const planIconModal = planIconWrapperModal ? planIconWrapperModal.querySelector('i') : null;
+
+            const planType = (userData.plan_type || 'gratuito').toLowerCase();
+
+            if (planTitleModal) {
+                planTitleModal.textContent = planType === 'gratuito' ? 'Sem Plano' : planType.charAt(0).toUpperCase() + planType.slice(1);
+            }
+            if (planDescriptionModal) {
+                planDescriptionModal.textContent = getPlanDescription(planType);
             }
 
-            const newTicketData = {
-                subject: ticketSubject.value.trim(),
-                category: newTicketCategory,
-                initial_message: ticketDescription.value.trim()
-            };
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/tickets`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                        "ngrok-skip-browser-warning": "true"
-                    },
-                    body: JSON.stringify(newTicketData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            if (planIconWrapperModal) {
+                planIconWrapperModal.className = 'plan-icon-wrapper';
+                if (planType === 'premium') {
+                    planIconWrapperModal.classList.add('gold-summary-bg');
+                    if (planIconModal) planIconModal.className = 'fas fa-crown';
+                } else if (planType === 'essencial' || planType === 'basico') {
+                    planIconWrapperModal.classList.add('orange-summary-bg');
+                    if (planIconModal) planIconModal.className = 'fas fa-shield-alt';
+                } else {
+                    planIconWrapperModal.classList.add('grey-summary-bg');
+                    if (planIconModal) planIconModal.className = 'fas fa-shield-alt';
                 }
-                
-                const createdTicket = await response.json();
-                console.log('Ticket criado com sucesso:', createdTicket);
-
-                alert('Ticket criado com sucesso! Em breve você receberá um e-mail de confirmação.');
-
-                await loadTicketsForCurrentUser();
-                closeModal(createTicketModal);
-                
-            } catch (error) {
-                console.error('Erro ao criar ticket:', error);
-                alert(`Erro ao criar ticket: ${error.message || 'Ocorreu um erro inesperado.'}`);
-            } finally {
-                createTicketSubmitBtn.disabled = false;
-                createTicketSubmitBtn.textContent = 'Criar Ticket';
             }
+        
+            const userProfilePicture = document.getElementById('userProfilePicture');
+            const userDefaultAvatar = document.getElementById('userDefaultAvatar');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+
+            if (userData.photoURL) {
+                userProfilePicture.src = userData.photoURL;
+                userProfilePicture.style.display = 'block';
+                userDefaultAvatar.style.display = 'none';
+            } else {
+                userProfilePicture.style.display = 'none';
+                userDefaultAvatar.style.display = 'block';
+                userDefaultAvatar.textContent = userData.fullName ? userData.fullName.charAt(0) : 'U';
+            }
+            userNameDisplay.textContent = userData.fullName || userData.username || 'Usuário';
+            dropdownUserName.textContent = `Olá, ${userData.fullName || 'Usuário'}!`;
+
+        } catch (error) {
+            console.error('Erro ao buscar perfil do usuário:', error);
+            alert('Erro ao carregar os dados do seu perfil.');
+        }
+    }
+
+    async function updateUsername(newUsername) {
+        const user = window.firebase.auth().currentUser;
+        if (!user) { alert("Você não está logado."); return; }
+        const idToken = await user.getIdToken();
+    
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                body: JSON.stringify({ username: newUsername })
+            });
+            if (await handleApiAuthError(response)) return;
+            if (response.ok) {
+                alert('Nome de usuário atualizado com sucesso!');
+                fetchUserProfile(); 
+            } else {
+                const errorData = await response.json();
+                alert(`Erro ao atualizar o nome de usuário: ${errorData.detail || 'Erro desconhecido.'}`);
+            }
+        } catch (error) {
+            console.error('Erro na requisição para atualizar o nome de usuário:', error);
+            alert('Ocorreu um erro ao se conectar com o servidor.');
+        }
+    }
+
+    async function updateProfileInfo() {
+        const user = window.firebase.auth().currentUser;
+        if (!user) { alert("Você não está logado."); return; }
+        const idToken = await user.getIdToken();
+        const contact = profileContactInput.value.trim();
+        const updateData = {};
+        if (contact) {
+            updateData.contact = contact;
+        } else {
+            alert('Por favor, preencha o campo de Telefone para atualizar.');
+            return;
+        }
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                body: JSON.stringify(updateData)
+            });
+            if (await handleApiAuthError(response)) return;
+            if (response.ok) {
+                alert('Perfil atualizado com sucesso!');
+                fetchUserProfile();
+            } else {
+                const errorData = await response.json();
+                alert(`Erro ao atualizar o perfil: ${errorData.detail || 'Erro desconhecido.'}`);
+            }
+        } catch (error) {
+            console.error('Erro na requisição para atualizar o perfil:', error);
+            alert('Ocorreu um erro ao se conectar com o servidor.');
+        }
+    }
+
+    async function changePassword() {
+        const user = window.firebase.auth().currentUser;
+        if (!user) { alert("Você não está logado."); return; }
+        const currentPassword = currentPasswordInput.value;
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        if (!currentPassword) {
+            alert('Por favor, digite a sua senha atual para confirmar.');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            alert('A nova senha e a confirmação não correspondem.');
+            return;
+        }
+        if (newPassword.length < 6) {
+            alert('A nova senha deve ter no mínimo 6 caracteres.');
+            return;
+        }
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+            await user.reauthenticateWithCredential(credential);
+            await user.updatePassword(newPassword);
+            alert('Senha alterada com sucesso!');
+            if (changePasswordForm) {
+                changePasswordForm.reset();
+            }
+        } catch (error) {
+            console.error('Erro ao alterar senha:', error.code, error.message);
+            let errorMessage = 'Erro desconhecido ao alterar a senha.';
+            if (error.code === 'auth/wrong-password') {
+                errorMessage = 'A senha atual está incorreta. Tente novamente.';
+            } else if (error.code === 'auth/requires-recent-login') {
+                errorMessage = 'Esta é uma operação sensível. Por favor, saia e entre novamente para confirmar sua identidade antes de alterar a senha.';
+            } else {
+                errorMessage = `Erro: ${error.message}`;
+            }
+            alert(errorMessage);
+        }
+    }
+
+    async function createPassword() {
+        const user = window.firebase.auth().currentUser;
+        if (!user) { alert("Você não está logado."); return; }
+        const newPassword = createNewPasswordInput.value;
+        const confirmPassword = createConfirmPasswordInput.value;
+        if (newPassword !== confirmPassword) {
+            alert('A nova senha e a confirmação não correspondem.');
+            return;
+        }
+        if (newPassword.length < 6) {
+            alert('A nova senha deve ter no mínimo 6 caracteres.');
+            return;
+        }
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, newPassword);
+            await user.linkWithCredential(credential);
+            alert('Senha criada com sucesso! Agora você pode fazer login com e-mail e senha.');
+            createPasswordForm.reset();
+            checkAuthProviderAndRenderSecurityTab();
+        } catch (error) {
+            console.error('Erro ao criar senha:', error.code, error.message);
+            alert(`Erro ao criar a senha: ${error.message}`);
+        }
+    }
+    
+    function checkAuthProviderAndRenderSecurityTab() {
+        const user = window.firebase.auth().currentUser;
+        if (!user) return;
+        const hasPasswordProvider = user.providerData.some(provider => provider.providerId === 'password');
+        if (hasPasswordProvider) {
+            if (changePasswordForm) changePasswordForm.style.display = 'block';
+            if (createPasswordContainer) createPasswordContainer.style.display = 'none';
+        } else {
+            if (changePasswordForm) changePasswordForm.style.display = 'none';
+            if (createPasswordContainer) createPasswordContainer.style.display = 'block';
+        }
+    }
+    
+    function handleEditUsername() {
+        const usernameDisplay = document.getElementById('profile-username-display');
+        const usernameWrapper = document.querySelector('.profile-username-wrapper');
+        const currentUsername = usernameDisplay.textContent.replace('@', '').trim();
+    
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentUsername;
+        input.className = 'edit-username-input';
+    
+        usernameWrapper.replaceChild(input, usernameDisplay);
+        input.focus();
+    
+        const saveBtn = document.createElement('button');
+        saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+        saveBtn.className = 'save-username-btn';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+        cancelBtn.className = 'cancel-username-btn';
+        
+        const editBtn = document.getElementById('editUsernameBtn');
+        editBtn.style.display = 'none';
+        usernameWrapper.appendChild(saveBtn);
+        usernameWrapper.appendChild(cancelBtn);
+    
+        saveBtn.addEventListener('click', async () => {
+            const newUsername = input.value.trim();
+            if (newUsername && newUsername !== currentUsername) {
+                await updateUsername(newUsername);
+            }
+            restoreUsernameView(newUsername || currentUsername);
+        });
+    
+        cancelBtn.addEventListener('click', () => {
+            restoreUsernameView(currentUsername);
+        });
+        
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                saveBtn.click();
+            }
+        });
+        
+        function restoreUsernameView(username) {
+            usernameDisplay.textContent = `@${username}`;
+            usernameWrapper.replaceChild(usernameDisplay, input);
+            usernameWrapper.removeChild(saveBtn);
+            usernameWrapper.removeChild(cancelBtn);
+            editBtn.style.display = 'block';
+        }
+    }
+
+    // --- LÓGICA DE EXECUÇÃO E LISTENERS ---
+    
+    // Listener para o botão de perfil
+    if (openProfileModalBtn) {
+        openProfileModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeAllModals();
+            openModal(profileModal);
+            fetchUserProfile(); // Garante que os dados do perfil estejam atualizados
         });
     }
 
-    if (sendReplyBtn) {
-        sendReplyBtn.addEventListener('click', addReplyToTicket);
+    // Listener unificado para os botões de fechar modal (X) e botões "Cancelar"
+    document.querySelectorAll('.modal-close-btn, .btn-cancel-form').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const modalId = e.currentTarget.dataset.modalId;
+            const modalToClose = document.getElementById(modalId);
+            closeModal(modalToClose);
+        });
+    });
+
+    if (tabButtons) {
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                button.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+                if (targetTab === 'security-tab') {
+                    checkAuthProviderAndRenderSecurityTab();
+                }
+            });
+        });
+    }
+
+    if (profileInfoForm) {
+        profileInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            updateProfileInfo();
+        });
+    }
+
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            changePassword();
+        });
+    }
+
+    if (createPasswordForm) {
+        createPasswordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            createPassword();
+        });
+    }
+
+    if (editUsernameBtn) {
+        editUsernameBtn.addEventListener('click', handleEditUsername);
     }
     
+    // --- Lógica Específica da Página de Tickets ---
+    if (ticketSearchInput) ticketSearchInput.addEventListener('input', applyFiltersAndSort);
+    if (sendReplyBtn) { sendReplyBtn.addEventListener('click', addReplyToTicket); }
     if (replyMessageInput) {
         replyMessageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -408,22 +797,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    if (createTicketForm) { createTicketForm.addEventListener('submit', async (event) => { event.preventDefault(); await createNewTicket(); }); }
+    if (openNewChamadoBtn) { openNewChamadoBtn.addEventListener('click', () => { openModal(createTicketModal); }); }
     
     function setupFilterListeners() {
-        if (ticketSearchInput) ticketSearchInput.addEventListener('input', applyFiltersAndSort);
-
         const toggleDropdown = (button, menu) => {
             button.addEventListener('click', (e) => {
                 e.stopPropagation();
-                
-                document.querySelectorAll('.dropdown-menu').forEach(m => {
-                    if (m !== menu) m.classList.remove('show');
-                });
-                
-                document.querySelectorAll('.dropdown-toggle').forEach(b => {
-                    if (b !== button) b.classList.remove('active');
-                });
-                
+                document.querySelectorAll('.dropdown-menu').forEach(m => { if (m !== menu) m.classList.remove('show'); });
+                document.querySelectorAll('.dropdown-toggle').forEach(b => { if (b !== button) b.classList.remove('active'); });
                 const isShowing = menu.classList.toggle('show');
                 button.classList.toggle('active', isShowing);
             });
@@ -437,23 +819,14 @@ document.addEventListener('DOMContentLoaded', () => {
             option.addEventListener('click', (e) => {
                 const menu = e.target.closest('.dropdown-menu');
                 if (!menu) return;
-                
                 const filterType = menu.dataset.filter;
-                
                 menu.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('active'));
-                
                 e.target.classList.add('active');
-                
                 const displaySpan = document.getElementById(`${filterType}-display`);
-                if (displaySpan) { // Verificação para evitar erro
-                    displaySpan.textContent = e.target.textContent;
-                }
-                
+                if (displaySpan) { displaySpan.textContent = e.target.textContent; }
                 menu.classList.remove('show');
-                
                 const toggleButton = document.getElementById(`${filterType}-toggle`);
                 if (toggleButton) toggleButton.classList.remove('active');
-                
                 applyFiltersAndSort();
             });
         });
@@ -466,52 +839,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setupFilterListeners();
     
-    if (typeof window.firebase !== 'undefined' && typeof window.firebase.auth !== 'undefined') {
-        window.firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                loadTicketsForCurrentUser();
-            } else {
-                ticketsListContainer.innerHTML = '';
-                noTicketsMessage.style.display = 'flex';
-                currentUserTickets = [];
-            }
-        });
-    } else {
-        console.error("Firebase Auth não disponível. Verifique a importação do Firebase.");
-    }
-
-    if (openNewChamadoBtn) {
-        openNewChamadoBtn.addEventListener('click', () => {
-            openModal(createTicketModal);
-        });
-    }
-    
     let pollingInterval;
     async function checkTicketsForUpdates() {
         if (!window.firebase.auth().currentUser) {
-             clearInterval(pollingInterval);
-             pollingInterval = null;
-             return;
-        }
-
-        const token = await getAuthToken();
-        if (!token) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
             return;
         }
 
+        const token = await getAuthToken();
+        if (!token) { return; }
+
         try {
-            const response = await fetch(`${BACKEND_URL}/api/tickets`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    "ngrok-skip-browser-warning": "true"
-                }
-            });
-
-            if (!response.ok) {
-                console.error(`Erro na verificação periódica de tickets: ${response.status}`);
-                return;
-            }
-
+            const response = await fetch(`${BACKEND_URL}/api/tickets`, { headers: { 'Authorization': `Bearer ${token}`, "ngrok-skip-browser-warning": "true" } });
+            if (!response.ok) { console.error(`Erro na verificação periódica de tickets: ${response.status}`); return; }
             const newTickets = await response.json();
             
             if (JSON.stringify(currentUserTickets) !== JSON.stringify(newTickets)) {
@@ -521,17 +862,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (ticketDetailModal && ticketDetailModal.classList.contains('show-modal') && currentOpenTicketId) {
                     const updatedTicket = currentUserTickets.find(t => t.id === currentOpenTicketId);
-                    if (updatedTicket) {
-                        openTicketDetailModal(updatedTicket.id);
-                    }
+                    if (updatedTicket) { openTicketDetailModal(updatedTicket.id); }
                 }
             }
-        } catch (error) {
-            console.error("Erro durante a verificação de atualizações:", error);
-        }
+        } catch (error) { console.error("Erro durante a verificação de atualizações:", error); }
     }
 
-    if (!pollingInterval) {
-      pollingInterval = setInterval(checkTicketsForUpdates, 5000);
-    }
+    if (!pollingInterval) { pollingInterval = setInterval(checkTicketsForUpdates, 5000); }
+
+    // Inicia o carregamento dos tickets ao carregar a página
+    window.firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            loadTicketsForCurrentUser();
+            // Também carrega os dados do perfil para o dropdown
+            fetchUserProfile(); 
+        } else {
+            ticketsListContainer.innerHTML = '';
+            noTicketsMessage.style.display = 'flex';
+            currentUserTickets = [];
+            
+            const userProfilePicture = document.getElementById('userProfilePicture');
+            const userDefaultAvatar = document.getElementById('userDefaultAvatar');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const dropdownUserName = document.getElementById('dropdownUserName');
+
+            if (userProfilePicture) userProfilePicture.style.display = 'none';
+            if (userDefaultAvatar) userDefaultAvatar.style.display = 'block';
+            if (userDefaultAvatar) userDefaultAvatar.textContent = 'U';
+            if (userNameDisplay) userNameDisplay.textContent = 'Usuário';
+            if (dropdownUserName) dropdownUserName.textContent = 'Olá, Usuário!';
+        }
+    });
+
 });

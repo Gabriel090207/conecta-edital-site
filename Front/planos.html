@@ -37,9 +37,9 @@
                     <span id="userNameDisplay">Carregando...</span> 
                     <i class="fas fa-chevron-down"></i>
                     <div class="dropdown-content">
-                        <h3 class="olausuario" >Olá, Usuário!</h3>
+                        <h3 class="olausuario" id="dropdownUserName">Olá, Usuário!</h3>
                         <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
-                        <a href="#"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                        <a href="planos.html"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
                         <hr>
                         <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
                     </div>
@@ -223,64 +223,122 @@
         </div>
     </footer>
 
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-content profile-content">
-            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
-            <div class="profile-header">
-                <div class="profile-avatar-wrapper">
-                    <img id="profile-picture" src="" alt="Foto de Perfil" style="display:none;">
-                    <span id="profile-default-avatar" class="profile-avatar"></span>
-                </div>
-                <h2 id="profile-username" class="profile-username-tag">@username</h2>
-                <div class="profile-name-and-edit">
-                    <span id="profile-full-name">Nome Completo</span>
-                    <button id="edit-profile-btn" class="icon-btn"><i class="fas fa-pencil-alt"></i></button>
-                </div>
-            </div>
-            
-            <div class="profile-details-grid" id="profile-display-view">
-                <div class="detail-card">
-                    <i class="fas fa-envelope detail-icon"></i>
-                    <div class="detail-text">
-                        <span>Email</span>
-                        <p id="profile-email">email@exemplo.com</p>
-                    </div>
-                </div>
-                <div class="detail-card">
-                    <i class="fas fa-credit-card detail-icon"></i>
-                    <div class="detail-text">
-                        <span>Plano Atual</span>
-                        <p id="profile-plan">Carregando...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <form id="profile-edit-form" class="profile-details-grid" style="display:none;">
-                <div class="detail-card">
-                    <i class="fas fa-user-tag detail-icon"></i>
-                    <div class="detail-text">
-                        <label for="edit-username">Nome de Usuário</label>
-                        <input type="text" id="edit-username" class="edit-input" placeholder="@usuario">
-                    </div>
-                </div>
-                <div class="detail-card">
-                    <i class="fas fa-id-badge detail-icon"  style="font-size: 35px;"></i>
-                    <div class="detail-text">
-                        <label for="edit-full-name">Nome Completo</label>
-                        <input type="text" id="edit-full-name" class="edit-input" placeholder="Nome Completo">
-                    </div>
-                </div>
-            </form>
     
-            <div class="profile-actions">
-                <button class="btn-secondary1" id="cancel-edit-btn" style="display:none;">Cancelar</button>
-                <button class="btn-primary1" id="save-profile-btn" style="display:none;">Salvar</button>
-                
+
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content large-modal">
+            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
+            
+            <div class="profile-header-content">
+                <div class="profile-avatar-container">
+                    <span class="profile-avatar-placeholder" id="profileDefaultAvatar">GB</span>
+                    <img id="profileImagePreview" src="" alt="Foto de Perfil" style="display:none;">
+                    <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
+                    <button type="button" class="edit-avatar-btn" id="editAvatarBtn">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+                <div class="profile-username-wrapper">
+                    <span class="profile-username-display" id="profile-username-display"></span>
+                    <button type="button" class="edit-username-btn" id="editUsernameBtn">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="info-tab">Informações</button>
+                    <button class="tab-button" data-tab="security-tab">Segurança</button>
+                    <button class="tab-button" data-tab="subscription-tab">Assinatura</button>
+                </div>
+    
+                <div class="tab-content-container">
+                    <div id="info-tab" class="tab-content active">
+                        <form id="profile-info-form">
+                            <div class="form-group">
+                                <label for="profile-full-name"><i class="fas fa-user-tag i"></i> Nome Completo</label>
+                                <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
+                                <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-contact"><i class="fas fa-phone"></i> Telefone</label>
+                                <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email"><i class="fas fa-envelope i"></i> E-mail</label>
+                                <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
+                                <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-save-changes">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+    
+                    <div id="security-tab" class="tab-content">
+                        <form id="change-password-form">
+                            <div class="form-group">
+                                <label for="current-password"><i class="fas fa-lock"></i> Senha Atual</label>
+                                <input type="password" id="current-password" placeholder="********">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
+                                <input type="password" id="new-password" placeholder="Nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                                <input type="password" id="confirm-password" placeholder="Confirme sua nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-change-password">Alterar Senha</button>
+                            </div>
+                        </form>
+                        
+                        <div id="create-password-container" style="display: none;">
+                            <div class="modal-info-message">
+                                <p>Você está logado usando sua conta Google. Para criar uma senha de acesso direto, preencha os campos abaixo.</p>
+                            </div>
+                            <form id="create-password-form">
+                                <div class="form-group">
+                                    <label for="create-new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
+                                    <input type="password" id="create-new-password" placeholder="Sua nova senha">
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                                    <input type="password" id="create-confirm-password" placeholder="Confirme sua nova senha">
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                    <button type="submit" class="btn-create-password">Criar Senha</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+    
+                    <div id="subscription-tab" class="tab-content">
+                        <div class="subscription-status-card">
+                            <div class="plan-icon-wrapper grey-summary-bg">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="plan-title">Sem Plano</div>
+                            <div class="plan-description">Você não possui um plano ativo. Faça upgrade para mais recursos.</div>
+                            <button class="btn-manage-subscription" onclick="window.location.href='planos.html'">Gerenciar Assinatura</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -288,6 +346,7 @@
     <script src="firebase-config.js"></script>
     <script src="common-auth-ui.js"></script>
     <script src="planos.js"></script>
+    <script src="monitoramento.js"></script>
 
 </body>
 </html>

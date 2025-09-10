@@ -212,6 +212,14 @@ class UserProfileUpdate(BaseModel):
     photoURL: str | None = None
     contact: str | None = None 
     
+# NOVO MODELO PARA ATUALIZAÇÃO DO PERFIL POR ADMIN
+class AdminProfileUpdate(BaseModel):
+    fullName: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    contact: Optional[str] = None
+    plan_type: Optional[str] = None
+    
 # Dependência de Autenticação Firebase
 async def get_current_user_uid(request: Request) -> str:
     """
@@ -304,10 +312,9 @@ async def fetch_content(url: HttpUrl) -> Optional[httpx.Response]:
             return response
     except httpx.RequestError as exc:
         print(f"ERRO: Não foi possível acessar {url} - {exc}")
-        return None
     except Exception as e:
         print(f"ERRO: Inesperado ao baixar conteúdo de {url}: {e}")
-        return None
+    return None
 
 async def find_pdf_in_html(html_content: bytes, base_url: HttpUrl) -> Optional[HttpUrl]:
     """Tenta encontrar um link para PDF dentro de um conteúdo HTML."""
@@ -918,7 +925,7 @@ async def test_monitoring_endpoint(
         return {"message": "Palavra-chave não encontrada. Verifique se a palavra está correta ou tente outro PDF."}
 
 # ========================================================================================================
-#            ROTAS DE SUPORTE
+#       ROTAS DE SUPORTE
 # ========================================================================================================
 
 @app.get("/api/tickets", response_model=List[Ticket])
@@ -1095,7 +1102,7 @@ async def update_user_profile(
 
 
 # ========================================================================================================
-#            ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
+#       ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
 # ========================================================================================================
 
 @app.get("/admin/tickets")
@@ -1414,6 +1421,45 @@ async def get_all_users_for_audit():
         
     return users_list
 
+# NOVO ENDPOINT DE ADMIN
+@app.patch("/admin/users/{user_uid}")
+async def admin_update_user_profile(
+    user_uid: str,
+    update_data: AdminProfileUpdate,
+    admin_uid: str = Depends(get_current_admin_uid)
+):
+    """
+    Permite que um administrador atualize os dados de perfil de qualquer usuário.
+    """
+    db = firestore.client()
+    user_doc_ref = db.collection('users').document(user_uid)
+    user_doc = user_doc_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Dados do usuário não encontrados.")
+    
+    update_payload = update_data.dict(exclude_unset=True)
+    if not update_payload:
+        return {"message": "Nenhum dado fornecido para atualização."}
+
+    try:
+        # Se o e-mail for alterado, também o atualize no Firebase Auth
+        if 'email' in update_payload and update_payload['email'] != user_doc.to_dict().get('email'):
+            auth.update_user(user_uid, email=update_payload['email'])
+        
+        user_doc_ref.update(update_payload)
+        print(f"Admin {admin_uid} atualizou o perfil do usuário {user_uid}.")
+        
+        updated_doc = user_doc_ref.get().to_dict()
+        return {"message": "Perfil atualizado com sucesso!", "user": updated_doc}
+
+    except FirebaseError as e:
+        print(f"ERRO: Erro no Firebase ao atualizar usuário: {e}")
+        raise HTTPException(status_code=400, detail=f"Erro no Firebase: {e}")
+    except Exception as e:
+        print(f"ERRO: Erro inesperado ao atualizar perfil do usuário: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno do servidor.")
+
 
 @app.get("/admin/feedback_stats")
 async def get_admin_feedback_stats():
@@ -1523,7 +1569,7 @@ async def get_admin_feedback_stats():
     }
 
 # ========================================================================================================
-#            ROTAS PARA DICAS
+#       ROTAS PARA DICAS
 # ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
 async def create_dica(dica: Dica):
@@ -1595,7 +1641,7 @@ async def record_dica_view(dica_id: str):
     return {"message": "Visualização registrada com sucesso."}
 
 # ========================================================================================================
-#            ROTAS PARA ARTIGOS DO BLOG
+#       ROTAS PARA ARTIGOS DO BLOG
 # ========================================================================================================
 @app.post("/articles", response_model=Article, status_code=201)
 async def create_article(article: Article):
@@ -1665,13 +1711,7 @@ async def record_article_view(article_id: str):
     return {"message": "Visualização de artigo registrada com sucesso."}
     
 # ========================================================================================================
-#            ROTAS PARA FAQ
-# ========================================================================================================
-# ========================================================================================================
-#            ROTAS PARA FAQ
-# ========================================================================================================
-# ========================================================================================================
-#            ROTAS PARA FAQ
+#       ROTAS PARA FAQ
 # ========================================================================================================
 @app.post("/faq", response_model=FAQ, status_code=201)
 async def create_faq(faq: FAQ):
@@ -1756,7 +1796,7 @@ async def record_faq_view(faq_id: str):
 
 
 # ========================================================================================================
-#            ROTAS PARA FAQS POPULARES FIXAS
+#       ROTAS PARA FAQS POPULARES FIXAS
 # ========================================================================================================
 @app.post("/popular_faqs/{faq_id}/visualizacao")
 async def record_popular_faq_view(faq_id: str):
@@ -1783,7 +1823,7 @@ async def record_popular_faq_view(faq_id: str):
         raise HTTPException(status_code=500, detail="Erro interno do servidor.")
 
 # ========================================================================================================
-#            NOVA ROTA PARA OBTER ESTATÍSTICAS
+#       NOVA ROTA PARA OBTER ESTATÍSTICAS
 # ========================================================================================================
 @app.get("/popular_faqs/stats")
 async def get_popular_faqs_stats():
