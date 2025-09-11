@@ -1931,3 +1931,39 @@ body.modal-open {
     font-weight: 600;
     cursor: pointer;
 }
+
+/* Estilo para o botão "Editar" dentro do card de usuário */
+.btn-edit-user {
+    background: linear-gradient(135deg,#3a68ff, #0427c1);  /* Azul primário */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: flex-end; /* Alinha o botão à direita no card */
+    margin-top: 10px; /* Adiciona um espaço acima */
+}
+
+.btn-edit-user:hover {
+    background-color: #1558b3; /* Azul mais escuro ao passar o mouse */
+    transform: translateY(-2px); /* Efeito de elevação sutil */
+}
+
+.btn-edit-user:active {
+    background-color: #114282; /* Azul ainda mais escuro ao clicar */
+    transform: translateY(0);
+}
+
+#user-edit-form input[type="text"],
+#user-edit-form input[type="email"],
+#user-edit-form select {
+    width: 100%; /* Esta é a linha de correção. */
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
