@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conecta Edital - Central de Suporte</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="suporte.css">
+       <link rel="stylesheet" href="suporte.css">
     <link rel="stylesheet" href="monitoramento.css">
+ 
     
+    
+    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -161,21 +165,34 @@
     <div class="modal-overlay" id="ticket-detail-modal">
         <div class="modal-content ticket-detail-content">
             <div class="modal-header">
-                <h3 id="ticket-detail-title">#ID_DO_TICKET</h3>
-                <div class="ticket-detail-meta-header">
-                    <span class="ticket-created-at"><i class="fas fa-clock"></i> Criado em <span id="ticket-detail-created-at"></span></span>
-                    <span class="ticket-status-tag" id="ticket-detail-status-tag"></span>
+                <div class="ticket-header-info">
+                    <span class="ticket-id" id="ticket-detail-id">#A4B8E1</span>
+                    <h3 class="ticket-subject" id="ticket-detail-title">Problema com o pedido</h3>
                 </div>
                 <button class="modal-close-btn" data-modal-id="ticket-detail-modal">&times;</button>
+            </div>
+            
+            <div class="ticket-meta-info-wrapper">
+                <div class="ticket-meta-info">
+                    <span class="ticket-meta-item"><i class="fas fa-clock"></i> Criado em: <span id="ticket-detail-created-at"></span></span>
+                    <span class="ticket-meta-item"><i class="fas fa-user-circle"></i> Atendido por: <span id="ticket-detail-assignee"></span></span>
+                </div>
+            </div>
+
+            <div class="ticket-status-banner" id="ticket-status-banner">
+                <span id="ticket-status-display">Em andamento</span>
             </div>
 
             <div class="ticket-messages-container" id="ticket-messages-container">
                 </div>
 
             <div class="ticket-reply-form-section">
-                <textarea id="reply-message-input" placeholder="Digite sua mensagem..." rows="3"></textarea>
+                <textarea id="reply-message-input" placeholder="Digite sua mensagem..." rows="1"></textarea>
                 <div class="reply-actions">
-                    <button class="btn-send-reply" id="send-reply-btn"><i class="fas fa-paper-plane"></i> Enviar Mensagem</button>
+                    <i class="fas fa-paperclip attach-icon" id="attach-file-btn"></i>
+                    <button class="btn-send-reply" id="send-reply-btn">
+                        <i class="fas fa-paper-plane send-icon"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -255,19 +272,16 @@
                     <div id="info-tab" class="tab-content active">
                         <form id="profile-info-form">
                             <div class="form-group">
-                                <label for="profile-full-name">Nome Completo</label>
-                                <i class="fas fa-user-tag"></i>
+                                <label for="profile-full-name"><i class="fas fa-user-tag i"></i> Nome Completo</label>
                                 <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
                                 <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
                             </div>
                             <div class="form-group">
-                                <label for="profile-contact">Telefone</label>
-                                <i class="fas fa-phone"></i>
+                                <label for="profile-contact"><i class="fas fa-phone oi"></i> Telefone</label>
                                 <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
                             </div>
                             <div class="form-group">
-                                <label for="profile-email">E-mail</label>
-                                <i class="fas fa-envelope"></i>
+                                <label for="profile-email"><i class="fas fa-envelope i"></i> E-mail</label>
                                 <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
                                 <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
                             </div>
@@ -281,22 +295,19 @@
                     <div id="security-tab" class="tab-content">
                         <form id="change-password-form">
                             <div class="form-group">
-                                <label for="current-password">Senha Atual</label>
-                                <i class="fas fa-lock"></i>
+                                <label for="current-password"><i class="fas fa-lock"></i> Senha Atual</label>
                                 <input type="password" id="current-password" placeholder="********">
-                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                <button type="button" class="toggle-password"><i class="fas fa-eye " style="margin-top: 13px;"></i>></i></button>
                             </div>
                             <div class="form-group">
-                                <label for="new-password">Nova Senha</label>
-                                <i class="fas fa-unlock"></i>
+                                <label for="new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
                                 <input type="password" id="new-password" placeholder="Nova senha">
-                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                <button type="button" class="toggle-password"><i class="fas fa-eye" style="margin-top: 13px;"></i>></i></button>
                             </div>
                             <div class="form-group">
-                                <label for="confirm-password">Confirmar Nova Senha</label>
-                                <i class="fas fa-key"></i>
+                                <label for="confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
                                 <input type="password" id="confirm-password" placeholder="Confirme sua nova senha">
-                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                <button type="button" class="toggle-password"><i class="fas fa-eye " style="margin-top: 13px;"></i>></i></button>
                             </div>
                             <div class="modal-actions">
                                 <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
@@ -310,16 +321,14 @@
                             </div>
                             <form id="create-password-form">
                                 <div class="form-group">
-                                    <label for="create-new-password">Nova Senha</label>
-                                    <i class="fas fa-unlock"></i>
+                                    <label for="create-new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
                                     <input type="password" id="create-new-password" placeholder="Sua nova senha">
-                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye" style="margin-top: 13px;"></i></button>
                                 </div>
                                 <div class="form-group">
-                                    <label for="create-confirm-password">Confirmar Nova Senha</label>
-                                    <i class="fas fa-key"></i>
+                                    <label for="create-confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
                                     <input type="password" id="create-confirm-password" placeholder="Confirme sua nova senha">
-                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye" style="margin-top: 13px;"></i></button>
                                 </div>
                                 <div class="modal-actions">
                                     <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
@@ -332,7 +341,7 @@
                     <div id="subscription-tab" class="tab-content">
                         <div class="subscription-status-card">
                             <div class="plan-icon-wrapper grey-summary-bg">
-                                <i class="fas fa-shield-alt"></i>
+                                <i class="fas fa-times-circle"></i>
                             </div>
                             <div class="plan-title">Sem Plano</div>
                             <div class="plan-description">Você não possui um plano ativo. Faça upgrade para mais recursos.</div>
@@ -343,13 +352,14 @@
             </div>
         </div>
     </div>
-    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script src="common-auth-ui.js"></script>
+
     <script src="suporte.js"></script>
+    <script src="monitoramento.js"></script> 
 </body>
 </html>

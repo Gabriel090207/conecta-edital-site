@@ -67,13 +67,12 @@ ul {
 .navbar-left .logo {
     display: flex;
     align-items: center;
-    font-weight: 600;
-    font-size: 1.2rem;
+    font-weight: 300;
     color: #007bff;
 }
 
 .navbar-left .logo img {
-    margin-right: 10px;
+    margin-right: 80px;
     border-radius: 4px;
 }
 
@@ -125,46 +124,19 @@ ul {
     color: transparent !important; /* Adicione !important aqui também */
     -webkit-text-stroke: 1px #007bff;
   }
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
 
-.navbar-right .notification-icon {
-    font-size: 1.2rem;
-    color: #6c757d;
-    position: relative;
-    padding: 5px;
+.navbar-center ul li a.ajuda i{
+    transform: scale(1.1);
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #08ac6d;
+  
 }
-
-.navbar-right .user-menu {
-    display: flex;
-    align-items: center;
-    background-color: #f8f9fa;
-    border-radius: 20px;
-    padding: 5px 15px 5px 5px;
-    cursor: pointer;
-    border: 1px solid #e0e0e0;
-}
-
-.navbar-right .user-avatar {
-    background-color: #007bff;
-    color: #ffffff;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 600;
-    margin-right: 10px;
-}
-
-.navbar-right .user-menu span {
-    font-weight: 500;
-    margin-right: 10px;
-}
+    
+  .navbar-center ul li a.ajuda:hover i {
+    transform: scale(1.1);
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #08ac6d;
+  }
 
 
 
