@@ -811,9 +811,9 @@ ul { list-style: none; }
 }
 
 .message-bubble {
-    padding: 10px 15px;
-    border-radius: 20px;
-    max-width: 80%;
+    padding: 6px 15px;
+    border-radius: 7px;
+    max-width: 60%;
     word-wrap: break-word;
     font-size: 0.9em;
     line-height: 1.4;
@@ -825,10 +825,10 @@ ul { list-style: none; }
     background-color: #e9ecef;
     color: #333;
     align-self: flex-start;
-    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
 }
 .message-bubble.admin-message {
-    background: linear-gradient(135deg, #3a68ff, #0427c1);
+    background: #3a68ff;
     color: #fff;
     align-self: flex-end;
     border-bottom-right-radius: 5px;
@@ -1967,3 +1967,5 @@ body.modal-open {
     box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
+

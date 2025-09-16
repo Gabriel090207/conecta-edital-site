@@ -153,6 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
             typeBadgeText = 'Radar';
             detailsHtml = `
                         <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p><strong>${mon.edital_identifier || 'N/A'}</strong></p></div>
+                        <div class="detail-item"><i class="fas fa-book-open" style=" text-shadow:
+        -1px -1px 0 #07a8ff,
+        1px -1px 0 #07a8ff,
+        -1px 1px 0 #07a8ff,
+        1px 1px 0 #07a8ff;"></i><span>Diário Oficial</span><p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p></div>
                     `;
         }
         const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo';
@@ -283,7 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 userDefaultAvatar.style.display = 'none';
             } else {
                 userProfilePicture.style.display = 'none';
-                userDefaultAvatar.style.display = 'block';
+                userDefaultAvatar.style.display = 'flex';
+                // Define a primeira letra do nome completo para o placeholder
                 userDefaultAvatar.textContent = userData.fullName ? userData.fullName.charAt(0) : 'U';
             }
 
@@ -664,6 +670,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 const modalAtivado = document.getElementById('monitoramento-ativado-modal');
                 window.loadDashboardDataAndRender();
+                const completedMessage = document.createElement('div');
+                completedMessage.className = 'activation-completed-message';
+                completedMessage.innerHTML = '<p>Configuração Concluída, Você receberá notificações sempre que houver atualizações relevantes.</p>';
+                modalAtivado.querySelector('.modal-content').appendChild(completedMessage);
+                
                 setTimeout(() => {
                     modalAtivado.classList.remove('show-modal');
                     document.body.style.overflow = '';

@@ -13,12 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const noTicketsMessage = document.getElementById('no-tickets-message');
 
     const ticketDetailModal = document.getElementById('ticket-detail-modal');
+    const ticketDetailId = document.getElementById('ticket-detail-id');
     const ticketDetailTitle = document.getElementById('ticket-detail-title');
     const ticketDetailCreatedAt = document.getElementById('ticket-detail-created-at');
-    const ticketDetailStatusTag = document.getElementById('ticket-detail-status-tag');
+    const ticketDetailAssignee = document.getElementById('ticket-detail-assignee');
+    const ticketStatusDisplay = document.getElementById('ticket-status-display');
+    const ticketStatusBanner = document.getElementById('ticket-status-banner');
     const ticketMessagesContainer = document.getElementById('ticket-messages-container');
     const replyMessageInput = document.getElementById('reply-message-input');
     const sendReplyBtn = document.getElementById('send-reply-btn');
+    const attachFileBtn = document.getElementById('attach-file-btn');
+    const fileInput = document.getElementById('ticket-attachments');
+    const fileUploadArea = document.getElementById('file-upload-area');
+    const selectedFilesPreview = document.getElementById('selected-files-preview');
+    let uploadedFiles = [];
     
     const ticketSearchInput = document.getElementById('ticket-search');
     const statusToggle = document.getElementById('status-toggle');
@@ -34,18 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUserTickets = [];
     let currentOpenTicketId = null;
 
-    // --- NOVO: Referências para o modal de perfil (Integrado) ---
     const profileModal = document.getElementById('profile-modal');
     const openProfileModalBtn = document.getElementById('open-profile-modal-btn');
     const modalCloseButtons = document.querySelectorAll('.modal-close-btn');
     const tabButtons = document.querySelectorAll('.tab-button');
     const profileInfoForm = document.getElementById('profile-info-form');
-    const profileSecurityForm = document.getElementById('profile-security-form');
     const changePasswordForm = document.getElementById('change-password-form');
     const createPasswordContainer = document.getElementById('create-password-container');
     const createPasswordForm = document.getElementById('create-password-form');
     const profileFullNameInput = document.getElementById('profile-full-name');
-    const profileUsernameInput = document.getElementById('profile-username');
+    const profileUsernameDisplay = document.getElementById('profile-username-display');
     const profileContactInput = document.getElementById('profile-contact');
     const profileEmailInput = document.getElementById('profile-email');
     const profileImagePreview = document.getElementById('profileImagePreview');
@@ -61,18 +67,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordToggleButtons = document.querySelectorAll('.toggle-password');
     const editUsernameBtn = document.getElementById('editUsernameBtn');
     
-    let currentUserName = '';
+    let currentUserName = 'Vinicius'; 
+    let currentUsername = 'usuario';
 
-
-    // --- Funções Auxiliares de UI ---
     function normalizeString(str) {
         if (!str) return '';
         return str.toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9-]/g, '-')
-                    .replace(/--+/g, '-')
-                    .trim();
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9-]/g, '-')
+            .replace(/--+/g, '-')
+            .trim();
     }
 
     function openModal(modalElement) {
@@ -81,6 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = 'hidden';
             if (modalElement === createTicketModal) {
                 createTicketForm.reset();
+                selectedFilesPreview.innerHTML = '';
+                uploadedFiles = [];
             }
             if (modalElement === ticketDetailModal) {
                 replyMessageInput.value = '';
@@ -107,8 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.body.style.overflow = '';
     }
-
-    // --- FUNÇÕES DE TICKETS ---
 
     async function getAuthToken() {
         const user = window.firebase.auth().currentUser;
@@ -250,37 +255,83 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentOpenTicketId = ticketId;
-        ticketDetailTitle.textContent = `#${ticket.id.substring(0, 8)} - ${ticket.subject}`;
-        const formattedDate = new Date(ticket.created_at).toLocaleString('pt-BR');
-        ticketDetailCreatedAt.textContent = `Criado em: ${formattedDate}`;
-        ticketDetailStatusTag.textContent = ticket.status;
-        ticketDetailStatusTag.className = 'ticket-status-tag';
-        ticketDetailStatusTag.classList.add(`status-${normalizeString(ticket.status)}`);
+        ticketDetailId.textContent = `#${ticket.id.substring(0, 8)}`;
+        ticketDetailTitle.textContent = ticket.subject;
+        ticketDetailCreatedAt.textContent = new Date(ticket.created_at).toLocaleString('pt-BR');
+        ticketDetailAssignee.textContent = ticket.assignee || 'Não Atribuído';
+        ticketStatusDisplay.textContent = ticket.status;
+        ticketStatusBanner.className = `ticket-status-banner status-${normalizeString(ticket.status)}`;
 
         ticketMessagesContainer.innerHTML = '';
+
         ticket.messages.forEach(message => {
-            const messageBubble = document.createElement('div');
-            messageBubble.classList.add('message-bubble', message.sender === 'user' ? 'sent' : 'received');
-            const formattedMsgDate = new Date(message.timestamp).toLocaleString('pt-BR');
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('message-wrapper', message.sender === 'user' ? 'sent' : 'received');
+
+            let senderName = '';
+            let senderRole = '';
+            let avatarContent = '';
+            let isUserMessage = message.sender === 'user';
+
+            if (isUserMessage) {
+                senderName = currentUsername || 'Você';
+                const avatarText = currentUserName ? currentUserName.charAt(0) : 'U';
+
+                if (window.firebase.auth().currentUser && window.firebase.auth().currentUser.photoURL) {
+                    avatarContent = `<img src="${window.firebase.auth().currentUser.photoURL}" alt="${avatarText}">`;
+                } else {
+                    avatarContent = `<span>${avatarText}</span>`;
+                }
+            } else {
+                senderName = ticket.assignee || 'Maria Silva';
+                senderRole = 'SUPORTE';
+                avatarContent = `<i class="fas fa-headset"></i>`;
+            }
             
-            let attachmentsHtml = '';
-            if (message.attachments && message.attachments.length > 0) {
-                 attachmentsHtml = '<p class="attachment-text">Anexo enviado.</p>';
+            // Adiciona o cabeçalho para as mensagens do suporte
+            const messageHeader = document.createElement('div');
+            messageHeader.classList.add('message-header');
+            
+            if (isUserMessage) {
+                messageHeader.innerHTML = `<span class="message-sender">${senderName}</span>`;
+            } else {
+                messageHeader.innerHTML = `
+                    <span class="message-sender">${senderName}</span>
+                    ${senderRole ? `<span class="message-sender-role">${senderRole}</span>` : ''}
+                `;
             }
 
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('message-bubble', isUserMessage ? 'sent' : 'received');
             messageBubble.innerHTML = `
-                <span class="message-sender">${message.sender === 'user' ? 'Você' : 'Suporte'}</span>
                 <span class="message-text">${message.text}</span>
-                ${attachmentsHtml}
-                <span class="message-timestamp">${formattedMsgDate}</span>
+                <span class="message-timestamp">${new Date(message.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
             `;
-            ticketMessagesContainer.appendChild(messageBubble);
-        });
-        ticketMessagesContainer.scrollTop = ticketMessagesContainer.scrollHeight;
 
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.appendChild(messageHeader);
+            messageContent.appendChild(messageBubble);
+
+            const avatar = document.createElement('div');
+            avatar.classList.add('message-sender-avatar', isUserMessage ? 'sent' : 'received');
+            avatar.innerHTML = avatarContent;
+
+            if (isUserMessage) {
+                messageWrapper.appendChild(messageContent);
+                messageWrapper.appendChild(avatar);
+            } else {
+                messageWrapper.appendChild(avatar);
+                messageWrapper.appendChild(messageContent);
+            }
+
+            ticketMessagesContainer.appendChild(messageWrapper);
+        });
+
+        ticketMessagesContainer.scrollTop = ticketMessagesContainer.scrollHeight;
         openModal(ticketDetailModal);
     }
-    
+
     async function addReplyToTicket() {
         const messageText = replyMessageInput.value.trim();
 
@@ -295,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const originalButtonHtml = sendReplyBtn.innerHTML;
         sendReplyBtn.disabled = true;
-        sendReplyBtn.textContent = 'Enviando...';
+        sendReplyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         const ticketToUpdate = currentUserTickets.find(t => t.id === currentOpenTicketId);
         if (!ticketToUpdate) {
@@ -338,11 +389,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify(replyData)
             });
-
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+            
+            const createdTicket = await response.json();
             console.log('Resposta enviada com sucesso para o backend.');
 
             await loadTicketsForCurrentUser();
@@ -377,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         createTicketSubmitBtn.disabled = true;
-        createTicketSubmitBtn.textContent = 'Enviando...';
+        createTicketSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         
         const token = await getAuthToken();
         if (!token) {
@@ -390,7 +442,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTicketData = {
             subject: ticketSubject.value.trim(),
             category: newTicketCategory,
-            initial_message: ticketDescription.value.trim()
+            initial_message: ticketDescription.value.trim(),
+            attachments: uploadedFiles.map(file => ({
+                fileName: file.name,
+                fileType: file.type
+            }))
         };
 
         try {
@@ -410,6 +466,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const createdTicket = await response.json();
             console.log('Ticket criado com sucesso:', createdTicket);
+            
+            if (uploadedFiles.length > 0) {
+                const firebaseStorageRef = window.firebase.storage().ref();
+                for (const file of uploadedFiles) {
+                    const filePath = `tickets/${createdTicket.id}/${file.name}`;
+                    const fileRef = firebaseStorageRef.child(filePath);
+                    await fileRef.put(file);
+                }
+            }
 
             alert('Ticket criado com sucesso! Em breve você receberá um e-mail de confirmação.');
 
@@ -425,8 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    // --- FUNÇÕES DA MODAL DE PERFIL --- (Integradas)
 
     function getPlanDescription(planType) {
         switch(planType) {
@@ -476,15 +539,62 @@ document.addEventListener('DOMContentLoaded', () => {
             profileFullNameInput.value = userData.fullName || '';
             profileContactInput.value = userData.contact || '';
             profileEmailInput.value = userData.email || '';
-
+            
             currentUserName = userData.fullName || '';
+            currentUsername = userData.username || 'Usuário';
 
             const profileUsernameDisplay = document.getElementById('profile-username-display');
             if (profileUsernameDisplay) {
-                profileUsernameDisplay.textContent = userData.username ? `@${userData.username}` : '@Usuário não informado';
+                profileUsernameDisplay.textContent = userData.username ? `@${userData.username}` : '@usuário não informado';
             }
             
-            updateProfilePictureUI(userData.photoURL);
+            // Lógica unificada para atualizar a foto de perfil em todos os lugares
+            const userProfilePicture = document.getElementById('userProfilePicture');
+            const userDefaultAvatar = document.getElementById('userDefaultAvatar');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const dropdownUserName = document.getElementById('dropdownUserName');
+
+            const photoURL = user.photoURL || userData.photoURL;
+
+            if (photoURL) {
+                if (userProfilePicture) {
+                    userProfilePicture.src = photoURL;
+                    userProfilePicture.style.display = 'block';
+                }
+                if (userDefaultAvatar) userDefaultAvatar.style.display = 'none';
+
+                // Atualiza a foto no modal de perfil
+                const modalProfilePicture = document.getElementById('profileImagePreview');
+                const modalProfileDefaultAvatar = document.getElementById('profileDefaultAvatar');
+                if (modalProfilePicture) {
+                    modalProfilePicture.src = photoURL;
+                    modalProfilePicture.style.display = 'block';
+                }
+                if (modalProfileDefaultAvatar) modalProfileDefaultAvatar.style.display = 'none';
+
+            } else {
+                if (userProfilePicture) userProfilePicture.style.display = 'none';
+                if (userDefaultAvatar) {
+                    userDefaultAvatar.style.display = 'block';
+                    userDefaultAvatar.textContent = userData.fullName ? userData.fullName.charAt(0) : 'U';
+                }
+            
+                // Atualiza o avatar padrão no modal de perfil
+                const modalProfilePicture = document.getElementById('profileImagePreview');
+                const modalProfileDefaultAvatar = document.getElementById('profileDefaultAvatar');
+                if (modalProfilePicture) modalProfilePicture.style.display = 'none';
+                if (modalProfileDefaultAvatar) {
+                    modalProfileDefaultAvatar.style.display = 'flex';
+                    modalProfileDefaultAvatar.textContent = userData.fullName ? userData.fullName.charAt(0) : 'U';
+                }
+            }
+            
+            // PRIORIZA O NOME DE USUÁRIO NO MENU DA BARRA DE NAVEGAÇÃO
+            userNameDisplay.textContent = userData.username || userData.fullName || 'Usuário';
+            
+            // CORRIGE A SAUDAÇÃO NO DROPDOWN
+            const firstName = userData.fullName ? userData.fullName.split(' ')[0] : 'Usuário';
+            dropdownUserName.textContent = `Olá, ${firstName}!`;
 
             const planTitleModal = document.querySelector('#subscription-tab .plan-title');
             const planDescriptionModal = document.querySelector('#subscription-tab .plan-description');
@@ -513,23 +623,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (planIconModal) planIconModal.className = 'fas fa-shield-alt';
                 }
             }
-        
-            const userProfilePicture = document.getElementById('userProfilePicture');
-            const userDefaultAvatar = document.getElementById('userDefaultAvatar');
-            const userNameDisplay = document.getElementById('userNameDisplay');
-
-            if (userData.photoURL) {
-                userProfilePicture.src = userData.photoURL;
-                userProfilePicture.style.display = 'block';
-                userDefaultAvatar.style.display = 'none';
-            } else {
-                userProfilePicture.style.display = 'none';
-                userDefaultAvatar.style.display = 'block';
-                userDefaultAvatar.textContent = userData.fullName ? userData.fullName.charAt(0) : 'U';
-            }
-            userNameDisplay.textContent = userData.fullName || userData.username || 'Usuário';
-            dropdownUserName.textContent = `Olá, ${userData.fullName || 'Usuário'}!`;
-
         } catch (error) {
             console.error('Erro ao buscar perfil do usuário:', error);
             alert('Erro ao carregar os dados do seu perfil.');
@@ -674,11 +767,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleEditUsername() {
         const usernameDisplay = document.getElementById('profile-username-display');
         const usernameWrapper = document.querySelector('.profile-username-wrapper');
-        const currentUsername = usernameDisplay.textContent.replace('@', '').trim();
+        const currentUsernameText = usernameDisplay.textContent.replace('@', '').trim();
     
         const input = document.createElement('input');
         input.type = 'text';
-        input.value = currentUsername;
+        input.value = currentUsernameText;
         input.className = 'edit-username-input';
     
         usernameWrapper.replaceChild(input, usernameDisplay);
@@ -699,14 +792,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
         saveBtn.addEventListener('click', async () => {
             const newUsername = input.value.trim();
-            if (newUsername && newUsername !== currentUsername) {
+            if (newUsername && newUsername !== currentUsernameText) {
                 await updateUsername(newUsername);
             }
-            restoreUsernameView(newUsername || currentUsername);
+            restoreUsernameView(newUsername || currentUsernameText);
         });
     
         cancelBtn.addEventListener('click', () => {
-            restoreUsernameView(currentUsername);
+            restoreUsernameView(currentUsernameText);
         });
         
         input.addEventListener('keydown', (e) => {
@@ -724,19 +817,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- LÓGICA DE EXECUÇÃO E LISTENERS ---
-    
-    // Listener para o botão de perfil
+    function handleFileSelection(files) {
+        selectedFilesPreview.innerHTML = '';
+        uploadedFiles = Array.from(files);
+        uploadedFiles.forEach(file => {
+            const fileTag = document.createElement('span');
+            fileTag.classList.add('file-tag');
+            fileTag.innerHTML = `
+                ${file.name}
+                <i class="fas fa-times remove-file" data-filename="${file.name}"></i>
+            `;
+            selectedFilesPreview.appendChild(fileTag);
+        });
+    }
+
     if (openProfileModalBtn) {
         openProfileModalBtn.addEventListener('click', (e) => {
             e.preventDefault();
             closeAllModals();
             openModal(profileModal);
-            fetchUserProfile(); // Garante que os dados do perfil estejam atualizados
+            fetchUserProfile(); 
         });
     }
 
-    // Listener unificado para os botões de fechar modal (X) e botões "Cancelar"
     document.querySelectorAll('.modal-close-btn, .btn-cancel-form').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -786,7 +889,6 @@ document.addEventListener('DOMContentLoaded', () => {
         editUsernameBtn.addEventListener('click', handleEditUsername);
     }
     
-    // --- Lógica Específica da Página de Tickets ---
     if (ticketSearchInput) ticketSearchInput.addEventListener('input', applyFiltersAndSort);
     if (sendReplyBtn) { sendReplyBtn.addEventListener('click', addReplyToTicket); }
     if (replyMessageInput) {
@@ -838,6 +940,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     setupFilterListeners();
+
+    if (attachFileBtn) {
+        attachFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            handleFileSelection(e.target.files);
+        });
+    }
+
+    if (fileUploadArea) {
+        fileUploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('drag-over');
+        });
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('drag-over');
+        });
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('drag-over');
+            handleFileSelection(e.dataTransfer.files);
+        });
+    }
+
+    if (selectedFilesPreview) {
+        selectedFilesPreview.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-file')) {
+                const fileName = e.target.dataset.filename;
+                uploadedFiles = uploadedFiles.filter(file => file.name !== fileName);
+                e.target.closest('.file-tag').remove();
+            }
+        });
+    }
+
     
     let pollingInterval;
     async function checkTicketsForUpdates() {
@@ -870,11 +1013,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!pollingInterval) { pollingInterval = setInterval(checkTicketsForUpdates, 5000); }
 
-    // Inicia o carregamento dos tickets ao carregar a página
     window.firebase.auth().onAuthStateChanged(user => {
         if (user) {
             loadTicketsForCurrentUser();
-            // Também carrega os dados do perfil para o dropdown
             fetchUserProfile(); 
         } else {
             ticketsListContainer.innerHTML = '';
@@ -885,12 +1026,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const userDefaultAvatar = document.getElementById('userDefaultAvatar');
             const userNameDisplay = document.getElementById('userNameDisplay');
             const dropdownUserName = document.getElementById('dropdownUserName');
+            const profileImagePreview = document.getElementById('profileImagePreview');
+            const profileDefaultAvatar = document.getElementById('profileDefaultAvatar');
 
             if (userProfilePicture) userProfilePicture.style.display = 'none';
             if (userDefaultAvatar) userDefaultAvatar.style.display = 'block';
             if (userDefaultAvatar) userDefaultAvatar.textContent = 'U';
             if (userNameDisplay) userNameDisplay.textContent = 'Usuário';
             if (dropdownUserName) dropdownUserName.textContent = 'Olá, Usuário!';
+
+            if (profileImagePreview) profileImagePreview.style.display = 'none';
+            if (profileDefaultAvatar) {
+                profileDefaultAvatar.style.display = 'flex';
+                profileDefaultAvatar.textContent = 'U';
+            }
         }
     });
 
