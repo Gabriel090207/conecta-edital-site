@@ -1035,7 +1035,7 @@ async def user_reply_to_ticket(
 
     ref.update({
         'messages': firestore.ArrayUnion([new_message]),
-        'status': 'Em Atendimento',
+        'status': 'Em Andamento',
         'last_updated_at': firestore.SERVER_TIMESTAMP
     })
     
@@ -1379,7 +1379,7 @@ async def get_admin_feedback_stats():
                 total_resolved_time += resolved_time
             resolved_tickets_count += 1
         
-        if status in ['Aguardando', 'Em Atendimento']:
+        if status in ['Aguardando', 'Em Andamento']:
             pending_tickets_count += 1
 
         if created_at:

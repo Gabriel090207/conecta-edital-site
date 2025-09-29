@@ -115,29 +115,73 @@
 
     <div class="modal-overlay" id="choose-type-modal">
         <div class="modal-content">
-            <button class="modal-close-btn" data-modal-id="choose-type-modal"><i class="fas fa-times"></i></button>
-            <div class="modal-header-icon green-light-background-type-choose">
-                <i class="fas fa-bullseye"></i>
-            </div>
-            <h2>Escolha o Tipo de Monitoramento</h2>
-            <p class="modal-subtitle">Selecione o tipo que melhor atende às suas necessidades de acompanhamento</p>
-            <div class="monitoramento-type-options">
-                <div class="type-option-card type-personal-option" data-type="personal">
-                    <div class="type-icon-wrapper blue-gradient-type-card"><i class="fas fa-user" style="color: rgb(21, 21, 180); border: rgb(21, 21, 180)"></i></div>
-                    <h3>Pessoal</h3>
-                    <p>Monitore resultados e convocações diretamente relacionadas a você, economizando tempo e evitando informações irrelevantes.</p>
-                    <button class="btn-select-type">Monitoramento Pessoal <i class="fas fa-arrow-right"></i></button>
+          <button class="modal-close-btn" data-modal-id="choose-type-modal">
+            <i class="fas fa-times"></i>
+          </button>
+      
+          <div class="modal-header-icon">
+            <i class="fas fa-bullseye"></i>
+          </div>
+      
+          <h2>Escolha o Tipo de Monitoramento</h2>
+          <p class="modal-subtitle">
+            Selecione o tipo que melhor atende às suas necessidades de acompanhamento
+          </p>
+      
+          <div class="monitoramento-type-options">
+            <!-- Card Pessoal -->
+            <div class="type-option-card type-personal-option" data-type="personal">
+              <div class="type-card-header">
+                <div class="type-icon-wrapper">
+                  <i class="fas fa-user"></i>
                 </div>
-                <div class="type-option-card type-radar-option" data-type="radar">
-                    <div class="type-icon-wrapper purple-gradient-type-card"><i class="fas fa-bullseye"></i></div>
-                    <h3>Radar</h3>
-                    <p>Acompanhe qualquer novidade em diários oficiais e editais específicos para cargos de interesse, mantendo você à frente.</p>
-                    <button class="btn-select-type1">Monitoramento Radar <i class="fas fa-arrow-right"></i></button>
-                </div>
+                <h3>Pessoal</h3>
+              </div>
+              <p>
+                Monitore resultados e convocações diretamente relacionadas a você,
+                economizando tempo e evitando informações irrelevantes.
+              </p>
+      
+              <div class="type-footer">
+                <span class="footer-label">
+                  <i class="fas fa-eye"></i> Monitoramento Pessoal
+                </span>
+                <button class="btn-select-type select-personal">
+                  Selecionar <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
             </div>
-            <button class="btn-cancel-modal" data-modal-id="choose-type-modal">Cancelar</button>
+      
+            <!-- Card Radar -->
+            <div class="type-option-card type-radar-option" data-type="radar">
+              <div class="type-card-header">
+                <div class="type-icon-wrapper">
+                  <i class="fas fa-bullseye"></i>
+                </div>
+                <h3>Radar</h3>
+              </div>
+              <p>
+                Acompanhe qualquer novidade em diários oficiais e editais específicos
+                para cargos de interesse, mantendo você à frente.
+              </p>
+      
+              <div class="type-footer">
+                <span class="footer-label">
+                  <i class="fas fa-eye"></i> Monitoramento Radar
+                </span>
+                <button class="btn-select-type1 select-radar">
+                  Selecionar <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+      
+          <button class="btn-cancel-modal" data-modal-id="choose-type-modal">
+            Cancelar
+          </button>
         </div>
-    </div>
+      </div>
+      
 
     <div class="modal-overlay" id="personal-monitoramento-modal">
         <div class="modal-content">

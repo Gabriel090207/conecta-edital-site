@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-meta">
-                    <span class="views-counter" data-faq-id="${faq.id}"><i class="fas fa-eye"></i> ${faq.visualizacoes} visualizações</span>
+                    <span class="views-counter" data-faq-id="${faq.id}"><i class="fas fa-eye eye-personal"></i> ${faq.visualizacoes} visualizações</span>
                     ${popularTagHtml}
                 </div>
                 <div class="faq-answer">
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         recordFaqView(faqId);
                         const viewsSpan = item.querySelector('.faq-meta .views-counter');
                         let currentViews = parseInt(viewsSpan.textContent.match(/\d+/)[0]);
-                        viewsSpan.innerHTML = `<i class="fas fa-eye"></i> ${currentViews + 1} visualizações`;
+                        viewsSpan.innerHTML = `<i class="fas fa-eye eye-personal"></i> ${currentViews + 1} visualizações`;
                     }
                 }
             });
