@@ -126,71 +126,134 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'planos.html';
     }
 
-    function createMonitoringItemHTML(mon) {
-        const itemCard = document.createElement('div');
-        itemCard.classList.add('monitoramento-item-card');
-        itemCard.dataset.id = mon.id;
-        let titleIconClass = '';
-        let typeBadgeText = '';
-        let detailsHtml = '';
-        if (mon.monitoring_type === 'personal') {
-            titleIconClass = 'fas fa-bell';
-            typeBadgeText = 'Pessoal';
-            detailsHtml = `
-                        <div class="detail-item"><i class="fas fa-user" style="text-shadow:
-        -1px -1px 0 #a600e8ff,
-        1px -1px 0 #a600e8ff,
-        -1px 1px 0 #a600e8ff,
-        1px 1px 0 #a600e8ff;"></i><span>Nome do Candidato(a)</span><p><strong>${mon.candidate_name || 'N/A'}</strong></p></div>
-                        <div class="detail-item"><i class="fas fa-book-open" style=" text-shadow:
-        -1px -1px 0 #07a8ff,
-        1px -1px 0 #07a8ff,
-        -1px 1px 0 #07a8ff,
-        1px 1px 0 #07a8ff;"></i><span>Diário Oficial</span><p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p></div>
-                        <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p ><strong >${mon.edital_identifier || 'N/A'}</strong></p></div>`;
-        } else if (mon.monitoring_type === 'radar') {
-            titleIconClass = 'fas fa-bell';
-            typeBadgeText = 'Radar';
-            detailsHtml = `
-                        <div class="detail-item"><i class="fas fa-id-card"></i><span>ID do Edital / Concurso</span><p><strong>${mon.edital_identifier || 'N/A'}</strong></p></div>
-                        <div class="detail-item"><i class="fas fa-book-open" style=" text-shadow:
-        -1px -1px 0 #07a8ff,
-        1px -1px 0 #07a8ff,
-        -1px 1px 0 #07a8ff,
-        1px 1px 0 #07a8ff;"></i><span>Diário Oficial</span><p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p></div>
-                    `;
-        }
-        const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo';
-        const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo';
+   function createMonitoringItemHTML(mon) {
+    const itemCard = document.createElement('div');
+    itemCard.classList.add('monitoramento-item-card');
+    itemCard.dataset.id = mon.id;
 
-        itemCard.innerHTML = `
-            <div class="item-header"><div class="item-header-title"><i class="${titleIconClass}"></i><h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3><button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button><button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button></div><span class="status-tag ${statusTagClass}">${mon.status === 'active' ? 'Monitorando' : 'Inativo'}</span></div>
-            <div class="item-details-grid">${detailsHtml}
-                <div class="detail-item"><i class="fas fa-clock" style=" text-shadow:
-        -1px -1px 0 #230094ff,
-        1px -1px 0 #230094ff,
-        -1px 1px 0 #230094ff,
-        1px 1px 0 #230094ff;"></i><span>Última Verificação</span><p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p></div>
-                <div class="detail-item"><i class="fas fa-key" style=" text-shadow:
-        -1px -1px 0 #656766ff,
-        1px -1px 0 #656766ff,
-        -1px 1px 0 #656766ff,
-        1px 1px 0 #656766ff;"></i><span>Palavras-chave Monitoradas</span><div class="keyword-tags"> ${(mon.keywords || mon.candidate_name || '').split(',').map(k => `<span class="keyword-tag">${k.trim()}</span>`).join('')}</div></div>
-                <div class="detail-item"><i class="fas fa-history" style=" text-shadow:
-        -1px -1px 0 #009479ff,
-        1px -1px 0 #009479ff,
-        -1px 1px 0 #009479ff,
-        1px 1px 0 #009479ff;"></i><span>Ocorrências</span><p class="occurrences-count"><strong>${mon.occurrences || 0} ocorrência(s)</strong> <a href="#" class="view-history-link">Ver Histórico</a></p></div>
-                <div class="detail-item"><i class="fas fa-bell" style="text-shadow:
-        -1px -1px 0 #a600e8ff,
-        1px -1px 0 #a600e8ff,
-        -1px 1px 0 #a600e8ff,
-        1px 1px 0 #a600e8ff;"></i><span>Status das Notificações</span><div class="notification-status"><span class="notification-tag email-enabled">Email</span><span class="notification-tag whatsapp-enabled">WhatsApp</span></div></div>
+    let titleIconClass = 'fas fa-bell';
+    let typeBadgeText = mon.monitoring_type === 'personal' ? 'Pessoal' : 'Radar';
+
+    const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo';
+    const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo';
+
+    // Padroniza os blocos sempre na mesma ordem
+    const detailsHtml = `
+        <div class="detail-item">
+            <i class="fas fa-id-card"></i>
+            <span>ID do Edital / Concurso</span>
+            <p><strong>${mon.edital_identifier || 'N/A'}</strong></p>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-book-open" style=" text-shadow:
+                -1px -1px 0 #07a8ff,
+                 1px -1px 0 #07a8ff,
+                -1px  1px 0 #07a8ff,
+                 1px  1px 0 #07a8ff;">
+            </i>
+            <span>Diário Oficial</span>
+            <p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p>
+        </div>
+
+        ${mon.monitoring_type === 'personal' ? `
+        <div class="detail-item">
+            <i class="fas fa-user" style="text-shadow:
+                -1px -1px 0 #a600e8ff,
+                 1px -1px 0 #a600e8ff,
+                -1px  1px 0 #a600e8ff,
+                 1px  1px 0 #a600e8ff;">
+            </i>
+            <span>Nome do Candidato(a)</span>
+            <p><strong>${mon.candidate_name || 'N/A'}</strong></p>
+        </div>` : ''}
+
+        <div class="detail-item">
+            <i class="fas fa-clock" style=" text-shadow:
+                -1px -1px 0 #230094ff,
+                 1px -1px 0 #230094ff,
+                -1px  1px 0 #230094ff,
+                 1px  1px 0 #230094ff;">
+            </i>
+            <span>Última Verificação</span>
+            <p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-key" style=" text-shadow:
+                -1px -1px 0 #656766ff,
+                 1px -1px 0 #656766ff,
+                -1px  1px 0 #656766ff,
+                 1px  1px 0 #656766ff;">
+            </i>
+            <span>Palavras-chave Monitoradas</span>
+            <div class="keyword-tags">
+                ${(mon.keywords || mon.candidate_name || '')
+                    .split(',')
+                    .map(k => `<span class="keyword-tag">${k.trim()}</span>`)
+                    .join('')}
             </div>
-            <div class="item-actions"><div class="toggle-switch"><input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}"><label for="toggle-monitoramento-${mon.id}">${toggleLabelText}</label></div><div class="action-buttons"><button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button><button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button><button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button></div></div>
-        `;
-        return itemCard;
-    }
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-history" style=" text-shadow:
+                -1px -1px 0 #009479ff,
+                 1px -1px 0 #009479ff,
+                -1px  1px 0 #009479ff,
+                 1px  1px 0 #009479ff;">
+            </i>
+            <span>Ocorrências</span>
+            <p class="occurrences-count">
+                <strong>${mon.occurrences || 0} ocorrência(s)</strong> 
+                <a href="#" class="view-history-link">Ver Histórico</a>
+            </p>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-bell" style="text-shadow:
+                -1px -1px 0 #a600e8ff,
+                 1px -1px 0 #a600e8ff,
+                -1px  1px 0 #a600e8ff,
+                 1px  1px 0 #a600e8ff;">
+            </i>
+            <span>Status das Notificações</span>
+            <div class="notification-status">
+                <span class="notification-tag email-enabled">Email</span>
+                <span class="notification-tag whatsapp-enabled">WhatsApp</span>
+            </div>
+        </div>
+    `;
+
+    itemCard.innerHTML = `
+        <div class="item-header">
+            <div class="item-header-title">
+                <i class="${titleIconClass}"></i>
+                <h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3>
+                <button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button>
+                <button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button>
+            </div>
+            <span class="status-tag ${statusTagClass}">
+                ${mon.status === 'active' ? 'Monitorando' : 'Inativo'}
+            </span>
+        </div>
+
+        <div class="item-details-grid">${detailsHtml}</div>
+
+        <div class="item-actions">
+            <div class="toggle-switch">
+                <input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}">
+                <label for="toggle-monitoramento-${mon.id}">${toggleLabelText}</label>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button>
+                <button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button>
+                <button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button>
+            </div>
+        </div>
+    `;
+    return itemCard;
+}
+
 
     // NOVA FUNÇÃO: Gerencia a exibição da foto ou do placeholder
     function updateProfilePictureUI(photoURL) {

@@ -929,7 +929,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const labels = Object.keys(data);
         const values = Object.values(data).map(item => item.percentage);
         const backgroundColors = {
-            'Resolvido': '#e2871f', 'Aguardando': '#1f63e2', 'Respondido': '#16c98d', 'Em Atendimento': '#e4203a', 'Concluído': '#e2871f'
+            'Finalizado': '#e2871f', 'Pendente': '#1f63e2', 'Respondido': '#16c98d', 'Em andamento': '#e4203a', 'Concluído': '#e2871f'
         };
         ticketStatusChart = new Chart(ticketStatusChartCanvas, {
             type: 'doughnut',
