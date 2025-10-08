@@ -804,69 +804,34 @@ async def mercadopago_webhook(request: Request):
         print(f"ERRO no Webhook: {e}")
         return {"status": "error", "message": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
-from fastapi import Depends, HTTPException
-from firebase_admin import firestore
-from google.cloud.firestore_v1.base_query import FieldFilter
-from app.dependencies import get_current_user_uid
-from app.utils import get_user_plan_from_firestore, get_max_slots_by_plan
-
 @app.get("/api/status")
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
-    """
-    Retorna o status geral do usuário (plano, slots disponíveis e monitoramentos).
-    Corrigido para evitar slots negativos.
-    """
-    try:
-        db = firestore.client()
+    db_firestore_client = firestore.client()
+    user_plan = await get_user_plan_from_firestore(user_uid)
+    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).stream()))
+    monitorings_active_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).where(filter=FieldFilter('status', '==', 'active')).stream()))
+    
+    display_plan_name = "Sem Plano"
+    if user_plan == 'basico':
+        display_plan_name = "Plano Básico"
+    elif user_plan == 'essencial':
+        display_plan_name = "Plano Essencial"
+    elif user_plan == 'premium':
+        display_plan_name = "Plano Premium"
 
-        # 🔹 Buscar plano do usuário
-        user_plan = await get_user_plan_from_firestore(user_uid)
+    if user_plan == 'premium':
+        slots_livres = "Ilimitado"
+    else:
+        slots_livres = get_max_slots_by_plan(user_plan) - user_monitorings_count
 
-        # 🔹 Contar monitoramentos totais e ativos
-        user_monitorings = list(db.collection('monitorings')
-            .where(filter=FieldFilter('user_uid', '==', user_uid))
-            .stream())
-
-        active_monitorings = list(db.collection('monitorings')
-            .where(filter=FieldFilter('user_uid', '==', user_uid))
-            .where(filter=FieldFilter('status', '==', 'active'))
-            .stream())
-
-        total_monitoramentos = len(user_monitorings)
-        monitoramentos_ativos = len(active_monitorings)
-
-        # 🔹 Nome legível do plano
-        if user_plan == 'basico':
-            display_plan_name = "Plano Básico"
-        elif user_plan == 'essencial':
-            display_plan_name = "Plano Essencial"
-        elif user_plan == 'premium':
-            display_plan_name = "Plano Premium"
-        else:
-            display_plan_name = "Sem Plano"
-
-        # 🔹 Cálculo dos slots livres
-        if user_plan == 'premium':
-            slots_livres = "Ilimitado"
-        else:
-            max_slots = get_max_slots_by_plan(user_plan)
-            # evita valores negativos
-            slots_livres = max(max_slots - total_monitoramentos, 0)
-
-        # 🔹 Retorno final
-        return {
-            "status": "ok",
-            "message": "Servidor está online!",
-            "user_plan": display_plan_name,
-            "total_monitoramentos": total_monitoramentos,
-            "monitoramentos_ativos": monitoramentos_ativos,
-            "slots_livres": slots_livres
-        }
-
-    except Exception as e:
-        print("❌ Erro em /api/status:", e)
-        raise HTTPException(status_code=500, detail="Erro ao carregar status do usuário.")
-
+    return {
+        "status": "ok",
+        "message": "Servidor está online!",
+        "user_plan": display_plan_name,
+        "total_monitoramentos": user_monitorings_count,
+        "monitoramentos_ativos": monitorings_active_count,
+        "slots_livres": slots_livres
+    }
 
 @app.delete("/api/monitoramentos/{monitoring_id}", status_code=204)
 async def delete_monitoring_endpoint(
@@ -1802,3 +1767,31 @@ async def update_monitoring(
     updated_doc = doc_ref.get().to_dict()
     return Monitoring(id=monitoring_id, **updated_doc)
 
+@app.put("/admin/users/{user_uid}/slots")
+async def admin_update_user_slots(user_uid: str, data: dict):
+    """
+    Permite que o administrador ajuste manualmente o número de slots personalizados de um usuário.
+    Espera no body: {"custom_slots": 5}
+    """
+    db = firestore.client()
+    user_ref = db.collection("users").document(user_uid)
+    doc = user_ref.get()
+
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+    custom_slots = data.get("custom_slots")
+
+    if not isinstance(custom_slots, int) or custom_slots < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="O campo 'custom_slots' deve ser um número inteiro não negativo."
+        )
+
+    try:
+        user_ref.update({"custom_slots": custom_slots})
+        print(f"✅ Slots personalizados do usuário {user_uid} atualizados para {custom_slots}.")
+        return {"status": "ok", "message": f"Slots atualizados para {custom_slots}."}
+    except Exception as e:
+        print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
