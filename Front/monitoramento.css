@@ -362,7 +362,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 15px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 .btn-create-monitoramento:hover {
@@ -1019,6 +1019,7 @@ ul {
 }
 
 /* Modal de Ativação (Progressão) */
+/* Modal de Ativação (Progressão) */
 .progress-bar-container {
     width: 100%;
     background-color: #e0e0e0;
@@ -1031,7 +1032,6 @@ ul {
 
 .progress-bar {
     height: 10px;
-    
     width: 0%;
     background: linear-gradient(90deg, #2ED16A, #1EB35B);
     border-radius: 15px;
@@ -1065,6 +1065,190 @@ ul {
     width: 100%;
     margin-top: 30px;
 }
+
+
+/* ======================================= */
+/* MODAL DE MONITORAMENTO ATIVADO - AJUSTADO PARA NOTEBOOK */
+/* ======================================= */
+
+#monitoramento-ativado-modal .modal-content {
+    max-width: 560px;
+    width: 90%;
+    margin: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 35px 45px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* ÍCONE DE SUCESSO (CHECK VERDE) */
+#monitoramento-ativado-modal .modal-header-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+#monitoramento-ativado-modal .modal-header-icon i {
+    color: #1db954;
+    font-size: 65px;
+}
+
+/* TÍTULOS */
+#monitoramento-ativado-modal h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #222;
+}
+#monitoramento-ativado-modal .modal-subtitle {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 25px;
+}
+
+/* BARRA DE PROGRESSO */
+#monitoramento-ativado-modal .progress-text {
+    text-align: left;
+    font-size: 0.9rem;
+    color: #444;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+#monitoramento-ativado-modal .progress-bar-container {
+    width: 100%;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    height: 10px;
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+#monitoramento-ativado-modal .progress-bar {
+    width: 0%;
+    height: 10px;
+    background: linear-gradient(90deg, #007bff, #0044cc);
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+}
+
+/* ETAPAS */
+#monitoramento-ativado-modal .activation-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+    text-align: left;
+}
+#monitoramento-ativado-modal .activation-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+#monitoramento-ativado-modal .activation-step.active,
+#monitoramento-ativado-modal .activation-step.completed {
+    opacity: 1;
+}
+
+/* ÍCONES DAS ETAPAS */
+#monitoramento-ativado-modal .step-status-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e3f0ff; /* fundo azul claro */
+    color: #007bff; /* ícone azul */
+    font-size: 1rem;
+    box-shadow: inset 0 0 0 2px #007bff20;
+}
+#monitoramento-ativado-modal .activation-step.active .step-status-icon {
+    background-color: #007bff;
+    color: white;
+    animation: pulse-blue 1.4s infinite;
+}
+#monitoramento-ativado-modal .activation-step.completed .step-status-icon {
+    background-color: #1db954;
+    color: #fff;
+    animation: none;
+}
+#monitoramento-ativado-modal .step-status-icon i {
+    font-size: 1rem;
+}
+
+/* TEXTO DAS ETAPAS */
+#monitoramento-ativado-modal .activation-step h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 3px;
+}
+#monitoramento-ativado-modal .activation-step p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+/* MENSAGEM FINAL */
+#monitoramento-ativado-modal .activation-completed-message {
+    background: #f6fff7;
+    border: 1px solid #1db954;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+}
+#monitoramento-ativado-modal .activation-completed-message p {
+    color: #1db954;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ANIMAÇÃO DO PULSO AZUL */
+@keyframes pulse-blue {
+    0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(0, 123, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+}
+
+/* ======================================= */
+/* RESPONSIVIDADE PARA NOTEBOOK E MENORES */
+/* ======================================= */
+@media (max-width: 1366px) {
+    #monitoramento-ativado-modal .modal-content {
+        max-width: 500px;
+        padding: 30px 35px;
+    }
+    #monitoramento-ativado-modal h2 {
+        font-size: 1.6rem;
+    }
+    #monitoramento-ativado-modal .modal-subtitle {
+        font-size: 0.95rem;
+    }
+    #monitoramento-ativado-modal .step-status-icon {
+        width: 38px;
+        height: 38px;
+    }
+}
+@media (max-width: 768px) {
+    #monitoramento-ativado-modal .modal-content {
+        width: 95%;
+        padding: 25px 25px;
+    }
+    #monitoramento-ativado-modal h2 {
+        font-size: 1.4rem;
+    }
+    #monitoramento-ativado-modal .activation-step h4 {
+        font-size: 0.95rem;
+    }
+}
+
+
 
 .activation-step {
     display: flex;
@@ -2299,3 +2483,190 @@ ul {
 .eye-personal1{
     margin-top: 23px;
 }
+
+
+/* Compactar espaçamentos dos itens */
+
+
+/* Reorganizar o nome do candidato abaixo do ID */
+/* Grades diferentes para cada tipo */
+.item-details-grid.grid-personal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "id diario"
+      "candidato verificacao"
+      "palavras ocorrencias"
+      "notificacao notificacao";
+    gap: 10px 20px;
+  }
+  
+  .item-details-grid.grid-radar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "id diario"
+      "palavras verificacao"
+      "notificacao ocorrencias";
+    gap: 10px 20px;
+  }
+  
+  /* Garantir que cada bloco caia na área certa */
+  .detail-id            { grid-area: id; }
+  .detail-candidato     { grid-area: candidato; }
+  .detail-diario        { grid-area: diario; }
+  .detail-verificacao   { grid-area: verificacao; }
+  .detail-ocorrencias   { grid-area: ocorrencias; }
+  .detail-palavras      { grid-area: palavras; }
+  .detail-notificacao   { grid-area: notificacao; }
+  
+  /* Compactar espaçamentos só onde precisamos */
+  .detail-item { margin-bottom: 2px; }
+  .detail-item span { margin: 0; font-size: 0.9rem; }
+  .detail-item p { margin: 2px 0 0 27px; }
+  
+  /* Palavras-chave menos “soltas” */
+  .detail-palavras .keyword-tags { margin-top: 6px; }
+  .detail-palavras .keyword-tag { margin-top: 2px; margin-right: 6px; }
+  
+  /* Ocorrências: link embaixo e colado do número */
+  .detail-ocorrencias .occurrences-count {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 2px 0 0 27px;   /* neutraliza margens globais do p */
+    gap: 2px;
+  }
+  .detail-ocorrencias .occurrences-count .view-history-link {
+    display: inline-block;
+    margin-top: 2px;
+    font-size: 0.85rem;
+  }
+  
+  /* Responsivo (empilha) */
+  @media (max-width: 768px) {
+    .item-details-grid.grid-personal {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "id"
+        "diario"
+        "candidato"
+        "verificacao"
+        "palavras"
+        "ocorrencias"
+        "notificacao";
+    }
+    .item-details-grid.grid-radar {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "id"
+        "diario"
+        "palavras"
+        "verificacao"
+        "ocorrencias"
+        "notificacao";
+    }
+  }
+  
+
+  /* ====== PATCH DE ALINHAMENTO DOS DETALHES ====== */
+/* Recuo consistente à esquerda + ícone fixo */
+.monitoramento-item-card .item-details-grid .detail-item {
+    position: relative;
+    padding-left: 32px;         /* recuo para texto ficar à direita do ícone */
+    margin-bottom: 8px;         /* espaçamento entre blocos mais compacto */
+  }
+  
+  .monitoramento-item-card .item-details-grid .detail-item i {
+    position: absolute;
+    left: 0;
+    top: 2px;                   /* ajusta alinhamento vertical do ícone */
+    margin: 0;                  /* remove margens que empurravam o layout */
+  }
+  
+  /* Label e valor empilhados (não lado a lado do ícone) */
+  .monitoramento-item-card .item-details-grid .detail-item span {
+    display: block;
+    margin: 0 0 2px 0;
+    font-size: 0.9rem;
+  }
+  
+  .monitoramento-item-card .item-details-grid .detail-item p {
+    margin: 0;                  /* sem margens mágicas; o padding-left do container resolve */
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  
+  /* Palavras-chave: menos “respiro” e tags mais juntinhas */
+  .monitoramento-item-card .detail-palavras .keyword-tags {
+    margin-top: 6px;            /* antes estava alto; reduz pra ficar compacto */
+    gap: 6px;
+  }
+  .monitoramento-item-card .detail-palavras .keyword-tag {
+    margin-top: 0;
+    margin-right: 0;
+  }
+  
+  /* Ocorrências: “Ver histórico” logo abaixo do número, sem espaço grande */
+  .monitoramento-item-card .detail-ocorrencias .occurrences-count {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;                   /* cola o link no número */
+  }
+  .monitoramento-item-card .detail-ocorrencias .occurrences-count .view-history-link {
+    margin: 0;                  /* zera qualquer margem superior residual */
+    font-size: 0.85rem;
+  }
+  
+  /* (Opcional) só pra garantir um respiro no header entre ícone e título */
+  .item-header-title i { margin-right: 10px; }
+  
+
+  .lockca{
+    margin-top: 0px;
+  }
+
+
+
+  .back-to-top-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #007bff;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+}
+
+.back-to-top-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #6c757d; /* cor padrão - cinza */
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+}
+
+.favorite-btn.active {
+    color: #007bff; /* azul ao clicar */
+}
+
+

@@ -54,11 +54,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const viewTicketsBtn = document.getElementById('view-tickets-btn');
     const allTicketsModal = document.getElementById('all-tickets-modal');
     const ticketsListAdmin = document.getElementById('tickets-list-admin');
-    const ticketDetailModal = document.getElementById('ticket-detail-modal');
+    const ticketDetailId = document.getElementById('ticket-detail-id');
     const ticketDetailTitle = document.getElementById('ticket-detail-title');
     const ticketDetailCreatedAt = document.getElementById('ticket-detail-created-at');
     const ticketDetailStatusTag = document.getElementById('ticket-detail-status-tag');
     const ticketDetailUserEmail = document.getElementById('ticket-detail-user-email');
+    const ticketDetailModal = document.getElementById('ticket-detail-modal');
+    // exemplo de preenchimento
+   
+
+
     const ticketMessagesContainer = document.getElementById('ticket-messages-container');
     const adminReplyMessageInput = document.getElementById('admin-reply-message-input');
     const sendAdminReplyBtn = document.getElementById('send-admin-reply-btn');
@@ -353,38 +358,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert("Ticket não encontrado.");
             return;
         }
-
+    
         currentViewingTicket = ticket;
-        ticketDetailTitle.textContent = `Ticket #${ticket.id.substring(0, 8)} - ${ticket.subject}`;
-        
+    
+        // Preenche ID e título separadamente
+        ticketDetailId.textContent = `#${ticket.id.substring(0, 8)}`;
+        ticketDetailTitle.textContent = ticket.subject;
+    
+        // Status
+        ticketDetailStatusTag.textContent = ticket.status;
+        ticketDetailStatusTag.className = `ticket-status-tag status-${ticket.status.toLowerCase().replace(/ /g, '-')}`;
+    
+        // Data formatada
         let formattedDate;
         if (ticket.created_at) {
             formattedDate = new Date(ticket.created_at).toLocaleString('pt-BR');
         } else {
             formattedDate = 'Data Desconhecida';
         }
-        
-        ticketDetailCreatedAt.textContent = `Criado em: ${formattedDate}`;
-        ticketDetailStatusTag.textContent = ticket.status;
-        ticketDetailStatusTag.className = `ticket-admin-status status-${ticket.status.toLowerCase().replace(/ /g, '-') || 'desconhecido'}`;
+        ticketDetailCreatedAt.textContent = formattedDate;
+    
+        // Email do usuário
         ticketDetailUserEmail.textContent = ticket.user_email;
-        changeStatusSelect.value = ticket.status;
-
+    
+        // Mensagens
         ticketMessagesContainer.innerHTML = '';
         ticket.messages.forEach(message => {
             const messageBubble = document.createElement('div');
             const messageClass = message.sender === 'admin' ? 'admin-message' : 'user-message';
             messageBubble.classList.add('message-bubble', messageClass);
-            
-            let formattedMsgDate;
-            if (message.timestamp) {
-                formattedMsgDate = new Date(message.timestamp).toLocaleString('pt-BR');
-            } else {
-                formattedMsgDate = 'Data Desconhecida';
-            }
-
+    
+            let formattedMsgDate = message.timestamp
+                ? new Date(message.timestamp).toLocaleString('pt-BR')
+                : 'Data Desconhecida';
+    
             const senderName = message.sender === 'admin' ? 'Admin' : 'Utilizador';
-            
             messageBubble.innerHTML = `
                 <span class="message-sender">${senderName}</span>
                 <p class="message-text">${message.text}</p>
@@ -392,10 +400,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             ticketMessagesContainer.appendChild(messageBubble);
         });
+    
         ticketMessagesContainer.scrollTop = ticketMessagesContainer.scrollHeight;
-
+    
+        // Abre o modal
         openModal(ticketDetailModal);
     }
+    
 
     async function sendAdminReply() {
         const replyText = adminReplyMessageInput.value.trim();

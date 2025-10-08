@@ -649,12 +649,12 @@ ul {
 .ticket-status{
     font-weight: bold;
 }
-.ticket-status.status-aberto { color: #007bff; }
-.ticket-status.status-aguardando { color: #ffc107; }
+.ticket-status.status-em-andamento { color: #007bff; }
+.ticket-status.status-pendente { color: #ffc107; }
 .ticket-status.status-em-atendimento { color: #17a2b8; }
-.ticket-status.status-respondido { color: #28a745; }
+.ticket-status.status-finalizado { color: #28a745; }
 .ticket-status.status-fechado { color: #dc3545; }
-.ticket-status.status-pendente { color: #6f42c1; }
+
 .ticket-status.status-desconhecido { color: #6c757d; }
 
 
@@ -1762,3 +1762,7 @@ ul {
     border-radius: 50%; 
   /* Adicionado para tornar a imagem redonda */
 }
+
+.lockca{
+    margin-top: 0px;
+  }
