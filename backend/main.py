@@ -1723,7 +1723,7 @@ async def get_popular_faqs_stats():
 
 
 
-    @app.put("/api/monitoramentos/{monitoring_id}", response_model=Monitoring)
+@app.put("/api/monitoramentos/{monitoring_id}", response_model=Monitoring)
 async def update_monitoring(
     monitoring_id: str,
     data: dict,
@@ -1764,3 +1764,4 @@ async def update_monitoring(
 
     updated_doc = doc_ref.get().to_dict()
     return Monitoring(id=monitoring_id, **updated_doc)
+
