@@ -659,11 +659,13 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
     const uid = document.getElementById("edit-user-uid").value;
     const token = localStorage.getItem("token");
 
+    const slotsValue = Math.max(0, parseInt(document.getElementById("edit-user-slots").value, 10) || 0);
+
     const updatePayload = {
         fullName: document.getElementById("edit-user-fullname").value,
         email: document.getElementById("edit-user-email").value,
         plan_type: document.getElementById("edit-user-plan").value,
-        slots_disponiveis: parseInt(document.getElementById("edit-user-slots").value, 10)
+        custom_slots: slotsValue
     };
 
     try {
@@ -688,6 +690,7 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
         alert("❌ Erro de conexão com o servidor.");
     }
 });
+
 
     
     // Funções para gerenciamento de dicas

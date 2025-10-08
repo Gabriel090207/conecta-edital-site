@@ -806,23 +806,52 @@ async def mercadopago_webhook(request: Request):
 
 @app.get("/api/status")
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
-    db_firestore_client = firestore.client()
+    db = firestore.client()
     user_plan = await get_user_plan_from_firestore(user_uid)
-    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).stream()))
-    monitorings_active_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).where(filter=FieldFilter('status', '==', 'active')).stream()))
-    
-    display_plan_name = "Sem Plano"
+
+    user_doc_ref = db.collection('users').document(user_uid)
+    user_doc = user_doc_ref.get()
+    user_data = user_doc.to_dict() if user_doc.exists else {}
+
+    # slots definidos pelo admin (custom_slots)
+    custom_slots = user_data.get("custom_slots")
+
+    # quantidade total de monitoramentos do usuário
+    user_monitorings_count = len(list(
+        db.collection('monitorings')
+        .where(filter=FieldFilter('user_uid', '==', user_uid))
+        .stream()
+    ))
+
+    # quantidade de monitoramentos ativos
+    monitorings_active_count = len(list(
+        db.collection('monitorings')
+        .where(filter=FieldFilter('user_uid', '==', user_uid))
+        .where(filter=FieldFilter('status', '==', 'active'))
+        .stream()
+    ))
+
+    # Nome de exibição do plano
     if user_plan == 'basico':
         display_plan_name = "Plano Básico"
     elif user_plan == 'essencial':
         display_plan_name = "Plano Essencial"
     elif user_plan == 'premium':
         display_plan_name = "Plano Premium"
+    else:
+        display_plan_name = "Sem Plano"
 
+    # 🧮 Calcula slots disponíveis
     if user_plan == 'premium':
         slots_livres = "Ilimitado"
     else:
-        slots_livres = get_max_slots_by_plan(user_plan) - user_monitorings_count
+        # prioriza custom_slots se existir
+        max_slots = int(custom_slots) if custom_slots is not None else get_max_slots_by_plan(user_plan)
+        slots_livres = max_slots - user_monitorings_count
+
+    # Evita mostrar número negativo
+    if isinstance(slots_livres, (int, float)) and slots_livres < 0:
+        slots_livres = 0
 
     return {
         "status": "ok",
