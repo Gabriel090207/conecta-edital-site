@@ -808,7 +808,7 @@ async def mercadopago_webhook(request: Request):
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
     db_firestore_client = firestore.client()
 
-    # 🔹 Pega dados do usuário
+    # 🔹 Obtém os dados do usuário
     user_ref = db_firestore_client.collection('users').document(user_uid)
     user_doc = user_ref.get()
 
@@ -816,7 +816,7 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
     user_data = user_doc.to_dict()
-    user_plan = user_data.get("plan_type", "gratuito")
+    user_plan = user_data.get("plan_type", "gratuito").strip().lower()
     slots_personalizados = user_data.get("slots_disponiveis")
 
     # 🔹 Conta monitoramentos
@@ -825,35 +825,39 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     total_monitoramentos = len(monitoramentos)
     monitoramentos_ativos = sum(1 for m in monitoramentos if m.to_dict().get("status") == "active")
 
-    # 🔹 Nome para exibição
-    plan_display_names = {
+    # 🔹 Nome de exibição do plano
+    display_plan_name = {
         "gratuito": "Sem Plano",
         "essencial": "Plano Essencial",
         "premium": "Plano Premium",
-    }
-    display_plan_name = plan_display_names.get(user_plan, "Sem Plano")
+    }.get(user_plan, "Sem Plano")
 
-    # 🔹 Cálculo de slots
+    # 🔹 Cálculo de slots disponíveis
     if user_plan == "premium":
         slots_livres = "Ilimitado"
 
     elif slots_personalizados is not None:
-        # ✅ Sempre respeita o valor manual definido no painel, mesmo no "Sem Plano"
+        # ✅ Sempre respeita o valor definido manualmente, mesmo no "Sem Plano"
         slots_livres = max(slots_personalizados - total_monitoramentos, 0)
 
     else:
-        # 🔹 Fallback para regra padrão do plano
+        # 🔹 Usa o padrão do plano (Essencial, Gratuito, etc)
         max_por_plano = get_max_slots_by_plan(user_plan)
         slots_livres = max(max_por_plano - total_monitoramentos, 0)
 
-    # 🔹 Retorno
+    # 🔹 Retorno final
     return {
         "status": "ok",
         "message": "Servidor está online!",
         "user_plan": display_plan_name,
         "total_monitoramentos": total_monitoramentos,
         "monitoramentos_ativos": monitoramentos_ativos,
-        "slots_livres": slots_livres
+        "slots_livres": slots_livres,
+        "debug": {
+            "plan_type": user_plan,
+            "slots_personalizados": slots_personalizados,
+            "total_monitoramentos": total_monitoramentos
+        }
     }
 
 
