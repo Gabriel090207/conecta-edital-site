@@ -819,41 +819,43 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     user_plan = user_data.get("plan_type", "gratuito")
     slots_personalizados = user_data.get("slots_disponiveis")
 
-    # 🔹 Conta os monitoramentos ativos e totais
+    # 🔹 Conta monitoramentos
     monitoramentos_ref = db_firestore_client.collection('monitorings').where("user_uid", "==", user_uid)
-    user_monitorings = list(monitoramentos_ref.stream())
-    user_monitorings_count = len(user_monitorings)
+    monitoramentos = list(monitoramentos_ref.stream())
+    total_monitoramentos = len(monitoramentos)
+    monitoramentos_ativos = sum(1 for m in monitoramentos if m.to_dict().get("status") == "active")
 
-    monitoramentos_ativos = [m for m in user_monitorings if m.to_dict().get("status") == "active"]
-    monitoramentos_ativos_count = len(monitoramentos_ativos)
+    # 🔹 Nome legível do plano
+    plan_display_names = {
+        "gratuito": "Sem Plano",
+        "essencial": "Plano Essencial",
+        "premium": "Plano Premium",
+    }
+    display_plan_name = plan_display_names.get(user_plan, "Sem Plano")
 
-    # 🔹 Nome do plano para exibição
-    display_plan_name = "Sem Plano"
-    if user_plan == 'basico':
-        display_plan_name = "Plano Básico"
-    elif user_plan == 'essencial':
-        display_plan_name = "Plano Essencial"
-    elif user_plan == 'premium':
-        display_plan_name = "Plano Premium"
-
-    # 🔹 Cálculo de slots disponíveis
-    if slots_personalizados is not None:
-        # ✅ Usa o valor definido manualmente pelo admin
-        slots_livres = slots_personalizados - user_monitorings_count
-    elif user_plan == 'premium':
+    # 🔹 Determina slots disponíveis
+    if user_plan == "premium":
         slots_livres = "Ilimitado"
-    else:
-        # 🔹 fallback pro cálculo padrão do plano
-        slots_livres = get_max_slots_by_plan(user_plan) - user_monitorings_count
 
+    elif slots_personalizados is not None:
+        # ✅ Admin definiu manualmente: prioridade máxima
+        slots_livres = max(slots_personalizados - total_monitoramentos, 0)
+
+    else:
+        # 🔹 fallback: usa a regra padrão do plano
+        max_por_plano = get_max_slots_by_plan(user_plan)
+        slots_livres = max(max_por_plano - total_monitoramentos, 0)
+
+    # 🔹 Retorno
     return {
         "status": "ok",
         "message": "Servidor está online!",
         "user_plan": display_plan_name,
-        "total_monitoramentos": user_monitorings_count,
-        "monitoramentos_ativos": monitoramentos_ativos_count,
+        "total_monitoramentos": total_monitoramentos,
+        "monitoramentos_ativos": monitoramentos_ativos,
         "slots_livres": slots_livres
     }
+
 
 @app.delete("/api/monitoramentos/{monitoring_id}", status_code=204)
 async def delete_monitoring_endpoint(
