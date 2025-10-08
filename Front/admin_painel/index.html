@@ -287,16 +287,20 @@
                 <h3>Editar Perfil de Usuário</h3>
                 <button class="modal-close-btn" data-modal-id="user-edit-modal">&times;</button>
             </div>
+    
             <form id="user-edit-form">
                 <input type="hidden" id="edit-user-uid">
+    
                 <div class="form-group">
                     <label for="edit-user-fullname">Nome Completo</label>
                     <input type="text" id="edit-user-fullname" required>
                 </div>
+    
                 <div class="form-group">
                     <label for="edit-user-email">E-mail</label>
                     <input type="email" id="edit-user-email" required>
                 </div>
+    
                 <div class="form-group">
                     <label for="edit-user-plan">Plano</label>
                     <select id="edit-user-plan">
@@ -305,6 +309,17 @@
                         <option value="premium">Premium</option>
                     </select>
                 </div>
+    
+                <!-- 🔹 NOVO CAMPO: Controle de Slots -->
+                <div class="form-group">
+                    <label for="edit-user-slots">Slots Disponíveis</label>
+                    <div class="slot-control">
+                        <button type="button" class="slot-btn" id="decrease-slot">−</button>
+                        <input type="number" id="edit-user-slots" value="0" min="0" readonly>
+                        <button type="button" class="slot-btn" id="increase-slot">+</button>
+                    </div>
+                </div>
+    
                 <div class="form-actions">
                     <button type="button" class="btn-cancelar" data-modal-id="user-edit-modal">Cancelar</button>
                     <button type="submit" class="btn-create">Salvar Alterações</button>
@@ -312,6 +327,8 @@
             </form>
         </div>
     </div>
+
+    
     <div class="modal-overlay" id="faq-modal">
         <div class="modal-content">
             <div class="modal-header">

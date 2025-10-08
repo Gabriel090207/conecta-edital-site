@@ -563,25 +563,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseStatus = await fetch(`${BACKEND_URL}/api/status`, {
                 headers: { 'Authorization': `Bearer ${idToken}` }
             });
-
             const responseMonitorings = await fetch(`${BACKEND_URL}/api/monitoramentos`, { 
                 headers: { 'Authorization': `Bearer ${idToken}` } 
             });
-
+    
             if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings)) return;
             if (!responseStatus.ok || !responseMonitorings.ok) {
                 throw new Error("Erro ao buscar dados do dashboard.");
             }
-
+    
             const statusData = await responseStatus.json();
             const monitoramentosList = await responseMonitorings.json();
-
+    
             currentStatusData = statusData;
             currentMonitorings = monitoramentosList;
-
+    
             updateSummaryCards(statusData);
             loadMonitorings(monitoramentosList);
-            fetchUserProfile(); // Adiciona a chamada para carregar os dados do perfil
+            fetchUserProfile();
+    
+            // ⚡️ Adicione esta linha:
+            if (typeof syncAllFavoriteButtons === "function") syncAllFavoriteButtons();
+    
+        
+     // Adiciona a chamada para carregar os dados do perfil
             
         } catch (error) {
             console.error("Erro ao carregar dados do dashboard:", error);
@@ -1079,6 +1084,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("Detectadas atualizações nos monitoramentos. Recarregando...");
                 currentMonitorings = newMonitorings;
                 window.loadDashboardDataAndRender();
+setTimeout(() => {
+    if (typeof syncAllFavoriteButtons === "function") syncAllFavoriteButtons();
+}, 500);
+
             }
         } catch (error) {
             console.error("Erro durante a verificação de atualizações:", error);
