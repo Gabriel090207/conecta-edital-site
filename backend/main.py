@@ -806,59 +806,52 @@ async def mercadopago_webhook(request: Request):
 
 @app.get("/api/status")
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
-    db = firestore.client()
-    user_plan = await get_user_plan_from_firestore(user_uid)
+    db_firestore_client = firestore.client()
 
-    user_doc_ref = db.collection('users').document(user_uid)
-    user_doc = user_doc_ref.get()
-    user_data = user_doc.to_dict() if user_doc.exists else {}
+    # 🔹 Obtém os dados do usuário diretamente do Firestore
+    user_ref = db_firestore_client.collection('users').document(user_uid)
+    user_doc = user_ref.get()
 
-    # slots definidos pelo admin (custom_slots)
-    custom_slots = user_data.get("custom_slots")
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    # quantidade total de monitoramentos do usuário
-    user_monitorings_count = len(list(
-        db.collection('monitorings')
-        .where(filter=FieldFilter('user_uid', '==', user_uid))
-        .stream()
-    ))
+    user_data = user_doc.to_dict()
+    user_plan = user_data.get("plan_type", "gratuito")
+    slots_personalizados = user_data.get("slots_disponiveis")
 
-    # quantidade de monitoramentos ativos
-    monitorings_active_count = len(list(
-        db.collection('monitorings')
-        .where(filter=FieldFilter('user_uid', '==', user_uid))
-        .where(filter=FieldFilter('status', '==', 'active'))
-        .stream()
-    ))
+    # 🔹 Conta os monitoramentos ativos e totais
+    monitoramentos_ref = db_firestore_client.collection('monitorings').where("user_uid", "==", user_uid)
+    user_monitorings = list(monitoramentos_ref.stream())
+    user_monitorings_count = len(user_monitorings)
 
-    # Nome de exibição do plano
+    monitoramentos_ativos = [m for m in user_monitorings if m.to_dict().get("status") == "active"]
+    monitoramentos_ativos_count = len(monitoramentos_ativos)
+
+    # 🔹 Nome do plano para exibição
+    display_plan_name = "Sem Plano"
     if user_plan == 'basico':
         display_plan_name = "Plano Básico"
     elif user_plan == 'essencial':
         display_plan_name = "Plano Essencial"
     elif user_plan == 'premium':
         display_plan_name = "Plano Premium"
-    else:
-        display_plan_name = "Sem Plano"
 
-    # 🧮 Calcula slots disponíveis
-    if user_plan == 'premium':
+    # 🔹 Cálculo de slots disponíveis
+    if slots_personalizados is not None:
+        # ✅ Usa o valor definido manualmente pelo admin
+        slots_livres = slots_personalizados - user_monitorings_count
+    elif user_plan == 'premium':
         slots_livres = "Ilimitado"
     else:
-        # prioriza custom_slots se existir
-        max_slots = int(custom_slots) if custom_slots is not None else get_max_slots_by_plan(user_plan)
-        slots_livres = max_slots - user_monitorings_count
-
-    # Evita mostrar número negativo
-    if isinstance(slots_livres, (int, float)) and slots_livres < 0:
-        slots_livres = 0
+        # 🔹 fallback pro cálculo padrão do plano
+        slots_livres = get_max_slots_by_plan(user_plan) - user_monitorings_count
 
     return {
         "status": "ok",
         "message": "Servidor está online!",
         "user_plan": display_plan_name,
         "total_monitoramentos": user_monitorings_count,
-        "monitoramentos_ativos": monitorings_active_count,
+        "monitoramentos_ativos": monitoramentos_ativos_count,
         "slots_livres": slots_livres
     }
 
