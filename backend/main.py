@@ -808,7 +808,7 @@ async def mercadopago_webhook(request: Request):
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
     db_firestore_client = firestore.client()
 
-    # 🔹 Obtém os dados do usuário diretamente do Firestore
+    # 🔹 Pega dados do usuário
     user_ref = db_firestore_client.collection('users').document(user_uid)
     user_doc = user_ref.get()
 
@@ -825,7 +825,7 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     total_monitoramentos = len(monitoramentos)
     monitoramentos_ativos = sum(1 for m in monitoramentos if m.to_dict().get("status") == "active")
 
-    # 🔹 Nome legível do plano
+    # 🔹 Nome para exibição
     plan_display_names = {
         "gratuito": "Sem Plano",
         "essencial": "Plano Essencial",
@@ -833,16 +833,16 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     }
     display_plan_name = plan_display_names.get(user_plan, "Sem Plano")
 
-    # 🔹 Determina slots disponíveis
+    # 🔹 Cálculo de slots
     if user_plan == "premium":
         slots_livres = "Ilimitado"
 
     elif slots_personalizados is not None:
-        # ✅ Admin definiu manualmente: prioridade máxima
+        # ✅ Sempre respeita o valor manual definido no painel, mesmo no "Sem Plano"
         slots_livres = max(slots_personalizados - total_monitoramentos, 0)
 
     else:
-        # 🔹 fallback: usa a regra padrão do plano
+        # 🔹 Fallback para regra padrão do plano
         max_por_plano = get_max_slots_by_plan(user_plan)
         slots_livres = max(max_por_plano - total_monitoramentos, 0)
 
