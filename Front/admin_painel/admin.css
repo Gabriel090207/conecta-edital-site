@@ -1818,6 +1818,7 @@ body.modal-open {
 
 
 
+
 .modal-content.ticket-detail-content {
     max-width: 900px;
     padding: 0;
@@ -2019,5 +2020,48 @@ body.modal-open {
 .ticket-admin-status.status-finalizado {
     background:  linear-gradient(45deg, #05bc5b, #00823c); /* Cinza para "Fechado" */
 }
+
+
+
+/* --- Controle de Slots (Visual Unificado) --- */
+.slot-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    max-width: 200px; /* igual ao input normal */
+}
+
+.slot-btn {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    font-size: 18px;
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.slot-btn:hover {
+    background-color: #f3f3f3;
+    border-color: #bbb;
+}
+
+#edit-user-slots {
+    width: 100%;
+    max-width: 80px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    background-color: #fff;
+    color: #333;
+    outline: none;
+}
+
 
 

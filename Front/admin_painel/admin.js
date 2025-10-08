@@ -577,68 +577,92 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // NOVO: Função para abrir o modal de edição de usuário
-    function openEditUserModal(userUid) {
-        const userToEdit = allUsers.find(u => u.uid === userUid);
-        if (!userToEdit) {
-            alert('Usuário não encontrado.');
-            return;
+   // === FUNÇÃO PARA ABRIR MODAL DE EDIÇÃO DO USUÁRIO ===
+function openEditUserModal(userData) {
+    // Preenche campos com os dados do usuário
+    document.getElementById("edit-user-uid").value = userData.uid;
+    document.getElementById("edit-user-fullname").value = userData.full_name || "";
+    document.getElementById("edit-user-email").value = userData.email || "";
+    document.getElementById("edit-user-plan").value = userData.plan_type || "gratuito";
+
+    // --- Controle de Slots ---
+    const decreaseBtn = document.getElementById("decrease-slots");
+    const increaseBtn = document.getElementById("increase-slots");
+    const slotInput = document.getElementById("edit-user-slots");
+
+    // Define valor inicial (caso já exista no backend)
+    slotInput.value = userData.slots_disponiveis || 0;
+
+    // Garante que não duplique eventos
+    decreaseBtn.replaceWith(decreaseBtn.cloneNode(true));
+    increaseBtn.replaceWith(increaseBtn.cloneNode(true));
+
+    const newDecreaseBtn = document.getElementById("decrease-slots");
+    const newIncreaseBtn = document.getElementById("increase-slots");
+
+    newDecreaseBtn.addEventListener("click", () => {
+        let value = parseInt(slotInput.value, 10);
+        if (value > 0) slotInput.value = value - 1;
+    });
+
+    newIncreaseBtn.addEventListener("click", () => {
+        let value = parseInt(slotInput.value, 10);
+        slotInput.value = value + 1;
+    });
+
+    // Exibe o modal
+    const modal = document.getElementById("user-edit-modal");
+    modal.classList.add("show-modal");
+    document.body.style.overflow = "hidden";
+}
+
+// === FECHAR MODAL ===
+document.querySelectorAll(".modal-close-btn, .btn-cancelar").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".modal-overlay").forEach(modal => {
+            modal.classList.remove("show-modal");
+        });
+        document.body.style.overflow = "auto";
+    });
+});
+
+// === SALVAR ALTERAÇÕES DE USUÁRIO (ADMIN) ===
+document.getElementById("user-edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const uid = document.getElementById("edit-user-uid").value;
+    const token = localStorage.getItem("token");
+
+    const updatePayload = {
+        fullName: document.getElementById("edit-user-fullname").value,
+        email: document.getElementById("edit-user-email").value,
+        plan_type: document.getElementById("edit-user-plan").value,
+        slots_disponiveis: parseInt(document.getElementById("edit-user-slots").value, 10)
+    };
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/admin/users/${uid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(updatePayload)
+        });
+
+        if (response.ok) {
+            alert("✅ Usuário atualizado com sucesso!");
+            location.reload();
+        } else {
+            const err = await response.json();
+            alert(`⚠️ Erro: ${err.detail || "Falha ao atualizar usuário"}`);
         }
-        
-        editUserUidInput.value = userToEdit.uid;
-        editUserFullnameInput.value = userToEdit.full_name;
-        editUserEmailInput.value = userToEdit.email;
-        editUserPlanSelect.value = userToEdit.plan_type;
-
-        openModal(userEditModal);
+    } catch (error) {
+        console.error("Erro ao atualizar usuário:", error);
+        alert("❌ Erro de conexão com o servidor.");
     }
-    
-    // NOVO: Listener para o formulário de edição de usuário
-    if (userEditForm) {
-        userEditForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userUid = editUserUidInput.value;
-            
-            const updateData = {
-                fullName: editUserFullnameInput.value,
-                email: editUserEmailInput.value,
-                plan_type: editUserPlanSelect.value
-            };
+});
 
-            try {
-                const response = await fetch(`${BACKEND_URL}/admin/users/${userUid}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Removido cabeçalho de autorização para esta rota
-                    },
-                    body: JSON.stringify(updateData)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Erro ao atualizar: ${errorData.detail || response.statusText}`);
-                }
-
-                alert('Perfil do usuário atualizado com sucesso!');
-                closeModal(userEditModal);
-                loadAllUsersForAudit(); // Recarrega a lista para mostrar as mudanças
-            } catch (error) {
-                console.error("Erro ao atualizar o perfil do usuário:", error);
-                alert(`Erro ao atualizar o perfil: ${error.message}`);
-            }
-        });
-    }
-
-
-    if (userSearchInput) {
-        userSearchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredUsers = allUsers.filter(user =>
-                user.email.toLowerCase().includes(searchTerm)
-            );
-            renderUserList(filteredUsers);
-        });
-    }
     
     // Funções para gerenciamento de dicas
     async function loadDicas() {

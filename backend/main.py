@@ -221,6 +221,8 @@ class AdminProfileUpdate(BaseModel):
     email: Optional[EmailStr] = None
     contact: Optional[str] = None
     plan_type: Optional[str] = None
+    slots_disponiveis: Optional[int] = None
+
     
 # Dependência de Autenticação Firebase
 async def get_current_user_uid(request: Request) -> str:
