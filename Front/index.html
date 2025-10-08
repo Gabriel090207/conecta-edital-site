@@ -240,41 +240,64 @@
             </div>
         </section>
 
-        <section id="testar" class="precisao-section" style="margin-top: -90px;">
-            <button class="btn-tag btn-demonstracao-tag"><i class="fas fa-star"></i> Demonstração Gratuita</button>
-            <h1>Descubra a Precisão do <span class="highlight-blue">Conecta Edital</span> em Segundos</h1>
-            <p class="subtitle">Carregue um PDF, informe a palavra-chave e receba o resultado no seu email. Rápido, seguro e sem compromisso.</p>
-            <div class="upload-form-card">
-                <div class="form-step-item">
-                    <span class="step-number-circle-form">1</span>
-                    <span class="step-title-form">Anexe seu Edital ou Documento PDF</span>
-                    <div class="upload-box">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p class="upload-text">Clique aqui ou arraste seu PDF</p>
-                        <small>Tamanho máximo: 5MB - Apenas arquivos PDF</small>
-                    </div>
-                </div>
-                <div class="form-step-item">
-                    <span class="step-number-circle-form">2</span>
-                    <span class="step-title-form">Qual palavra-chave quer monitorar?</span>
-                    <div class="input-with-icon">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Ex: Seu nome, cargo, número do edital...">
-                    </div>
-                    <small class="input-hint"><i class="fas fa-info-circle"></i> A IA buscará este termo em todo o documento</small>
-                </div>
-                <div class="form-step-item">
-                    <span class="step-number-circle-form">3</span>
-                    <span class="step-title-form">Para qual e-mail devemos enviar o resultado?</span>
-                    <div class="input-with-icon">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" placeholder="seu@email.com">
-                    </div>
-                    <small class="input-hint"><i class="fas fa-info-circle"></i> Para demonstrar como você receberá as notificações</small>
-                </div>
-                <button class="btn-analisar-ia"><i class="fas fa-bolt"></i> Analisar com IA Agora</button>
+       <section id="testar" class="precisao-section" style="margin-top: -90px;">
+    <button class="btn-tag btn-demonstracao-tag">
+        <i class="fas fa-star"></i> Demonstração Gratuita
+    </button>
+
+    <h1>Descubra a Precisão do <span class="highlight-blue">Conecta Edital</span> em Segundos</h1>
+    <p class="subtitle">
+        Carregue um PDF, informe a palavra-chave e receba o resultado no seu email. Rápido, seguro e sem compromisso.
+    </p>
+
+    <form id="testMonitoringForm" class="upload-form-card" enctype="multipart/form-data">
+        <!-- Etapa 1 - Upload -->
+        <div class="form-step-item">
+            <span class="step-number-circle-form">1</span>
+            <span class="step-title-form">Anexe seu Edital ou Documento PDF</span>
+
+            <div id="pdfUploadBox" class="upload-box">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p class="upload-text">Clique aqui ou arraste seu PDF</p>
+                <small>Tamanho máximo: 5MB - Apenas arquivos PDF</small>
+                <input type="file" id="pdfFile" name="pdf_file" accept="application/pdf" hidden required>
             </div>
-        </section>
+        </div>
+
+        <!-- Etapa 2 - Palavra-chave -->
+        <div class="form-step-item">
+            <span class="step-number-circle-form">2</span>
+            <span class="step-title-form">Qual palavra-chave quer monitorar?</span>
+
+            <div class="input-with-icon">
+                <i class="fas fa-search"></i>
+                <input type="text" id="keyword" name="keyword" placeholder="Ex: Seu nome, cargo, número do edital..." required>
+            </div>
+            <small class="input-hint">
+                <i class="fas fa-info-circle"></i> A IA buscará este termo em todo o documento
+            </small>
+        </div>
+
+        <!-- Etapa 3 - E-mail -->
+        <div class="form-step-item">
+            <span class="step-number-circle-form">3</span>
+            <span class="step-title-form">Para qual e-mail devemos enviar o resultado?</span>
+
+            <div class="input-with-icon">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+            </div>
+            <small class="input-hint">
+                <i class="fas fa-info-circle"></i> Para demonstrar como você receberá as notificações
+            </small>
+        </div>
+
+        <!-- Botão -->
+        <button type="submit" class="btn-analisar-ia">
+            <i class="fas fa-bolt"></i> Analisar com IA Agora
+        </button>
+    </form>
+</section>
 
         <section class="why-choose-us-section" id="beneficios" style="margin-top: -90px;">
             <h1>Por que Escolher o <span class="highlight-blue">Conecta Edital</span>?</h1>

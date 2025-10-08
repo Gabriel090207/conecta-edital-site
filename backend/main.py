@@ -993,7 +993,7 @@ async def create_ticket(
         "user_email": user_email,
         "subject": new_ticket.subject,
         "category": new_ticket.category, # NOVO CAMPO ADICIONADO AQUI
-        "status": "Aguardando",
+        "status": "Pendente",
         "created_at": firestore.SERVER_TIMESTAMP,
         "last_updated_at": firestore.SERVER_TIMESTAMP,
         "assignee": "Não Atribuído",
@@ -1379,7 +1379,7 @@ async def get_admin_feedback_stats():
                 total_resolved_time += resolved_time
             resolved_tickets_count += 1
         
-        if status in ['Aguardando', 'Em Andamento']:
+        if status in ['Pendente', 'Em Andamento']:
             pending_tickets_count += 1
 
         if created_at:
@@ -1720,3 +1720,47 @@ async def get_popular_faqs_stats():
     for doc in stats_docs:
         stats[doc.id] = doc.to_dict().get('visualizacoes', 0)
     return stats
+
+
+
+    @app.put("/api/monitoramentos/{monitoring_id}", response_model=Monitoring)
+async def update_monitoring(
+    monitoring_id: str,
+    data: dict,
+    user_uid: str = Depends(get_current_user_uid)
+):
+    """
+    Atualiza os dados de um monitoramento (link e ID do edital).
+    O campo nome_completo só pode ser alterado em monitoramentos pessoais.
+    """
+    db = firestore.client()
+    doc_ref = db.collection('monitorings').document(monitoring_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Monitoramento não encontrado.")
+
+    mon_data = doc.to_dict()
+    if mon_data.get("user_uid") != user_uid:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para editar este monitoramento.")
+
+    updates = {}
+
+    # Atualiza campos comuns
+    if "link_diario" in data:
+        updates["official_gazette_link"] = data["link_diario"]
+    if "id_edital" in data:
+        updates["edital_identifier"] = data["id_edital"]
+
+    # Atualiza nome apenas se for tipo pessoal
+    if mon_data.get("monitoring_type") == "personal" and "nome_completo" in data:
+        updates["candidate_name"] = data["nome_completo"]
+
+    if not updates:
+        raise HTTPException(status_code=400, detail="Nenhum dado válido fornecido para atualização.")
+
+    updates["last_checked_at"] = firestore.SERVER_TIMESTAMP
+    doc_ref.update(updates)
+
+    updated_doc = doc_ref.get().to_dict()
+    return Monitoring(id=monitoring_id, **updated_doc)

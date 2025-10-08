@@ -171,8 +171,8 @@
                     <textarea id="dica-conteudo" rows="10" required></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-cancel" data-modal-id="dica-form-modal">Cancelar</button>
-                    <button type="submit" class="btn-submit" id="dica-submit-btn">Salvar Dica</button>
+                    <button type="button" class="btn-cancelar" data-modal-id="dica-form-modal">Cancelar</button>
+                    <button type="submit" class="btn-create" id="dica-submit-btn">Salvar Dica</button>
                 </div>
             </form>
         </div>
@@ -199,10 +199,10 @@
                         </div>
                         <div class="select-items select-hide">
                             <div data-value="Todos" class="select-item selected">Todos Status <i class="fas fa-check"></i></div>
-                            <div data-value="Aguardando" class="select-item">Pendente</div>
-                            <div data-value="Em Atendimento" class="select-item">Em Atendimento</div>
-                            <div data-value="Respondido" class="select-item">Respondido</div>
-                            <div data-value="Resolvido" class="select-item">Resolvido</div>
+                            <div data-value="Pendente" class="select-item">Pendente</div>
+                            <div data-value="Em Andamento" class="select-item">Em Andamento</div>
+
+                            <div data-value="Finalizado" class="select-item">Finalizado</div>
                         </div>
                     </div>
                 </div>
@@ -214,37 +214,50 @@
         </div>
     </div>
     
-    <div class="modal-overlay" id="ticket-detail-modal">
-        <div class="modal-content ticket-detail-content">
-            <button class="modal-close-btn" data-modal-id="ticket-detail-modal">&times;</button>
-            <div class="ticket-detail-header">
-                <div class="ticket-detail-meta">
-                    <h3 id="ticket-detail-title">#ID_DO_TICKET</h3>
-                    <span class="ticket-status-tag" id="ticket-detail-status-tag"></span>
-                </div>
-                <div class="ticket-detail-info-row">
-                    <span class="ticket-created-at"><i class="fas fa-clock"></i> Criado em <span id="ticket-detail-created-at"></span></span>
-                    <span class="ticket-user-email"><i class="fas fa-envelope"></i> <span id="ticket-detail-user-email"></span></span>
-                </div>
+   <div class="modal-overlay" id="ticket-detail-modal">
+    <div class="modal-content ticket-detail-content">
+        <button class="modal-close-btn" data-modal-id="ticket-detail-modal">&times;</button>
+        
+        <!-- Cabeçalho -->
+        <div class="ticket-detail-header">
+            <div class="ticket-detail-meta">
+                <span class="ticket-id" id="ticket-detail-id"></span>
+                <h3 class="ticket-subject" id="ticket-detail-title"></h3>
+                      
+            <div class="ticket-detail-info-row">
+                <span class="ticket-created-at"><i class="fas fa-clock"></i> Criado em <span id="ticket-detail-created-at"></span></span>
+                <span class="ticket-user-email"><i class="fas fa-envelope"></i> <span id="ticket-detail-user-email"></span></span>
             </div>
-            <div class="ticket-messages-container" id="ticket-messages-container">
-            </div>
-            <div class="ticket-reply-form-section">
-                <textarea id="admin-reply-message-input" placeholder="Digite sua mensagem..." rows="3"></textarea>
-                <div class="reply-actions">
-                    <div class="status-change-container">
-                        <label for="change-status-select">Alterar Status:</label>
-                        <select id="change-status-select">
-                            <option value="Pendente">Pendente</option>
-                            <option value="Em Atendimento">Em Andamento</option>
-                            <option value="Resolvido">Finalizado</option>
-                        </select>
-                    </div>
-                    <button class="btn-send-reply" id="send-admin-reply-btn"><i class="fas fa-paper-plane"></i> Enviar Resposta</button>
+                <span class="ticket-status-tag" id="ticket-detail-status-tag"></span>
+              </div>
+        
+        </div>
+
+        <!-- Container de mensagens -->
+        <div class="ticket-messages-container" id="ticket-messages-container">
+        </div>
+
+        <!-- Rodapé de resposta -->
+        <div class="ticket-reply-form-section">
+             <div class="status-change-container">
+                    <label for="change-status-select">Alterar Status:</label>
+                    <select id="change-status-select">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Finalizado">Finalizado</option>
+                    </select>
                 </div>
+            <textarea id="admin-reply-message-input" placeholder="Digite sua mensagem..." rows="3"></textarea>
+            <div class="reply-actions">
+               
+                <button class="btn-send-reply" id="send-admin-reply-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
+</div>
+
     <div id="audit-users-modal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close-btn" data-modal-id="audit-users-modal">
@@ -293,8 +306,8 @@
                     </select>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-cancel" data-modal-id="user-edit-modal">Cancelar</button>
-                    <button type="submit" class="btn-submit">Salvar Alterações</button>
+                    <button type="button" class="btn-cancelar" data-modal-id="user-edit-modal">Cancelar</button>
+                    <button type="submit" class="btn-create">Salvar Alterações</button>
                 </div>
             </form>
         </div>
@@ -348,8 +361,8 @@
                     </label>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-cancel" data-modal-id="faq-form-modal">Cancelar</button>
-                    <button type="submit" class="btn-submit" id="faq-submit-btn">Salvar FAQ</button>
+                    <button type="button" class="btn-cancelar" data-modal-id="faq-form-modal">Cancelar</button>
+                    <button type="submit" class="btn-create" id="faq-submit-btn">Salvar FAQ</button>
                 </div>
             </form>
         </div>
@@ -487,8 +500,8 @@
                     <textarea id="blog-content" rows="10" required></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-cancel" data-modal-id="blog-form-modal">Cancelar</button>
-                    <button type="submit" class="btn-submit" id="blog-submit-btn">Salvar Artigo</button>
+                    <button type="button" class="btn-cancelar" data-modal-id="blog-form-modal">Cancelar</button>
+                    <button type="submit" class="btn-create" id="blog-submit-btn">Salvar Artigo</button>
                 </div>
             </form>
         </div>

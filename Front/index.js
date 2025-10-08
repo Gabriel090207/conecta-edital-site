@@ -409,4 +409,117 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+
+    // ===============================================
+// ===============================================
+// Lógica da Demonstração - Teste de Monitoramento
+// ===============================================
+
+ const testForm = document.getElementById("testMonitoringForm");
+    const uploadBox = document.getElementById("pdfUploadBox");
+    const pdfInput = document.getElementById("pdfFile");
+    const keywordInput = document.getElementById("keyword");
+   
+    // Caso os elementos não existam (para evitar erros)
+    if (!uploadBox || !pdfInput || !testForm) return;
+
+    // ========= Proteção para não usar mais de uma vez =========
+    if (localStorage.getItem("demoUsed") === "true") {
+        const analyzeButton = document.querySelector(".btn-analisar-ia");
+        if (analyzeButton) {
+            analyzeButton.disabled = true;
+            analyzeButton.innerHTML = '<i class="fas fa-lock"></i> Demonstração já utilizada';
+        }
+    }
+
+    // Permite clicar na área para selecionar o arquivo
+    uploadBox.addEventListener("click", () => pdfInput.click());
+
+    // Mostra o nome do arquivo quando for selecionado
+    pdfInput.addEventListener("change", () => {
+        if (pdfInput.files.length > 0) {
+            const fileName = pdfInput.files[0].name;
+            uploadBox.querySelector(".upload-text").textContent = fileName;
+        } else {
+            uploadBox.querySelector(".upload-text").textContent = "Clique aqui ou arraste seu PDF";
+        }
+    });
+
+    // Suporte a "arrastar e soltar" (drag & drop)
+    uploadBox.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadBox.classList.add("drag-over");
+    });
+
+    uploadBox.addEventListener("dragleave", () => {
+        uploadBox.classList.remove("drag-over");
+    });
+
+    uploadBox.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove("drag-over");
+        const file = e.dataTransfer.files[0];
+        if (file && file.type === "application/pdf") {
+            pdfInput.files = e.dataTransfer.files;
+            uploadBox.querySelector(".upload-text").textContent = file.name;
+        } else {
+            alert("Por favor, envie apenas arquivos PDF.");
+        }
+    });
+
+    // Submissão do formulário de teste
+    testForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Bloqueio local
+        if (localStorage.getItem("demoUsed") === "true") {
+            alert("⚠️ Você já usou sua demonstração gratuita. Crie uma conta para continuar usando o Conecta Edital.");
+            return;
+        }
+
+        const pdfFile = pdfInput.files[0];
+        const keyword = keywordInput?.value.trim();
+        const email = emailInput?.value.trim();
+
+        if (!pdfFile || !keyword || !email) {
+            alert("Por favor, envie um PDF e preencha todos os campos.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("pdf_file", pdfFile);
+        formData.append("keyword", keyword);
+        formData.append("email", email);
+
+        const analyzeButton = testForm.querySelector(".btn-analisar-ia");
+        const originalText = analyzeButton.innerHTML;
+        analyzeButton.disabled = true;
+        analyzeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analisando...';
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/test-monitoring`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message || "✅ Análise concluída! Verifique seu e-mail.");
+                localStorage.setItem("demoUsed", "true");
+                analyzeButton.innerHTML = '<i class="fas fa-lock"></i> Demonstração já utilizada';
+                testForm.reset();
+                uploadBox.querySelector(".upload-text").textContent = "Clique aqui ou arraste seu PDF";
+            } else {
+                alert(result.detail || "❌ Erro ao processar o teste de monitoramento.");
+            }
+        } catch (error) {
+            console.error("Erro ao enviar o teste:", error);
+            alert("⚠️ Falha de conexão com o servidor. Tente novamente.");
+        } finally {
+            analyzeButton.disabled = true; // bloqueia mesmo depois
+            analyzeButton.innerHTML = '<i class="fas fa-lock"></i> Demonstração já utilizada';
+        }
+    });
 });

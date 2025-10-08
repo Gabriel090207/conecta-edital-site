@@ -736,183 +736,7 @@ ul { list-style: none; }
 }
 
 /* Estilos do modal de detalhes do ticket */
-.modal-content.ticket-detail-content {
-    max-width: 650px;
-}
 
-.ticket-detail-header {
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-.ticket-detail-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.ticket-id {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #333;
-}
-
-.ticket-detail-info-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    font-size: 0.9em;
-    color: #777;
-    margin-top: 10px;
-}
-
-.ticket-detail-info-row span {
-    margin-right: 15px;
-}
-
-.ticket-detail-info-row i {
-    margin-right: 5px;
-}
-
-.ticket-messages-container {
-    background-color: #f9f9f9;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 15px;
-    overflow-y: auto;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 400px;
-}
-
-.ticket-admin-status.status-respondido {
-    background: linear-gradient(135deg, #05bc5b, #00823c); /* Verde para "Respondido" */
-}
-
-.ticket-admin-status.status-aguardando {
-    background: linear-gradient(135deg, #ffef60, #ffc13a); /* Amarelo para "Aguardando" */
-    color: white; /* Texto escuro para contraste */
-}
-
-.ticket-admin-status.status-em-atendimento {
-    background: linear-gradient(135deg, #3a68ff, #0427c1); /* Azul para "Em Atendimento" */
-}
-
-.ticket-admin-status.status-fechado {
-    background: linear-gradient(135deg, rgb(148, 148, 148), #50504e); /* Cinza para "Fechado" */
-}
-
-.ticket-admin-status.status-resolvido {
-    background: linear-gradient(135deg, #05bc5b, #00823c); /* Verde para "Resolvido" */
-}
-
-.message-bubble {
-    padding: 6px 15px;
-    border-radius: 7px;
-    max-width: 60%;
-    word-wrap: break-word;
-    font-size: 0.9em;
-    line-height: 1.4;
-    position: relative;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-.message-bubble.user-message {
-    background-color: #e9ecef;
-    color: #333;
-    align-self: flex-start;
-    border-top-left-radius: 5px;
-}
-.message-bubble.admin-message {
-    background: #3a68ff;
-    color: #fff;
-    align-self: flex-end;
-    border-bottom-right-radius: 5px;
-}
-
-.message-sender {
-    font-size: 0.8em;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 3px;
-}
-
-.message-timestamp {
-    font-size: 0.7em;
-    color: rgba(255, 255, 255, 0.7);
-    display: block;
-    text-align: right;
-    margin-top: 5px;
-}
-
-.message-bubble.user-message .message-timestamp {
-    color: rgba(0, 0, 0, 0.5);
-}
-
-.ticket-reply-form-section {
-    padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 15px;
-}
-
-#admin-reply-message-input {
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    font-family: inherit;
-    font-size: 1em;
-    resize: vertical;
-    min-height: 80px;
-    margin-bottom: 10px;
-}
-
-.reply-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-}
-
-.status-change-container {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.status-change-container label {
-    font-size: 0.9em;
-    color: #555;
-    white-space: nowrap;
-}
-
-#change-status-select {
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 0.9em;
-}
-
-.btn-send-reply {
-    background: linear-gradient(135deg, #3a68ff, #0427c1);
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-right: 20px;
-}
-
-.btn-send-reply:hover {
-    background-color: #0056b3;
-}
 
 /* Estilo do Modal (Pop-up) */
 .modal-overlay {
@@ -1922,14 +1746,35 @@ body.modal-open {
     cursor: pointer;
 }
 
-.btn-submit {
-    background-color: #007bff;
+.btn-create {
+   background-color:  #08a853; /* Verde */
     color: white;
-    padding: 10px 15px;
-    border-radius: 8px;
     border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+.btn-cancelar{
+ margin-top: 15px;
+    background-color: #e62727;
+    color: #ffffff;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+
 }
 
 /* Estilo para o botão "Editar" dentro do card de usuário */
@@ -1966,6 +1811,213 @@ body.modal-open {
     font-size: 1rem;
     box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+
+
+
+
+.modal-content.ticket-detail-content {
+    max-width: 900px;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.ticket-detail-header {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-bottom: none;
+}
+
+.ticket-detail-meta h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-top: 5px;
+}
+
+
+.ticket-id {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #007bff;
+}
+
+.ticket-detail-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+
+
+/* Banner do status */
+.ticket-status-tag {
+    display: block;
+    background-color: #ffeb3b;
+    color: #5d4037;
+    text-align: center;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 0;
+    margin: 10px -20px 0;
+}
+
+/* Área de mensagens */
+.ticket-messages-container {
+    padding: 20px;
+    height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Mensagem enviada */
+.message-bubble.admin-message {
+    background-color: #3A66FF;
+    color: #fff;
+    align-self: flex-end;
+    border-radius: 18px 18px 5px 18px;
+    padding: 12px 18px;
+    max-width: 60%;
+    font-size: 0.9rem;
+}
+
+.message-bubble.admin-message .message-timestamp {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* Mensagem recebida */
+.message-bubble.user-message {
+    background-color: #f0f0f0;
+    color: #333;
+    align-self: flex-start;
+    border-radius: 18px 18px 18px 5px;
+    padding: 12px 18px;
+    max-width: 60%;
+    font-size: 0.9rem;
+}
+
+.message-bubble.user-message .message-timestamp {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* Campo de resposta */
+.ticket-reply-form-section {
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+    gap: 10px;
+}
+
+.ticket-reply-form-section textarea {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 40px;
+    font-size: 1rem;
+    max-height: 22px;
+    resize: none;
+    outline: none;
+}
+
+.reply-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-send-reply {
+    background-color: #007bff;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-send-reply:hover {
+    background-color: #0056b3;
+}
+
+.btn-send-reply i {
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.status-change-container select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 0.9rem;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.status-change-container select:focus {
+    border-color: #3A66FF;
+    box-shadow: 0 0 0 0.2rem rgba(58, 102, 255, 0.25);
+}
+
+.status-change-container option {
+    padding: 10px;
+}
+
+
+
+
+
+.ticket-detail-status-tag.status-pendente {
+    display: block;
+    background-color: #ffeb3b;
+    color: #5d4037;
+    text-align: center;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 0;
+    margin: 10px -20px 0;
+}
+
+
+
+.ticket-admin-status.status-pendente {
+    background: linear-gradient(135deg, #ffef60, #ffc13a); /* Amarelo para "Aguardando" */
+    color: white; /* Texto escuro para contraste */
+}
+
+.ticket-admin-status.status-em-andamento {
+    background: linear-gradient(135deg, #3a68ff, #0427c1); /* Azul para "Em Atendimento" */
+}
+
+.ticket-admin-status.status-finalizado {
+    background:  linear-gradient(45deg, #05bc5b, #00823c); /* Cinza para "Fechado" */
 }
 
 

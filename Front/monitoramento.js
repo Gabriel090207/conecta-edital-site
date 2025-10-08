@@ -126,134 +126,155 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'planos.html';
     }
 
-   function createMonitoringItemHTML(mon) {
-    const itemCard = document.createElement('div');
-    itemCard.classList.add('monitoramento-item-card');
-    itemCard.dataset.id = mon.id;
+    function createMonitoringItemHTML(mon) {
+        const itemCard = document.createElement('div');
+        itemCard.classList.add('monitoramento-item-card');
+        itemCard.dataset.id = mon.id;
+        itemCard.dataset.type = mon.monitoring_type;
 
-    let titleIconClass = 'fas fa-bell';
-    let typeBadgeText = mon.monitoring_type === 'personal' ? 'Pessoal' : 'Radar';
-
-    const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo';
-    const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo';
-
-    // Padroniza os blocos sempre na mesma ordem
-    const detailsHtml = `
-        <div class="detail-item">
-            <i class="fas fa-id-card"></i>
-            <span>ID do Edital / Concurso</span>
-            <p><strong>${mon.edital_identifier || 'N/A'}</strong></p>
-        </div>
-
-        <div class="detail-item">
-            <i class="fas fa-book-open" style=" text-shadow:
-                -1px -1px 0 #07a8ff,
-                 1px -1px 0 #07a8ff,
-                -1px  1px 0 #07a8ff,
-                 1px  1px 0 #07a8ff;">
-            </i>
-            <span>Diário Oficial</span>
-            <p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p>
-        </div>
-
-        ${mon.monitoring_type === 'personal' ? `
-        <div class="detail-item">
-            <i class="fas fa-user" style="text-shadow:
-                -1px -1px 0 #a600e8ff,
-                 1px -1px 0 #a600e8ff,
-                -1px  1px 0 #a600e8ff,
-                 1px  1px 0 #a600e8ff;">
-            </i>
-            <span>Nome do Candidato(a)</span>
-            <p><strong>${mon.candidate_name || 'N/A'}</strong></p>
-        </div>` : ''}
-
-        <div class="detail-item">
-            <i class="fas fa-clock" style=" text-shadow:
-                -1px -1px 0 #230094ff,
-                 1px -1px 0 #230094ff,
-                -1px  1px 0 #230094ff,
-                 1px  1px 0 #230094ff;">
-            </i>
-            <span>Última Verificação</span>
-            <p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p>
-        </div>
-
-        <div class="detail-item">
-            <i class="fas fa-key" style=" text-shadow:
-                -1px -1px 0 #656766ff,
-                 1px -1px 0 #656766ff,
-                -1px  1px 0 #656766ff,
-                 1px  1px 0 #656766ff;">
-            </i>
-            <span>Palavras-chave Monitoradas</span>
-            <div class="keyword-tags">
-                ${(mon.keywords || mon.candidate_name || '')
-                    .split(',')
-                    .map(k => `<span class="keyword-tag">${k.trim()}</span>`)
-                    .join('')}
+    
+        const titleIconClass = 'fas fa-bell';
+        const typeBadgeText = mon.monitoring_type === 'personal' ? 'Pessoal' : 'Radar';
+    
+        const toggleLabelText = mon.status === 'active' ? 'Ativo' : 'Inativo';
+        const statusTagClass = mon.status === 'active' ? 'status-monitoring' : 'status-inativo';
+    
+        const detailsHtml = `
+            <!-- ID -->
+            <div class="detail-item detail-id">
+                <i class="fas fa-id-card"></i>
+                <span>ID do Edital / Concurso</span>
+                <p><strong>${mon.edital_identifier || 'N/A'}</strong></p>
             </div>
-        </div>
-
-        <div class="detail-item">
-            <i class="fas fa-history" style=" text-shadow:
-                -1px -1px 0 #009479ff,
-                 1px -1px 0 #009479ff,
-                -1px  1px 0 #009479ff,
-                 1px  1px 0 #009479ff;">
-            </i>
-            <span>Ocorrências</span>
-            <p class="occurrences-count">
-                <strong>${mon.occurrences || 0} ocorrência(s)</strong> 
-                <a href="#" class="view-history-link">Ver Histórico</a>
-            </p>
-        </div>
-
-        <div class="detail-item">
-            <i class="fas fa-bell" style="text-shadow:
-                -1px -1px 0 #a600e8ff,
-                 1px -1px 0 #a600e8ff,
-                -1px  1px 0 #a600e8ff,
-                 1px  1px 0 #a600e8ff;">
-            </i>
-            <span>Status das Notificações</span>
-            <div class="notification-status">
-                <span class="notification-tag email-enabled">Email</span>
-                <span class="notification-tag whatsapp-enabled">WhatsApp</span>
+    
+            <!-- Nome do candidato (só no Pessoal) -->
+            ${mon.monitoring_type === 'personal' ? `
+            <div class="detail-item detail-candidato">
+                <i class="fas fa-user" style="text-shadow:
+                    -1px -1px 0 #a600e8ff,
+                     1px -1px 0 #a600e8ff,
+                    -1px  1px 0 #a600e8ff,
+                     1px  1px 0 #a600e8ff;">
+                </i>
+                <span>Nome do Candidato(a)</span>
+                <p><strong>${mon.candidate_name || 'N/A'}</strong></p>
+            </div>` : ''}
+    
+            <!-- Diário -->
+            <div class="detail-item detail-diario">
+                <i class="fas fa-book-open" style="text-shadow:
+                    -1px -1px 0 #07a8ff,
+                     1px -1px 0 #07a8ff,
+                    -1px  1px 0 #07a8ff,
+                     1px  1px 0 #07a8ff;">
+                </i>
+                <span>Diário Oficial</span>
+                <p><a href="${mon.official_gazette_link || '#'}" target="_blank" class="link-diario">Acessar Diário Oficial</a></p>
             </div>
-        </div>
-    `;
-
-    itemCard.innerHTML = `
-        <div class="item-header">
-            <div class="item-header-title">
-                <i class="${titleIconClass}"></i>
-                <h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3>
-                <button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button>
-                <button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button>
+    
+            <!-- Última verificação -->
+            <div class="detail-item detail-verificacao">
+                <i class="fas fa-clock" style="text-shadow:
+                    -1px -1px 0 #230094ff,
+                     1px -1px 0 #230094ff,
+                    -1px  1px 0 #230094ff,
+                     1px  1px 0 #230094ff;">
+                </i>
+                <span>Última Verificação</span>
+                <p><strong>${mon.last_checked_at ? new Date(mon.last_checked_at).toLocaleString('pt-BR') : 'Nunca verificado'}</strong></p>
             </div>
-            <span class="status-tag ${statusTagClass}">
-                ${mon.status === 'active' ? 'Monitorando' : 'Inativo'}
-            </span>
-        </div>
-
-        <div class="item-details-grid">${detailsHtml}</div>
-
-        <div class="item-actions">
-            <div class="toggle-switch">
-                <input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}">
-                <label for="toggle-monitoramento-${mon.id}">${toggleLabelText}</label>
+    
+            <!-- Palavras-chave -->
+            <div class="detail-item detail-palavras">
+                <i class="fas fa-key" style="text-shadow:
+                    -1px -1px 0 #656766ff,
+                     1px -1px 0 #656766ff,
+                    -1px  1px 0 #656766ff,
+                     1px  1px 0 #656766ff;">
+                </i>
+                <span>Palavras-chave Monitoradas</span>
+                <div class="keyword-tags">
+                    ${(mon.keywords || mon.candidate_name || '')
+                        .split(',')
+                        .map(k => `<span class="keyword-tag">${k.trim()}</span>`)
+                        .join('')}
+                </div>
             </div>
-            <div class="action-buttons">
-                <button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button>
-                <button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button>
-                <button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button>
+    
+            <!-- Ocorrências -->
+            <div class="detail-item detail-ocorrencias">
+                <i class="fas fa-history" style="text-shadow:
+                    -1px -1px 0 #009479ff,
+                     1px -1px 0 #009479ff,
+                    -1px  1px 0 #009479ff,
+                     1px  1px 0 #009479ff;">
+                </i>
+                <span>Ocorrências</span>
+                <p class="occurrences-count">
+                    <strong>${mon.occurrences || 0} ocorrência(s)</strong>
+                    <a href="#" class="view-history-link">Ver Histórico</a>
+                </p>
             </div>
-        </div>
-    `;
-    return itemCard;
-}
+    
+           <!-- Notificações -->
+<div class="detail-item detail-notificacao">
+    <i class="fas fa-bell" style="text-shadow:
+        -1px -1px 0 #a600e8ff,
+         1px -1px 0 #a600e8ff,
+        -1px  1px 0 #a600e8ff,
+         1px  1px 0 #a600e8ff;">
+    </i>
+    <span>Status das Notificações</span>
+    <div class="notification-status">
+        ${
+            currentStatusData.user_plan === 'Plano Essencial'
+                ? `<span class="notification-tag email-enabled">Email</span>`
+                : `
+                    <span class="notification-tag email-enabled">Email</span>
+                    <span class="notification-tag whatsapp-enabled">WhatsApp</span>
+                  `
+        }
+    </div>
+</div>
 
+
+
+        `;
+    
+        itemCard.innerHTML = `
+            <div class="item-header">
+                <div class="item-header-title">
+                    <i class="${titleIconClass}"></i>
+                    <h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3>
+                    <button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button>
+                </div>
+                <span class="status-tag ${statusTagClass}">
+                    ${mon.status === 'active' ? 'Monitorando' : 'Inativo'}
+                </span>
+            </div>
+    
+            <!-- aplica grid diferente para Pessoal vs Radar -->
+            <div class="item-details-grid ${mon.monitoring_type === 'personal' ? 'grid-personal' : 'grid-radar'}">
+                ${detailsHtml}
+            </div>
+    
+            <div class="item-actions">
+                <div class="toggle-switch">
+                    <input type="checkbox" id="toggle-monitoramento-${mon.id}" ${mon.status === 'active' ? 'checked' : ''} data-id="${mon.id}">
+                    <label for="toggle-monitoramento-${mon.id}">${toggleLabelText}</label>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-action btn-configure" data-id="${mon.id}"><i class="fas fa-cog"></i> Configurar</button>
+                    <button class="btn-action btn-test" data-id="${mon.id}"><i class="fas fa-play"></i> Testar</button>
+                    <button class="btn-action btn-delete" data-id="${mon.id}"><i class="fas fa-trash-alt"></i> Excluir</button>
+                </div>
+            </div>
+        `;
+    
+        return itemCard;
+    }
+    
 
     // NOVA FUNÇÃO: Gerencia a exibição da foto ou do placeholder
     function updateProfilePictureUI(photoURL) {
@@ -1160,4 +1181,342 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editUsernameBtn) {
         editUsernameBtn.addEventListener('click', handleEditUsername);
     }
+
+
+        // --- Botão Voltar ao Topo ---
+    const backToTopBtn = document.querySelector('.back-to-top-button');
+
+    if (backToTopBtn) {
+        // Mostrar/ocultar botão conforme rolagem
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        // Rolagem suave ao clicar
+           // --- Botão Voltar ao Topo ---
+    const backToTopBtn = document.querySelector('.back-to-top-button');
+
+    if (backToTopBtn) {
+        // Mostrar/ocultar botão conforme rolagem
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        // Rolagem suave ao clicar
+        backToTopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // ====================== FAVORITOS COM FIRESTORE ======================
+
+// ====================== FAVORITOS PERSISTENTES FIRESTORE ======================
+
+const FAVORITE_KEY = "monitoramentosFavoritos";
+let favoritos = JSON.parse(localStorage.getItem(FAVORITE_KEY) || "[]");
+const monitoramentoContainer = document.querySelector(".monitoramento-list-section");
+
+// --- 🔹 Aplica o estado visual da estrela
+function applyFavoriteState(btn, id) {
+    if (!btn || !id) return;
+    const icon = btn.querySelector("i");
+    const isFav = favoritos.includes(id);
+
+    btn.classList.toggle("active", isFav);
+    if (icon) {
+        icon.classList.toggle("fas", isFav); // ícone sólido
+        icon.classList.toggle("far", !isFav); // ícone contorno
+    }
+}
+
+// --- 🔹 Reordena cards (favoritos primeiro)
+function reorderCards() {
+    if (!monitoramentoContainer) return;
+    const cards = [...monitoramentoContainer.querySelectorAll(".monitoramento-item-card")];
+    cards.sort((a, b) => {
+        const aFav = favoritos.includes(a.dataset.id);
+        const bFav = favoritos.includes(b.dataset.id);
+        return bFav - aFav; // favoritos primeiro
+    });
+    cards.forEach(card => monitoramentoContainer.appendChild(card));
+}
+
+// --- 🔹 Atualiza todas as estrelas
+function syncAllFavoriteButtons() {
+    monitoramentoContainer?.querySelectorAll(".favorite-btn").forEach(btn => {
+        const card = btn.closest(".monitoramento-item-card");
+        const id = card?.dataset.id;
+        if (id) applyFavoriteState(btn, id);
+    });
+    reorderCards();
+}
+
+// --- 🔹 Salva favoritos no Firestore
+async function saveFavoritesToFirestore() {
+    const user = window.auth.currentUser;
+    if (!user || !window.db) return;
+
+    try {
+        await window.db.collection("users").doc(user.uid).set(
+            { favoritos },
+            { merge: true } // não sobrescreve o resto do doc
+        );
+        console.log("✅ Favoritos salvos no Firestore:", favoritos);
+    } catch (err) {
+        console.error("❌ Erro ao salvar favoritos no Firestore:", err);
+    }
+}
+
+// --- 🔹 Carrega favoritos do Firestore
+async function loadFavoritesFromFirestore() {
+    const user = window.auth.currentUser;
+    if (!user || !window.db) return;
+
+    try {
+        const doc = await window.db.collection("users").doc(user.uid).get();
+        if (doc.exists && Array.isArray(doc.data().favoritos)) {
+            favoritos = doc.data().favoritos;
+            localStorage.setItem(FAVORITE_KEY, JSON.stringify(favoritos));
+            console.log("⭐ Favoritos carregados do Firestore:", favoritos);
+            syncAllFavoriteButtons();
+        } else {
+            console.log("Nenhum favorito salvo no Firestore ainda.");
+        }
+    } catch (err) {
+        console.error("Erro ao carregar favoritos:", err);
+    }
+}
+
+// --- 🔹 Evento de clique na estrela
+monitoramentoContainer?.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".favorite-btn");
+    if (!btn) return;
+
+    e.preventDefault();
+    const card = btn.closest(".monitoramento-item-card");
+    const id = card?.dataset.id;
+    if (!id) return;
+
+    // Alterna estado local
+    if (favoritos.includes(id)) {
+        favoritos = favoritos.filter(f => f !== id);
+    } else {
+        favoritos.push(id);
+    }
+
+    // Atualiza visual e localStorage
+    localStorage.setItem(FAVORITE_KEY, JSON.stringify(favoritos));
+    applyFavoriteState(btn, id);
+    reorderCards();
+
+    // Sincroniza no Firestore
+    await saveFavoritesToFirestore();
+});
+
+// --- 🔹 Ao logar, carrega favoritos e aplica após render
+window.auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        await loadFavoritesFromFirestore();
+
+        // garante que os favoritos sejam aplicados após render dos monitoramentos
+        const checkRendered = setInterval(() => {
+            const cards = monitoramentoContainer?.querySelectorAll(".monitoramento-item-card");
+            if (cards && cards.length > 0) {
+                syncAllFavoriteButtons();
+                clearInterval(checkRendered);
+            }
+        }, 500);
+    }
+});
+
+// --- 🔹 Estilos visuais
+const style = document.createElement("style");
+style.innerHTML = `
+.favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #6c757d;
+    transition: color 0.25s ease, transform 0.2s ease;
+}
+.favorite-btn.active i {
+    color: #007bff !important;
+    transform: scale(1.2);
+}
+.favorite-btn i {
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+.favorite-btn:hover i {
+    color: #0056b3;
+}
+.favorite-btn:active i {
+    transform: scale(1.3);
+}
+`;
+document.head.appendChild(style);
+
+}
+
+
+// ====================== EDIÇÃO DE MONITORAMENTOS CORRIGIDA ======================
+
+// ==================== EDIÇÃO DE MONITORAMENTO (CORRIGIDO) ====================
+
+// =======================
+// 🔧 Função de Editar Monitoramento
+// =======================
+const monitoramentoContainer = document.querySelector(".monitoramento-list-section");
+
+if (monitoramentoContainer) {
+    monitoramentoContainer.addEventListener("click", async (e) => {
+        const editBtn = e.target.closest(".edit-btn");
+        if (!editBtn) return;
+
+        e.preventDefault();
+
+        const card = editBtn.closest(".monitoramento-item-card");
+        if (!card) return;
+
+        const monitoramentoId = card.dataset.id;
+        const tipo = card.querySelector("h3")?.textContent.toLowerCase().includes("pessoal") 
+            ? "pessoal" 
+            : "radar";
+
+        // Busca o usuário logado e o token Firebase
+        const user = window.auth?.currentUser;
+        if (!user) {
+            alert("Você precisa estar logado para editar um monitoramento.");
+            return;
+        }
+        const token = await user.getIdToken();
+
+        // 🔄 Busca todos os monitoramentos e filtra o específico
+        let dadosMonitoramento = null;
+        try {
+            const resp = await fetch(`${BACKEND_URL}/api/monitoramentos`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (resp.ok) {
+                const lista = await resp.json();
+                dadosMonitoramento = lista.find(m => m.id === monitoramentoId);
+                if (!dadosMonitoramento) {
+                    alert("Monitoramento não encontrado.");
+                    return;
+                }
+            } else {
+                alert("Erro ao buscar lista de monitoramentos.");
+                return;
+            }
+        } catch (err) {
+            console.error("Erro ao buscar monitoramentos:", err);
+            alert("Erro ao buscar dados do monitoramento.");
+            return;
+        }
+
+        // 🧩 Escolhe e abre o modal correto
+        const modalId = tipo === "pessoal" ? "personal-monitoramento-modal" : "radar-monitoramento-modal";
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        document.querySelectorAll(".modal-overlay.show-modal").forEach(m => m.classList.remove("show-modal"));
+        modal.classList.add("show-modal");
+        document.body.style.overflow = "hidden";
+
+        // ✏️ Preenche os campos com os dados atuais
+        if (tipo === "pessoal") {
+            modal.querySelector("#personal-link").value = dadosMonitoramento.official_gazette_link || "";
+            modal.querySelector("#personal-id").value = dadosMonitoramento.edital_identifier || "";
+            const nomeInput = modal.querySelector("#personal-name");
+            if (nomeInput) {
+                nomeInput.value = dadosMonitoramento.candidate_name || "";
+                nomeInput.disabled = true; // 🔒 bloqueia edição
+            }
+        } else {
+            modal.querySelector("#radar-link").value = dadosMonitoramento.official_gazette_link || "";
+            modal.querySelector("#radar-id").value = dadosMonitoramento.edital_identifier || "";
+        }
+
+        // 🎨 Atualiza título e ícone conforme tipo
+        const titulo = modal.querySelector(".modal-content h2");
+        const icone = modal.querySelector(".modal-header-icon i");
+        if (tipo === "pessoal") {
+            titulo.textContent = "Monitoramento Pessoal";
+            icone.className = "fas fa-user";
+        } else {
+            titulo.textContent = "Monitoramento Radar";
+            icone.className = "fas fa-bullseye";
+        }
+
+        // 🔘 Atualiza botão para "Salvar Alterações"
+        const actionBtn = modal.querySelector(".btn-create-monitoramento");
+        if (!actionBtn) return;
+        actionBtn.textContent = "Salvar Alterações";
+        actionBtn.classList.add("btn-save-monitoramento");
+
+        // Remove qualquer listener antigo
+        const newActionBtn = actionBtn.cloneNode(true);
+        actionBtn.parentNode.replaceChild(newActionBtn, actionBtn);
+
+        // 💾 Evento para salvar alterações
+        newActionBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const updatedData = tipo === "pessoal"
+                ? {
+                    link_diario: modal.querySelector("#personal-link").value.trim(),
+                    id_edital: modal.querySelector("#personal-id").value.trim(),
+                    nome_completo: modal.querySelector("#personal-name").value.trim()
+                }
+                : {
+                    link_diario: modal.querySelector("#radar-link").value.trim(),
+                    id_edital: modal.querySelector("#radar-id").value.trim()
+                };
+
+            if (!updatedData.link_diario || !updatedData.id_edital) {
+                alert("⚠️ Preencha todos os campos obrigatórios!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/monitoramentos/${monitoramentoId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response.ok) {
+                    alert("✅ Monitoramento atualizado com sucesso!");
+                    modal.classList.remove("show-modal");
+                    document.body.style.overflow = "";
+                    if (typeof window.loadDashboardDataAndRender === "function") {
+                        window.loadDashboardDataAndRender();
+                    }
+                } else {
+                    const err = await response.json();
+                    alert(`❌ Erro ao atualizar: ${err.detail || response.statusText}`);
+                }
+            } catch (err) {
+                console.error("Erro ao atualizar monitoramento:", err);
+                alert("⚠️ Erro de conexão com o servidor.");
+            }
+        });
+    });
+}
 });

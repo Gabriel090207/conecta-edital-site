@@ -244,65 +244,75 @@
     </div>
 
     <div class="modal-overlay" id="monitoramento-ativado-modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" data-modal-id="monitoramento-ativado-modal"><i class="fas fa-times"></i></button>
-            <div class="modal-header-icon green-light-background-type-choose" style="background: none;">
-                <i class="fas fa-check-circle" style="color: green; font-size: 70px; margin-bottom: -15px;"></i>
-            </div>
-            <h2>Monitoramento Ativado!</h2>
-            <p class="modal-subtitle" style="margin-top: -20px; margin-bottom: -20px;">Seu monitoramento está ativo e funcionando</p>
-            <span class="progress-text" style="margin-left: 15px; margin-top: -40px;">Progresso</span>
+    <div class="modal-content monitoramento-modal">
+        <button class="modal-close-btn" data-modal-id="monitoramento-ativado-modal">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-header-icon success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h2 class="modal-title">Monitoramento Ativado!</h2>
+        <p class="modal-subtitle">Seu monitoramento está ativo e funcionando</p>
+
+        <div class="progress-section">
+            <span class="progress-label">Progresso</span>
             <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar"></div> 
-                <span class="progress-percentage" id="progress-percentage" style="color:black">0%</span> 
-            </div>
-            <div class="activation-steps">
-                <div class="activation-step" data-step="1">
-                    <div class="step-status-icon">
-                        <i class="fas fa-sync-alt icon-spinning"></i> 
-                        <i class="fas fa-check icon-check"></i> 
-                    </div>
-                    <div class="step-text-content">
-                        <h4>Configurando monitoramento</h4>
-                        <p>Preparando as configurações iniciais...</p>
-                    </div>
-                </div>
-                <div class="activation-step" data-step="2">
-                    <div class="step-status-icon">
-                        <i class="fas fa-sync-alt icon-spinning"></i>
-                        <i class="fas fa-check icon-check"></i>
-                    </div>
-                    <div class="step-text-content">
-                        <h4>Verificando Diário Oficial</h4>
-                        <p>Validando acesso ao diário oficial...</p>
-                    </div>
-                </div>
-                <div class="activation-step" data-step="3">
-                    <div class="step-status-icon">
-                        <i class="fas fa-sync-alt icon-spinning"></i>
-                        <i class="fas fa-check icon-check" ></i>
-                    </div>
-                    <div class="step-text-content">
-                        <h4>Ativando alertas em tempo real</h4>
-                        <p>Configurando sistema de notificações...</p>
-                    </div>
-                </div>
-                <div class="activation-step" data-step="4">
-                    <div class="step-status-icon">
-                        <i class="fas fa-sync-alt icon-spinning"></i>
-                        <i class="fas fa-check icon-check" ></i>
-                    </div>
-                    <div class="step-text-content">
-                        <h4>Finalizando configuração</h4>
-                        <p>Últimos ajustes e ativação...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="activation-completed-message" >
-                <p>Configuração Concluída, Você receberá notificações sempre que houver atualizações relevantes.</p>
+                <div class="progress-bar" id="progress-bar"></div>
+                <span class="progress-percentage" id="progress-percentage">0%</span>
             </div>
         </div>
+
+        <div class="activation-steps">
+            <div class="activation-step" data-step="1">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Configurando monitoramento</h4>
+                    <p>Preparando as configurações iniciais...</p>
+                </div>
+            </div>
+            <div class="activation-step" data-step="2">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Verificando Diário Oficial</h4>
+                    <p>Validando acesso ao diário oficial...</p>
+                </div>
+            </div>
+            <div class="activation-step" data-step="3">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Ativando alertas em tempo real</h4>
+                    <p>Configurando sistema de notificações...</p>
+                </div>
+            </div>
+            <div class="activation-step" data-step="4">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Finalizando configuração</h4>
+                    <p>Últimos ajustes e ativação...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="activation-completed-message">
+            <p>✅ Configuração concluída! Você receberá notificações sempre que houver atualizações relevantes.</p>
+        </div>
     </div>
+</div>
+
     
     <div class="modal-overlay" id="profile-modal">
         <div class="modal-content large-modal">
@@ -424,10 +434,10 @@
                 <a href="#" class="footer-logo">
                     <img src="Captura de tela 2025-07-16 145658.png" alt="Logo Conecta Edital" style="max-width:70%;">
                 </a>
-                <p>O Conecta Edital é a plataforma líder em monitoramento inteligente para concurseiros. Transformamos a forma como você acompanha editais e convocações.</p>
+                <p>O Conecta Edital é a plataforma líder em monitoramento inteligente de diários oficiais, desenvolvida para concurseiros que não querem perder nenhuma atualização. Monitoramos diariamente todos os diários oficiais municipais, estaduais e federais e enviamos notificações em tempo real sempre que houver atualizações com seu nome.</p>
                 <div class="security-badges">
                     <span class="badge online"><i class="fas fa-circle"></i> Sistema Online</span>
-                    <span class="badge secure"><i class="fas fa-lock"></i> Dados Seguros</span>
+                    <span class="badge secure"><i class="fas fa-lock lockca"></i> Dados Seguros</span>
                 </div>
             </div>
             <div class="footer-column navigation">
@@ -459,6 +469,10 @@
             </div>
         </div>
     </footer>
+
+     <a href="#top" class="back-to-top-button" aria-label="Voltar ao topo">
+            <i class="fas fa-arrow-up"></i>
+        </a>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
