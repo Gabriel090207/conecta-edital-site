@@ -1847,3 +1847,38 @@ async def admin_update_user_slots(user_uid: str, data: dict):
         print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
         raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
 
+@app.patch("/admin/users/{uid}")
+async def update_user_admin(uid: str, user_update: dict):
+    db_firestore_client = firestore.client()
+    user_ref = db_firestore_client.collection("users").document(uid)
+    user_doc = user_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+    update_data = {}
+
+    # Atualiza nome
+    if "fullName" in user_update and user_update["fullName"]:
+        update_data["fullName"] = user_update["fullName"]
+
+    # Atualiza email
+    if "email" in user_update and user_update["email"]:
+        update_data["email"] = user_update["email"]
+
+    # Atualiza tipo de plano
+    if "plan_type" in user_update and user_update["plan_type"]:
+        update_data["plan_type"] = user_update["plan_type"]
+
+    # ✅ Atualiza os slots personalizados se enviados
+    if "custom_slots" in user_update:
+        update_data["slots_disponiveis"] = int(user_update["custom_slots"])
+
+    # Aplica as mudanças
+    if update_data:
+        user_ref.update(update_data)
+        print(f"✅ Usuário {uid} atualizado com dados:", update_data)
+    else:
+        print(f"⚠️ Nenhum dado enviado para atualizar {uid}")
+
+    return {"message": "Usuário atualizado com sucesso", "updated_fields": update_data}

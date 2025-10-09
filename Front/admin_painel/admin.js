@@ -584,106 +584,94 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
    // === FUNÇÃO PARA ABRIR O MODAL DE EDIÇÃO DE USUÁRIO ===
-function openEditUserModal(userData) {
+   function openEditUserModal(userData) {
     console.log("Abrindo modal para UID:", userData.uid);
-  
-    // Preenche os campos
+
+    const modal = document.getElementById("user-edit-modal");
+    if (!modal) {
+        console.error("Modal de edição de usuário não encontrado!");
+        return;
+    }
+
+    // Preenche campos
     document.getElementById("edit-user-uid").value = userData.uid;
     document.getElementById("edit-user-fullname").value = userData.full_name || "";
     document.getElementById("edit-user-email").value = userData.email || "";
     document.getElementById("edit-user-plan").value = userData.plan_type || "gratuito";
-  
-    // Garante que o modal existe antes de continuar
-    const modal = document.getElementById("user-edit-modal");
-    if (!modal) {
-      console.error("Modal de edição de usuário não encontrado no DOM!");
-      return;
-    }
-  
-    // Mostra o modal
-    modal.classList.add("show-modal");
-    document.body.style.overflow = "hidden";
-  
-    // Usa setTimeout para garantir que o DOM interno já foi renderizado
-    setTimeout(() => {
-      const decreaseBtn = document.getElementById("decrease-slots");
-      const increaseBtn = document.getElementById("increase-slots");
-      const slotInput = document.getElementById("edit-user-slots");
-  
-      if (!decreaseBtn || !increaseBtn || !slotInput) {
-        console.error("Botões de slots não encontrados dentro do modal!");
-        return;
-      }
-  
-      // Valor inicial vindo do backend
-      slotInput.value = userData.slots_disponiveis || 0;
-  
-      // Remove eventos anteriores (se houver)
-      decreaseBtn.replaceWith(decreaseBtn.cloneNode(true));
-      increaseBtn.replaceWith(increaseBtn.cloneNode(true));
-  
-      const newDecreaseBtn = document.getElementById("decrease-slots");
-      const newIncreaseBtn = document.getElementById("increase-slots");
-  
-      // Eventos novos
-      newDecreaseBtn.addEventListener("click", () => {
+
+    const slotWrapper = document.getElementById("slot-wrapper"); // 🔹 div que envolve o campo
+    const slotInput = document.getElementById("edit-user-slots");
+    const decreaseBtn = document.getElementById("decrease-slots");
+    const increaseBtn = document.getElementById("increase-slots");
+
+    // 🔥 Usa o valor salvo no Firestore
+    slotInput.value = userData.slots_disponiveis ?? 0;
+
+    // Remove eventos antigos
+    decreaseBtn.replaceWith(decreaseBtn.cloneNode(true));
+    increaseBtn.replaceWith(increaseBtn.cloneNode(true));
+
+    const newDecreaseBtn = document.getElementById("decrease-slots");
+    const newIncreaseBtn = document.getElementById("increase-slots");
+
+    newDecreaseBtn.addEventListener("click", () => {
         let value = parseInt(slotInput.value, 10);
         if (value > 0) slotInput.value = value - 1;
-      });
-  
-      newIncreaseBtn.addEventListener("click", () => {
+    });
+
+    newIncreaseBtn.addEventListener("click", () => {
         let value = parseInt(slotInput.value, 10);
         slotInput.value = value + 1;
-      });
-    }, 50);
-  }
-  
-  // === FECHAR MODAL ===
-  document.querySelectorAll(".modal-close-btn, .btn-cancelar").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const modal = document.getElementById("user-edit-modal");
-      modal.classList.remove("show-modal");
-      document.body.style.overflow = "auto";
-  
-      // Voltar para tela de auditoria
-      const auditModal = document.getElementById("audit-users-modal");
-      if (auditModal) auditModal.classList.add("show-modal");
     });
-  });
-  
 
-  // === ATUALIZAÇÃO AUTOMÁTICA DE SLOTS CONFORME O PLANO ===
-document.addEventListener("change", (e) => {
-    if (e.target && e.target.id === "edit-user-plan") {
-      const selectedPlan = e.target.value;
-      const slotInput = document.getElementById("edit-user-slots");
-      const decreaseBtn = document.getElementById("decrease-slots");
-      const increaseBtn = document.getElementById("increase-slots");
-  
-      if (!slotInput || !decreaseBtn || !increaseBtn) return;
-  
-      if (selectedPlan === "premium") {
-        slotInput.value = "∞";
-        slotInput.setAttribute("readonly", true);
-        decreaseBtn.disabled = true;
-        increaseBtn.disabled = true;
-      } else {
-        decreaseBtn.disabled = false;
-        increaseBtn.disabled = false;
-        slotInput.removeAttribute("readonly");
-  
-        if (selectedPlan === "essencial") {
-          slotInput.value = 3;
-        } else if (selectedPlan === "basico") {
-          slotInput.value = 5;
+    const planSelect = document.getElementById("edit-user-plan");
+
+    // 💡 Função pra atualizar o campo de slots conforme o plano
+    const updateSlotVisibility = () => {
+        const plan = planSelect.value;
+
+        if (plan === "premium") {
+            // 🔥 Esconde o campo completamente
+            slotWrapper.style.display = "none";
+            slotInput.value = 0; // só pra garantir que o backend não receba "∞"
         } else {
-          // “Sem plano” (gratuito)
-          slotInput.value = 0;
+            // Mostra o campo nos outros planos
+            slotWrapper.style.display = "flex";
+
+            if (plan === "essencial") {
+                if (!userData.slots_disponiveis) slotInput.value = 3;
+            } else if (plan === "basico") {
+                if (!userData.slots_disponiveis) slotInput.value = 5;
+            } else {
+                // sem plano
+                slotInput.value = 0;
+            }
         }
-      }
-    }
-  });
-  
+    };
+
+    // Executa ao abrir o modal
+    updateSlotVisibility();
+
+    // Atualiza ao mudar o plano
+    planSelect.addEventListener("change", updateSlotVisibility);
+
+    // Exibe modal
+    modal.classList.add("show-modal");
+    document.body.style.overflow = "hidden";
+}
+
+// === FECHAR MODAL ===
+document.querySelectorAll(".modal-close-btn, .btn-cancelar").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const modal = document.getElementById("user-edit-modal");
+        modal.classList.remove("show-modal");
+        document.body.style.overflow = "auto";
+
+        const auditModal = document.getElementById("audit-users-modal");
+        if (auditModal) auditModal.classList.add("show-modal");
+    });
+});
+
 
 // === SALVAR ALTERAÇÕES DE USUÁRIO (ADMIN) ===
 document.getElementById("user-edit-form").addEventListener("submit", async (e) => {
