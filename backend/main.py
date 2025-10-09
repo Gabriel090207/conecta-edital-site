@@ -2156,7 +2156,12 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
 
     return monitoramentos
 
-    async def create_notification(user_uid: str, type_: str, title: str, message: str, link: str = "#"):
+
+# ========================================================================================================
+#       FUNÇÃO GLOBAL DE NOTIFICAÇÃO (🔥 CORRIGIDA)
+# ========================================================================================================
+
+async def create_notification(user_uid: str, type_: str, title: str, message: str, link: str = "#"):
     """
     Cria uma notificação no Firestore para o usuário especificado.
     """
