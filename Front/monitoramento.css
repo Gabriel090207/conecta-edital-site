@@ -351,6 +351,7 @@ ul {
 
 /* Gradiente para o botão de criar monitoramento nos modais */
 .btn-create-monitoramento {
+    margin-bottom: -21px;
     background-color:  #08a853; /* Verde */
     color: white;
     border: none;
@@ -362,7 +363,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: -21px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 .btn-create-monitoramento:hover {
@@ -970,14 +971,93 @@ ul {
 }
 
 .form-group label {
+    
     font-size: 0.95rem;
-    color: #343a40;
+    color: #3a3e43;
     font-weight: 500;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
+
+.mon label{
+    margin-top: -35px;
+}
+
+.mon1 label{
+    font-weight: 550;
+    color: #222;
+    margin-top: -35px;
+}
+
+.mon1 input{
+    margin-bottom: -50px;
+}
+
+
+/* Diminui a margem inferior (espaço abaixo) do input "Nome Completo" */
+#personal-monitoramento-modal #personal-name {
+  margin-bottom: -23px; /* ajuste o valor conforme quiser */
+}
+
+/* Altera apenas o input "radar-id" dentro do modal de Radar */
+#radar-monitoramento-modal #radar-id {
+  margin-bottom: -23px; /* ajuste o valor conforme quiser */
+}
+
+
+
+
+
+.form-group .id {
+    margin-top: -20px;
+    font-size: 0.95rem;
+    color: #3a3e43;
+    font-weight: 500;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.telefoneperfil{
+    margin-top: -20px;
+}
+
+.emailperfil{
+    margin-top: -20px;
+}
+
+.nomeperfil{
+    margin-top: -16px;
+}
+
+
+
+
+
+.form-group i.ic1 {
+  position: absolute;
+  top: 35%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 1rem;
+  pointer-events: none; /* pra não atrapalhar clique no input */
+}
+
+.form-group i.ic {
+  position: absolute;
+  top: 10%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 1rem;
+  pointer-events: none; /* pra não atrapalhar clique no input */
+}
+
+
 
 .form-group input {
     width: 100%;
@@ -998,7 +1078,7 @@ ul {
 
 .required-tag {
     position: absolute;
-    margin-top: 8px;
+    margin-top: -10px;
     top: 0;
     right: 0;
     background-color: #f0f8ff; 
@@ -1006,16 +1086,59 @@ ul {
     border: 1px solid #212dd4;
     padding: 2px 8px;
     border-radius: 15px;
-    font-size: 0.75rem;
+    font-size: 0.55rem;
     font-weight: 600;
     transform: translateY(-50%);
 }
+
+.required-tag1{
+     position: absolute;
+    margin-top: -25px;
+    top: 0;
+    right: 0;
+    background-color: #f0f8ff; 
+    color: #212dd4;
+    border: 1px solid #212dd4;
+    padding: 2px 8px;
+    border-radius: 15px;
+    font-size: 0.55rem;
+    font-weight: 600;
+    transform: translateY(-50%);
+}
+
+.required-tag2{
+     position: absolute;
+    margin-top: -23px;
+    top: 0;
+    right: 0;
+    background-color: #f0f8ff; 
+    color: #212dd4;
+    border: 1px solid #212dd4;
+    padding: 2px 8px;
+    border-radius: 15px;
+    font-size: 0.55rem;
+    font-weight: 600;
+    transform: translateY(-50%);
+}
+
+
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 15px;
     margin-top: 20px;
+}
+
+
+.success-icon {
+  background: none !important;   /* remove o fundo azul */
+  box-shadow: none !important;   /* remove sombras */
+}
+
+.success-icon i {
+  color: #22c55e !important;     /* verde padrão (você pode ajustar) */
+  background: none !important;   /* garante sem fundo no í */
 }
 
 /* Modal de Ativação (Progressão) */
@@ -1569,12 +1692,17 @@ ul {
 }
 
 .fa-user-tag.i{
-    margin-top: 1px;
+    margin-top: -10px;
 
 }
 
 .fa-envelope.i{
-    margin-top: 1px;
+    margin-top: -10px;
+
+}
+
+.fa-phone.i{
+    margin-top: 2px;
 
 }
 .footer-container {
@@ -1710,24 +1838,34 @@ ul {
 
 /* Estilos para o Modal de Perfil do Usuário */
 /* ========================================================================== */
-.modal-overlay .large-modal {
+.large-modal {
     max-width: 600px;
     padding: 2.5rem;
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
+    max-height: 60vh;
 }
 
 .modal-overlay .modal-content h2 {
     font-size: 1.5rem;
     color: #333;
-    margin-top: 10px;
+      margin-top: -18px;
+  
+}
+
+.modal-overlay .large-modal {
+    max-width: 600px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 65vh;
 }
 
 .modal-overlay .modal-content .modal-subtitle {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 2rem;
+      margin-top: -18px;
 }
 
 /* Abas */
@@ -1958,8 +2096,44 @@ ul {
     z-index: 10;
 }
 
+.btn-manage-subscription{
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
 /* Botões de Ação */
-.btn-save-changes, .btn-change-password, .btn-manage-subscription, .btn-create-password {
+.btn-save-changes, .btn-change-password, .btn-create-password {
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: -10px;
+}
+
+
+.btn-cancel-form {
+    margin-bottom: -21px;
+   margin-top: -21px;
+    background-color: #e62727;
+    color: #ffffff;
     padding: 12px 25px;
     font-size: 1rem;
     font-weight: 600;
@@ -1967,20 +2141,11 @@ ul {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
-    background: linear-gradient(135deg, #05bc5b, #00823c);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 15px;
 }
 
-.btn-manage-subscription {
-    background: linear-gradient(135deg, #0cff85, #00823c);
-}
-
-.btn-cancel-form {
-    margin-top: 15px;
+.btn-cancel-form1 {
+  margin-top: -10px;
+ 
     background-color: #e62727;
     color: #ffffff;
     padding: 12px 25px;
@@ -1993,8 +2158,13 @@ ul {
 }
 
 .btn-cancel-form:hover {
-    transform: translateY(-2px);
-    background-color: #d0d0d0;
+    background-color: #c2001c;
+    transform: translateY(-1px);
+}
+
+.btn-cancel-form1:hover {
+    background-color: #c2001c;
+    transform: translateY(-1px);
 }
 
 .btn-save-changes:hover, .btn-change-password:hover, .btn-manage-subscription:hover, .btn-create-password:hover {
@@ -2249,7 +2419,9 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2257,6 +2429,8 @@ ul {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+
+     
   }
   .modal-overlay.show-modal {
     opacity: 1;
@@ -2266,9 +2440,23 @@ ul {
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 100%;
+   
+    max-width: 810px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .modal-content1 {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     padding: 30px;
     width: 100%;
-    max-width: 900px;
+    max-width: 700px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -2305,17 +2493,38 @@ ul {
   }
   
   /* Títulos */
-  .modal-content h2 {
+  .modal-content, .modal-content1 h2 {
     font-size: 1.8rem;
     font-weight: 700;
     color: #222;
     text-align: center;
   }
+
+
+   .modal-content1 h2 {
+    margin-top: -20px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #222;
+    text-align: center;
+  }
+
+
+  .modal-info-message{
+    margin-top: -10px;
+    margin-bottom: 10px;
+    font-size: 1.0rem;
+    font-weight: 700;
+    color: #222;
+    text-align: center;
+  }
+
   .modal-subtitle {
     font-size: 1rem;
     color: #6c757d;
     text-align: center;
-    margin-bottom: 20px;
+    margin-top: -25px;
+    margin-bottom: 30px;
   }
   
   /* Cards */
@@ -2327,6 +2536,7 @@ ul {
   }
   .type-option-card {
     flex: 1;
+     margin-top: -30px;
     min-width: 320px;
     max-width: 360px;
     border-radius: 15px;
@@ -2422,6 +2632,7 @@ ul {
   }
   .btn-select-type:hover {
     background: #e6f0ff;
+    color: #5f6fff;
   }
   /* Botão Radar */
   .btn-select-type1 {
@@ -2430,11 +2641,12 @@ ul {
   }
   .btn-select-type1:hover {
     background: #f0e6ff;
+    color: #a047ff;
   }
   
   /* Cancelar */
   .btn-cancel-modal {
-    background-color: #f71335;
+     background-color: #e62727;
     color: white;
     border: none;
     border-radius: 14px;
@@ -2666,7 +2878,66 @@ ul {
 }
 
 .favorite-btn.active {
-    color: #007bff; /* azul ao clicar */
+    color: #fff709; /* azul ao clicar */
 }
 
+.edit-title-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .edit-monitoring-input {
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
+    border: 1px solid #a3c0ff;
+    border-radius: 5px;
+    padding: 3px 6px;
+    outline: none;
+    min-width: 240px;
+  }
+  
+  .save-monitoring-title-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #28a745;
+    font-size: 16px;
+  }
+  
+  .save-monitoring-title-btn:hover {
+    color: #1e7e34;
+    transform: scale(1.1);
+  }
+  
 
+  .item-header-title {
+    display: flex;
+    align-items: center; /* alinha ícone, texto e botões no meio verticalmente */
+    gap: 6px; /* espaço entre o texto e o lápis */
+}
+
+.item-header-title h3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.item-header-title .edit-monitoring-title-btn,
+.item-header-title  {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    font-size: 14px;
+    margin-left: 5px;
+    padding: 0;
+    line-height: 1;
+}
+
+.item-header-title .edit-monitoring-title-btn i,
+.item-header-title .edit-btn i {
+    vertical-align: middle;
+}
