@@ -1906,9 +1906,11 @@ async def patch_monitoring(
 
     updates = {}
 
-    # 🔹 Permite atualizar o nome customizado do monitoramento
+    # 🔹 Permite atualizar o nome customizado do monitoramento (mas ignora strings vazias)
     if "nome_customizado" in data:
-        updates["nome_customizado"] = data["nome_customizado"]
+        nome_customizado = str(data["nome_customizado"]).strip()
+        if nome_customizado:  # só salva se tiver conteúdo
+            updates["nome_customizado"] = nome_customizado
 
     # 🔹 (Opcional) também permite alterar o status, se enviado
     if "status" in data and data["status"] in ["active", "inactive"]:
@@ -1922,6 +1924,7 @@ async def patch_monitoring(
 
     updated_doc = doc_ref.get().to_dict()
     return {"id": monitoring_id, **updated_doc}
+
 
 @app.get("/api/monitoramentos")
 async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
