@@ -1745,32 +1745,41 @@ async def get_admin_feedback_stats():
 # ========================================================================================================
 #       ROTAS PARA DICAS
 # ========================================================================================================
+# ========================================================================================================
+#       ROTA PARA CRIAR DICAS (com notificação automática para todos os usuários)
+# ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
 async def create_dica(dica: Dica):
+    """
+    Cria uma nova dica e envia notificações para todos os usuários.
+    """
     db = firestore.client()
     dica_dict = dica.dict(exclude_unset=True)
     dica_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
+
+    # Adiciona a dica no Firestore
     _, doc_ref = db.collection('dicas').add(dica_dict)
-    
     new_doc = doc_ref.get()
-    
-    if new_doc.exists:
-        new_dica = Dica(id=new_doc.id, **new_doc.to_dict())
-        return new_dica
-    else:
+
+    if not new_doc.exists:
         raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
 
+    new_dica = Dica(id=new_doc.id, **new_doc.to_dict())
 
-# Depois de criar a dica
-users = db.collection("users").stream()
-for user in users:
-    await create_notification(
-        user_uid=user.id,
-        type_="nova_dica",
-        title="Nova Dica disponível",
-        message=f"{dica.titulo}",
-        link="/dicas"
-    )
+    # Envia notificação para todos os usuários
+    users = db.collection("users").stream()
+    for user in users:
+        await create_notification(
+            user_uid=user.id,
+            type_="nova_dica",
+            title="Nova Dica disponível 💡",
+            message=f"{dica.titulo}",
+            link="/dicas"
+        )
+        print(f"✅ Notificação enviada para {user.id}")
+
+    return new_dica
+
 
 @app.get("/dicas", response_model=List[Dica])
 async def list_dicas():
