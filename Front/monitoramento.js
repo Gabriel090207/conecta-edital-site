@@ -569,46 +569,49 @@ document.addEventListener('DOMContentLoaded', () => {
     window.loadDashboardDataAndRender = async function() {
         const user = window.auth.currentUser;
         if (!user) { return; }
-    
+      
         try {
-            const idToken = await user.getIdToken();
-            const responseStatus = await fetch(`${BACKEND_URL}/api/status`, {
-                headers: { 'Authorization': `Bearer ${idToken}` }
-            });
-            const responseMonitorings = await fetch(`${BACKEND_URL}/api/monitoramentos`, { 
-                headers: { 'Authorization': `Bearer ${idToken}` } 
-            });
-    
-            if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings)) return;
-            if (!responseStatus.ok || !responseMonitorings.ok) {
-                throw new Error("Erro ao buscar dados do dashboard.");
-            }
-    
-            const statusData = await responseStatus.json();
-            const monitoramentosList = await responseMonitorings.json();
-    
-            currentStatusData = statusData;
-            currentMonitorings = monitoramentosList;
-    
-            updateSummaryCards(statusData);
-            loadMonitorings(monitoramentosList);
-            fetchUserProfile();
-    
-            // ⚡️ Adicione esta linha:
-            if (typeof syncAllFavoriteButtons === "function") syncAllFavoriteButtons();
-    
-        
-     // Adiciona a chamada para carregar os dados do perfil
-            
+          const idToken = await user.getIdToken();
+      
+          const responseStatus = await fetch(`${BACKEND_URL}/api/status`, {
+            headers: { 'Authorization': `Bearer ${idToken}` }
+          });
+      
+          const responseMonitorings = await fetch(`${BACKEND_URL}/api/monitoramentos`, { 
+            headers: { 
+              'Authorization': `Bearer ${idToken}`,
+              'Cache-Control': 'no-cache' // 🔥 força o backend a trazer dados atualizados
+            } 
+          });
+      
+          if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings)) return;
+          if (!responseStatus.ok || !responseMonitorings.ok) {
+            throw new Error("Erro ao buscar dados do dashboard.");
+          }
+      
+          const statusData = await responseStatus.json();
+          const monitoramentosList = await responseMonitorings.json();
+      
+          currentStatusData = statusData;
+          currentMonitorings = monitoramentosList;
+      
+          updateSummaryCards(statusData);
+          loadMonitorings(monitoramentosList);
+          fetchUserProfile();
+      
+          // ⚡️ Reaplica favoritos depois de carregar os cards
+          if (typeof syncAllFavoriteButtons === "function") syncAllFavoriteButtons();
+      
         } catch (error) {
-            console.error("Erro ao carregar dados do dashboard:", error);
-            if (monitorsCountValue) monitorsCountValue.textContent = 'N/A';
-            if (monitorsActiveStatus) monitorsActiveStatus.textContent = 'Erro';
-            if (slotsAvailableValue) slotsAvailableValue.textContent = 'N/A';
-            if (slotsFreeStatus) slotsFreeStatus.textContent = 'Erro';
-            if (initialNoMonitoramentoMessage) initialNoMonitoramentoMessage.style.display = 'flex';
+          console.error("Erro ao carregar dados do dashboard:", error);
+          if (monitorsCountValue) monitorsCountValue.textContent = 'N/A';
+          if (monitorsActiveStatus) monitorsActiveStatus.textContent = 'Erro';
+          if (slotsAvailableValue) slotsAvailableValue.textContent = 'N/A';
+          if (slotsFreeStatus) slotsFreeStatus.textContent = 'Erro';
+          if (initialNoMonitoramentoMessage) initialNoMonitoramentoMessage.style.display = 'flex';
         }
-    };
+      };
+      
 
 
     function updateSummaryCards(data) {
@@ -1594,7 +1597,7 @@ function enableEditableTitles() {
       const oldTitle = titleSpan.textContent.trim();
       const id = card.dataset.id;
   
-      // cria input inline + check
+      // Cria campo de edição inline
       const wrapper = document.createElement("div");
       wrapper.className = "edit-title-wrapper";
   
@@ -1613,16 +1616,17 @@ function enableEditableTitles() {
       input.focus();
       editBtn.style.display = "none";
   
-      // função salvar
       async function saveTitle() {
         const newTitle = input.value.trim() || oldTitle;
-        const newSpan = document.createElement("h3");
-        newSpan.className = "monitoring-title-text";
-        newSpan.textContent = newTitle;
-        wrapper.replaceWith(newSpan);
+  
+        // Substitui novamente por <span>
+        const span = document.createElement("span");
+        span.className = "monitoring-title-text";
+        span.textContent = newTitle;
+        wrapper.replaceWith(span);
         editBtn.style.display = "inline-block";
   
-        // envia pro backend
+        // Só envia se houver mudança
         if (newTitle !== oldTitle) {
           try {
             const user = window.auth.currentUser;
@@ -1639,32 +1643,29 @@ function enableEditableTitles() {
             });
   
             if (response.ok) {
-                const updated = await response.json();
-                console.log(`✅ Nome do monitoramento atualizado: ${updated.nome_customizado}`);
-              
-                // 🔹 Atualiza o título visualmente
-                const span = document.createElement("span");
-                span.className = "monitoring-title-text";
-                span.textContent = updated.nome_customizado;
-                wrapper.replaceWith(span);
-                editBtn.style.display = "inline-block";
-              
-                // 🔹 Atualiza o array local
-                const item = currentMonitorings.find(m => m.id === id);
-                if (item) item.nome_customizado = updated.nome_customizado;
-              
-                // 🔹 Pausa o polling por 6s pra evitar overwrite
-                if (pollingInterval) {
-                  clearInterval(pollingInterval);
-                  pollingInterval = null;
-                  setTimeout(() => {
-                    pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
-                  }, 6000);
-                }
+              const updated = await response.json();
+              console.log(`✅ Nome atualizado: ${updated.nome_customizado}`);
+  
+              // Atualiza no array local
+              const item = currentMonitorings.find(m => m.id === id);
+              if (item) item.nome_customizado = updated.nome_customizado;
+  
+              // Atualiza visualmente o card sem reload
+              loadMonitorings(currentMonitorings);
+  
+              // Pausa o polling pra evitar regravação
+              if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+                setTimeout(() => {
+                  pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+                }, 6000);
               }
-              
-               else {
-              console.error("❌ Erro ao atualizar nome.");
+  
+            } else {
+              const err = await response.json();
+              console.error("❌ Erro ao atualizar nome:", err);
+              alert(err.detail || "Erro ao atualizar nome.");
             }
           } catch (err) {
             console.error("Erro:", err);
