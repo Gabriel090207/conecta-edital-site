@@ -1882,3 +1882,44 @@ async def update_user_admin(uid: str, user_update: dict):
         print(f"⚠️ Nenhum dado enviado para atualizar {uid}")
 
     return {"message": "Usuário atualizado com sucesso", "updated_fields": update_data}
+
+
+@app.patch("/api/monitoramentos/{monitoring_id}")
+async def patch_monitoring(
+    monitoring_id: str,
+    data: dict,
+    user_uid: str = Depends(get_current_user_uid)
+):
+    """
+    Atualiza campos específicos de um monitoramento — incluindo nome_customizado.
+    """
+    db = firestore.client()
+    doc_ref = db.collection("monitorings").document(monitoring_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Monitoramento não encontrado.")
+
+    mon_data = doc.to_dict()
+    if mon_data.get("user_uid") != user_uid:
+        raise HTTPException(status_code=403, detail="Sem permissão para editar este monitoramento.")
+
+    updates = {}
+
+    # 🔹 Permite atualizar o nome customizado do monitoramento
+    if "nome_customizado" in data:
+        updates["nome_customizado"] = data["nome_customizado"]
+
+    # 🔹 (Opcional) também permite alterar o status, se enviado
+    if "status" in data and data["status"] in ["active", "inactive"]:
+        updates["status"] = data["status"]
+
+    if not updates:
+        raise HTTPException(status_code=400, detail="Nenhum campo válido fornecido.")
+
+    updates["last_checked_at"] = firestore.SERVER_TIMESTAMP
+    doc_ref.update(updates)
+
+    updated_doc = doc_ref.get().to_dict()
+    return {"id": monitoring_id, **updated_doc}
+

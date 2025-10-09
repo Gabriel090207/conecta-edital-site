@@ -184,7 +184,7 @@
       
 
     <div class="modal-overlay" id="personal-monitoramento-modal">
-        <div class="modal-content">
+        <div class="modal-content1">
             <button class="modal-close-btn" data-modal-id="personal-monitoramento-modal"><i class="fas fa-times"></i></button>
             <div class="modal-header-icon blue-gradient-type">
                 <i class="fas fa-user"></i>
@@ -192,20 +192,20 @@
             <h2>Monitoramento Pessoal</h2>
             <p class="modal-subtitle">Configure o monitoramento para acompanhar seus resultados pessoais</p>
             <form class="modal-form" id="personal-monitoring-form"> 
-                <div class="form-group">
-                    <label for="personal-link"><i class="fas fa-link"></i> Link do Diário Oficial</label>
+                <div class="form-group mon1">
+                    <label for="personal-link"><i class="fas fa-link ic"></i> Link do Diário Oficial</label>
                     <input type="text" id="personal-link" placeholder="https://diario.exemplo.gov.br">
-                    <span class="required-tag">Obrigatório</span>
+                    <span class="required-tag2">Obrigatório</span>
                 </div>
-                <div class="form-group">
-                    <label for="personal-id"><i class="fas fa-id-card"></i> ID do Edital / Concurso</label>
+                <div class="form-group mon1">
+                    <label for="personal-id"><i class="fas fa-id-card ic"></i> ID do Edital / Concurso</label>
                     <input type="text" id="personal-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital">
-                    <span class="required-tag">Obrigatório</span>
+                    <span class="required-tag2">Obrigatório</span>
                 </div>
-                <div class="form-group">
-                    <label for="personal-name"><i class="fas fa-user" style="font-size: 20px"></i> Nome Completo</label>
+                <div class="form-group mon1">
+                    <label for="personal-name"><i class="fas fa-user ic" style="font-size: 20px"></i> Nome Completo</label>
                     <input type="text" id="personal-name" placeholder="Seu nome completo">
-                    <span class="required-tag">Obrigatório</span>
+                    <span class="required-tag2">Obrigatório</span>
                 </div>
                 
                 <div class="modal-actions">
@@ -217,7 +217,7 @@
     </div>
 
     <div class="modal-overlay" id="radar-monitoramento-modal">
-        <div class="modal-content">
+        <div class="modal-content1">
             <button class="modal-close-btn" data-modal-id="radar-monitoramento-modal"><i class="fas fa-times"></i></button>
             <div class="modal-header-icon purple-gradient-type" style="background-color: #e1bafc">
                 <i class="fas fa-bullseye" style="color: #851fce"></i>
@@ -225,14 +225,14 @@
             <h2>Monitoramento Radar</h2>
             <p class="modal-subtitle">Configure o monitoramento para acompanhar novidades do edital</p>
             <form class="modal-form" id="radar-monitoring-form"> 
-                <div class="form-group">
-                    <label for="radar-link"><i class="fas fa-link"></i> Link do Diário Oficial</label>
+                <div class="form-group mon">
+                    <label for="radar-link"><i class="fas fa-link ic" class="idinput"></i> Link do Diário Oficial</label>
                     <input type="text" id="radar-link" placeholder="https://diario.exemplo.gov.br">
-                    <span class="required-tag">Obrigatório</span>
+                    <span class="required-tag1">Obrigatório</span>
                 </div>
-                <div class="form-group">
-                    <label for="radar-id"><i class="fas fa-id-card"></i> ID do Edital / Concurso</label>
-                    <input type="text" id="radar-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital">
+                <div class="form-group mon">
+                    <label for="radar-id" class="id"><i class="fas fa-id-card ic1"></i> ID do Edital / Concurso</label>
+                    <input type="text" id="radar-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital" >
                     <span class="required-tag">Obrigatório</span>
                 </div>
                 <div class="modal-actions">
@@ -346,21 +346,21 @@
                     <div id="info-tab" class="tab-content active">
                         <form id="profile-info-form">
                             <div class="form-group">
-                                <label for="profile-full-name"><i class="fas fa-user-tag i"></i> Nome Completo</label>
+                                <label for="profile-full-name" class="nomeperfil"><i class="fas fa-user-tag i"></i> Nome Completo</label>
                                 <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
                                 <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
                             </div>
                             <div class="form-group">
-                                <label for="profile-contact"><i class="fas fa-phone"></i> Telefone</label>
+                                <label for="profile-contact" class="telefoneperfil"><i class="fas fa-phone i"></i> Telefone</label>
                                 <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
                             </div>
                             <div class="form-group">
-                                <label for="profile-email"><i class="fas fa-envelope i"></i> E-mail</label>
+                                <label for="profile-email" class="emailperfil"><i class="fas fa-envelope i"></i> E-mail</label>
                                 <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
                                 <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
                             </div>
                             <div class="modal-actions">
-                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
                                 <button type="submit" class="btn-save-changes">Salvar Alterações</button>
                             </div>
                         </form>
@@ -384,7 +384,7 @@
                                 <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
                             </div>
                             <div class="modal-actions">
-                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
                                 <button type="submit" class="btn-change-password">Alterar Senha</button>
                             </div>
                         </form>
@@ -405,7 +405,7 @@
                                     <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
                                 </div>
                                 <div class="modal-actions">
-                                    <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                    <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
                                     <button type="submit" class="btn-create-password">Criar Senha</button>
                                 </div>
                             </form>

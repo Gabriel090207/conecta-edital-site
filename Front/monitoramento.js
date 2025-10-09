@@ -244,11 +244,22 @@ document.addEventListener('DOMContentLoaded', () => {
         itemCard.innerHTML = `
             <div class="item-header">
                 <div class="item-header-title">
-                    <i class="${titleIconClass}"></i>
-                    <h3>Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}</h3>
-                    <button class="edit-btn" data-id="${mon.id}" title="Editar monitoramento"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito"><i class="far fa-star"></i></button>
-                </div>
+    <i class="${titleIconClass}"></i>
+
+    <h3 class="editable-monitoring-title">
+        <span class="monitoring-title-text">
+            ${mon.nome_customizado || `Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}`}
+        </span>
+        <button class="edit-btn" data-id="${mon.id}" title="Editar nome do monitoramento">
+            <i class="fas fa-pencil-alt"></i>
+        </button>
+    </h3>
+
+    <button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito">
+        <i class="far fa-star"></i>
+    </button>
+</div>
+
                 <span class="status-tag ${statusTagClass}">
                     ${mon.status === 'active' ? 'Monitorando' : 'Inativo'}
                 </span>
@@ -774,13 +785,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const deleteMonitoring = async (id) => {
-        if (!confirm('Tem certeza que deseja excluir este monitoramento?')) { return; }
-        const user = window.auth.currentUser;
-        if (!user) { alert("Você não está logado."); return; } const idToken = await user.getIdToken();
-        try { const response = await fetch(`${BACKEND_URL}/api/monitoramentos/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${idToken}` } });
-            if (await handleApiAuthError(response)) return; if (response.status === 204) { console.log(`Monitoramento ${id} excluído com sucesso!`); window.loadDashboardDataAndRender(); } else if (response.status === 404) { alert('Monitoramento não encontrado.'); console.warn(`Monitoramento ${id} não encontrado no backend.`); } else { const errorData = await response.json(); throw new Error(errorData.detail || 'Erro desconhecido ao excluir.'); }
-        } catch (error) { console.error("Erro ao excluir monitoramento:", error); alert(`Falha ao excluir monitoramento: ${error.message}`); }
-    };
+    if (!confirm('Tem certeza que deseja excluir este monitoramento?')) return;
+
+    const user = window.auth.currentUser;
+    if (!user) {
+        alert("Você não está logado.");
+        return;
+    }
+
+    const idToken = await user.getIdToken();
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/monitoramentos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${idToken}` }
+        });
+
+        if (await handleApiAuthError(response)) return;
+
+        if (response.status === 204) {
+            console.log(`✅ Monitoramento ${id} excluído com sucesso!`);
+
+            // 🔥 Remove o card da tela imediatamente
+            const card = document.querySelector(`.monitoramento-item-card[data-id="${id}"]`);
+            if (card) {
+                card.classList.add("fade-out");
+                setTimeout(() => card.remove(), 300);
+            }
+
+            // Atualiza o contador de monitoramentos e slots
+            if (typeof window.loadDashboardDataAndRender === "function") {
+                setTimeout(() => window.loadDashboardDataAndRender(), 400);
+            }
+
+        } else if (response.status === 404) {
+            alert('Monitoramento não encontrado.');
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Erro desconhecido ao excluir.');
+        }
+    } catch (error) {
+        console.error("Erro ao excluir monitoramento:", error);
+        alert(`Falha ao excluir monitoramento: ${error.message}`);
+    }
+};
+
 
     const toggleMonitoringStatus = async (id, isActive) => {
         const user = window.auth.currentUser;
@@ -1060,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (monitoringListSection) { monitoringListSection.addEventListener('change', (e) => { if (e.target.matches('input[type="checkbox"][id^="toggle-monitoramento-"]')) { const monitoringId = e.target.dataset.id; const isActive = e.target.checked; toggleMonitoringStatus(monitoringId, isActive); } });
-        monitoringListSection.addEventListener('click', (e) => { const targetButton = e.target.closest('.btn-action'); if (targetButton) { const monitoringId = targetButton.dataset.id; if (targetButton.classList.contains('btn-delete')) { deleteMonitoring(monitoringId); } else if (targetButton.classList.contains('btn-configure')) { console.log(`Botão "Configurar" clicado para ${monitoringId}! (Ainda não implementado)`); alert(`Configurar monitoramento ${monitoringId} - Funcionalidade em desenvolvimento.`); } else if (targetButton.classList.contains('btn-test')) { testMonitoring(monitoringId); } } }); }
+        monitoringListSection.addEventListener('click', (e) => { const targetButton = e.target.closest('.btn-action'); if (targetButton) { const monitoringId = targetButton.dataset.id; if (targetButton.classList.contains('btn-delete')) { deleteMonitoring(monitoringId); } else if (targetButton.classList.contains('btn-test')) { testMonitoring(monitoringId); } } }); }
 
     let pollingInterval;
     async function checkMonitoringsForUpdates() {
@@ -1362,7 +1411,7 @@ style.innerHTML = `
     transition: color 0.25s ease, transform 0.2s ease;
 }
 .favorite-btn.active i {
-    color: #007bff !important;
+    color: #fff709 !important;
     transform: scale(1.2);
 }
 .favorite-btn i {
@@ -1370,7 +1419,7 @@ style.innerHTML = `
     transition: transform 0.2s ease;
 }
 .favorite-btn:hover i {
-    color: #0056b3;
+    color: #e0d804;
 }
 .favorite-btn:active i {
     transform: scale(1.3);
@@ -1392,18 +1441,19 @@ const monitoramentoContainer = document.querySelector(".monitoramento-list-secti
 
 if (monitoramentoContainer) {
     monitoramentoContainer.addEventListener("click", async (e) => {
-        const editBtn = e.target.closest(".edit-btn");
-        if (!editBtn) return;
+        const configBtn = e.target.closest(".btn-configure");
+        if (!configBtn) return; // Agora o gatilho é o botão "Configurar"
 
         e.preventDefault();
 
-        const card = editBtn.closest(".monitoramento-item-card");
+        const card = configBtn.closest(".monitoramento-item-card");
         if (!card) return;
 
         const monitoramentoId = card.dataset.id;
-        const tipo = card.querySelector("h3")?.textContent.toLowerCase().includes("pessoal") 
-            ? "pessoal" 
+        const tipo = card.querySelector("h3")?.textContent.toLowerCase().includes("pessoal")
+            ? "pessoal"
             : "radar";
+
 
         // Busca o usuário logado e o token Firebase
         const user = window.auth?.currentUser;
@@ -1528,4 +1578,87 @@ if (monitoramentoContainer) {
         });
     });
 }
+
+
+function enableEditableTitles() {
+    const container = document.querySelector(".monitoramento-list-section");
+    if (!container) return;
+  
+    container.addEventListener("click", async (e) => {
+      const editBtn = e.target.closest(".edit-btn");
+      if (!editBtn) return;
+  
+      const card = editBtn.closest(".monitoramento-item-card");
+      const titleSpan = card.querySelector(".monitoring-title-text");
+      const oldTitle = titleSpan.textContent.trim();
+      const id = card.dataset.id;
+  
+      // cria input inline + check
+      const wrapper = document.createElement("div");
+      wrapper.className = "edit-title-wrapper";
+  
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = oldTitle;
+      input.className = "edit-monitoring-input";
+  
+      const checkBtn = document.createElement("button");
+      checkBtn.className = "save-monitoring-title-btn";
+      checkBtn.innerHTML = '<i class="fas fa-check"></i>';
+  
+      wrapper.appendChild(input);
+      wrapper.appendChild(checkBtn);
+      titleSpan.replaceWith(wrapper);
+      input.focus();
+      editBtn.style.display = "none";
+  
+      // função salvar
+      async function saveTitle() {
+        const newTitle = input.value.trim() || oldTitle;
+        const newSpan = document.createElement("h3");
+        newSpan.className = "monitoring-title-text";
+        newSpan.textContent = newTitle;
+        wrapper.replaceWith(newSpan);
+        editBtn.style.display = "inline-block";
+  
+        // envia pro backend
+        if (newTitle !== oldTitle) {
+          try {
+            const user = window.auth.currentUser;
+            if (!user) return alert("Você não está logado.");
+            const token = await user.getIdToken();
+  
+            const response = await fetch(`${BACKEND_URL}/api/monitoramentos/${id}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
+              body: JSON.stringify({ nome_customizado: newTitle })
+            });
+  
+            if (response.ok) {
+              console.log(`✅ Nome do monitoramento atualizado: ${newTitle}`);
+            } else {
+              console.error("❌ Erro ao atualizar nome.");
+            }
+          } catch (err) {
+            console.error("Erro:", err);
+          }
+        }
+      }
+  
+      checkBtn.addEventListener("click", saveTitle);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") saveTitle();
+        if (e.key === "Escape") {
+          wrapper.replaceWith(titleSpan);
+          editBtn.style.display = "inline-block";
+        }
+      });
+    });
+  }
+  
+  window.addEventListener("load", enableEditableTitles);
+  
 });

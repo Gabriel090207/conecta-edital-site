@@ -413,24 +413,15 @@
           </div>
 
           <!-- 🔹 NOVO CAMPO: Controle de Slots -->
-          <div class="form-group">
+          <div class="form-group" id="slot-wrapper" style="display: flex; flex-direction: column; gap: 8px;">
             <label for="edit-user-slots">Slots Disponíveis</label>
-            <div class="slot-control">
-              <button type="button" class="slot-btn" id="decrease-slots">
-                -
-              </button>
-              <input
-                type="number"
-                id="edit-user-slots"
-                value="0"
-                min="0"
-                readonly
-              />
-              <button type="button" class="slot-btn" id="increase-slots">
-                +
-              </button>
+            <div class="slot-control" style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" class="slot-btn" id="decrease-slots">-</button>
+              <input type="number" id="edit-user-slots" value="0" min="0" />
+              <button type="button" class="slot-btn" id="increase-slots">+</button>
             </div>
           </div>
+          
 
           <div class="form-actions">
             <button

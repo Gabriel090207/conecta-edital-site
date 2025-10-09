@@ -599,12 +599,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("edit-user-email").value = userData.email || "";
     document.getElementById("edit-user-plan").value = userData.plan_type || "gratuito";
 
-    const slotWrapper = document.getElementById("slot-wrapper"); // 🔹 div que envolve o campo
+    const slotWrapper = document.getElementById("slot-wrapper");
     const slotInput = document.getElementById("edit-user-slots");
     const decreaseBtn = document.getElementById("decrease-slots");
     const increaseBtn = document.getElementById("increase-slots");
 
-    // 🔥 Usa o valor salvo no Firestore
+    // 🔹 Usa o valor salvo no Firestore, senão usa 0
     slotInput.value = userData.slots_disponiveis ?? 0;
 
     // Remove eventos antigos
@@ -626,25 +626,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const planSelect = document.getElementById("edit-user-plan");
 
-    // 💡 Função pra atualizar o campo de slots conforme o plano
+    // 💡 Atualiza visibilidade e valor de slots conforme o plano
     const updateSlotVisibility = () => {
         const plan = planSelect.value;
 
         if (plan === "premium") {
-            // 🔥 Esconde o campo completamente
+            // 🔥 Esconde campo de slots no Premium
             slotWrapper.style.display = "none";
-            slotInput.value = 0; // só pra garantir que o backend não receba "∞"
+            slotInput.value = 0; // apenas pra não enviar lixo ao backend
         } else {
-            // Mostra o campo nos outros planos
+            // ✅ Exibe o campo em todos os outros planos
             slotWrapper.style.display = "flex";
 
-            if (plan === "essencial") {
-                if (!userData.slots_disponiveis) slotInput.value = 3;
-            } else if (plan === "basico") {
-                if (!userData.slots_disponiveis) slotInput.value = 5;
-            } else {
-                // sem plano
-                slotInput.value = 0;
+            // Mantém o valor salvo, mas se não tiver, aplica padrão do plano
+            if (!userData.slots_disponiveis) {
+                if (plan === "essencial") slotInput.value = 3;
+                else if (plan === "basico") slotInput.value = 5;
+                else slotInput.value = 0; // sem plano
             }
         }
     };
