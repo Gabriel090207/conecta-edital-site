@@ -1847,27 +1847,3 @@ async def admin_update_user_slots(user_uid: str, data: dict):
         print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
         raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
 
-@app.put("/admin/users/{user_uid}/slots")
-async def admin_update_user_slots(user_uid: str, data: dict):
-    db = firestore.client()
-    user_ref = db.collection("users").document(user_uid)
-    doc = user_ref.get()
-
-    if not doc.exists:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
-
-    custom_slots = data.get("custom_slots")
-
-    if not isinstance(custom_slots, int) or custom_slots < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="O campo 'custom_slots' deve ser um número inteiro não negativo."
-        )
-
-    try:
-        user_ref.update({"custom_slots": custom_slots})
-        print(f"✅ Slots personalizados do usuário {user_uid} atualizados para {custom_slots}.")
-        return {"status": "ok", "message": f"Slots atualizados para {custom_slots}."}
-    except Exception as e:
-        print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
