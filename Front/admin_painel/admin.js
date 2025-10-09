@@ -652,6 +652,39 @@ function openEditUserModal(userData) {
   });
   
 
+  // === ATUALIZAÇÃO AUTOMÁTICA DE SLOTS CONFORME O PLANO ===
+document.addEventListener("change", (e) => {
+    if (e.target && e.target.id === "edit-user-plan") {
+      const selectedPlan = e.target.value;
+      const slotInput = document.getElementById("edit-user-slots");
+      const decreaseBtn = document.getElementById("decrease-slots");
+      const increaseBtn = document.getElementById("increase-slots");
+  
+      if (!slotInput || !decreaseBtn || !increaseBtn) return;
+  
+      if (selectedPlan === "premium") {
+        slotInput.value = "∞";
+        slotInput.setAttribute("readonly", true);
+        decreaseBtn.disabled = true;
+        increaseBtn.disabled = true;
+      } else {
+        decreaseBtn.disabled = false;
+        increaseBtn.disabled = false;
+        slotInput.removeAttribute("readonly");
+  
+        if (selectedPlan === "essencial") {
+          slotInput.value = 3;
+        } else if (selectedPlan === "basico") {
+          slotInput.value = 5;
+        } else {
+          // “Sem plano” (gratuito)
+          slotInput.value = 0;
+        }
+      }
+    }
+  });
+  
+
 // === SALVAR ALTERAÇÕES DE USUÁRIO (ADMIN) ===
 document.getElementById("user-edit-form").addEventListener("submit", async (e) => {
     e.preventDefault();
