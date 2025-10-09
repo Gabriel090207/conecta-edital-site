@@ -1082,6 +1082,11 @@ async def create_ticket(
     return Ticket(**ticket_doc)
 
 
+# ========================================================================================================
+# ROTAS DE SUPORTE (USER E ADMIN)
+# ========================================================================================================
+
+# --- Usuário responde ao ticket ---
 @app.post("/api/tickets/{ticket_id}/reply")
 async def user_reply_to_ticket(
     ticket_id: str,
@@ -1091,10 +1096,12 @@ async def user_reply_to_ticket(
     db = firestore.client()
     ref = db.collection('tickets').document(ticket_id)
     doc = ref.get()
+
     if not doc.exists:
         raise HTTPException(status_code=404, detail="Ticket não encontrado.")
 
-    if doc.to_dict().get('user_uid') != user_uid:
+    ticket_data = doc.to_dict()
+    if ticket_data.get('user_uid') != user_uid:
         raise HTTPException(status_code=403, detail="Você não tem permissão para responder a este ticket.")
 
     now = datetime.now(timezone.utc)
@@ -1102,7 +1109,7 @@ async def user_reply_to_ticket(
         "sender": "user",
         "text": reply.text,
         "timestamp": now,
-        "attachments": [] # Campo de anexo vazio
+        "attachments": []
     }
 
     ref.update({
@@ -1111,128 +1118,20 @@ async def user_reply_to_ticket(
         'last_updated_at': firestore.SERVER_TIMESTAMP
     })
 
+    # 🔹 Notificação ao admin (ou sistema, se desejar)
     await create_notification(
-    user_uid=ticket_data.get("user_uid"),
-    type_="resposta_suporte",
-    title="Nova resposta do suporte",
-    message=f"O suporte respondeu ao seu ticket {ticket_id}.",
-    link=f"/suporte?ticket={ticket_id}"
-)
+        user_uid=ticket_data.get("admin_uid", "admin-system"),  # ajuste conforme seu app
+        type_="nova_resposta_usuario",
+        title="Nova resposta de usuário",
+        message=f"O usuário respondeu ao ticket {ticket_id}.",
+        link=f"/admin/suporte?ticket={ticket_id}"
+    )
 
-    
     updated_ticket_data = ref.get().to_dict()
-    return {"message": "Resposta enviada", "ticket": updated_ticket_data}
+    return {"message": "Resposta enviada com sucesso!", "ticket": updated_ticket_data}
 
 
-# Ao o admin responder
-
-# --- ROTA PARA OBTER DADOS DE UM USUÁRIO ESPECÍFICO ---
-@app.get("/api/users/{user_uid}", response_model=UserData)
-async def get_user_data(user_uid: str, current_user_uid: str = Depends(get_current_user_uid)):
-    """
-    Retorna os dados do perfil do usuário autenticado.
-    A dependência `current_user_uid` garante que o usuário só pode acessar
-    os próprios dados, e não os de outros.
-    """
-    if user_uid != current_user_uid:
-        raise HTTPException(
-            status_code=403,
-            detail="Você não tem permissão para acessar os dados de outro usuário."
-        )
-
-    db = firestore.client()
-    user_doc_ref = db.collection('users').document(user_uid)
-    user_doc = user_doc_ref.get()
-
-    if not user_doc.exists:
-        raise HTTPException(status_code=404, detail="Dados do usuário não encontrados.")
-    
-    user_data = user_doc.to_dict()
-    
-    # Adiciona valores padrão caso as chaves não existam
-    user_data['fullName'] = user_data.get('fullName', 'Nome não informado')
-    user_data['username'] = user_data.get('username', 'Usuário não informado')
-    user_data['email'] = user_data.get('email', 'E-mail não informado')
-    user_data['plan_type'] = user_data.get('plan_type', 'Sem Plano')
-    user_data['photoURL'] = user_data.get('photoURL', None)
-    user_data['contact'] = user_data.get('contact', None)
-    
-    return UserData(**user_data)
-# ========================================================================================================
-# --- ROTA CORRIGIDA PARA ATUALIZAR O PERFIL DO USUÁRIO ---
-# ========================================================================================================
-@app.patch("/api/users/{user_uid}", response_model=UserData)
-async def update_user_profile(
-    user_uid: str,
-    update_data: UserProfileUpdate,
-    current_user_uid: str = Depends(get_current_user_uid)
-):
-    """
-    Atualiza o perfil do usuário logado no Firestore.
-    A dependência `current_user_uid` garante que o usuário só pode acessar
-    e editar os próprios dados, e não os de outros.
-    """
-    if user_uid != current_user_uid:
-        raise HTTPException(
-            status_code=403,
-            detail="Você não tem permissão para editar os dados de outro usuário."
-        )
-
-    db = firestore.client()
-    user_doc_ref = db.collection('users').document(current_user_uid)
-    
-    # Valida se os dados enviados são válidos
-    update_payload = update_data.model_dump(exclude_unset=True)
-    
-    # Se houver dados para atualizar, faça o update
-    if update_payload:
-        user_doc_ref.update(update_payload)
-        
-        # Retorna o documento completo e atualizado
-        updated_doc = user_doc_ref.get()
-        # NOTA: O id não está no dicionário do Firestore, então adicionamos
-        updated_data = updated_doc.to_dict()
-        if updated_data:
-            updated_data['id'] = updated_doc.id
-        return UserData(**updated_data)
-    
-    # Se nenhum dado for fornecido, retorna o perfil atual sem alterações
-    return await get_user_data(user_uid, current_user_uid)
-
-
-# ========================================================================================================
-#       ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
-# ========================================================================================================
-
-@app.get("/admin/tickets")
-async def list_all_tickets():
-    """Retorna todos os tickets, ordenados do mais recente para o mais antigo."""
-    db = firestore.client()
-    tickets_ref = db.collection('tickets').order_by('last_updated_at', direction=firestore.Query.DESCENDING)
-    
-    tickets_list = []
-    for doc in tickets_ref.stream():
-        ticket_data = doc.to_dict()
-        
-        # Converte o timestamp do Firestore para o formato ISO
-        if 'created_at' in ticket_data and ticket_data['created_at']:
-            ticket_data['created_at'] = ticket_data['created_at'].isoformat()
-        if 'last_updated_at' in ticket_data and ticket_data['last_updated_at']:
-            ticket_data['last_updated_at'] = ticket_data['last_updated_at'].isoformat()
-        
-        if 'messages' in ticket_data and isinstance(ticket_data['messages'], list):
-            for message in ticket_data['messages']:
-                if isinstance(message.get('timestamp'), datetime):
-                    message['timestamp'] = message['timestamp'].isoformat()
-
-        # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
-        if 'category' not in ticket_data:
-            ticket_data['category'] = 'Outros'
-            
-        tickets_list.append(Ticket(id=doc.id, **ticket_data))
-
-    return tickets_list
-
+# --- Admin responde ao ticket ---
 @app.post("/admin/tickets/{ticket_id}/reply")
 async def admin_reply_to_ticket(
     ticket_id: str,
@@ -1245,15 +1144,14 @@ async def admin_reply_to_ticket(
     if not ticket_doc.exists:
         raise HTTPException(status_code=404, detail="Ticket não encontrado.")
 
-
-# Ao o admin responder
+    ticket_data = ticket_doc.to_dict()
 
     now = datetime.now(timezone.utc)
     new_message = {
         "sender": "admin",
         "text": reply.text,
         "timestamp": now,
-        "attachments": [] # Campo de anexo vazio
+        "attachments": []
     }
 
     ticket_doc_ref.update({
@@ -1262,299 +1160,21 @@ async def admin_reply_to_ticket(
         'last_updated_at': firestore.SERVER_TIMESTAMP
     })
 
+    # 🔹 Cria notificação para o usuário
     await create_notification(
-    user_uid=ticket_data.get("user_uid"),
-    type_="resposta_suporte",
-    title="Nova resposta do suporte",
-    message=f"O suporte respondeu ao seu ticket {ticket_id}.",
-    link=f"/suporte?ticket={ticket_id}"
-)
-
+        user_uid=ticket_data.get("user_uid"),
+        type_="resposta_suporte",
+        title="Nova resposta do suporte",
+        message=f"O suporte respondeu ao seu ticket {ticket_id}.",
+        link=f"/suporte?ticket={ticket_id}"
+    )
 
     updated_ticket_data = ticket_doc_ref.get().to_dict()
     return {"message": "Resposta do admin enviada com sucesso!", "ticket": updated_ticket_data}
 
 
-
-
-@app.patch("/admin/tickets/{ticket_id}/status")
-async def update_ticket_status(
-    ticket_id: str,
-    status_update: TicketStatusUpdate,
-):
-    db = firestore.client()
-    ticket_doc_ref = db.collection('tickets').document(ticket_id)
-
-    if not ticket_doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="Ticket não encontrado.")
-
-    ticket_doc_ref.update({'status': status_update.status, 'last_updated_at': firestore.SERVER_TIMESTAMP})
-    return {"message": f"Status do ticket {ticket_id} atualizado para '{status_update.status}'."}
-
-# Rota para o administrador ver todas as estatísticas
-@app.get("/admin/stats")
-async def get_admin_stats():
-    db = firestore.client()
-    users_ref = db.collection('users')
-    monitorings_ref = db.collection('monitorings')
-
-    all_users = list(users_ref.stream())
-    total_users = len(all_users)
-    all_monitorings = list(monitorings_ref.stream())
-
-    plan_distribution = {
-        'gratuito': {'count': 0, 'slots_used': 0},
-        'essencial': {'count': 0, 'slots_used': 0},
-        'premium': {'count': 0, 'slots_used': 0}
-    }
-    slot_distribution = {
-        'zero_slots': {'count': 0},
-        'one_two_slots': {'count': 0},
-        'three_five_slots': {'count': 0},
-        'six_plus_slots': {'count': 0}
-    }
-
-    monitorings_by_user = defaultdict(int)
-    for mon_doc in all_monitorings:
-        mon_data = mon_doc.to_dict()
-        user_uid = mon_data.get('user_uid')
-        if user_uid:
-            monitorings_by_user[user_uid] += 1
-    
-    active_users_count = 0
-    inactive_users_count = 0
-    
-    for user_doc in all_users:
-        user_uid = user_doc.id
-        user_data = user_doc.to_dict()
-        user_plan = user_data.get('plan_type', 'gratuito')
-        
-        num_monitorings = monitorings_by_user.get(user_uid, 0)
-        if num_monitorings > 0:
-            active_users_count += 1
-        else:
-            inactive_users_count += 1
-            
-        if user_plan in plan_distribution:
-            plan_distribution[user_plan]['count'] += 1
-
-        if num_monitorings == 0:
-            slot_distribution['zero_slots']['count'] += 1
-        elif num_monitorings <= 2:
-            slot_distribution['one_two_slots']['count'] += 1
-        elif num_monitorings <= 5:
-            slot_distribution['three_five_slots']['count'] += 1
-        else:
-            slot_distribution['six_plus_slots']['count'] += 1
-
-    for plan_key in plan_distribution:
-        if total_users > 0:
-            plan_distribution[plan_key]['percentage'] = (plan_distribution[plan_key]['count'] / total_users) * 100
-        else:
-            plan_distribution[plan_key]['percentage'] = 0
-
-    total_slot_users = sum(s['count'] for s in slot_distribution.values())
-    for slot_key in slot_distribution:
-        if total_slot_users > 0:
-            slot_distribution[slot_key]['percentage'] = (slot_distribution[slot_key]['count'] / total_slot_users) * 100
-        else:
-            slot_distribution[slot_key]['percentage'] = 0
-            
-    user_status_distribution = {
-        'active': {'count': active_users_count, 'percentage': 0},
-        'inactive': {'count': inactive_users_count, 'percentage': 0}
-    }
-    if total_users > 0:
-        user_status_distribution['active']['percentage'] = (active_users_count / total_users) * 100
-        user_status_distribution['inactive']['percentage'] = (inactive_users_count / total_users) * 100
-
-    return {
-        "total_users": total_users,
-        "plan_distribution": {
-            "no_plan": plan_distribution['gratuito'],
-            "essencial": plan_distribution['essencial'],
-            "premium": plan_distribution['premium']
-        },
-        "slot_distribution": {
-            "zero_slots": slot_distribution['zero_slots'],
-            "one_two_slots": slot_distribution['one_two_slots'],
-            "three_five_slots": slot_distribution['three_five_slots'],
-            "six_plus_slots": slot_distribution['six_plus_slots']
-        },
-        "user_status_distribution": user_status_distribution
-    }
-
-@app.get("/admin/users")
-async def get_all_users_for_audit():
-    """
-    Retorna uma lista simplificada de todos os usuários para auditoria.
-    """
-    db = firestore.client()
-    users_stream = db.collection('users').stream()
-    
-    users_list = []
-    for doc in users_stream:
-        user_data = doc.to_dict()
-        users_list.append({
-            "uid": doc.id,
-            "email": user_data.get("email", "N/A"),
-            "plan_type": user_data.get("plan_type", "gratuito"),
-            "full_name": user_data.get("fullName", "N/A"),
-            "status": user_data.get("status", "ativo")
-        })
-        
-    return users_list
-
-# NOVO ENDPOINT DE ADMIN
-@app.patch("/admin/users/{user_uid}")
-async def admin_update_user_profile(
-    user_uid: str,
-    update_data: AdminProfileUpdate,
-):
-    """
-    Permite que um administrador atualize os dados de perfil de qualquer usuário.
-    """
-    db = firestore.client()
-    user_doc_ref = db.collection('users').document(user_uid)
-    user_doc = user_doc_ref.get()
-
-    if not user_doc.exists:
-        raise HTTPException(status_code=404, detail="Dados do usuário não encontrados.")
-    
-    update_payload = update_data.dict(exclude_unset=True)
-    if not update_payload:
-        return {"message": "Nenhum dado fornecido para atualização."}
-
-    try:
-        # Se o e-mail for alterado, também o atualize no Firebase Auth
-        if 'email' in update_payload and update_payload['email'] != user_doc.to_dict().get('email'):
-            auth.update_user(user_uid, email=update_payload['email'])
-        
-        user_doc_ref.update(update_payload)
-        print(f"Admin atualizou o perfil do usuário {user_uid}.")
-        
-        updated_doc = user_doc_ref.get().to_dict()
-        return {"message": "Perfil atualizado com sucesso!", "user": updated_doc}
-
-    except FirebaseError as e:
-        print(f"ERRO: Erro no Firebase ao atualizar usuário: {e}")
-        raise HTTPException(status_code=400, detail=f"Erro no Firebase: {e}")
-    except Exception as e:
-        print(f"ERRO: Erro inesperado ao atualizar perfil do usuário: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno do servidor.")
-
-
-@app.get("/admin/feedback_stats")
-async def get_admin_feedback_stats():
-    db = firestore.client()
-    tickets_ref = db.collection('tickets')
-    users_ref = db.collection('users')
-    
-    all_tickets = list(tickets_ref.stream())
-    total_tickets = len(all_tickets)
-    
-    # Estatísticas de Tickets
-    tickets_by_status = defaultdict(int)
-    tickets_by_category = defaultdict(int)
-    tickets_by_month = defaultdict(int)
-    total_resolved_time = 0
-    resolved_tickets_count = 0
-    pending_tickets_count = 0
-    
-    for ticket in all_tickets:
-        ticket_data = ticket.to_dict()
-        status = ticket_data.get('status', 'Desconhecido')
-        category = ticket_data.get('category', 'Outros')
-        created_at = ticket_data.get('created_at')
-        
-        tickets_by_status[status] += 1
-        tickets_by_category[category] += 1
-        
-        if status == 'Resolvido':
-            last_updated_at = ticket_data.get('last_updated_at')
-            if created_at and last_updated_at:
-                resolved_time = (last_updated_at - created_at).total_seconds()
-                total_resolved_time += resolved_time
-            resolved_tickets_count += 1
-        
-        if status in ['Pendente', 'Em Andamento']:
-            pending_tickets_count += 1
-
-        if created_at:
-            month_year = created_at.strftime('%b. %y')
-            tickets_by_month[month_year] += 1
-    
-    # Cálculo da média de tempo de resolução
-    avg_resolution_time_hours = (total_resolved_time / resolved_tickets_count / 3600) if resolved_tickets_count > 0 else 0
-    response_rate = (tickets_by_status.get('Respondido', 0) + tickets_by_status.get('Resolvido', 0)) / total_tickets * 100 if total_tickets > 0 else 0
-    
-    # Distribuição de Status
-    ticket_status_distribution = {}
-    for status, count in tickets_by_status.items():
-        percentage = (count / total_tickets) * 100 if total_tickets > 0 else 0
-        ticket_status_distribution[status] = {'count': count, 'percentage': percentage}
-    
-    # Distribuição de Categoria
-    tickets_by_category_list = [{'category': cat, 'count': count} for cat, count in tickets_by_category.items()]
-    
-    # Tendência Mensal (preenche meses sem tickets)
-    now = datetime.now()
-    monthly_trend = []
-    for i in range(6, -1, -1):  # Últimos 7 meses
-        month_ago = now - relativedelta(months=i)
-        month_year_label = month_ago.strftime('%b. %y')
-        monthly_trend.append({
-            'month': month_year_label,
-            'count': tickets_by_month.get(month_year_label, 0)
-        })
-    
-    # Usuários Mais Ativos
-    tickets_by_user = defaultdict(int)
-    for ticket in all_tickets:
-        user_uid = ticket.to_dict().get('user_uid')
-        if user_uid:
-            tickets_by_user[user_uid] += 1
-    
-    most_active_users = []
-    # Busca apenas os top 5 usuários mais ativos com uma query otimizada
-    users_with_tickets = [uid for uid, count in sorted(tickets_by_user.items(), key=lambda item: item[1], reverse=True)[:5]]
-    
-    if users_with_tickets:
-        docs = users_ref.stream()
-        user_data_map = {doc.id: doc.to_dict() for doc in docs if doc.id in users_with_tickets}
-        
-        for uid in users_with_tickets:
-            user_data = user_data_map.get(uid, {})
-            user_name = user_data.get('fullName', 'Usuário Desconhecido')
-            user_email = user_data.get('email', 'email@desconhecido.com')
-            most_active_users.append({
-                'name': user_name,
-                'email': user_email,
-                'ticket_count': tickets_by_user[uid]
-            })
-    
-    # Contagem de usuários ativos e totais
-    all_users_count = len(list(users_ref.stream()))
-    active_users_count = len(list(users_ref.where(filter=FieldFilter('status', '==', 'ativo')).stream()))
-
-    return {
-        "total_users": total_users,
-        "plan_distribution": {
-            "no_plan": plan_distribution['gratuito'],
-            "essencial": plan_distribution['essencial'],
-            "premium": plan_distribution['premium']
-        },
-        "slot_distribution": {
-            "zero_slots": slot_distribution['zero_slots'],
-            "one_two_slots": slot_distribution['one_two_slots'],
-            "three_five_slots": slot_distribution['three_five_slots'],
-            "six_plus_slots": slot_distribution['six_plus_slots']
-        },
-        "user_status_distribution": user_status_distribution
-    }
-
 # ========================================================================================================
-#       ROTAS PARA DICAS
+# ROTA PARA CRIAR DICAS (E NOTIFICAR TODOS OS USUÁRIOS)
 # ========================================================================================================
 @app.post("/dicas", response_model=Dica, status_code=201)
 async def create_dica(dica: Dica):
@@ -1564,24 +1184,24 @@ async def create_dica(dica: Dica):
     _, doc_ref = db.collection('dicas').add(dica_dict)
     
     new_doc = doc_ref.get()
-    
-    if new_doc.exists:
-        new_dica = Dica(id=new_doc.id, **new_doc.to_dict())
-        return new_dica
-    else:
+    if not new_doc.exists:
         raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
+    
+    new_dica = Dica(id=new_doc.id, **new_doc.to_dict())
 
+    # 🔹 Cria notificação para todos os usuários
+    users = db.collection("users").stream()
+    for user in users:
+        await create_notification(
+            user_uid=user.id,
+            type_="nova_dica",
+            title="Nova Dica disponível",
+            message=f"{dica.titulo}",
+            link="/dicas"
+        )
 
-# Depois de criar a dica
-users = db.collection("users").stream()
-for user in users:
-    await create_notification(
-        user_uid=user.id,
-        type_="nova_dica",
-        title="Nova Dica disponível",
-        message=f"{dica.titulo}",
-        link="/dicas"
-    )
+    return new_dica
+
 
 @app.get("/dicas", response_model=List[Dica])
 async def list_dicas():
