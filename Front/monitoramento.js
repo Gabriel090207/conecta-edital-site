@@ -246,14 +246,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="item-header-title">
     <i class="${titleIconClass}"></i>
 
-    <h3 class="editable-monitoring-title">
-        <span class="monitoring-title-text">
-            ${mon.nome_customizado || `Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}`}
-        </span>
-        <button class="edit-btn" data-id="${mon.id}" title="Editar nome do monitoramento">
-            <i class="fas fa-pencil-alt"></i>
-        </button>
-    </h3>
+  <h3 class="editable-monitoring-title">
+  <span class="monitoring-title-text">
+    ${mon.nome_customizado || mon.custom_name || `Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}`}
+  </span>
+  <button class="edit-btn" data-id="${mon.id}" title="Editar nome do monitoramento">
+    <i class="fas fa-pencil-alt"></i>
+  </button>
+</h3>
+
 
     <button class="favorite-btn" data-id="${mon.id}" title="Marcar como favorito">
         <i class="far fa-star"></i>
@@ -1638,8 +1639,30 @@ function enableEditableTitles() {
             });
   
             if (response.ok) {
-              console.log(`✅ Nome do monitoramento atualizado: ${newTitle}`);
-            } else {
+                console.log(`✅ Nome do monitoramento atualizado: ${newTitle}`);
+              
+                // 🔹 Atualiza imediatamente o texto no card
+                const span = document.createElement("span");
+                span.className = "monitoring-title-text";
+                span.textContent = newTitle;
+                wrapper.replaceWith(span);
+                editBtn.style.display = "inline-block";
+              
+                // 🔹 Atualiza localmente o array para refletir o novo nome
+                const item = currentMonitorings.find(m => m.id === id);
+                if (item) {
+                  item.nome_customizado = newTitle;
+                }
+              
+                // 🔹 Re-renderiza os monitoramentos com o novo título
+                loadMonitorings(currentMonitorings);
+              
+                // (Opcional) Reaplica favoritos se existir
+                if (typeof syncAllFavoriteButtons === "function") {
+                  setTimeout(() => syncAllFavoriteButtons(), 200);
+                }
+              }
+               else {
               console.error("❌ Erro ao atualizar nome.");
             }
           } catch (err) {

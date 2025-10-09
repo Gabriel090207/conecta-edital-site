@@ -1923,3 +1923,35 @@ async def patch_monitoring(
     updated_doc = doc_ref.get().to_dict()
     return {"id": monitoring_id, **updated_doc}
 
+@app.get("/api/monitoramentos")
+async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
+    """
+    Retorna todos os monitoramentos do usuário autenticado.
+    Inclui nome_customizado para que o front-end exiba nomes personalizados.
+    """
+    db = firestore.client()
+    monitorings_ref = db.collection("monitorings").where("user_uid", "==", user_uid)
+    docs = monitorings_ref.stream()
+
+    monitoramentos = []
+    for doc in docs:
+        data = doc.to_dict()
+        data["id"] = doc.id
+        monitoramentos.append({
+            "id": doc.id,
+            "monitoring_type": data.get("monitoring_type"),
+            "edital_identifier": data.get("edital_identifier"),
+            "candidate_name": data.get("candidate_name"),
+            "official_gazette_link": data.get("official_gazette_link"),
+            "keywords": data.get("keywords", ""),
+            "occurrences": data.get("occurrences", 0),
+            "status": data.get("status", "inactive"),
+            "last_checked_at": data.get("last_checked_at"),
+            "user_uid": data.get("user_uid"),
+            "nome_customizado": data.get("nome_customizado", ""),  # ✅ campo essencial
+        })
+    
+    if not monitoramentos:
+        return []  # Evita erro no front caso ainda não tenha monitoramentos
+
+    return monitoramentos
