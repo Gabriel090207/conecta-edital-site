@@ -808,7 +808,7 @@ async def mercadopago_webhook(request: Request):
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
     db_firestore_client = firestore.client()
 
-    # 🔹 Obtém os dados do usuário
+    # 🔹 Obtém os dados do usuário diretamente do Firestore
     user_ref = db_firestore_client.collection('users').document(user_uid)
     user_doc = user_ref.get()
 
@@ -816,50 +816,63 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
     user_data = user_doc.to_dict()
-    user_plan = user_data.get("plan_type", "gratuito").strip().lower()
+
+    # 🔹 Corrige inconsistências de campo e normaliza o plano
+    user_plan_raw = (
+        user_data.get("plan_type") or  # campo usado atualmente
+        user_data.get("plano") or      # fallback: campo antigo no Firestore
+        "gratuito"
+    )
+
+    # 🔹 Normaliza (remove espaços e converte para minúsculas)
+    user_plan = user_plan_raw.strip().lower()
+
     slots_personalizados = user_data.get("slots_disponiveis")
 
-    # 🔹 Conta monitoramentos
+    # 🔹 Conta monitoramentos do usuário
     monitoramentos_ref = db_firestore_client.collection('monitorings').where("user_uid", "==", user_uid)
-    monitoramentos = list(monitoramentos_ref.stream())
-    total_monitoramentos = len(monitoramentos)
-    monitoramentos_ativos = sum(1 for m in monitoramentos if m.to_dict().get("status") == "active")
+    user_monitorings = list(monitoramentos_ref.stream())
+    user_monitorings_count = len(user_monitorings)
 
-    # 🔹 Nome de exibição do plano
-    display_plan_name = {
-        "gratuito": "Sem Plano",
-        "essencial": "Plano Essencial",
-        "premium": "Plano Premium",
-    }.get(user_plan, "Sem Plano")
+    # 🔹 Conta quantos estão ativos
+    monitoramentos_ativos = [m for m in user_monitorings if m.to_dict().get("status") == "active"]
+    monitoramentos_ativos_count = len(monitoramentos_ativos)
 
-    # 🔹 Cálculo de slots disponíveis
-    if user_plan == "premium":
+    # 🔹 Nome do plano para exibição
+    display_plan_name = "Sem Plano"
+    if user_plan == "basico":
+        display_plan_name = "Plano Básico"
+    elif user_plan == "essencial":
+        display_plan_name = "Plano Essencial"
+    elif user_plan == "premium":
+        display_plan_name = "Plano Premium"
+
+    # 🔹 Define slots disponíveis
+    if slots_personalizados is not None:
+        # ✅ Caso o admin tenha definido manualmente
+        slots_livres = slots_personalizados - user_monitorings_count
+    elif user_plan == "premium":
+        # ✅ Premium = ilimitado
         slots_livres = "Ilimitado"
-
-    elif slots_personalizados is not None:
-        # ✅ Sempre respeita o valor definido manualmente, mesmo no "Sem Plano"
-        slots_livres = max(slots_personalizados - total_monitoramentos, 0)
-
+    elif user_plan in ["basico", "essencial", "gratuito"]:
+        # 🔹 Calcula baseado no plano padrão
+        slots_livres = get_max_slots_by_plan(user_plan) - user_monitorings_count
     else:
-        # 🔹 Usa o padrão do plano (Essencial, Gratuito, etc)
-        max_por_plano = get_max_slots_by_plan(user_plan)
-        slots_livres = max(max_por_plano - total_monitoramentos, 0)
+        # 🔸 Sem plano = nenhum slot
+        slots_livres = 0
 
-    # 🔹 Retorno final
+    # 🔹 Evita número negativo
+    if isinstance(slots_livres, int) and slots_livres < 0:
+        slots_livres = 0
+
     return {
         "status": "ok",
         "message": "Servidor está online!",
         "user_plan": display_plan_name,
-        "total_monitoramentos": total_monitoramentos,
-        "monitoramentos_ativos": monitoramentos_ativos,
-        "slots_livres": slots_livres,
-        "debug": {
-            "plan_type": user_plan,
-            "slots_personalizados": slots_personalizados,
-            "total_monitoramentos": total_monitoramentos
-        }
+        "total_monitoramentos": user_monitorings_count,
+        "monitoramentos_ativos": monitoramentos_ativos_count,
+        "slots_livres": slots_livres
     }
-
 
 @app.delete("/api/monitoramentos/{monitoring_id}", status_code=204)
 async def delete_monitoring_endpoint(
