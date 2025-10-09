@@ -1639,29 +1639,30 @@ function enableEditableTitles() {
             });
   
             if (response.ok) {
-                console.log(`✅ Nome do monitoramento atualizado: ${newTitle}`);
+                const updated = await response.json();
+                console.log(`✅ Nome do monitoramento atualizado: ${updated.nome_customizado}`);
               
-                // 🔹 Atualiza imediatamente o texto no card
+                // 🔹 Atualiza o título visualmente
                 const span = document.createElement("span");
                 span.className = "monitoring-title-text";
-                span.textContent = newTitle;
+                span.textContent = updated.nome_customizado;
                 wrapper.replaceWith(span);
                 editBtn.style.display = "inline-block";
               
-                // 🔹 Atualiza localmente o array para refletir o novo nome
+                // 🔹 Atualiza o array local
                 const item = currentMonitorings.find(m => m.id === id);
-                if (item) {
-                  item.nome_customizado = newTitle;
-                }
+                if (item) item.nome_customizado = updated.nome_customizado;
               
-                // 🔹 Re-renderiza os monitoramentos com o novo título
-                loadMonitorings(currentMonitorings);
-              
-                // (Opcional) Reaplica favoritos se existir
-                if (typeof syncAllFavoriteButtons === "function") {
-                  setTimeout(() => syncAllFavoriteButtons(), 200);
+                // 🔹 Pausa o polling por 6s pra evitar overwrite
+                if (pollingInterval) {
+                  clearInterval(pollingInterval);
+                  pollingInterval = null;
+                  setTimeout(() => {
+                    pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+                  }, 6000);
                 }
               }
+              
                else {
               console.error("❌ Erro ao atualizar nome.");
             }
