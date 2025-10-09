@@ -549,17 +549,26 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
             found_keywords.append(keyword)
 
-    if found_keywords:
-        monitoramento.occurrences += 1
-        mon_doc_ref.update({'occurrences': firestore.Increment(1)})
+   if found_keywords:
+    monitoramento.occurrences += 1
+    mon_doc_ref.update({'occurrences': firestore.Increment(1)})
 
-        print(f"✅ Ocorrência ENCONTRADA para {monitoramento.id}! Palavras-chave: {', '.join(found_keywords)}")
-        send_email_notification(
-            monitoramento=monitoramento,
-            template_type='occurrence_found',
-            to_email=monitoramento.user_email,
-            found_keywords=found_keywords
-        )
+    # 🔔 Cria notificação Firestore
+    await create_notification(
+        user_uid=monitoramento.user_uid,
+        type_="nova_ocorrencia",
+        title="Nova ocorrência encontrada!",
+        message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
+        link="/meus-monitoramentos"
+    )
+
+    send_email_notification(
+        monitoramento=monitoramento,
+        template_type='occurrence_found',
+        to_email=monitoramento.user_email,
+        found_keywords=found_keywords
+    )
+
     else:
         print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
     print(f"--- Verificação para {monitoramento.id} Concluída ---\n")
@@ -1095,6 +1104,16 @@ async def user_reply_to_ticket(
     updated_ticket_data = ref.get().to_dict()
     return {"message": "Resposta enviada", "ticket": updated_ticket_data}
 
+
+# Ao o admin responder
+await create_notification(
+    user_uid=ticket_data.get("user_uid"),
+    type_="resposta_suporte",
+    title="Nova resposta do suporte",
+    message=f"O suporte respondeu ao seu ticket {ticket_id}.",
+    link=f"/suporte?ticket={ticket_id}"
+)
+
 # --- ROTA PARA OBTER DADOS DE UM USUÁRIO ESPECÍFICO ---
 @app.get("/api/users/{user_uid}", response_model=UserData)
 async def get_user_data(user_uid: str, current_user_uid: str = Depends(get_current_user_uid)):
@@ -1230,6 +1249,16 @@ async def admin_reply_to_ticket(
 
     updated_ticket_data = ticket_doc_ref.get().to_dict()
     return {"message": "Resposta do admin enviada com sucesso!", "ticket": updated_ticket_data}
+
+
+# Ao o admin responder
+await create_notification(
+    user_uid=ticket_data.get("user_uid"),
+    type_="resposta_suporte",
+    title="Nova resposta do suporte",
+    message=f"O suporte respondeu ao seu ticket {ticket_id}.",
+    link=f"/suporte?ticket={ticket_id}"
+)
 
 
 @app.patch("/admin/tickets/{ticket_id}/status")
@@ -1525,6 +1554,18 @@ async def create_dica(dica: Dica):
         return new_dica
     else:
         raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
+
+
+# Depois de criar a dica
+users = db.collection("users").stream()
+for user in users:
+    await create_notification(
+        user_uid=user.id,
+        type_="nova_dica",
+        title="Nova Dica disponível",
+        message=f"{dica.titulo}",
+        link="/dicas"
+    )
 
 @app.get("/dicas", response_model=List[Dica])
 async def list_dicas():
@@ -1958,3 +1999,20 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
         return []  # Evita erro no front caso ainda não tenha monitoramentos
 
     return monitoramentos
+
+    async def create_notification(user_uid: str, type_: str, title: str, message: str, link: str = "#"):
+    """
+    Cria uma notificação no Firestore para o usuário especificado.
+    """
+    db = firestore.client()
+    notif_ref = db.collection("notifications").document(user_uid).collection("items").document()
+    data = {
+        "type": type_,
+        "title": title,
+        "message": message,
+        "link": link,
+        "is_read": False,
+        "created_at": firestore.SERVER_TIMESTAMP
+    }
+    notif_ref.set(data)
+    print(f"🔔 Notificação criada para {user_uid}: {title}")
