@@ -549,7 +549,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
             found_keywords.append(keyword)
 
-   if found_keywords:
+    if found_keywords:
     monitoramento.occurrences += 1
     mon_doc_ref.update({'occurrences': firestore.Increment(1)})
 
