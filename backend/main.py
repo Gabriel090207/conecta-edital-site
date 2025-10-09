@@ -2197,27 +2197,8 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
             "status": data.get("status", "inactive"),
             "last_checked_at": data.get("last_checked_at"),
             "user_uid": data.get("user_uid"),
-            "nome_customizado": data.get("nome_customizado", ""),  # ✅ campo essencial
+            "nome_customizado": data.get("nome_customizado", ""),
         })
     
-    if not monitoramentos:
-        return []  # Evita erro no front caso ainda não tenha monitoramentos
-
+    # Se não houver monitoramentos, retorne lista vazia mesmo
     return monitoramentos
-
-    async def create_notification(user_uid: str, type_: str, title: str, message: str, link: str = "#"):
-    """
-    Cria uma notificação no Firestore para o usuário especificado.
-    """
-    db = firestore.client()
-    notif_ref = db.collection("notifications").document(user_uid).collection("items").document()
-    data = {
-        "type": type_,
-        "title": title,
-        "message": message,
-        "link": link,
-        "is_read": False,
-        "created_at": firestore.SERVER_TIMESTAMP
-    }
-    notif_ref.set(data)
-    print(f"🔔 Notificação criada para {user_uid}: {title}")
