@@ -512,37 +512,33 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         print(f"Verificação para {monitoramento.id} falhou: Não foi possível obter o PDF.")
         return
 
-    # Usando o hash do conteúdo do PDF para verificação
     current_pdf_hash = hashlib.sha256(pdf_content).hexdigest()
 
-    db_firestore_client = firestore.client()
-    mon_doc_ref = db_firestore_client.collection('monitorings').document(monitoramento.id)
-    mon_doc = mon_doc_ref.get()
+    db = firestore.client()
+    doc_ref = db.collection('monitorings').document(monitoramento.id)
+    doc = doc_ref.get()
 
-    if mon_doc.exists and mon_doc.to_dict().get('last_pdf_hash') == current_pdf_hash:
-        print(f"PDF para {monitoramento.id} não mudou desde a última verificação. Nenhuma notificação necessária.")
-        mon_doc_ref.update({'last_checked_at': firestore.SERVER_TIMESTAMP})
+    if doc.exists and doc.to_dict().get('last_pdf_hash') == current_pdf_hash:
+        print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
+        doc_ref.update({'last_checked_at': firestore.SERVER_TIMESTAMP})
         return
 
-    mon_doc_ref.update({'last_pdf_hash': current_pdf_hash, 'last_checked_at': firestore.SERVER_TIMESTAMP})
-
-    print(f"DEBUG: PDF para {monitoramento.id} é NOVO ou MODIFICADO. Prosseguindo com a análise.")
-    
+    doc_ref.update({'last_pdf_hash': current_pdf_hash, 'last_checked_at': firestore.SERVER_TIMESTAMP})
     pdf_text = await extract_text_from_pdf(pdf_content)
-    
+
     found_keywords = []
     keywords_to_search = [monitoramento.edital_identifier]
     if monitoramento.monitoring_type == 'personal' and monitoramento.candidate_name:
         keywords_to_search.append(monitoramento.candidate_name)
-    
+
     try:
         parsed_url = urlparse(str(monitoramento.official_gazette_link))
         file_name = parsed_url.path.split('/')[-1]
     except Exception:
         file_name = ""
 
-    pdf_text_lower = pdf_text.lower();
-    file_name_lower = file_name.lower();
+    pdf_text_lower = pdf_text.lower()
+    file_name_lower = file_name.lower()
 
     for keyword in keywords_to_search:
         keyword_lower = keyword.lower()
@@ -550,42 +546,202 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             found_keywords.append(keyword)
 
     if found_keywords:
-    monitoramento.occurrences += 1
-    mon_doc_ref.update({'occurrences': firestore.Increment(1)})
+        monitoramento.occurrences += 1
+        doc_ref.update({'occurrences': firestore.Increment(1)})
 
-    # 🔔 Cria notificação Firestore
-    await create_notification(
-        user_uid=monitoramento.user_uid,
-        type_="nova_ocorrencia",
-        title="Nova ocorrência encontrada!",
-        message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
-        link="/meus-monitoramentos"
-    )
+        # 🔔 Cria notificação Firestore
+        await create_notification(
+            user_uid=monitoramento.user_uid,
+            type_="nova_ocorrencia",
+            title="Nova ocorrência encontrada!",
+            message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
+            link="/meus-monitoramentos"
+        )
 
-    send_email_notification(
-        monitoramento=monitoramento,
-        template_type='occurrence_found',
-        to_email=monitoramento.user_email,
-        found_keywords=found_keywords
-    )
-
+        send_email_notification(
+            monitoramento=monitoramento,
+            template_type='occurrence_found',
+            to_email=monitoramento.user_email,
+            found_keywords=found_keywords
+        )
+        print(f"✅ Ocorrência detectada para {monitoramento.id} e notificação enviada!")
     else:
         print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
-    print(f"--- Verificação para {monitoramento.id} Concluída ---\n")
 
-# Agendador simples em background para verificações recorrentes
-async def periodic_monitoring_task():
+    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
+
+
+# ===============================================================
+# 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
+# ===============================================================
+async def perform_monitoring_check(monitoramento: Monitoring):
+    """
+    Executa a verificação para um monitoramento específico.
+    Dispara o envio de email se uma ocorrência for encontrada.
+    """
+    print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
+    
+    pdf_content = await get_pdf_content_from_url(monitoramento.official_gazette_link)
+    if not pdf_content:
+        print(f"Verificação para {monitoramento.id} falhou: Não foi possível obter o PDF.")
+        return
+
+    current_pdf_hash = hashlib.sha256(pdf_content).hexdigest()
+
     db = firestore.client()
-    while True:
-        print(f"\nIniciando rodada de verificações periódicas para TODOS os usuários...")
-        monitorings_stream = db.collection('monitorings').where(filter=FieldFilter('status', '==', 'active')).stream()
-        for doc in monitorings_stream:
-            mon_data = doc.to_dict()
-            mon_id = doc.id
-            monitoring_obj = Monitoring(id=mon_id, **mon_data)
-            await perform_monitoring_check(monitoring_obj)
-        print(f"Rodada de verificações periódica concluída. Próxima em 30 segundos.")
-        await asyncio.sleep(30)
+    doc_ref = db.collection('monitorings').document(monitoramento.id)
+    doc = doc_ref.get()
+
+    if doc.exists and doc.to_dict().get('last_pdf_hash') == current_pdf_hash:
+        print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
+        doc_ref.update({'last_checked_at': firestore.SERVER_TIMESTAMP})
+        return
+
+    doc_ref.update({'last_pdf_hash': current_pdf_hash, 'last_checked_at': firestore.SERVER_TIMESTAMP})
+    pdf_text = await extract_text_from_pdf(pdf_content)
+
+    found_keywords = []
+    keywords_to_search = [monitoramento.edital_identifier]
+    if monitoramento.monitoring_type == 'personal' and monitoramento.candidate_name:
+        keywords_to_search.append(monitoramento.candidate_name)
+
+    try:
+        parsed_url = urlparse(str(monitoramento.official_gazette_link))
+        file_name = parsed_url.path.split('/')[-1]
+    except Exception:
+        file_name = ""
+
+    pdf_text_lower = pdf_text.lower()
+    file_name_lower = file_name.lower()
+
+    for keyword in keywords_to_search:
+        keyword_lower = keyword.lower()
+        if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
+            found_keywords.append(keyword)
+
+    if found_keywords:
+        monitoramento.occurrences += 1
+        doc_ref.update({'occurrences': firestore.Increment(1)})
+
+        # 🔔 Cria notificação Firestore
+        await create_notification(
+            user_uid=monitoramento.user_uid,
+            type_="nova_ocorrencia",
+            title="Nova ocorrência encontrada!",
+            message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
+            link="/meus-monitoramentos"
+        )
+
+        send_email_notification(
+            monitoramento=monitoramento,
+            template_type='occurrence_found',
+            to_email=monitoramento.user_email,
+            found_keywords=found_keywords
+        )
+        print(f"✅ Ocorrência detectada para {monitoramento.id} e notificação enviada!")
+    else:
+        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
+
+    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
+
+
+# ===============================================================
+# 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
+# ===============================================================
+async def perform_monitoring_check(monitoramento: Monitoring):
+    """
+    Executa a verificação para um monitoramento específico.
+    Dispara o envio de email se uma ocorrência for encontrada.
+    """
+    print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
+    
+    pdf_content = await get_pdf_content_from_url(monitoramento.official_gazette_link)
+    if not pdf_content:
+        print(f"Verificação para {monitoramento.id} falhou: Não foi possível obter o PDF.")
+        return
+
+    current_pdf_hash = hashlib.sha256(pdf_content).hexdigest()
+
+    db = firestore.client()
+    doc_ref = db.collection('monitorings').document(monitoramento.id)
+    doc = doc_ref.get()
+
+    if doc.exists and doc.to_dict().get('last_pdf_hash') == current_pdf_hash:
+        print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
+        doc_ref.update({'last_checked_at': firestore.SERVER_TIMESTAMP})
+        return
+
+    doc_ref.update({'last_pdf_hash': current_pdf_hash, 'last_checked_at': firestore.SERVER_TIMESTAMP})
+    pdf_text = await extract_text_from_pdf(pdf_content)
+
+    found_keywords = []
+    keywords_to_search = [monitoramento.edital_identifier]
+    if monitoramento.monitoring_type == 'personal' and monitoramento.candidate_name:
+        keywords_to_search.append(monitoramento.candidate_name)
+
+    try:
+        parsed_url = urlparse(str(monitoramento.official_gazette_link))
+        file_name = parsed_url.path.split('/')[-1]
+    except Exception:
+        file_name = ""
+
+    pdf_text_lower = pdf_text.lower()
+    file_name_lower = file_name.lower()
+
+    for keyword in keywords_to_search:
+        keyword_lower = keyword.lower()
+        if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
+            found_keywords.append(keyword)
+
+    if found_keywords:
+        monitoramento.occurrences += 1
+        doc_ref.update({'occurrences': firestore.Increment(1)})
+
+        # 🔔 Cria notificação Firestore
+        await create_notification(
+            user_uid=monitoramento.user_uid,
+            type_="nova_ocorrencia",
+            title="Nova ocorrência encontrada!",
+            message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
+            link="/meus-monitoramentos"
+        )
+
+        send_email_notification(
+            monitoramento=monitoramento,
+            template_type='occurrence_found',
+            to_email=monitoramento.user_email,
+            found_keywords=found_keywords
+        )
+        print(f"✅ Ocorrência detectada para {monitoramento.id} e notificação enviada!")
+    else:
+        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
+
+    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
+
+
+# ===============================================================
+# 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
+# ===============================================================
+async def create_notification(user_uid: str, type_: str, title: str, message: str, link: str = "#"):
+    """
+    Cria uma notificação no Firestore para o usuário especificado.
+    """
+    db = firestore.client()
+    notif_ref = db.collection("notifications").document(user_uid).collection("items").document()
+
+    data = {
+        "type": type_,
+        "title": title,
+        "message": message,
+        "link": link,
+        "is_read": False,
+        "created_at": firestore.SERVER_TIMESTAMP
+    }
+
+    notif_ref.set(data)
+    print(f"🔔 Notificação criada para {user_uid}: {title}")
+
+
 
 @app.on_event("startup")
 async def startup_event():
