@@ -95,54 +95,62 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Renderiza o histórico no painel lateral
-  function renderizarHistorico(data) {
-    const ocorrencias = Array.isArray(data) ? data : [data];
+ // Renderiza o histórico no painel lateral
+function renderizarHistorico(data) {
+  const ocorrencias = Array.isArray(data) ? data : [data];
 
-    historicoLista.innerHTML = ocorrencias
-      .map((oc) => {
-        // 🕓 Corrigir formato da data
-        let dataOcorrencia = "Data desconhecida";
-        if (oc.detected_at || oc.last_checked_at) {
-          try {
-            const base = oc.detected_at || oc.last_checked_at;
-            if (base._seconds) {
-              dataOcorrencia = new Date(base._seconds * 1000).toLocaleString("pt-BR");
-            } else {
-              dataOcorrencia = new Date(base).toLocaleString("pt-BR");
-            }
-          } catch {
-            dataOcorrencia = "Data inválida";
+  historicoLista.innerHTML = ocorrencias
+    .map((oc) => {
+      // 🕓 Corrigir formato da data
+      let dataOcorrencia = "Data desconhecida";
+      if (oc.detected_at || oc.last_checked_at) {
+        try {
+          const base = oc.detected_at || oc.last_checked_at;
+          if (base._seconds) {
+            dataOcorrencia = new Date(base._seconds * 1000).toLocaleString("pt-BR");
+          } else {
+            dataOcorrencia = new Date(base).toLocaleString("pt-BR");
           }
+        } catch {
+          dataOcorrencia = "Data inválida";
         }
+      }
 
-        // 🔗 Prioridade do link: official_gazette_link → link → last_pdf_hash
-        let linkPdf = oc.official_gazette_link || oc.link || oc.last_pdf_hash;
+      // 🔗 Prioridade do link:
+      // 1️⃣ pdf_real_link (novo campo do backend)
+      // 2️⃣ official_gazette_link
+      // 3️⃣ link ou last_pdf_hash
+      let linkPdf =
+        oc.pdf_real_link ||
+        oc.official_gazette_link ||
+        oc.link ||
+        oc.last_pdf_hash;
 
-        if (linkPdf) {
-          // Se for um hash (sem http), monta URL completa
-          if (!linkPdf.startsWith("http")) {
-            linkPdf = `${BACKEND_URL}/pdfs/${linkPdf}`;
-          }
+      if (linkPdf) {
+        if (!linkPdf.startsWith("http")) {
+          linkPdf = `${BACKEND_URL}/pdfs/${linkPdf}`;
         }
+      }
 
-        return `
-          <div class="historico-card">
-            <div class="historico-info">
-              <i class="fas fa-bell"></i>
-              <div>
-                <strong>Ocorrências encontradas</strong>
-                <p>ID do edital: <b>${oc.edital_identifier || "-"}</b></p>
-                ${
-                  linkPdf
-                    ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link"></i> Ver Ocorrência</a></p>`
-                    : "<p><i>Sem link disponível</i></p>"
-                }
-                <small>Data da ocorrência: ${dataOcorrencia}</small>
-              </div>
+      return `
+        <div class="historico-card">
+          <div class="historico-info">
+            <i class="fas fa-bell"></i>
+            <div>
+              <strong>Ocorrência encontrada</strong>
+              <p>ID do edital: <b>${oc.edital_identifier || "-"}</b></p>
+              ${
+                linkPdf
+                  ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link" style="font-size: 12px"></i> Ver Ocorrência</a></p>`
+                  : "<p><i>Sem link disponível</i></p>"
+              }
+              <small>Data da ocorrência: ${dataOcorrencia}</small>
             </div>
           </div>
-        `;
-      })
-      .join("");
-  }
+        </div>
+      `;
+    })
+    .join("");
+}
+
 });
