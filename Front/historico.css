@@ -71,10 +71,11 @@
 }
 
 .historico-card {
-  background: #f8f9fa;
+  background: #ffffff;
   border-radius: 10px;
   padding: 12px 14px;
   margin-bottom: 12px;
+  border: 1px solid #e3e7ee;
   border-left: 4px solid #007bff;
   transition: transform 0.2s;
 }
@@ -109,9 +110,15 @@
 .historico-link {
   display: inline-block;
   margin-top: 5px;
-  color: #007bff;
+  font-weight: 500;
+  color: #222;
   font-size: 0.85rem;
   text-decoration: none;
+}
+
+.lin {
+  font-weight: 500;
+  color: #222;
 }
 
 .historico-link:hover {
