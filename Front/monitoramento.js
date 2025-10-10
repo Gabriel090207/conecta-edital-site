@@ -1415,7 +1415,7 @@ style.innerHTML = `
     transition: color 0.25s ease, transform 0.2s ease;
 }
 .favorite-btn.active i {
-    color: #fff709 !important;
+    color: #EBB90D !important;
     transform: scale(1.2);
 }
 .favorite-btn i {
@@ -1423,7 +1423,7 @@ style.innerHTML = `
     transition: transform 0.2s ease;
 }
 .favorite-btn:hover i {
-    color: #e0d804;
+    color: #EBB90D;
 }
 .favorite-btn:active i {
     transform: scale(1.3);
@@ -1437,151 +1437,6 @@ document.head.appendChild(style);
 // ====================== EDIÇÃO DE MONITORAMENTOS CORRIGIDA ======================
 
 // ==================== EDIÇÃO DE MONITORAMENTO (CORRIGIDO) ====================
-
-// =======================
-// 🔧 Função de Editar Monitoramento
-// =======================
-const monitoramentoContainer = document.querySelector(".monitoramento-list-section");
-
-if (monitoramentoContainer) {
-    monitoramentoContainer.addEventListener("click", async (e) => {
-        const configBtn = e.target.closest(".btn-configure");
-        if (!configBtn) return; // Agora o gatilho é o botão "Configurar"
-
-        e.preventDefault();
-
-        const card = configBtn.closest(".monitoramento-item-card");
-        if (!card) return;
-
-        const monitoramentoId = card.dataset.id;
-        const tipo = card.querySelector("h3")?.textContent.toLowerCase().includes("pessoal")
-            ? "pessoal"
-            : "radar";
-
-
-        // Busca o usuário logado e o token Firebase
-        const user = window.auth?.currentUser;
-        if (!user) {
-            alert("Você precisa estar logado para editar um monitoramento.");
-            return;
-        }
-        const token = await user.getIdToken();
-
-        // 🔄 Busca todos os monitoramentos e filtra o específico
-        let dadosMonitoramento = null;
-        try {
-            const resp = await fetch(`${BACKEND_URL}/api/monitoramentos`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-            if (resp.ok) {
-                const lista = await resp.json();
-                dadosMonitoramento = lista.find(m => m.id === monitoramentoId);
-                if (!dadosMonitoramento) {
-                    alert("Monitoramento não encontrado.");
-                    return;
-                }
-            } else {
-                alert("Erro ao buscar lista de monitoramentos.");
-                return;
-            }
-        } catch (err) {
-            console.error("Erro ao buscar monitoramentos:", err);
-            alert("Erro ao buscar dados do monitoramento.");
-            return;
-        }
-
-        // 🧩 Escolhe e abre o modal correto
-        const modalId = tipo === "pessoal" ? "personal-monitoramento-modal" : "radar-monitoramento-modal";
-        const modal = document.getElementById(modalId);
-        if (!modal) return;
-
-        document.querySelectorAll(".modal-overlay.show-modal").forEach(m => m.classList.remove("show-modal"));
-        modal.classList.add("show-modal");
-        document.body.style.overflow = "hidden";
-
-        // ✏️ Preenche os campos com os dados atuais
-        if (tipo === "pessoal") {
-            modal.querySelector("#personal-link").value = dadosMonitoramento.official_gazette_link || "";
-            modal.querySelector("#personal-id").value = dadosMonitoramento.edital_identifier || "";
-            const nomeInput = modal.querySelector("#personal-name");
-            if (nomeInput) {
-                nomeInput.value = dadosMonitoramento.candidate_name || "";
-                nomeInput.disabled = true; // 🔒 bloqueia edição
-            }
-        } else {
-            modal.querySelector("#radar-link").value = dadosMonitoramento.official_gazette_link || "";
-            modal.querySelector("#radar-id").value = dadosMonitoramento.edital_identifier || "";
-        }
-
-        // 🎨 Atualiza título e ícone conforme tipo
-        const titulo = modal.querySelector(".modal-content h2");
-        const icone = modal.querySelector(".modal-header-icon i");
-        if (tipo === "pessoal") {
-            titulo.textContent = "Monitoramento Pessoal";
-            icone.className = "fas fa-user";
-        } else {
-            titulo.textContent = "Monitoramento Radar";
-            icone.className = "fas fa-bullseye";
-        }
-
-        // 🔘 Atualiza botão para "Salvar Alterações"
-        const actionBtn = modal.querySelector(".btn-create-monitoramento");
-        if (!actionBtn) return;
-        actionBtn.textContent = "Salvar Alterações";
-        actionBtn.classList.add("btn-save-monitoramento");
-
-        // Remove qualquer listener antigo
-        const newActionBtn = actionBtn.cloneNode(true);
-        actionBtn.parentNode.replaceChild(newActionBtn, actionBtn);
-
-        // 💾 Evento para salvar alterações
-        newActionBtn.addEventListener("click", async (e) => {
-            e.preventDefault();
-
-            const updatedData = tipo === "pessoal"
-                ? {
-                    link_diario: modal.querySelector("#personal-link").value.trim(),
-                    id_edital: modal.querySelector("#personal-id").value.trim(),
-                    nome_completo: modal.querySelector("#personal-name").value.trim()
-                }
-                : {
-                    link_diario: modal.querySelector("#radar-link").value.trim(),
-                    id_edital: modal.querySelector("#radar-id").value.trim()
-                };
-
-            if (!updatedData.link_diario || !updatedData.id_edital) {
-                alert("⚠️ Preencha todos os campos obrigatórios!");
-                return;
-            }
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/monitoramentos/${monitoramentoId}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(updatedData)
-                });
-
-                if (response.ok) {
-                    alert("✅ Monitoramento atualizado com sucesso!");
-                    modal.classList.remove("show-modal");
-                    document.body.style.overflow = "";
-                    if (typeof window.loadDashboardDataAndRender === "function") {
-                        window.loadDashboardDataAndRender();
-                    }
-                } else {
-                    const err = await response.json();
-                    alert(`❌ Erro ao atualizar: ${err.detail || response.statusText}`);
-                }
-            } catch (err) {
-                console.error("Erro ao atualizar monitoramento:", err);
-                alert("⚠️ Erro de conexão com o servidor.");
-            }
-        });
-    });
-}
 
 
 function enableEditableTitles() {
@@ -1685,5 +1540,11 @@ function enableEditableTitles() {
   }
   
   window.addEventListener("load", enableEditableTitles);
-  
+  // ===================== MODAL DE OCORRÊNCIAS =====================
+
+
+
+
+
+
 });

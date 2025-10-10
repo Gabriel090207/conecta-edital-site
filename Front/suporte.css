@@ -826,14 +826,16 @@ ul {
 }
 
 .btn-cancel {
-    background-color: #e62727;
+   background-color: #e62727;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 14px;
     padding: 10px 20px;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    align-self: center;
 }
 
 .btn-cancel:hover {
@@ -844,7 +846,7 @@ ul {
     background-color: #08a853;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 14px;
     padding: 10px 20px;
     font-size: 1rem;
     cursor: pointer;

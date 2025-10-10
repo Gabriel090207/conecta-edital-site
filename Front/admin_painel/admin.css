@@ -1750,8 +1750,8 @@ body.modal-open {
    background-color:  #08a853; /* Verde */
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 12px 25px;
+    border-radius: 14px;
+    padding: 10px 20px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -1766,14 +1766,15 @@ body.modal-open {
 .btn-cancelar{
  margin-top: 15px;
     background-color: #e62727;
-    color: #ffffff;
-    padding: 12px 25px;
-    font-size: 1rem;
-    font-weight: 600;
+    color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 14px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    align-self: center;
 
 }
 

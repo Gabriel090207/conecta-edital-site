@@ -115,6 +115,11 @@ ul {
     color: transparent !important; /* Adicione !important aqui */
     -webkit-text-stroke: 1px #6c757d;
   }
+
+.sino{
+    color: transparent !important; /* Adicione !important aqui */
+    -webkit-text-stroke: 1px #6c757d;
+}
   
   .navbar-center ul li a:hover i,
   .navbar-center ul li a.active i {
@@ -355,8 +360,8 @@ ul {
     background-color:  #08a853; /* Verde */
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 12px 25px;
+    border-radius: 14px;
+    padding: 10px 20px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -371,6 +376,27 @@ ul {
     transform: translateY(-1px);
 }
 
+
+.btn-save-monitoramento {
+    margin-bottom: -21px;
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: -21px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-save-monitoramento:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
 /* Corrigindo a cor do botão cancelar no modal */
 
 
@@ -982,6 +1008,8 @@ ul {
 }
 
 .mon label{
+    font-weight: 550;
+    color: #222;
     margin-top: -35px;
 }
 
@@ -1039,7 +1067,7 @@ ul {
 
 .form-group i.ic1 {
   position: absolute;
-  top: 35%;
+  top: 65%;
   left: 12px;
   transform: translateY(-50%);
   color: #6c757d;
@@ -2132,15 +2160,16 @@ ul {
 .btn-cancel-form {
     margin-bottom: -21px;
    margin-top: -21px;
-    background-color: #e62727;
-    color: #ffffff;
-    padding: 12px 25px;
-    font-size: 1rem;
-    font-weight: 600;
+ background-color: #e62727;
+    color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 14px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    align-self: center;
 }
 
 .btn-cancel-form1 {
@@ -2878,7 +2907,7 @@ ul {
 }
 
 .favorite-btn.active {
-    color: #fff709; /* azul ao clicar */
+    color: #EBB90D; /* azul ao clicar */
 }
 
 .edit-title-wrapper {
@@ -2940,4 +2969,92 @@ ul {
 .item-header-title .edit-monitoring-title-btn i,
 .item-header-title .edit-btn i {
     vertical-align: middle;
+}
+
+/* ===================== MODAL DE OCORRÊNCIAS ===================== */
+#ocorrencias-modal {
+  display: none;
+}
+#ocorrencias-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 3000;
+}
+
+.modal-content.modal-ocorrencias {
+  background: #fff;
+  width: 380px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.modal-ocorrencias .notif-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-ocorrencias .notif-list {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.modal-ocorrencias .notif-footer {
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  padding: 10px;
+  text-align: center;
+}
+
+.btn-fechar-ocorrencias {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-fechar-ocorrencias:hover {
+  background: #0056b3;
+}
+
+.ocorrencia-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #e3e7ee;
+  border-radius: 8px;
+  margin: 6px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ocorrencia-item:hover {
+  background: #f7f9ff;
+  border-color: #bcd0ff;
+}
+.ocorrencia-item i {
+  color: #007bff;
+  font-size: 18px;
+}
+.ocorrencia-item span {
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }

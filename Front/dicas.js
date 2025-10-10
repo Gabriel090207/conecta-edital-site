@@ -88,15 +88,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const exibirPontos = dica.conteudo.length > 150 ? '...' : '';
             // --- FIM DA SOLUÇÃO ---
 
-            dicaCard.innerHTML = `
-                <span class="tags ${tagClass}">${dica.topico}</span>
-                <h3>${dica.titulo}</h3>
-                <p>${conteudoFormatadoParaCard}${exibirPontos}</p>
-                <div class="card-footer">
-                    <span class="autor">Por: ${dica.autor}</span>
-                    <span class="data">${dataCriacao}</span>
-                </div>
-            `;
+            // Define ícones e cores
+const topicStyles = {
+  "Geral":    { icon: "🌐", bg: "#d9f2f2", color: "#069999" },
+  "Monitoramento": { icon: "📈", bg: "#e6f1fb", color: "#2b7de9" },
+  "Estudos":  { icon: "📘", bg: "#eaf5e8", color: "#3b7a2d" },
+  "Notificação": { icon: "🔔", bg: "#fff7da", color: "#c28700" },
+  "Avançado": { icon: "⭐", bg: "#f4e3fa", color: "#a020f0" }
+};
+
+const estilo = topicStyles[dica.topico] || { icon: "📄", bg: "#eee", color: "#555" };
+
+dicaCard.innerHTML = `
+    <div class="topic-badge" 
+        style="background-color: ${estilo.bg}; color: ${estilo.color};">
+        ${estilo.icon} ${dica.topico}
+    </div>
+    <h3>${dica.titulo}</h3>
+    <p>${conteudoFormatadoParaCard}${exibirPontos}</p>
+    <div class="card-footer">
+        <span class="autor">Por: ${dica.autor}</span>
+        <span class="data">${dataCriacao}</span>
+    </div>
+`;
+
             dicaCard.addEventListener('click', () => {
                 openDicaViewerModal(dica);
             });
