@@ -514,8 +514,8 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     
     result = await get_pdf_content_from_url(monitoramento.official_gazette_link)
     if not result:
-    print(f"Verificação para {monitoramento.id} falhou: Não foi possível obter o PDF.")
-    return
+        print(f"Verificação para {monitoramento.id} falhou: Não foi possível obter o PDF.")
+        return
 
     pdf_content, pdf_real_url = result
  
