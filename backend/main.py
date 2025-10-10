@@ -2227,6 +2227,7 @@ async def get_monitoramento_historico(
     """
     Retorna o histórico básico (últimas verificações e número de ocorrências)
     de um monitoramento específico.
+    Inclui o link do diário oficial para abrir o PDF real.
     """
     db = firestore.client()
     doc_ref = db.collection("monitorings").document(monitoramento_id)
@@ -2246,4 +2247,5 @@ async def get_monitoramento_historico(
         "occurrences": data.get("occurrences", 0),
         "last_checked_at": data.get("last_checked_at"),
         "last_pdf_hash": data.get("last_pdf_hash"),
+        "official_gazette_link": data.get("official_gazette_link"),  # 👈 ADICIONADO AQUI
     }

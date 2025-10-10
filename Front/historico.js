@@ -1,7 +1,10 @@
+// ===============================
+// histórico.js (Painel Lateral)
+// ===============================
 document.addEventListener("DOMContentLoaded", () => {
   console.log("📜 histórico.js carregado com estilo de painel lateral.");
 
-  // Elemento raiz do painel
+  // Painel lateral do histórico
   const historicoPanel = document.createElement("div");
   historicoPanel.className = "historico-panel hidden";
   historicoPanel.innerHTML = `
@@ -22,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = historicoPanel.querySelector("#fechar-historico");
   const historicoLista = historicoPanel.querySelector("#historico-lista");
 
-  // Funções de exibir/ocultar painel
+  // Funções de exibir/ocultar
   function abrirHistorico() {
     historicoPanel.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -36,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   overlay.addEventListener("click", fecharHistorico);
   closeBtn.addEventListener("click", fecharHistorico);
 
-  // Evento principal de clique
+  // Captura clique em "Ver Histórico"
   document.body.addEventListener("click", async (e) => {
     const btn = e.target.closest(".view-history-link");
     if (!btn) return;
@@ -57,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await carregarHistorico(monitoramentoId);
   });
 
-  // Função para buscar histórico no backend
+  // Função principal para carregar histórico
   async function carregarHistorico(monitoramentoId) {
     const user = window.auth?.currentUser;
     if (!user) {
@@ -68,9 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const token = await user.getIdToken();
 
     try {
-      // ⚙️ Ajuste de rota — use a rota correta do backend (verifique se é /ocorrencias ou /historico)
       const resp = await fetch(`${BACKEND_URL}/api/monitoramentos/${monitoramentoId}/historico`, {
-
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -81,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await resp.json();
 
-      if (!data || data.length === 0) {
+      if (!data || data.occurrences === 0) {
         historicoLista.innerHTML = `<p class="empty-text">Nenhuma ocorrência encontrada.</p>`;
         return;
       }
@@ -93,29 +94,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Renderiza histórico no painel
-  function renderizarHistorico(ocorrencias) {
+  // Renderiza o histórico no painel lateral
+  function renderizarHistorico(data) {
+    const ocorrencias = Array.isArray(data) ? data : [data];
+
     historicoLista.innerHTML = ocorrencias
       .map((oc) => {
-        const data = oc.detected_at
-          ? new Date(oc.detected_at._seconds * 1000).toLocaleString("pt-BR")
-          : "Data desconhecida";
+        // 🕓 Corrigir formato da data
+        let dataOcorrencia = "Data desconhecida";
+        if (oc.detected_at || oc.last_checked_at) {
+          try {
+            const base = oc.detected_at || oc.last_checked_at;
+            if (base._seconds) {
+              dataOcorrencia = new Date(base._seconds * 1000).toLocaleString("pt-BR");
+            } else {
+              dataOcorrencia = new Date(base).toLocaleString("pt-BR");
+            }
+          } catch {
+            dataOcorrencia = "Data inválida";
+          }
+        }
+
+        // 🔗 Prioridade do link: official_gazette_link → link → last_pdf_hash
+        let linkPdf = oc.official_gazette_link || oc.link || oc.last_pdf_hash;
+
+        if (linkPdf) {
+          // Se for um hash (sem http), monta URL completa
+          if (!linkPdf.startsWith("http")) {
+            linkPdf = `${BACKEND_URL}/pdfs/${linkPdf}`;
+          }
+        }
 
         return `
           <div class="historico-card">
             <div class="historico-info">
               <i class="fas fa-bell"></i>
               <div>
-                <strong>Ocorrência detectada</strong>
-                <p>${oc.description || "Sem detalhes disponíveis."}</p>
-                <small>${data}</small>
+                <strong>Ocorrências encontradas</strong>
+                <p>ID do edital: <b>${oc.edital_identifier || "-"}</b></p>
+                ${
+                  linkPdf
+                    ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link"></i> Ver Ocorrência</a></p>`
+                    : "<p><i>Sem link disponível</i></p>"
+                }
+                <small>Data da ocorrência: ${dataOcorrencia}</small>
               </div>
             </div>
-            ${
-              oc.link
-                ? `<a href="${oc.link}" target="_blank" class="historico-link">Ver publicação</a>`
-                : ""
-            }
           </div>
         `;
       })
