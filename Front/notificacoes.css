@@ -1,117 +1,227 @@
-/* ======= NOTIFICAÇÕES ======= */
 .notification-container {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .notification-icon {
-    position: relative;
-    font-size: 20px;
-    color: #555;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  
-  .notification-icon:hover {
-    color: #007bff;
-  }
-  
-  .notification-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background-color: #ff4444;
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-    border-radius: 50%;
-    padding: 3px 6px;
-    min-width: 16px;
-    text-align: center;
-  }
-  
-  .notification-dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 28px;
-    background: white;
-    width: 330px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-    border-radius: 10px;
-    z-index: 100;
-    overflow: hidden;
-  }
-  
-  .notification-dropdown.active {
-    display: block;
-  }
-  
-  .notification-header {
-    font-weight: bold;
-    padding: 12px 15px;
-    background: #f5f5f5;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .notification-list {
-    max-height: 320px;
-    overflow-y: auto;
-  }
-  
-  .notification-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .notification-item:hover {
-    background: #f7f9ff;
-  }
-  
-  .notification-item i {
-    font-size: 18px;
-    color: #007bff;
-  }
-  
-  .notification-content {
-    flex: 1;
-  }
-  
-  .notification-content p {
-    margin: 0;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .notification-content small {
-    color: #888;
-    font-size: 12px;
-  }
-  
-  .notification-empty {
-    text-align: center;
-    padding: 25px 0;
-    color: #888;
-    font-size: 14px;
-  }
-  
-  .notification-footer {
-    text-align: center;
-    padding: 10px;
-    background: #f5f5f5;
-    font-size: 13px;
-  }
-  
-  .notification-footer a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  .notification-footer a:hover {
-    text-decoration: underline;
-  }
-  
+  position: relative;
+  display: inline-block;
+}
+
+.notification-icon {
+  position: relative;
+  font-size: 20px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.notification-icon:hover {
+  color: #007bff;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+     background-color: #e62727; /* azul consistente com o tema */
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px #fff; /* borda branca sutil em volta */
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+
+/* ======= DROPDOWN ======= */
+.notification-dropdown {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  width: 340px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.notification-dropdown.active {
+  display: flex;
+}
+
+/* ======= CABEÇALHO ======= */
+.notif-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.notif-header i {
+  font-size: 18px;
+  color: #007bff;
+}
+
+/* ======= LISTA ======= */
+.notif-list {
+  max-height: 320px;
+  overflow-y: auto;
+  background: #fff;
+}
+
+/* ======= RODAPÉ ======= */
+.notif-footer {
+  text-align: center;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  padding: 10px;
+}
+
+.notif-footer a {
+  color: #007bff;
+  font-size: 13px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+
+.notif-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ======= ITEM ======= */
+.notif-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid #e3e7ee;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 8px 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.notif-card:hover {
+  background: #f6f9ff;
+  transform: translateY(-1px);
+}
+
+.notif-card.unread {
+  background: #eef4ff;
+  border-color: #bcd0ff;
+}
+
+/* ======= ÍCONE CIRCULAR (CONTORNO) ======= */
+.notif-left {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  margin-right: 12px;
+  background: #fff;
+  border: 2px solid;
+}
+
+.notif-blue {
+
+   background: linear-gradient(135deg, #ff6d33, #dd2110);
+  color: white;
+}
+.notif-orange {
+  border-color: #ff9800;
+  color: #ff9800;
+}
+.notif-red {
+  border-color: #e53935;
+  color: #e53935;
+}
+.notif-green {
+  border-color: #2e7d32;
+  color: #2e7d32;
+}
+.notif-gray {
+  border-color: #999;
+  color: #555;
+}
+
+.notif-left i {
+  font-size: 17px;
+}
+
+/* ======= CENTRO ======= */
+.notif-center {
+  flex: 1;
+  text-align: left;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.notif-title {
+  font-size: 10px;
+  font-weight: 400;
+  color: #222;
+}
+
+.notif-message {
+  font-size: 11px;
+  color: #555;
+  margin-top: 2px;
+}
+
+/* ======= DIREITA (TEMPO) ======= */
+.notif-right {
+  text-align: right;
+  font-size: 12px;
+  color: #777;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+/* ======= ESTADO VAZIO ======= */
+.notif-empty {
+  text-align: center;
+  color: #999;
+  padding: 25px 0;
+}
+
+.notif-empty i {
+  display: block;
+  font-size: 32px;
+  margin-bottom: 6px;
+  color: #bbb;
+}
+
+.notification-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.notification-dropdown::-webkit-scrollbar-thumb {
+  background-color: #d0d0d0;
+  border-radius: 3px;
+}
+
+
+.notif-footer a i {
+  margin-top: -1px;
+  font-size: 13px; /* tamanho do ícone */
+  color: #007bff;  /* cor do ícone */
+  transition: transform 0.2s ease, color 0.2s ease;
+}

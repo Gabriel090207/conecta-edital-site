@@ -7,6 +7,7 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="monitoramento.css"> 
     <link rel="stylesheet" href="notificacoes.css"> 
+    <link rel="stylesheet" href="historico.css"> 
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -30,7 +31,12 @@
                 </ul>
             </nav>
             <div class="navbar-right">
-                <a href="#" class="notification-icon"><i class="fas fa-bell"></i></a>
+                <a href="#" class="notification-icon">
+                    <i class="fas fa-bell sino"></i>
+                    <span class="notification-badge"></span>
+                    <div class="notification-dropdown"></div>
+                  </a>
+                  
                 <div class="user-menu" id="user-dropdown-toggle"> 
                     <span class="user-avatar-placeholder" id="userDefaultAvatar"></span>
                     <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
@@ -191,7 +197,7 @@
                 <i class="fas fa-user"></i>
             </div>
             <h2>Monitoramento Pessoal</h2>
-            <p class="modal-subtitle">Configure o monitoramento para acompanhar seus resultados pessoais</p>
+            <p class="modal-subtitle">Configure o monitoramento para acompanhar atualizações pessoais</p>
             <form class="modal-form" id="personal-monitoring-form"> 
                 <div class="form-group mon1">
                     <label for="personal-link"><i class="fas fa-link ic"></i> Link do Diário Oficial</label>
@@ -224,7 +230,7 @@
                 <i class="fas fa-bullseye" style="color: #851fce"></i>
             </div>
             <h2>Monitoramento Radar</h2>
-            <p class="modal-subtitle">Configure o monitoramento para acompanhar novidades do edital</p>
+            <p class="modal-subtitle">Configure o monitoramento para acompanhar atualizações do edital</p>
             <form class="modal-form" id="radar-monitoring-form"> 
                 <div class="form-group mon">
                     <label for="radar-link"><i class="fas fa-link ic" class="idinput"></i> Link do Diário Oficial</label>
@@ -232,7 +238,7 @@
                     <span class="required-tag1">Obrigatório</span>
                 </div>
                 <div class="form-group mon">
-                    <label for="radar-id" class="id"><i class="fas fa-id-card ic1"></i> ID do Edital / Concurso</label>
+                    <label for="radar-id" class="id" style="font-weight: 550; color: #222;"><i class="fas fa-id-card ic1"></i> ID do Edital / Concurso</label>
                     <input type="text" id="radar-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital" >
                     <span class="required-tag">Obrigatório</span>
                 </div>
@@ -471,6 +477,20 @@
         </div>
     </footer>
 
+    <!-- Modal de Histórico -->
+<div id="historico-modal" class="modal-overlay">
+  <div class="modal-content historico-modal-content">
+    <button id="historico-close-btn" class="modal-close-btn">
+      <i class="fas fa-times"></i>
+    </button>
+    <h2><i class="fas fa-history"></i> Histórico de Ocorrências</h2>
+    <div id="historico-content" class="historico-list">
+      <p>Carregando...</p>
+    </div>
+  </div>
+</div>
+
+
      <a href="#top" class="back-to-top-button" aria-label="Voltar ao topo">
             <i class="fas fa-arrow-up"></i>
         </a>
@@ -483,5 +503,11 @@
     <script src="common-auth-ui.js"></script> 
     <script src="monitoramento.js"></script> 
     <script src="notificacoes.js"></script> 
+    <script src="monitoramento-editar.js"></script>
+    <script src="historico.js"></script>
+
+
+
+
 </body>
 </html>

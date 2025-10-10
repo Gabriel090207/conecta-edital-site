@@ -2038,7 +2038,7 @@ async def update_monitoring(
     user_uid: str = Depends(get_current_user_uid)
 ):
     """
-    Atualiza os dados de um monitoramento (link e ID do edital).
+    Atualiza os dados de um monitoramento (link, ID do edital, nome e keywords).
     O campo nome_completo só pode ser alterado em monitoramentos pessoais.
     """
     db = firestore.client()
@@ -2063,6 +2063,12 @@ async def update_monitoring(
     # Atualiza nome apenas se for tipo pessoal
     if mon_data.get("monitoring_type") == "personal" and "nome_completo" in data:
         updates["candidate_name"] = data["nome_completo"]
+
+    # ✅ Atualiza keywords, se enviado
+    if "keywords" in data and data["keywords"]:
+        updates["keywords"] = data["keywords"]
+    elif "palavras_chave" in data and data["palavras_chave"]:
+        updates["keywords"] = data["palavras_chave"]
 
     if not updates:
         raise HTTPException(status_code=400, detail="Nenhum dado válido fornecido para atualização.")
@@ -2211,3 +2217,34 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
     
     # Se não houver monitoramentos, retorne lista vazia mesmo
     return monitoramentos
+
+
+@app.get("/api/monitoramentos/{monitoramento_id}/historico")
+async def get_monitoramento_historico(
+    monitoring_id: str,
+    user_uid: str = Depends(get_current_user_uid)
+):
+    """
+    Retorna o histórico básico (últimas verificações e número de ocorrências)
+    de um monitoramento específico.
+    """
+    db = firestore.client()
+    doc_ref = db.collection("monitorings").document(monitoring_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Monitoramento não encontrado.")
+
+    data = doc.to_dict()
+    if data.get("user_uid") != user_uid:
+        raise HTTPException(status_code=403, detail="Sem permissão para visualizar este monitoramento.")
+
+    # Aqui retornamos as informações básicas de histórico
+    return {
+        "monitoring_id": monitoring_id,
+        "edital_identifier": data.get("edital_identifier"),
+        "monitoring_type": data.get("monitoring_type"),
+        "occurrences": data.get("occurrences", 0),
+        "last_checked_at": data.get("last_checked_at"),
+        "last_pdf_hash": data.get("last_pdf_hash"),
+    }
