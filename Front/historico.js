@@ -141,7 +141,7 @@ function renderizarHistorico(data) {
               <p>ID do edital: <b>${oc.edital_identifier || "-"}</b></p>
               ${
                 linkPdf
-                  ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link" style="font-size: 12px"></i> Ver Ocorrência</a></p>`
+                  ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link historico-link" style="font-size: 12px; color: black;"></i> Ver Ocorrência</a></p>`
                   : "<p><i>Sem link disponível</i></p>"
               }
               <small>Data da ocorrência: ${dataOcorrencia}</small>
