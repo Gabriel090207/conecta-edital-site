@@ -2221,7 +2221,7 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
 
 @app.get("/api/monitoramentos/{monitoramento_id}/historico")
 async def get_monitoramento_historico(
-    monitoring_id: str,
+    monitoramento_id: str,
     user_uid: str = Depends(get_current_user_uid)
 ):
     """
@@ -2229,7 +2229,7 @@ async def get_monitoramento_historico(
     de um monitoramento específico.
     """
     db = firestore.client()
-    doc_ref = db.collection("monitorings").document(monitoring_id)
+    doc_ref = db.collection("monitorings").document(monitoramento_id)
     doc = doc_ref.get()
 
     if not doc.exists:
@@ -2239,9 +2239,8 @@ async def get_monitoramento_historico(
     if data.get("user_uid") != user_uid:
         raise HTTPException(status_code=403, detail="Sem permissão para visualizar este monitoramento.")
 
-    # Aqui retornamos as informações básicas de histórico
     return {
-        "monitoring_id": monitoring_id,
+        "monitoramento_id": monitoramento_id,
         "edital_identifier": data.get("edital_identifier"),
         "monitoring_type": data.get("monitoring_type"),
         "occurrences": data.get("occurrences", 0),
