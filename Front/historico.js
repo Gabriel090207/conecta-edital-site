@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="historico-overlay"></div>
     <div class="historico-container">
       <div class="historico-header">
-        <h3><i class="fas fa-history"></i> Histórico de Ocorrências</h3>
+        <h3> Histórico de Ocorrências</h3>
         <button id="fechar-historico" class="fechar-historico-btn">&times;</button>
       </div>
       <div id="historico-lista" class="historico-lista">
@@ -135,13 +135,13 @@ function renderizarHistorico(data) {
       return `
         <div class="historico-card">
           <div class="historico-info">
-            <i class="fas fa-bell"></i>
+            <i class="fas fa-history"></i>
             <div>
               <strong>Ocorrência encontrada</strong>
               <p>ID do edital: <b>${oc.edital_identifier || "-"}</b></p>
               ${
                 linkPdf
-                  ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link historico-link" style="font-size: 12px; color: black;"></i> Ver Ocorrência</a></p>`
+                  ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link historico-link" style="font-size: 12px; color: black !important; -webkit-text-stroke: 0px;"></i> Ver Ocorrência</a></p>`
                   : "<p><i>Sem link disponível</i></p>"
               }
               <small>Data da ocorrência: ${dataOcorrencia}</small>

@@ -76,7 +76,7 @@
   padding: 12px 14px;
   margin-bottom: 12px;
   border: 1px solid #e3e7ee;
-  border-left: 4px solid #007bff;
+  border-left: 4px solid #009479ff;
   transition: transform 0.2s;
 }
 
@@ -91,7 +91,8 @@
 }
 
 .historico-info i {
-  color: #007bff;
+  color: transparent !important; /* Adicione !important aqui */
+  -webkit-text-stroke: 1px #009479ff;
   font-size: 1.3rem;
   margin-top: 4px;
 }
