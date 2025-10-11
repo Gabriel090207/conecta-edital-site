@@ -1396,80 +1396,11 @@ async def user_reply_to_ticket(
 
 
 # --- ROTA PARA OBTER DADOS DE UM USUÁRIO ESPECÍFICO ---
-@app.get("/api/users/{user_uid}", response_model=UserData)
-async def get_user_data(user_uid: str, current_user_uid: str = Depends(get_current_user_uid)):
-    """
-    Retorna os dados do perfil do usuário autenticado.
-    A dependência `current_user_uid` garante que o usuário só pode acessar
-    os próprios dados, e não os de outros.
-    """
-    if user_uid != current_user_uid:
-        raise HTTPException(
-            status_code=403,
-            detail="Você não tem permissão para acessar os dados de outro usuário."
-        )
 
-    db = firestore.client()
-    user_doc_ref = db.collection('users').document(user_uid)
-    user_doc = user_doc_ref.get()
-
-    if not user_doc.exists:
-        raise HTTPException(status_code=404, detail="Dados do usuário não encontrados.")
-    
-    user_data = user_doc.to_dict()
-    
-    # Adiciona valores padrão caso as chaves não existam
-    user_data['fullName'] = user_data.get('fullName', 'Nome não informado')
-    user_data['username'] = user_data.get('username', 'Usuário não informado')
-    user_data['email'] = user_data.get('email', 'E-mail não informado')
-    user_data['plan_type'] = user_data.get('plan_type', 'Sem Plano')
-    user_data['photoURL'] = user_data.get('photoURL', None)
-    user_data['contact'] = user_data.get('contact', None)
-    
-    return UserData(**user_data)
 # ========================================================================================================
 # --- ROTA CORRIGIDA PARA ATUALIZAR O PERFIL DO USUÁRIO ---
 # ========================================================================================================
-@app.patch("/api/users/{user_uid}", response_model=UserData)
-async def update_user_profile(
-    user_uid: str,
-    update_data: UserProfileUpdate,
-    current_user_uid: str = Depends(get_current_user_uid)
-):
-    """
-    Atualiza o perfil do usuário logado no Firestore.
-    A dependência `current_user_uid` garante que o usuário só pode acessar
-    e editar os próprios dados, e não os de outros.
-    """
-    if user_uid != current_user_uid:
-        raise HTTPException(
-            status_code=403,
-            detail="Você não tem permissão para editar os dados de outro usuário."
-        )
-
-    db = firestore.client()
-    user_doc_ref = db.collection('users').document(current_user_uid)
-    
-    # Valida se os dados enviados são válidos
-    update_payload = update_data.model_dump(exclude_unset=True)
-    
-    # Se houver dados para atualizar, faça o update
-    if update_payload:
-        user_doc_ref.update(update_payload)
-        
-        # Retorna o documento completo e atualizado
-        updated_doc = user_doc_ref.get()
-        # NOTA: O id não está no dicionário do Firestore, então adicionamos
-        updated_data = updated_doc.to_dict()
-        if updated_data:
-            updated_data['id'] = updated_doc.id
-        return UserData(**updated_data)
-    
-    # Se nenhum dado for fornecido, retorna o perfil atual sem alterações
-    return await get_user_data(user_uid, current_user_uid)
-
-
-# ========================================================================================================
+================================================================================================
 #       ROTAS DE SUPORTE PARA O PAINEL DE ADMIN
 # ========================================================================================================
 
@@ -1673,43 +1604,6 @@ async def get_all_users_for_audit():
     return users_list
 
 # NOVO ENDPOINT DE ADMIN
-@app.patch("/admin/users/{user_uid}")
-async def admin_update_user_profile(
-    user_uid: str,
-    update_data: AdminProfileUpdate,
-):
-    """
-    Permite que um administrador atualize os dados de perfil de qualquer usuário.
-    """
-    db = firestore.client()
-    user_doc_ref = db.collection('users').document(user_uid)
-    user_doc = user_doc_ref.get()
-
-    if not user_doc.exists:
-        raise HTTPException(status_code=404, detail="Dados do usuário não encontrados.")
-    
-    update_payload = update_data.dict(exclude_unset=True)
-    if not update_payload:
-        return {"message": "Nenhum dado fornecido para atualização."}
-
-    try:
-        # Se o e-mail for alterado, também o atualize no Firebase Auth
-        if 'email' in update_payload and update_payload['email'] != user_doc.to_dict().get('email'):
-            auth.update_user(user_uid, email=update_payload['email'])
-        
-        user_doc_ref.update(update_payload)
-        print(f"Admin atualizou o perfil do usuário {user_uid}.")
-        
-        updated_doc = user_doc_ref.get().to_dict()
-        return {"message": "Perfil atualizado com sucesso!", "user": updated_doc}
-
-    except FirebaseError as e:
-        print(f"ERRO: Erro no Firebase ao atualizar usuário: {e}")
-        raise HTTPException(status_code=400, detail=f"Erro no Firebase: {e}")
-    except Exception as e:
-        print(f"ERRO: Erro inesperado ao atualizar perfil do usuário: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno do servidor.")
-
 
 @app.get("/admin/feedback_stats")
 async def get_admin_feedback_stats():
@@ -2157,35 +2051,6 @@ async def update_monitoring(
     updated_doc = doc_ref.get().to_dict()
     return Monitoring(id=monitoring_id, **updated_doc)
 
-@app.put("/admin/users/{user_uid}/slots")
-async def admin_update_user_slots(user_uid: str, data: dict):
-    """
-    Permite que o administrador ajuste manualmente o número de slots personalizados de um usuário.
-    Espera no body: {"custom_slots": 5}
-    """
-    db = firestore.client()
-    user_ref = db.collection("users").document(user_uid)
-    doc = user_ref.get()
-
-    if not doc.exists:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
-
-    custom_slots = data.get("custom_slots")
-
-    if not isinstance(custom_slots, int) or custom_slots < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="O campo 'custom_slots' deve ser um número inteiro não negativo."
-        )
-
-    try:
-        user_ref.update({"custom_slots": custom_slots})
-        print(f"✅ Slots personalizados do usuário {user_uid} atualizados para {custom_slots}.")
-        return {"status": "ok", "message": f"Slots atualizados para {custom_slots}."}
-    except Exception as e:
-        print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
-
 
 @app.patch("/api/monitoramentos/{monitoring_id}")
 async def patch_monitoring(
@@ -2300,25 +2165,143 @@ async def get_monitoramento_historico(
 
 from fastapi import Body
 
-@app.put("/admin/users/{user_uid}/slots", dependencies=[Depends(get_current_admin_uid)])
-async def update_user_slots(user_uid: str, data: dict = Body(...)):
+
+
+@app.get("/api/users/{user_uid}", response_model=UserData)
+async def get_user_data(user_uid: str, current_user_uid: str = Depends(get_current_user_uid)):
     """
-    Atualiza a quantidade de slots personalizados de um usuário.
+    Retorna os dados do perfil do usuário autenticado.
+    A dependência `current_user_uid` garante que o usuário só pode acessar
+    os próprios dados, e não os de outros.
+    """
+    if user_uid != current_user_uid:
+        raise HTTPException(
+            status_code=403,
+            detail="Você não tem permissão para acessar os dados de outro usuário."
+        )
+
+    db = firestore.client()
+    user_doc_ref = db.collection('users').document(user_uid)
+    user_doc = user_doc_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Dados do usuário não encontrados.")
+    
+    user_data = user_doc.to_dict()
+    
+    # Adiciona valores padrão caso as chaves não existam
+    user_data['fullName'] = user_data.get('fullName', 'Nome não informado')
+    user_data['username'] = user_data.get('username', 'Usuário não informado')
+    user_data['email'] = user_data.get('email', 'E-mail não informado')
+    user_data['plan_type'] = user_data.get('plan_type', 'Sem Plano')
+    user_data['photoURL'] = user_data.get('photoURL', None)
+    user_data['contact'] = user_data.get('contact', None)
+
+    # 🔹 Garante que o campo de slots exista e use o valor salvo ou o padrão do plano
+    default_slots = {"gratuito": 1, "essencial": 3, "premium": 10}
+    plan = user_data.get("plan_type", "gratuito")
+    user_data["slots"] = user_data.get("slots", default_slots.get(plan, 1))
+
+    return UserData(**user_data)
+
+
+@app.patch("/api/users/{user_uid}", response_model=UserData)
+async def update_user_profile(
+    user_uid: str,
+    update_data: UserProfileUpdate,
+    current_user_uid: str = Depends(get_current_user_uid)
+):
+    """
+    Atualiza o perfil do usuário logado no Firestore.
+    A dependência `current_user_uid` garante que o usuário só pode acessar
+    e editar os próprios dados, e não os de outros.
+    """
+    if user_uid != current_user_uid:
+        raise HTTPException(
+            status_code=403,
+            detail="Você não tem permissão para editar os dados de outro usuário."
+        )
+
+    db = firestore.client()
+    user_doc_ref = db.collection('users').document(current_user_uid)
+    
+    update_payload = update_data.model_dump(exclude_unset=True)
+    
+    if update_payload:
+        user_doc_ref.update(update_payload)
+        
+        updated_doc = user_doc_ref.get()
+        updated_data = updated_doc.to_dict()
+        if updated_data:
+            updated_data['id'] = updated_doc.id
+        return UserData(**updated_data)
+    
+    return await get_user_data(user_uid, current_user_uid)
+
+
+@app.patch("/admin/users/{user_uid}")
+async def admin_update_user_profile(
+    user_uid: str,
+    update_data: AdminProfileUpdate,
+):
+    """
+    Permite que um administrador atualize os dados de perfil de qualquer usuário.
+    """
+    db = firestore.client()
+    user_doc_ref = db.collection('users').document(user_uid)
+    user_doc = user_doc_ref.get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Dados do usuário não encontrados.")
+    
+    update_payload = update_data.dict(exclude_unset=True)
+    if not update_payload:
+        return {"message": "Nenhum dado fornecido para atualização."}
+
+    try:
+        if 'email' in update_payload and update_payload['email'] != user_doc.to_dict().get('email'):
+            auth.update_user(user_uid, email=update_payload['email'])
+        
+        user_doc_ref.update(update_payload)
+        print(f"Admin atualizou o perfil do usuário {user_uid}.")
+        
+        updated_doc = user_doc_ref.get().to_dict()
+        return {"message": "Perfil atualizado com sucesso!", "user": updated_doc}
+
+    except FirebaseError as e:
+        print(f"ERRO: Erro no Firebase ao atualizar usuário: {e}")
+        raise HTTPException(status_code=400, detail=f"Erro no Firebase: {e}")
+    except Exception as e:
+        print(f"ERRO: Erro inesperado ao atualizar perfil do usuário: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno do servidor.")
+
+
+# 🔹 Mantemos apenas UMA rota de slots corrigida e funcional
+@app.put("/admin/users/{user_uid}/slots", dependencies=[Depends(get_current_admin_uid)])
+async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
+    """
+    Permite que o administrador ajuste manualmente o número de slots de um usuário.
     Exemplo de body:
     {
         "slots": 4
     }
     """
-    slots = data.get("slots")
-    if slots is None or not isinstance(slots, int) or slots < 0:
-        raise HTTPException(status_code=400, detail="Valor de slots inválido.")
-
+    db = firestore.client()
     user_ref = db.collection("users").document(user_uid)
-    user_doc = user_ref.get()
-    if not user_doc.exists:
+    doc = user_ref.get()
+
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    # Atualiza slots no Firestore
-    user_ref.update({"slots": slots})
+    slots = data.get("slots")
+    if not isinstance(slots, int) or slots < 0:
+        raise HTTPException(status_code=400, detail="O campo 'slots' deve ser um número inteiro não negativo.")
 
-    return {"message": f"Slots do usuário {user_uid} atualizados para {slots}."}
+    try:
+        # 🔹 Usa set(..., merge=True) pra criar o campo se ele não existir
+        user_ref.set({"slots": slots}, merge=True)
+        print(f"✅ Slots do usuário {user_uid} atualizados para {slots}.")
+        return {"status": "ok", "message": f"Slots atualizados para {slots}."}
+    except Exception as e:
+        print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
