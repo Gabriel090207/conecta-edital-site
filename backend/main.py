@@ -2256,6 +2256,8 @@ async def patch_monitoring(
     return {"id": monitoring_id, **updated_doc}
 
 
+from fastapi.responses import JSONResponse
+
 @app.get("/api/monitoramentos")
 async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
     """
@@ -2283,10 +2285,12 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
             "last_checked_at": data.get("last_checked_at"),
             "user_uid": data.get("user_uid"),
             "user_email": data.get("user_email"),
-            "nome_customizado": data.get("nome_customizado", None),  # ✅ Mantém nome customizado
+            "nome_customizado": data.get("nome_customizado") or "",  # 👈 garante string
         })
 
-    return monitoramentos
+    # 🔥 força a API a não ser cacheada (nem por Cloudflare nem por Render)
+    return JSONResponse(content=monitoramentos, headers={"Cache-Control": "no-store, max-age=0"})
+
 
 
 @app.get("/api/monitoramentos/{monitoramento_id}/historico")

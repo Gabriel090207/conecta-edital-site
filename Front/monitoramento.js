@@ -247,9 +247,15 @@ document.addEventListener('DOMContentLoaded', () => {
     <i class="${titleIconClass}"></i>
 
   <h3 class="editable-monitoring-title">
-  <span class="monitoring-title-text">
-    ${mon.nome_customizado || mon.custom_name || `Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}`}
-  </span>
+<span class="monitoring-title-text">
+  ${
+    mon.nome_customizado && mon.nome_customizado.trim() !== ""
+      ? mon.nome_customizado
+      : `Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}`
+  }
+</span>
+
+
   <button class="edit-btn" data-id="${mon.id}" title="Editar nome do monitoramento">
     <i class="fas fa-pencil-alt"></i>
   </button>
@@ -580,9 +586,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const responseMonitorings = await fetch(`${BACKEND_URL}/api/monitoramentos`, { 
             headers: { 
               'Authorization': `Bearer ${idToken}`,
-              'Cache-Control': 'no-cache' // 🔥 força o backend a trazer dados atualizados
+              'Cache-Control': 'no-cache', // 🔥 força o backend a trazer dados atualizados
             } 
           });
+          
       
           if (await handleApiAuthError(responseStatus) || await handleApiAuthError(responseMonitorings)) return;
           if (!responseStatus.ok || !responseMonitorings.ok) {
@@ -1438,7 +1445,6 @@ document.head.appendChild(style);
 
 // ==================== EDIÇÃO DE MONITORAMENTO (CORRIGIDO) ====================
 
-
 function enableEditableTitles() {
     const container = document.querySelector(".monitoramento-list-section");
     if (!container) return;
@@ -1505,10 +1511,13 @@ function enableEditableTitles() {
               const item = currentMonitorings.find(m => m.id === id);
               if (item) item.nome_customizado = updated.nome_customizado;
   
-              // Atualiza visualmente o card sem reload
+              // Atualiza visualmente os cards sem reload
               loadMonitorings(currentMonitorings);
   
-              // Pausa o polling pra evitar regravação
+              // ✅ Reaplica o listener de edição após recriar os cards
+              enableEditableTitles();
+  
+              // Pausa o polling pra evitar conflito e reativa depois
               if (pollingInterval) {
                 clearInterval(pollingInterval);
                 pollingInterval = null;
@@ -1522,6 +1531,14 @@ function enableEditableTitles() {
               console.error("❌ Erro ao atualizar nome:", err);
               alert(err.detail || "Erro ao atualizar nome.");
             }
+
+            if (item) {
+                item.nome_customizado = updated.nome_customizado;
+              }
+              
+              // Atualiza DOM sem recarregar backend
+              loadMonitorings(currentMonitorings);
+              
           } catch (err) {
             console.error("Erro:", err);
           }
@@ -1540,6 +1557,34 @@ function enableEditableTitles() {
   }
   
   window.addEventListener("load", enableEditableTitles);
+  
+  // --- CSS opcional para campo de edição ---
+  const styleEdit = document.createElement("style");
+  styleEdit.innerHTML = `
+    .edit-monitoring-input {
+      font-size: 16px;
+      font-weight: 600;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 4px 8px;
+      width: 220px;
+    }
+    .save-monitoring-title-btn {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      margin-left: 8px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .save-monitoring-title-btn:hover {
+      background: #0056b3;
+    }
+  `;
+  document.head.appendChild(styleEdit);
+  
   // ===================== MODAL DE OCORRÊNCIAS =====================
 
 
