@@ -2186,12 +2186,10 @@ async def admin_update_user_slots(user_uid: str, data: dict):
         print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
         raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
 
+
+
 @app.patch("/admin/users/{uid}")
-async def update_user(uid: str, payload: dict):
-    """
-    Atualiza dados de um usuário (usado no painel admin).
-    Agora também permite atualizar diretamente 'slots_disponiveis'.
-    """
+async def update_user(uid: str, payload: AdminProfileUpdate):
     db = firestore.client()
     user_ref = db.collection("users").document(uid)
     user_doc = user_ref.get()
@@ -2199,8 +2197,12 @@ async def update_user(uid: str, payload: dict):
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    data = payload
+    # 👇 converte para dicionário, usando aliases corretos
+    data = payload.dict(by_alias=True, exclude_unset=True)
+    print("DEBUG DATA RECEBIDA:", data)
     update_data = {}
+
+
 
     # 🧠 Nome completo
     if "fullName" in data:
@@ -2255,6 +2257,9 @@ async def update_user(uid: str, payload: dict):
 
     # 🗄️ Atualiza Firestore
     user_ref.update(update_data)
+
+    print("FIRESTORE UPDATE:", update_data)
+
 
     # ✅ Retorno
     return {
