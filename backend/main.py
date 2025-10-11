@@ -2308,3 +2308,15 @@ async def get_monitoramento_historico(
         "last_pdf_hash": data.get("last_pdf_hash"),
         "official_gazette_link": data.get("official_gazette_link"),  # 👈 ADICIONADO AQUI
     }
+
+
+from fastapi.responses import JSONResponse
+
+@app.options("/{rest_of_path:path}")
+async def preflight_handler(rest_of_path: str):
+    """Resposta genérica para requisições preflight (OPTIONS)"""
+    response = JSONResponse({"message": "Preflight OK"})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
+    return response
