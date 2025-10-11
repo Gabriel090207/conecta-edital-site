@@ -2187,71 +2187,6 @@ async def admin_update_user_slots(user_uid: str, data: dict):
         raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
 
 
-
-@app.patch("/admin/users/{uid}")
-async def update_user(uid: str, payload: AdminProfileUpdate):
-    """
-    Atualiza dados de um usuário (usado no painel admin).
-    Agora também recria campos deletados e garante parse correto do JSON.
-    """
-    db = firestore.client()
-    user_ref = db.collection("users").document(uid)
-    user_doc = user_ref.get()
-
-    if not user_doc.exists:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
-
-    # ✅ Faz o parsing correto do payload recebido
-    data = payload.dict(by_alias=True, exclude_unset=True)
-    print("DEBUG DATA RECEBIDA:", data)
-
-    update_data = {}
-
-    # 🧠 Nome completo
-    if "fullName" in data:
-        update_data["full_name"] = data["fullName"]
-
-    # 📧 E-mail
-    if "email" in data:
-        update_data["email"] = data["email"]
-
-    # 💳 Tipo de plano
-    if "plan_type" in data:
-        update_data["plan_type"] = data["plan_type"]
-
-    # 🔢 Slots base por plano
-    plan_type = data.get("plan_type", user_doc.get("plan_type"))
-    if plan_type == "essencial":
-        slots_base = 3
-    elif plan_type == "premium":
-        slots_base = 9999
-    elif plan_type == "gratuito":
-        slots_base = 0
-    else:
-        slots_base = user_doc.get("slots_base", 0)
-
-    update_data["slots_base"] = slots_base
-
-    # 🧩 Atualização direta de slots
-    if "slots_disponiveis" in data:
-        update_data["slots_disponiveis"] = int(data["slots_disponiveis"])
-        update_data["slots_extra"] = max(0, update_data["slots_disponiveis"] - slots_base)
-    else:
-        current_extra = user_doc.get("slots_extra", 0)
-        update_data["slots_extra"] = current_extra
-        update_data["slots_disponiveis"] = slots_base + current_extra
-
-    print("FIRESTORE UPDATE:", update_data)
-
-    # ✅ Garante criação e atualização de campos, mesmo se deletados
-    user_ref.set(update_data, merge=True)
-
-    return {
-        "message": "Usuário atualizado com sucesso",
-        "updated_fields": update_data
-    }
-
-
 @app.patch("/api/monitoramentos/{monitoring_id}")
 async def patch_monitoring(
     monitoring_id: str,
@@ -2361,3 +2296,29 @@ async def get_monitoramento_historico(
         "last_pdf_hash": data.get("last_pdf_hash"),
         "official_gazette_link": data.get("official_gazette_link"),  # 👈 ADICIONADO AQUI
     }
+
+
+from fastapi import Body
+
+@app.put("/admin/users/{user_uid}/slots", dependencies=[Depends(get_current_admin_uid)])
+async def update_user_slots(user_uid: str, data: dict = Body(...)):
+    """
+    Atualiza a quantidade de slots personalizados de um usuário.
+    Exemplo de body:
+    {
+        "slots": 4
+    }
+    """
+    slots = data.get("slots")
+    if slots is None or not isinstance(slots, int) or slots < 0:
+        raise HTTPException(status_code=400, detail="Valor de slots inválido.")
+
+    user_ref = db.collection("users").document(user_uid)
+    user_doc = user_ref.get()
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+    # Atualiza slots no Firestore
+    user_ref.update({"slots": slots})
+
+    return {"message": f"Slots do usuário {user_uid} atualizados para {slots}."}
