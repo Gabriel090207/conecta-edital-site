@@ -16,7 +16,7 @@ document.getElementById("decrease-slots").addEventListener("click", () => {
 // ==========================
 async function openEditUserModal(userUid) {
   try {
-    const res = await fetch(`/admin/users/${userUid}`); // rota para buscar dados de um usuário (ajuste se necessário)
+    const res = await fetch(`/api/users/${userUid}`); // rota para buscar dados de um usuário (ajuste se necessário)
     if (!res.ok) throw new Error("Erro ao carregar dados do usuário.");
 
     const user = await res.json();
@@ -63,11 +63,11 @@ document.querySelector(".btn-create").addEventListener("click", async (e) => {
     if (!profileRes.ok) throw new Error("Erro ao atualizar informações do usuário.");
 
     // 2️⃣ Atualiza slots
-    const slotsRes = await fetch(`/admin/users/${userUid}/slots`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slots: slotsValue }),
-    });
+const slotsRes = await fetch(`/admin/users/${userUid}/slots`, {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ custom_slots: slotsValue }), // 👈 nome igual ao backend
+});
 
     if (!slotsRes.ok) throw new Error("Erro ao atualizar slots do usuário.");
 

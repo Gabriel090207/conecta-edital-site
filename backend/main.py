@@ -2281,30 +2281,31 @@ async def admin_update_user_profile(
 async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
     """
     Permite que o administrador ajuste manualmente o número de slots de um usuário.
-    Espera no body:
+    Exemplo de body:
     {
-        "custom_slots": 5
+        "slots": 4
     }
     """
-    db = firestore.client()
-    user_ref = db.collection("users").document(user_uid)
-    doc = user_ref.get()
-
-    if not doc.exists:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
-
-    # 🔹 Aceita tanto "custom_slots" quanto "slots" no body
-    slots = data.get("custom_slots") or data.get("slots")
-    if not isinstance(slots, int) or slots < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="O campo 'custom_slots' ou 'slots' deve ser um número inteiro não negativo."
-        )
-
     try:
-        user_ref.set({"custom_slots": slots}, merge=True)
-        print(f"✅ Slots do usuário {user_uid} atualizados para {slots}.")
-        return {"status": "ok", "message": f"Slots atualizados para {slots}."}
+        db = firestore.client()  # 🔹 Garante que o Firestore está inicializado
+        user_ref = db.collection("users").document(user_uid)
+        doc = user_ref.get()
+
+        if not doc.exists:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+        slots = data.get("slots")
+        if not isinstance(slots, int) or slots < 0:
+            raise HTTPException(status_code=400, detail="O campo 'slots' deve ser um número inteiro não negativo.")
+
+        # 🔹 Atualiza (ou cria) o campo "slots" diretamente
+        user_ref.update({"slots": slots})
+        print(f"✅ Slots do usuário {user_uid} atualizados para {slots} no Firestore.")
+
+        # 🔹 Lê novamente o documento atualizado
+        updated = user_ref.get().to_dict()
+        return {"status": "ok", "message": f"Slots atualizados para {slots}.", "user": updated}
+
     except Exception as e:
         print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
+        raise HTTPException(status_code=500, detail=f"Erro ao atualizar slots: {e}")
