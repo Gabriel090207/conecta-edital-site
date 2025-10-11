@@ -2286,24 +2286,30 @@ async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
         "slots": 4
     }
     """
+    print(f"🟡 Recebida requisição para atualizar slots de {user_uid} com dados: {data}")
+
     try:
         db = firestore.client()  # 🔹 Garante que o Firestore está inicializado
         user_ref = db.collection("users").document(user_uid)
         doc = user_ref.get()
 
         if not doc.exists:
+            print(f"❌ Usuário {user_uid} não encontrado no Firestore.")
             raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
         slots = data.get("slots")
         if not isinstance(slots, int) or slots < 0:
+            print(f"⚠️ Valor inválido recebido para slots: {slots}")
             raise HTTPException(status_code=400, detail="O campo 'slots' deve ser um número inteiro não negativo.")
 
-        # 🔹 Atualiza (ou cria) o campo "slots" diretamente
-        user_ref.update({"slots": slots})
+        # 🔹 Usa set com merge=True para garantir que o campo seja criado ou atualizado
+        user_ref.set({"slots": slots}, merge=True)
         print(f"✅ Slots do usuário {user_uid} atualizados para {slots} no Firestore.")
 
         # 🔹 Lê novamente o documento atualizado
         updated = user_ref.get().to_dict()
+        print(f"📄 Documento atualizado no Firestore: {updated}")
+
         return {"status": "ok", "message": f"Slots atualizados para {slots}.", "user": updated}
 
     except Exception as e:
