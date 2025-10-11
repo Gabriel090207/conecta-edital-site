@@ -2259,8 +2259,8 @@ async def patch_monitoring(
 @app.get("/api/monitoramentos")
 async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
     """
-    Retorna todos os monitoramentos do usuário autenticado.
-    Inclui nome_customizado para que o front-end exiba nomes personalizados.
+    Retorna todos os monitoramentos do usuário autenticado,
+    incluindo nome_customizado (se existir).
     """
     db = firestore.client()
     monitorings_ref = db.collection("monitorings").where("user_uid", "==", user_uid)
@@ -2270,6 +2270,7 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
     for doc in docs:
         data = doc.to_dict()
         data["id"] = doc.id
+
         monitoramentos.append({
             "id": doc.id,
             "monitoring_type": data.get("monitoring_type"),
@@ -2281,10 +2282,10 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
             "status": data.get("status", "inactive"),
             "last_checked_at": data.get("last_checked_at"),
             "user_uid": data.get("user_uid"),
-            "nome_customizado": data.get("nome_customizado", ""),
+            "user_email": data.get("user_email"),
+            "nome_customizado": data.get("nome_customizado", None),  # ✅ Mantém nome customizado
         })
-    
-    # Se não houver monitoramentos, retorne lista vazia mesmo
+
     return monitoramentos
 
 

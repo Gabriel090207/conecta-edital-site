@@ -41,7 +41,6 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-
 // 🧩 Abre o modal e preenche os dados
 function abrirModalEdicao(dados, tipo) {
   const modal =
@@ -91,7 +90,6 @@ function abrirModalEdicao(dados, tipo) {
   novoBotao.addEventListener("click", salvarEdicaoMonitoramento);
 }
 
-
 // 💾 Função para salvar alterações (agora gera keywords automaticamente)
 async function salvarEdicaoMonitoramento(e) {
   e.preventDefault();
@@ -117,8 +115,8 @@ async function salvarEdicaoMonitoramento(e) {
     const nome = modal.querySelector("#personal-name").value.trim();
     const idEdital = modal.querySelector("#personal-id").value.trim();
 
-    // 🔹 Gera as palavras-chave automaticamente: "Nome + ID"
-    const keywordsGeradas = `${nome} ${idEdital}`.trim();
+    // 🔹 Mantém as palavras-chave separadas (nome e ID)
+    const keywordsGeradas = [nome, idEdital];
 
     payload = {
       link_diario: modal.querySelector("#personal-link").value.trim(),
@@ -129,9 +127,15 @@ async function salvarEdicaoMonitoramento(e) {
     };
   } else {
     const idEdital = modal.querySelector("#radar-id").value.trim();
+
+    // 🔹 Gera as palavras-chave automaticamente com base no ID (relativo)
+    const keywordsGeradas = idEdital;
+
     payload = {
       link_diario: modal.querySelector("#radar-link").value.trim(),
       id_edital: idEdital,
+      keywords: keywordsGeradas,
+      palavras_chave: keywordsGeradas,
     };
   }
 
@@ -165,7 +169,6 @@ async function salvarEdicaoMonitoramento(e) {
     alert("Erro ao atualizar monitoramento.");
   }
 }
-
 
 // 🔁 Restaura modal pro modo criar
 function fecharModalEdicao(modal, tipo) {
