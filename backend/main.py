@@ -2197,12 +2197,11 @@ async def update_user(uid: str, payload: AdminProfileUpdate):
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    # 👇 converte para dicionário, usando aliases corretos
+    # ✅ converte o payload validado para dict com os aliases corretos
     data = payload.dict(by_alias=True, exclude_unset=True)
-    print("DEBUG DATA RECEBIDA:", data)
+    print("DEBUG DATA RECEBIDA:", data)  # Veja no console do servidor
+
     update_data = {}
-
-
 
     # 🧠 Nome completo
     if "fullName" in data:
@@ -2231,41 +2230,20 @@ async def update_user(uid: str, payload: AdminProfileUpdate):
 
     # 🧩 Atualização direta de slots (novo comportamento)
     if "slots_disponiveis" in data:
-        try:
-            update_data["slots_disponiveis"] = int(data["slots_disponiveis"])
-            # Calcula extras automaticamente (para manter coerência)
-            update_data["slots_extra"] = max(
-                0, update_data["slots_disponiveis"] - slots_base
-            )
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Valor inválido para slots_disponiveis.")
-
-    # 🧩 Compatibilidade com modo antigo (custom_slots)
-    elif "custom_slots" in data:
-        try:
-            slots_extra = int(data["custom_slots"])
-            update_data["slots_extra"] = slots_extra
-            update_data["slots_disponiveis"] = slots_base + slots_extra
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Valor inválido para custom_slots.")
-
+        update_data["slots_disponiveis"] = int(data["slots_disponiveis"])
+        update_data["slots_extra"] = max(0, update_data["slots_disponiveis"] - slots_base)
     else:
-        # Nenhum valor explícito foi passado — mantém o atual
+        # mantém valor atual se nada enviado
         current_extra = user_doc.get("slots_extra", 0)
         update_data["slots_extra"] = current_extra
         update_data["slots_disponiveis"] = slots_base + current_extra
 
-    # 🗄️ Atualiza Firestore
-    user_ref.update(update_data)
-
     print("FIRESTORE UPDATE:", update_data)
 
+    # 🔥 Use set(..., merge=True) pra garantir criação de novos campos
+    user_ref.set(update_data, merge=True)
 
-    # ✅ Retorno
-    return {
-        "message": "Usuário atualizado com sucesso",
-        "updated_fields": update_data
-    }
+    return {"message": "Usuário atualizado com sucesso", "updated_fields": update_data}
 
 @app.patch("/api/monitoramentos/{monitoring_id}")
 async def patch_monitoring(
