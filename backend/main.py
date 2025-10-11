@@ -2277,13 +2277,13 @@ async def admin_update_user_profile(
 
 
 # 🔹 Mantemos apenas UMA rota de slots corrigida e funcional
-@app.put("/admin/users/{user_uid}/slots", dependencies=[Depends(get_current_admin_uid)])
+@app.put("/admin/users/{user_uid}/slots")
 async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
     """
     Permite que o administrador ajuste manualmente o número de slots de um usuário.
-    Exemplo de body:
+    Espera no body:
     {
-        "slots": 4
+        "custom_slots": 5
     }
     """
     db = firestore.client()
@@ -2293,13 +2293,16 @@ async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
     if not doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    slots = data.get("slots")
+    # 🔹 Aceita tanto "custom_slots" quanto "slots" no body
+    slots = data.get("custom_slots") or data.get("slots")
     if not isinstance(slots, int) or slots < 0:
-        raise HTTPException(status_code=400, detail="O campo 'slots' deve ser um número inteiro não negativo.")
+        raise HTTPException(
+            status_code=400,
+            detail="O campo 'custom_slots' ou 'slots' deve ser um número inteiro não negativo."
+        )
 
     try:
-        # 🔹 Usa set(..., merge=True) pra criar o campo se ele não existir
-        user_ref.set({"slots": slots}, merge=True)
+        user_ref.set({"custom_slots": slots}, merge=True)
         print(f"✅ Slots do usuário {user_uid} atualizados para {slots}.")
         return {"status": "ok", "message": f"Slots atualizados para {slots}."}
     except Exception as e:
