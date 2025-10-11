@@ -68,7 +68,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # use * para testar
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -514,8 +514,8 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     
     result = await get_pdf_content_from_url(monitoramento.official_gazette_link)
     if not result:
-        print(f"Verificação para {monitoramento.id} falhou: Não foi possível obter o PDF.")
-        return
+       print(f"Verificação para {monitoramento.id} falhou: Não foi possível obter o PDF.")
+       return
 
     pdf_content, pdf_real_url = result
  
@@ -2308,5 +2308,3 @@ async def get_monitoramento_historico(
         "last_pdf_hash": data.get("last_pdf_hash"),
         "official_gazette_link": data.get("official_gazette_link"),  # 👈 ADICIONADO AQUI
     }
-
-
