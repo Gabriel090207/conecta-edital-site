@@ -2178,41 +2178,46 @@ async def admin_update_user_slots(user_uid: str, data: dict):
         raise HTTPException(status_code=500, detail="Erro ao atualizar slots no Firestore.")
 
 @app.patch("/admin/users/{uid}")
-async def update_user_admin(uid: str, user_update: dict):
-    db_firestore_client = firestore.client()
-    user_ref = db_firestore_client.collection("users").document(uid)
+async def update_user(uid: str, payload: dict):
+    db = firestore.client()
+    user_ref = db.collection("users").document(uid)
     user_doc = user_ref.get()
 
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
+    data = payload
     update_data = {}
 
-    # Atualiza nome
-    if "fullName" in user_update and user_update["fullName"]:
-        update_data["fullName"] = user_update["fullName"]
+    if "fullName" in data:
+        update_data["full_name"] = data["fullName"]
 
-    # Atualiza email
-    if "email" in user_update and user_update["email"]:
-        update_data["email"] = user_update["email"]
+    if "email" in data:
+        update_data["email"] = data["email"]
 
-    # Atualiza tipo de plano
-    if "plan_type" in user_update and user_update["plan_type"]:
-        update_data["plan_type"] = user_update["plan_type"]
+    if "plan_type" in data:
+        update_data["plan_type"] = data["plan_type"]
 
-    # ✅ Atualiza os slots personalizados se enviados
-    if "custom_slots" in user_update:
-        update_data["slots_disponiveis"] = int(user_update["custom_slots"])
+    # 🧩 Atualiza bônus de slots
+    if "custom_slots" in data:
+        update_data["slots_extra"] = int(data["custom_slots"])
 
-    # Aplica as mudanças
-    if update_data:
-        user_ref.update(update_data)
-        print(f"✅ Usuário {uid} atualizado com dados:", update_data)
-    else:
-        print(f"⚠️ Nenhum dado enviado para atualizar {uid}")
+    # 🧩 Define slots base de acordo com o plano
+    plan_type = data.get("plan_type", user_doc.get("plan_type"))
+    slots_base = 0
+    if plan_type == "essencial":
+        slots_base = 3
+    elif plan_type == "premium":
+        slots_base = 9999  # ilimitado
+    elif plan_type == "gratuito":
+        slots_base = 0
 
-    return {"message": "Usuário atualizado com sucesso", "updated_fields": update_data}
+    slots_extra = data.get("custom_slots", user_doc.get("slots_extra", 0))
+    update_data["slots_base"] = slots_base
+    update_data["slots_disponiveis"] = slots_base + slots_extra
 
+    user_ref.update(update_data)
+    return {"message": "Usuário atualizado", "updated_fields": update_data}
 
 @app.patch("/api/monitoramentos/{monitoring_id}")
 async def patch_monitoring(
