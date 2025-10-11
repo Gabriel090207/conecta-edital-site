@@ -225,13 +225,22 @@ class UserProfileUpdate(BaseModel):
     contact: str | None = None  
     
 # NOVO MODELO PARA ATUALIZAÇÃO DO PERFIL POR ADMIN
+
+
 class AdminProfileUpdate(BaseModel):
     fullName: Optional[str] = None
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     contact: Optional[str] = None
     plan_type: Optional[str] = None
-    slots_disponiveis: Optional[int] = None
+
+    # 🔥 Campo dos slots — sem acento e com alias aceitando "slots_disponiveis"
+    slots_disponiveis: Optional[int] = Field(None, alias="slots_disponiveis")
+
+    class Config:
+        allow_population_by_field_name = True
+        allow_population_by_alias = True
+
 
     
 # Dependência de Autenticação Firebase
