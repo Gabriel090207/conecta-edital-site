@@ -2179,6 +2179,10 @@ async def admin_update_user_slots(user_uid: str, data: dict):
 
 @app.patch("/admin/users/{uid}")
 async def update_user(uid: str, payload: dict):
+    """
+    Atualiza dados de um usuário (usado no painel admin).
+    Agora também permite atualizar diretamente 'slots_disponiveis'.
+    """
     db = firestore.client()
     user_ref = db.collection("users").document(uid)
     user_doc = user_ref.get()
@@ -2189,35 +2193,65 @@ async def update_user(uid: str, payload: dict):
     data = payload
     update_data = {}
 
+    # 🧠 Nome completo
     if "fullName" in data:
         update_data["full_name"] = data["fullName"]
 
+    # 📧 E-mail
     if "email" in data:
         update_data["email"] = data["email"]
 
+    # 💳 Tipo de plano
     if "plan_type" in data:
         update_data["plan_type"] = data["plan_type"]
 
-    # 🧩 Atualiza bônus de slots
-    if "custom_slots" in data:
-        update_data["slots_extra"] = int(data["custom_slots"])
-
-    # 🧩 Define slots base de acordo com o plano
+    # 🔢 Base de slots por plano
     plan_type = data.get("plan_type", user_doc.get("plan_type"))
-    slots_base = 0
     if plan_type == "essencial":
         slots_base = 3
     elif plan_type == "premium":
         slots_base = 9999  # ilimitado
     elif plan_type == "gratuito":
         slots_base = 0
+    else:
+        slots_base = user_doc.get("slots_base", 0)
 
-    slots_extra = data.get("custom_slots", user_doc.get("slots_extra", 0))
     update_data["slots_base"] = slots_base
-    update_data["slots_disponiveis"] = slots_base + slots_extra
 
+    # 🧩 Atualização direta de slots (novo comportamento)
+    if "slots_disponiveis" in data:
+        try:
+            update_data["slots_disponiveis"] = int(data["slots_disponiveis"])
+            # Calcula extras automaticamente (para manter coerência)
+            update_data["slots_extra"] = max(
+                0, update_data["slots_disponiveis"] - slots_base
+            )
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Valor inválido para slots_disponiveis.")
+
+    # 🧩 Compatibilidade com modo antigo (custom_slots)
+    elif "custom_slots" in data:
+        try:
+            slots_extra = int(data["custom_slots"])
+            update_data["slots_extra"] = slots_extra
+            update_data["slots_disponiveis"] = slots_base + slots_extra
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Valor inválido para custom_slots.")
+
+    else:
+        # Nenhum valor explícito foi passado — mantém o atual
+        current_extra = user_doc.get("slots_extra", 0)
+        update_data["slots_extra"] = current_extra
+        update_data["slots_disponiveis"] = slots_base + current_extra
+
+    # 🗄️ Atualiza Firestore
     user_ref.update(update_data)
-    return {"message": "Usuário atualizado", "updated_fields": update_data}
+
+    # ✅ Retorno
+    return {
+        "message": "Usuário atualizado com sucesso",
+        "updated_fields": update_data
+    }
 
 @app.patch("/api/monitoramentos/{monitoring_id}")
 async def patch_monitoring(
