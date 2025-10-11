@@ -2190,6 +2190,10 @@ async def admin_update_user_slots(user_uid: str, data: dict):
 
 @app.patch("/admin/users/{uid}")
 async def update_user(uid: str, payload: AdminProfileUpdate):
+    """
+    Atualiza dados de um usuário (usado no painel admin).
+    Agora também recria campos deletados e garante parse correto do JSON.
+    """
     db = firestore.client()
     user_ref = db.collection("users").document(uid)
     user_doc = user_ref.get()
@@ -2197,9 +2201,9 @@ async def update_user(uid: str, payload: AdminProfileUpdate):
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    # ✅ converte o payload validado para dict com os aliases corretos
+    # ✅ Faz o parsing correto do payload recebido
     data = payload.dict(by_alias=True, exclude_unset=True)
-    print("DEBUG DATA RECEBIDA:", data)  # Veja no console do servidor
+    print("DEBUG DATA RECEBIDA:", data)
 
     update_data = {}
 
@@ -2215,12 +2219,12 @@ async def update_user(uid: str, payload: AdminProfileUpdate):
     if "plan_type" in data:
         update_data["plan_type"] = data["plan_type"]
 
-    # 🔢 Base de slots por plano
+    # 🔢 Slots base por plano
     plan_type = data.get("plan_type", user_doc.get("plan_type"))
     if plan_type == "essencial":
         slots_base = 3
     elif plan_type == "premium":
-        slots_base = 9999  # ilimitado
+        slots_base = 9999
     elif plan_type == "gratuito":
         slots_base = 0
     else:
@@ -2228,22 +2232,25 @@ async def update_user(uid: str, payload: AdminProfileUpdate):
 
     update_data["slots_base"] = slots_base
 
-    # 🧩 Atualização direta de slots (novo comportamento)
+    # 🧩 Atualização direta de slots
     if "slots_disponiveis" in data:
         update_data["slots_disponiveis"] = int(data["slots_disponiveis"])
         update_data["slots_extra"] = max(0, update_data["slots_disponiveis"] - slots_base)
     else:
-        # mantém valor atual se nada enviado
         current_extra = user_doc.get("slots_extra", 0)
         update_data["slots_extra"] = current_extra
         update_data["slots_disponiveis"] = slots_base + current_extra
 
     print("FIRESTORE UPDATE:", update_data)
 
-    # 🔥 Use set(..., merge=True) pra garantir criação de novos campos
+    # ✅ Garante criação e atualização de campos, mesmo se deletados
     user_ref.set(update_data, merge=True)
 
-    return {"message": "Usuário atualizado com sucesso", "updated_fields": update_data}
+    return {
+        "message": "Usuário atualizado com sucesso",
+        "updated_fields": update_data
+    }
+
 
 @app.patch("/api/monitoramentos/{monitoring_id}")
 async def patch_monitoring(
