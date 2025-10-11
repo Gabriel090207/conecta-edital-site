@@ -105,6 +105,8 @@ class NewRadarMonitoring(BaseModel):
     link_diario: HttpUrl
     id_edital: str
 
+from pydantic import field_validator
+
 class Monitoring(BaseModel):
     id: str
     monitoring_type: str
@@ -112,7 +114,7 @@ class Monitoring(BaseModel):
     edital_identifier: str
     candidate_name: Optional[str] = None
     cpf: Optional[str] = None
-    keywords: str
+    keywords: Union[str, List[str]]  # ✅ aceita string ou lista
     last_checked_at: datetime
     last_pdf_hash: Optional[str] = None
     occurrences: int = 0
@@ -120,6 +122,14 @@ class Monitoring(BaseModel):
     created_at: datetime
     user_uid: str
     user_email: str
+
+    @field_validator("keywords", mode="before")
+    def normalize_keywords(cls, v):
+        """Garante que keywords seja sempre uma string."""
+        if isinstance(v, list):
+            return ", ".join(map(str, v))
+        return v
+
 
 class CreatePreferenceRequest(BaseModel):
     plan_id: str
