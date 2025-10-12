@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="monitoramento.css">
     <link rel="stylesheet" href="ajuda.css">
     <link rel="stylesheet" href="planos.css">
-    
+    <link rel="stylesheet" href="notificacoes.css"> 
    
     <link rel="stylesheet" href="ajuda.css">
 
@@ -33,9 +33,14 @@
                 </ul>
             </nav>
             <div class="navbar-right">
-                <a href="#" class="notification-icon"><i class="fas fa-bell"></i></a>
+                <a href="#" class="notification-icon">
+                    <i class="fas fa-bell sino"></i>
+                    <span class="notification-badge"></span>
+                    <div class="notification-dropdown"></div>
+                  </a>
+                  
                 <div class="user-menu" id="user-dropdown-toggle"> 
-                    <span class="user-avatar" id="userDefaultAvatar"></span> 
+                    <span class="user-avatar-placeholder" id="userDefaultAvatar"></span>
                     <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
                     <span id="userNameDisplay">Carregando...</span> 
                     <i class="fas fa-chevron-down"></i>
@@ -272,6 +277,7 @@
 
     <script src="ajuda.js"></script>
     <script src="monitoramento.js"></script> 
+    <script src="notificacoes.js"></script> 
 
 </body>
 </html>

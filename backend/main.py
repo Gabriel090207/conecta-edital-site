@@ -158,6 +158,7 @@ class Ticket(BaseModel):
     created_at: datetime
     last_updated_at: datetime
     messages: List[TicketMessage] = []
+    assignee: Optional[str] = "Não Atribuído"
 
 class NewTicket(BaseModel):
     subject: str
@@ -1448,25 +1449,26 @@ async def list_all_tickets():
     tickets_list = []
     for doc in tickets_ref.stream():
         ticket_data = doc.to_dict()
-        
-        # Converte o timestamp do Firestore para o formato ISO
-        if 'created_at' in ticket_data and ticket_data['created_at']:
+
+        # Converte timestamps Firestore → string
+        if isinstance(ticket_data.get('created_at'), datetime):
             ticket_data['created_at'] = ticket_data['created_at'].isoformat()
-        if 'last_updated_at' in ticket_data and ticket_data['last_updated_at']:
+        if isinstance(ticket_data.get('last_updated_at'), datetime):
             ticket_data['last_updated_at'] = ticket_data['last_updated_at'].isoformat()
-        
+
         if 'messages' in ticket_data and isinstance(ticket_data['messages'], list):
             for message in ticket_data['messages']:
                 if isinstance(message.get('timestamp'), datetime):
                     message['timestamp'] = message['timestamp'].isoformat()
 
-        # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
-        if 'category' not in ticket_data:
-            ticket_data['category'] = 'Outros'
-            
+        # ✅ Garante campos padrão mesmo que não existam no Firestore
+        ticket_data.setdefault('category', 'Outros')
+        ticket_data.setdefault('assignee', 'Não Atribuído')
+
         tickets_list.append(Ticket(id=doc.id, **ticket_data))
 
     return tickets_list
+
 
 @app.post("/admin/tickets/{ticket_id}/reply")
 async def admin_reply_to_ticket(
