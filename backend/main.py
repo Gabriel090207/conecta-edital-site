@@ -1858,30 +1858,35 @@ async def create_article(article: Article):
     db = firestore.client()
     article_dict = article.dict(exclude_unset=True)
     article_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
+
+    # 🔹 Cria o artigo no Firestore
     _, doc_ref = db.collection('articles').add(article_dict)
-    
     new_doc = doc_ref.get()
 
-
+    # 🔹 Verifica se o documento foi criado com sucesso
     if new_doc.exists:
         new_article = Article(id=new_doc.id, **new_doc.to_dict())
 
-    # 🔹 Envia notificação para todos os usuários
-    users = db.collection("users").stream()
-    for user in users:
-        await create_notification(
-            user_uid=user.id,
-            type_="novo_artigo",
-            title="📰 Novo artigo publicado!",
-            message=f"{new_article.titulo}",
-            link="/blog"
-        )
-        print(f"✅ Notificação enviada para {user.id}")
+        # 🔔 Envia notificação para todos os usuários
+        users = db.collection("users").stream()
+        for user in users:
+            await create_notification(
+                user_uid=user.id,
+                type_="novo_artigo",
+                title="📰 Novo artigo publicado!",
+                message=f"{new_article.titulo}",
+                link="/blog"
+            )
+            print(f"✅ Notificação enviada para {user.id}")
 
-    return new_article
+        return new_article
 
+    # 🔹 Caso o documento não exista (erro no Firestore)
     else:
-        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao buscar o documento recém-criado."
+        )
 
 @app.get("/articles", response_model=List[Article])
 async def list_articles():
