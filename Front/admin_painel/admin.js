@@ -697,17 +697,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.body.style.overflow = "hidden";
 }
 
-// === FECHAR MODAL ===
+// === FECHAR MODAL (voltar sempre pra tela inicial) ===
 document.querySelectorAll(".modal-close-btn, .btn-cancelar").forEach(btn => {
     btn.addEventListener("click", () => {
-        const modal = document.getElementById("user-edit-modal");
+      // Fecha todos os modais abertos
+      document.querySelectorAll(".modal-overlay").forEach(modal => {
         modal.classList.remove("show-modal");
-        document.body.style.overflow = "auto";
-
-        const auditModal = document.getElementById("audit-users-modal");
-        if (auditModal) auditModal.classList.add("show-modal");
+        modal.style.display = ""; // limpa qualquer 'display:none' que possa travar
+      });
+  
+      // Libera o scroll da página
+      document.body.classList.remove("modal-open");
+      document.body.style.overflow = "auto";
+  
+      // Reseta estado da tela inicial (sem recarregar)
+      console.log("✅ Todos os modais foram fechados. Voltando à tela inicial.");
     });
-});
+  });
+  
+
 
 
 // === SALVAR ALTERAÇÕES DE USUÁRIO (ADMIN) ===

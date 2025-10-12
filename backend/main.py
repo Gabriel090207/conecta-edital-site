@@ -1471,10 +1471,7 @@ async def list_all_tickets():
 
 
 @app.post("/admin/tickets/{ticket_id}/reply")
-async def admin_reply_to_ticket(
-    ticket_id: str,
-    reply: AdminReply,
-):
+async def admin_reply_to_ticket(ticket_id: str, reply: AdminReply):
     db = firestore.client()
     ticket_doc_ref = db.collection('tickets').document(ticket_id)
     ticket_doc = ticket_doc_ref.get()
@@ -1482,30 +1479,39 @@ async def admin_reply_to_ticket(
     if not ticket_doc.exists:
         raise HTTPException(status_code=404, detail="Ticket não encontrado.")
 
+    ticket_data = ticket_doc.to_dict()
+    user_uid = ticket_data.get("user_uid")
+
     now = datetime.now(timezone.utc)
     new_message = {
         "sender": "admin",
         "text": reply.text,
         "timestamp": now,
-        "attachments": [] # Campo de anexo vazio
+        "attachments": []
     }
 
     ticket_doc_ref.update({
-        'messages': firestore.ArrayUnion([new_message]),
-        'status': 'Respondido',
-        'last_updated_at': firestore.SERVER_TIMESTAMP
+        "messages": firestore.ArrayUnion([new_message]),
+        "status": "Respondido",
+        "last_updated_at": firestore.SERVER_TIMESTAMP
     })
 
+    # 🔔 Envia notificação para o usuário
     await create_notification(
-    user_uid=ticket_data.get("user_uid"),
-    type_="resposta_suporte",
-    title="Nova resposta do suporte",
-    message=f"O suporte respondeu ao seu ticket {ticket_id}.",
-    link=f"/suporte?ticket={ticket_id}"
-)
+        user_uid=user_uid,
+        type_="resposta_suporte",
+        title="Nova resposta do suporte 💬",
+        message=f"O suporte respondeu ao seu ticket {ticket_id}.",
+        link=f"/suporte?ticket={ticket_id}"
+    )
 
+    print(f"✅ Notificação enviada para o usuário {user_uid} sobre resposta no ticket {ticket_id}.")
     updated_ticket_data = ticket_doc_ref.get().to_dict()
-    return {"message": "Resposta do admin enviada com sucesso!", "ticket": updated_ticket_data}
+
+    return {
+        "message": "Resposta do admin enviada com sucesso!",
+        "ticket": updated_ticket_data
+    }
 
 
 # Ao o admin responder
@@ -1856,11 +1862,26 @@ async def create_article(article: Article):
     
     new_doc = doc_ref.get()
     
-    if new_doc.exists:
-        new_article = Article(id=new_doc.id, **new_doc.to_dict())
-        return new_article
+   if new_doc.exists:
+    new_article = Article(id=new_doc.id, **new_doc.to_dict())
+
+    # 🔔 Envia notificação para todos os usuários sobre novo artigo
+    users = db.collection("users").stream()
+    for user in users:
+        await create_notification(
+            user_uid=user.id,
+            type_="novo_artigo",
+            title="Novo artigo publicado 📰",
+            message=f"{article.titulo}",
+            link="/blog"
+        )
+        print(f"✅ Notificação enviada para {user.id}")
+
+    # Só retorna o artigo após enviar as notificações
+    return new_article
+
     else:
-        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
+    raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
 
 @app.get("/articles", response_model=List[Article])
 async def list_articles():
