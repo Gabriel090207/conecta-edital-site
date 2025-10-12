@@ -399,11 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await loadTicketsForCurrentUser();
 
-        } catch (error) {
-            console.error('Erro ao enviar resposta:', error);
-            alert(`Erro ao enviar resposta: ${error.message || 'Ocorreu um erro inesperado.'}`);
-            ticketToUpdate.messages.pop();
-            openTicketDetailModal(currentOpenTicketId);
+        
         } finally {
             sendReplyBtn.disabled = false;
             sendReplyBtn.innerHTML = originalButtonHtml;
