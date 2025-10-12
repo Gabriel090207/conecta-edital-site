@@ -329,25 +329,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? new Date(ticket.created_at).toLocaleString('pt-BR')
                     : 'Data Desconhecida';
     
-                ticketCard.innerHTML = `
+                    ticketCard.innerHTML = `
                     <div class="ticket-admin-header">
                         <h4>Ticket #${ticket.id.substring(0, 8)} - ${ticket.subject}</h4>
-                        <span class="ticket-admin-status status-${ticket.status.toLowerCase().replace(/ /g, '-') || 'desconhecido'}">
-                            ${ticket.status}
-                        </span>
+                        <span class="ticket-admin-status status-${ticket.status.toLowerCase().replace(/ /g, '-') || 'desconhecido'}">${ticket.status}</span>
                     </div>
                     <p class="ticket-admin-info">Criado em: ${formattedDate}</p>
                     <p class="ticket-admin-info">Por: ${ticket.user_email}</p>
-                    <div class="ticket-admin-actions">
+                    <p class="ticket-admin-info">Atendido por: <strong>${ticket.assignee || "Não Atribuído"}</strong></p>
+                    <div class="ticket-actions">
                         <button class="btn-view-ticket-admin" data-ticket-id="${ticket.id}">Ver Detalhes</button>
                         <select class="assign-ticket-select" data-ticket-id="${ticket.id}">
                             <option value="">Atribuir...</option>
-                            <option value="ronaldo">Ronaldo</option>
-                            <option value="rafael">Rafael</option>
-                            <option value="gabriel">Gabriel</option>
+                            <option value="Ronaldo" ${ticket.assignee === "Ronaldo" ? "selected" : ""}>Ronaldo</option>
+                            <option value="Rafael" ${ticket.assignee === "Rafael" ? "selected" : ""}>Rafael</option>
+                            <option value="Gabriel" ${ticket.assignee === "Gabriel" ? "selected" : ""}>Gabriel</option>
                         </select>
                     </div>
                 `;
+                
     
                 ticketsListAdmin.appendChild(ticketCard);
             });
