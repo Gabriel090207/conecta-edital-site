@@ -1292,8 +1292,14 @@ async def list_user_tickets(user_uid: str = Depends(get_current_user_uid)):
                     message['timestamp'] = message['timestamp'].isoformat()
 
         # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
+                # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
         if 'category' not in ticket_data:
             ticket_data['category'] = 'Outros'
+
+        # Garante que o campo 'assignee' sempre exista
+        if 'assignee' not in ticket_data or not ticket_data['assignee']:
+            ticket_data['assignee'] = 'Não Atribuído'
+
 
         tickets_list.append(Ticket(id=doc.id, **ticket_data))
 
