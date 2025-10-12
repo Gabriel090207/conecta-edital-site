@@ -1861,27 +1861,27 @@ async def create_article(article: Article):
     _, doc_ref = db.collection('articles').add(article_dict)
     
     new_doc = doc_ref.get()
-    
-   if new_doc.exists:
-    new_article = Article(id=new_doc.id, **new_doc.to_dict())
 
-    # 🔔 Envia notificação para todos os usuários sobre novo artigo
+
+    if new_doc.exists:
+        new_article = Article(id=new_doc.id, **new_doc.to_dict())
+
+    # 🔹 Envia notificação para todos os usuários
     users = db.collection("users").stream()
     for user in users:
         await create_notification(
             user_uid=user.id,
             type_="novo_artigo",
-            title="Novo artigo publicado 📰",
-            message=f"{article.titulo}",
+            title="📰 Novo artigo publicado!",
+            message=f"{new_article.titulo}",
             link="/blog"
         )
         print(f"✅ Notificação enviada para {user.id}")
 
-    # Só retorna o artigo após enviar as notificações
     return new_article
 
     else:
-    raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
+        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
 
 @app.get("/articles", response_model=List[Article])
 async def list_articles():
