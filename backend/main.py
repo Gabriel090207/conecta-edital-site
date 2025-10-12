@@ -1392,6 +1392,35 @@ async def user_reply_to_ticket(
     return {"message": "Resposta enviada", "ticket": updated_ticket_data}
 
 
+
+@app.patch("/admin/tickets/{ticket_id}/assign")
+async def assign_ticket_to_admin(ticket_id: str, data: dict = Body(...)):
+    """
+    Atribui um ticket a um administrador (campo assignee).
+    Exemplo de body esperado: {"assignee": "gabriel"}
+    """
+    db = firestore.client()
+    assignee = data.get("assignee")
+
+    if not assignee:
+        raise HTTPException(status_code=400, detail="Campo 'assignee' é obrigatório.")
+
+    ticket_ref = db.collection("tickets").document(ticket_id)
+    doc = ticket_ref.get()
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Ticket não encontrado.")
+
+    ticket_ref.update({
+        "assignee": assignee,
+        "last_updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    updated_ticket = ticket_ref.get().to_dict()
+
+    return {
+        "message": f"Ticket {ticket_id} atribuído a {assignee} com sucesso!",
+        "ticket": updated_ticket
+    }
 # Ao o admin responder
 
 

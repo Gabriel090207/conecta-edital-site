@@ -315,41 +315,84 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderTicketsList(tickets) {
         if (ticketsListAdmin) {
             ticketsListAdmin.innerHTML = '';
+    
             if (tickets.length === 0) {
                 ticketsListAdmin.innerHTML = '<p class="no-tickets-message">Nenhum ticket encontrado.</p>';
                 return;
             }
+    
             tickets.forEach(ticket => {
                 const ticketCard = document.createElement('div');
                 ticketCard.classList.add('ticket-admin-card');
                 
-                let formattedDate;
-                if (ticket.created_at) {
-                    formattedDate = new Date(ticket.created_at).toLocaleString('pt-BR');
-                } else {
-                    formattedDate = 'Data Desconhecida';
-                }
-
+                const formattedDate = ticket.created_at
+                    ? new Date(ticket.created_at).toLocaleString('pt-BR')
+                    : 'Data Desconhecida';
+    
                 ticketCard.innerHTML = `
                     <div class="ticket-admin-header">
                         <h4>Ticket #${ticket.id.substring(0, 8)} - ${ticket.subject}</h4>
-                        <span class="ticket-admin-status status-${ticket.status.toLowerCase().replace(/ /g, '-') || 'desconhecido'}">${ticket.status}</span>
+                        <span class="ticket-admin-status status-${ticket.status.toLowerCase().replace(/ /g, '-') || 'desconhecido'}">
+                            ${ticket.status}
+                        </span>
                     </div>
                     <p class="ticket-admin-info">Criado em: ${formattedDate}</p>
                     <p class="ticket-admin-info">Por: ${ticket.user_email}</p>
-                    <button class="btn-view-ticket-admin" data-ticket-id="${ticket.id}">Ver Detalhes</button>
+                    <div class="ticket-admin-actions">
+                        <button class="btn-view-ticket-admin" data-ticket-id="${ticket.id}">Ver Detalhes</button>
+                        <select class="assign-ticket-select" data-ticket-id="${ticket.id}">
+                            <option value="">Atribuir...</option>
+                            <option value="ronaldo">Ronaldo</option>
+                            <option value="rafael">Rafael</option>
+                            <option value="gabriel">Gabriel</option>
+                        </select>
+                    </div>
                 `;
+    
                 ticketsListAdmin.appendChild(ticketCard);
             });
-
+    
+            // Listener do botão "Ver Detalhes"
             ticketsListAdmin.querySelectorAll('.btn-view-ticket-admin').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const ticketId = e.currentTarget.dataset.ticketId;
                     openTicketDetailAdminModal(ticketId);
                 });
             });
+    
+            // Listener para atribuir tickets
+            ticketsListAdmin.querySelectorAll('.assign-ticket-select').forEach(select => {
+                select.addEventListener('change', async (e) => {
+                    const ticketId = e.target.dataset.ticketId;
+                    const assignee = e.target.value;
+    
+                    if (!assignee) return; // nada selecionado
+    
+                    try {
+                        const response = await fetch(`${BACKEND_URL}/admin/tickets/${ticketId}/assign`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                "ngrok-skip-browser-warning": "true"
+                            },
+                            body: JSON.stringify({ assignee })
+                        });
+    
+                        if (!response.ok) {
+                            throw new Error(`Erro HTTP ${response.status}`);
+                        }
+    
+                        alert(`🎯 Ticket atribuído a ${assignee} com sucesso!`);
+                        await loadAllTickets(); // recarrega lista
+                    } catch (err) {
+                        console.error("Erro ao atribuir ticket:", err);
+                        alert("Erro ao atribuir ticket. Tente novamente.");
+                    }
+                });
+            });
         }
     }
+    
 
     async function openTicketDetailAdminModal(ticketId) {
         const ticket = allTickets.find(t => t.id === ticketId);
@@ -453,11 +496,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             await loadAllTickets();
 
-        } catch (error) {
-            console.error("Erro ao enviar resposta do admin:", error);
-            alert(`Erro ao enviar resposta: ${error.message}`);
-            currentViewingTicket.messages.pop();
-            openTicketDetailAdminModal(currentViewingTicket.id);
+        
         } finally {
             sendAdminReplyBtn.disabled = false;
             sendAdminReplyBtn.innerHTML = originalButtonHtml;

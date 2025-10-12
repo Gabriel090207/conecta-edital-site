@@ -1863,15 +1863,16 @@ body.modal-open {
 
 /* Banner do status */
 .ticket-status-tag {
+    width: 95%;
     display: block;
-    background-color: #ffeb3b;
+    background-color: #ffeb3bc5;
     color: #5d4037;
     text-align: center;
     padding: 8px 15px;
     font-weight: 600;
     font-size: 0.9rem;
-    border-radius: 0;
-    margin: 10px -20px 0;
+    border-radius: 19px;
+    margin: 0 auto;
 }
 
 /* Área de mensagens */
@@ -1927,7 +1928,7 @@ body.modal-open {
     display: flex;
     align-items: flex-end;
     padding: 20px;
-    background-color: #fff;
+    background-color: #f8f9fa;
     border-top: 1px solid #e0e0e0;
     gap: 10px;
 }
@@ -2066,3 +2067,17 @@ body.modal-open {
 
 
 
+.ticket-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.assign-ticket-select {
+    margin-top: 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}

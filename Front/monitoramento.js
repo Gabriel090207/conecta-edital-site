@@ -768,8 +768,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const steps = document.querySelectorAll(".activation-step");
         const progressBar = document.getElementById("progress-bar");
         const progressText = document.getElementById("progress-percentage");
+        const modalAtivado = document.getElementById("monitoramento-ativado-modal");
         let step = 0;
         const totalSteps = steps.length;
+    
         function nextStep() {
             if (step < totalSteps) {
                 steps[step].classList.add("active");
@@ -779,22 +781,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 step++;
                 setTimeout(nextStep, 1500);
             } else {
-                const modalAtivado = document.getElementById('monitoramento-ativado-modal');
-                window.loadDashboardDataAndRender();
-                const completedMessage = document.createElement('div');
-                completedMessage.className = 'activation-completed-message';
-                completedMessage.innerHTML = '<p>Configuração Concluída, Você receberá notificações sempre que houver atualizações relevantes.</p>';
-                modalAtivado.querySelector('.modal-content').appendChild(completedMessage);
-                
+                // Garante que a barra termine em 100%
+                progressBar.style.width = "100%";
+                progressText.textContent = "100%";
+    
+                // Espera 1 segundo e fecha o modal
                 setTimeout(() => {
-                    modalAtivado.classList.remove('show-modal');
-                    document.body.style.overflow = '';
+                    modalAtivado.classList.remove("show-modal");
+                    document.body.style.overflow = "";
                 }, 1000);
             }
         }
+    
         nextStep();
     }
-
+    
     const deleteMonitoring = async (id) => {
     if (!confirm('Tem certeza que deseja excluir este monitoramento?')) return;
 
