@@ -1032,6 +1032,26 @@ document.addEventListener('DOMContentLoaded', () => {
             // A verificação da aba de segurança foi movida para o listener das abas
         });
     }
+
+    // ✅ Permite que o mesmo botão de "Perfil" (mobile e desktop) abra o mesmo modal
+document.querySelectorAll("#open-profile-modal-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeAllModals();
+        openModal(profileModal);
+        fetchUserProfile();
+
+        // fecha sidebar se estiver aberta (modo mobile)
+        const sidebar = document.getElementById("mobile-sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        if (sidebar && overlay) {
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+            document.body.style.overflow = "";
+        }
+    });
+});
+
     
     if (tabButtons) {
         tabButtons.forEach(button => {

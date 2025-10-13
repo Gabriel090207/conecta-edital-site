@@ -67,11 +67,28 @@
       
       <!-- Sidebar mobile (menu lateral) -->
       <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
         <div class="sidebar-profile">
           <img id="sidebarUserAvatar" src="" alt="Avatar" />
-          <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+          <div class="sidebar-user-info">
+            <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+            <div class="sidebar-actions">
+              <a href="#" id="open-profile-modal-btn">
+                <i class="fas fa-user"></i> Perfil
+              </a>
+              <a href="planos.html">
+                <i class="fas fa-credit-card"></i> Planos
+              </a>
+              <a href="#" id="logout-btn-mobile" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Sair
+              </a>
+            </div>
+          </div>
         </div>
+      
         <hr>
+      
+        <!-- itens de navegação -->
         <ul>
           <li><a href="#l"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
           <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
@@ -540,6 +557,7 @@
     <script src="monitoramento-editar.js"></script>
     <script src="historico.js"></script>
     <script src="editar-nome-monitoramento.js"></script>
+    <script src="navbar-mobile.js"></script>
 
 
 

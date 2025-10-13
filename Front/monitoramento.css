@@ -3313,3 +3313,172 @@ ul {
       }
 }
 
+
+/* === BOTÃO HAMBÚRGUER (☰) === */
+.menu-toggle {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 22px;
+    cursor: pointer;
+    display: none; /* só mostra no mobile */
+    z-index: 1100;
+  }
+  
+  /* === SIDEBAR MOBILE === */
+  .mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px; /* começa fora da tela */
+    width: 250px;
+    height: 100vh;
+    background: #ffffff;
+    color: #505255;
+    padding-top: 60px;
+    transition: left 0.3s ease;
+    z-index: 2000;
+    overflow-y: auto;
+  }
+  
+  /* perfil no topo da sidebar */
+  /* === perfil completo na sidebar === */
+.sidebar-profile {
+    display: flex;
+    align-items: left;
+    gap: 10px;
+    padding: 10px 20px 15px;
+    background: #ffffff;
+  }
+  
+  .sidebar-profile img {
+    
+    
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #333;
+  }
+  
+  .sidebar-user-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-username {
+    font-size: 15px;
+    font-weight: 600;
+    align-items: left;
+    margin-top: 10px;
+    margin-bottom: 50px;
+    
+  }
+  
+  .sidebar-actions a {
+   
+   margin-left: -65px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: left;
+    gap: 6px;
+    color: #505255;
+    font-size: 13px;
+    text-decoration: none;
+  }
+  
+  .sidebar-actions a:hover {
+    color: #fff;
+  }
+  
+  .logout-link {
+    color: #e74c3c !important;
+  }
+  
+  
+  /* itens de menu */
+  .mobile-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .mobile-sidebar li {
+    padding: 15px 20px;
+  }
+  
+  .mobile-sidebar li a {
+    color: #505255;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+  }
+  
+  .mobile-sidebar li a:hover {
+    color: #ebb90d;
+  }
+  
+  /* estado ativo (sidebar aberta) */
+  .mobile-sidebar.active {
+    left: 0;
+  }
+  
+  /* === FUNDO ESCURO (overlay) === */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    z-index: 1500;
+  }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+  
+  /* === RESPONSIVIDADE MOBILE === */
+  @media (max-width: 768px) {
+    /* mostra o botão ☰ e centraliza logo */
+    .menu-toggle {
+        margin-top: 5px;
+      display: block;
+      position: absolute;
+      left: 15px;
+    }
+  
+    /* centraliza logo */
+    .navbar-left {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  
+    /* esconde o menu central */
+    .navbar-center {
+      display: none !important;
+    }
+  
+    /* ajusta sino e usuário à direita */
+    .navbar-right {
+      position: absolute;
+      right: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  
+    /* esconde o chip do usuário na navbar (vamos colocar ele na sidebar depois) */
+    .user-menu {
+      display: none !important;
+    }
+
+    .navbar-left .logo img {
+        margin-left: 10%;
+        margin-top: -10px;
+        margin-right: 20px;
+        border-radius: 4px;
+    }
+    
+  }
+  
