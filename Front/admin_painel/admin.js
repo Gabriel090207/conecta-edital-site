@@ -426,23 +426,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     
         // Mensagens
         ticketMessagesContainer.innerHTML = '';
-        ticket.messages.forEach(message => {
-            const messageBubble = document.createElement('div');
-            const messageClass = message.sender === 'admin' ? 'admin-message' : 'user-message';
-            messageBubble.classList.add('message-bubble', messageClass);
+ticket.messages.forEach(message => {
+  const messageWrapper = document.createElement('div');
+  messageWrapper.classList.add('message-wrapper');
+
+  const messageClass = message.sender === 'admin' ? 'admin-message' : 'user-message';
+  messageWrapper.classList.add(messageClass);
+
+  // Formata apenas hora e minuto
+  let formattedMsgDate = message.timestamp
+    ? new Date(message.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    : '00:00';
+
+  const senderName = message.sender === 'admin' ? 'Admin' : 'Utilizador';
+
+  messageWrapper.innerHTML = `
+      <span class="message-sender-outside">${senderName}</span>
+      <div class="message-bubble">
+          <p class="message-text">${message.text}</p>
+          <span class="message-timestamp">${formattedMsgDate}</span>
+      </div>
+  `;
+
+  ticketMessagesContainer.appendChild(messageWrapper);
+});
+
+
+                
     
-            let formattedMsgDate = message.timestamp
-                ? new Date(message.timestamp).toLocaleString('pt-BR')
-                : 'Data Desconhecida';
-    
-            const senderName = message.sender === 'admin' ? 'Admin' : 'Utilizador';
-            messageBubble.innerHTML = `
-                <span class="message-sender">${senderName}</span>
-                <p class="message-text">${message.text}</p>
-                <span class="message-timestamp">${formattedMsgDate}</span>
-            `;
-            ticketMessagesContainer.appendChild(messageBubble);
-        });
+            
     
         ticketMessagesContainer.scrollTop = ticketMessagesContainer.scrollHeight;
     
@@ -968,42 +980,43 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
     }
 
     // Função para buscar dados do dashboard de feedback
-    async function fetchFeedbackDataAndRenderCharts() {
-        openModal(feedbackModal);
-        try {
-            const response = await fetch(`${BACKEND_URL}/admin/feedback_stats`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                    // Removido cabeçalho de autorização para esta rota
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`Erro na API: ${response.status}`);
-            }
-            const data = await response.json();
-            
-            // Preencher os cards de estatísticas
-            totalTicketsSpan.textContent = data.total_tickets;
-            responseRateSpan.textContent = `${data.response_rate.toFixed(1)}%`;
-            avgResolutionTimeSpan.textContent = `${data.avg_resolution_time_hours}h`;
-            satisfactionRateSpan.textContent = `${data.satisfaction_rate.toFixed(1)}%`;
-            pendingTicketsSpan.textContent = data.pending_tickets;
-            activeUsersFeedbackSpan.textContent = data.active_users_count;
-            totalUsersFeedbackSpan.textContent = data.total_users;
+   async function fetchFeedbackDataAndRenderCharts() {
+  openModal(feedbackModal);
+  try {
+    const response = await fetch(`${BACKEND_URL}/admin/feedback_stats`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      }
+    });
 
-            // Renderizar gráficos
-            renderTicketsByCategoryChart(data.tickets_by_category);
-            renderTicketStatusChart(data.ticket_status_distribution);
-            renderMonthlyTrendChart(data.monthly_ticket_trend);
-            renderActiveUsersList(data.most_active_users);
-
-        } catch (error) {
-            console.error("Erro ao buscar dados do dashboard de feedback:", error);
-            alert("Erro ao carregar o dashboard de feedback. Verifique o console para mais detalhes.");
-        }
+    if (!response.ok) {
+      throw new Error(`Erro na API: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    // ✅ Preencher os cards de estatísticas (verifica se existe antes)
+    totalTicketsSpan.textContent = data.total_tickets ?? 0;
+    responseRateSpan.textContent = `${(data.response_rate ?? 0).toFixed(1)}%`;
+    avgResolutionTimeSpan.textContent = `${(data.avg_resolution_time_hours ?? 0).toFixed(1)}h`;
+    satisfactionRateSpan.textContent = `${(data.satisfaction_rate ?? 0).toFixed(1)}%`; // opcional, caso adicione depois
+    pendingTicketsSpan.textContent = data.ticket_status_distribution?.Pendente?.count ?? 0;
+    activeUsersFeedbackSpan.textContent = data.active_users ?? 0;
+    totalUsersFeedbackSpan.textContent = data.total_users ?? 0;
+
+    // ✅ Renderizar gráficos (ajustando nomes conforme backend)
+    renderTicketsByCategoryChart(data.tickets_by_category ?? []);
+    renderTicketStatusChart(data.ticket_status_distribution ?? {});
+    renderMonthlyTrendChart(data.monthly_trend ?? []);
+    renderActiveUsersList(data.most_active_users ?? []);
+
+  } catch (error) {
+    console.error("Erro ao buscar dados do dashboard de feedback:", error);
+    alert("Erro ao carregar o dashboard de feedback. Verifique o console para mais detalhes.");
+  }
+}
 
     function renderTicketsByCategoryChart(data) {
         if (ticketsByCategoryChart) ticketsByCategoryChart.destroy();

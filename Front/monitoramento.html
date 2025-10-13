@@ -15,44 +15,79 @@
 <body>
     <header class="navbar">
         <div class="navbar-container">
-            <div class="navbar-left">
-                <a href="#" class="logo">
-                    <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
-                </a>
+      
+          <!-- Botão menu (hambúrguer) — só aparecerá no mobile -->
+          <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button>
+      
+          <!-- Logo -->
+          <div class="navbar-left">
+            <a href="#" class="logo">
+              <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+            </a>
+          </div>
+      
+          <!-- Menu central (desktop) -->
+          <nav class="navbar-center">
+            <ul>
+              <li><a href="#l" class="active"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+              <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+              <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+              <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+              <li style="margin-top: 4px;"> | </li>
+              <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+            </ul>
+          </nav>
+      
+          <!-- Lado direito -->
+          <div class="navbar-right">
+            <a href="#" class="notification-icon">
+              <i class="fas fa-bell sino"></i>
+              <span class="notification-badge"></span>
+              <div class="notification-dropdown"></div>
+            </a>
+      
+            <div class="user-menu" id="user-dropdown-toggle">
+              <span class="user-avatar-placeholder" id="userDefaultAvatar"></span>
+              <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;">
+              <span id="userNameDisplay">Carregando...</span>
+              <i class="fas fa-chevron-down"></i>
+              <div class="dropdown-content">
+                <h3 class="olausuario" id="dropdownUserName">Olá, Usuário!</h3>
+                <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                <a href="planos.html"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                <hr>
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+              </div>
             </div>
-            <nav class="navbar-center">
-                <ul>
-                    <li><a href="#l" class="active"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
-                    <li><a href="planos.html" ><i class="fas fa-credit-card"></i> Planos </a></li> 
-                    <li><a href="dicas.html" ><i class="fas fa-lightbulb"></i> Dicas</a></li> 
-                    <li><a href="suporte.html"><i class="fas fa-headphones" ></i> Suporte </a></li>
-                    <li style="margin-top: 4px;"> | </li>
-                    <li ><a href="ajuda.html" class="ajuda"> <i class="fas fa-info-circle"></i> Ajuda</a></li>
-                </ul>
-            </nav>
-            <div class="navbar-right">
-                <a href="#" class="notification-icon">
-                    <i class="fas fa-bell sino"></i>
-                    <span class="notification-badge"></span>
-                    <div class="notification-dropdown"></div>
-                  </a>
-                  
-                <div class="user-menu" id="user-dropdown-toggle"> 
-                    <span class="user-avatar-placeholder" id="userDefaultAvatar"></span>
-                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
-                    <span id="userNameDisplay">Carregando...</span> 
-                    <i class="fas fa-chevron-down"></i>
-                    <div class="dropdown-content">
-                        <h3 class="olausuario" id="dropdownUserName">Olá, Usuário!</h3>
-                        <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
-                        <a href="planos.html"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
-                        <hr>
-                        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </header>
+      </header>
+      
+      <!-- Sidebar mobile (menu lateral) -->
+      <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <div class="sidebar-profile">
+          <img id="sidebarUserAvatar" src="" alt="Avatar" />
+          <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+        </div>
+        <hr>
+        <ul>
+          <li><a href="#l"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+          <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+          <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+          <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+          <hr>
+          <li><a href="ajuda.html"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
+
+
+    
 
     <main class="monitoramento-content">
         <div class="header-section">
