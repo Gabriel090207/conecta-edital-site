@@ -1670,63 +1670,78 @@ async def get_admin_feedback_stats():
         status = ticket_data.get('status', 'Desconhecido')
         category = ticket_data.get('category', 'Outros')
         created_at = ticket_data.get('created_at')
-        
+
         tickets_by_status[status] += 1
         tickets_by_category[category] += 1
-        
+
+        # Tempo médio de resolução
         if status == 'Resolvido':
             last_updated_at = ticket_data.get('last_updated_at')
             if created_at and last_updated_at:
                 resolved_time = (last_updated_at - created_at).total_seconds()
                 total_resolved_time += resolved_time
             resolved_tickets_count += 1
-        
+
+        # Contagem de pendentes
         if status in ['Pendente', 'Em Andamento']:
             pending_tickets_count += 1
 
+        # Agrupamento mensal
         if created_at:
             month_year = created_at.strftime('%b. %y')
             tickets_by_month[month_year] += 1
-    
-    # Cálculo da média de tempo de resolução
-    avg_resolution_time_hours = (total_resolved_time / resolved_tickets_count / 3600) if resolved_tickets_count > 0 else 0
-    response_rate = (tickets_by_status.get('Respondido', 0) + tickets_by_status.get('Resolvido', 0)) / total_tickets * 100 if total_tickets > 0 else 0
-    
+
+    # Cálculos gerais
+    avg_resolution_time_hours = (
+        (total_resolved_time / resolved_tickets_count / 3600)
+        if resolved_tickets_count > 0 else 0
+    )
+
+    response_rate = (
+        (tickets_by_status.get('Respondido', 0) + tickets_by_status.get('Resolvido', 0))
+        / total_tickets * 100 if total_tickets > 0 else 0
+    )
+
     # Distribuição de Status
     ticket_status_distribution = {}
     for status, count in tickets_by_status.items():
         percentage = (count / total_tickets) * 100 if total_tickets > 0 else 0
         ticket_status_distribution[status] = {'count': count, 'percentage': percentage}
-    
-    # Distribuição de Categoria
-    tickets_by_category_list = [{'category': cat, 'count': count} for cat, count in tickets_by_category.items()]
-    
-    # Tendência Mensal (preenche meses sem tickets)
+
+    # Distribuição de Categorias
+    tickets_by_category_list = [
+        {'category': cat, 'count': count} for cat, count in tickets_by_category.items()
+    ]
+
+    # Tendência Mensal (últimos 7 meses)
     now = datetime.now()
     monthly_trend = []
-    for i in range(6, -1, -1):  # Últimos 7 meses
+    for i in range(6, -1, -1):
         month_ago = now - relativedelta(months=i)
         month_year_label = month_ago.strftime('%b. %y')
         monthly_trend.append({
             'month': month_year_label,
             'count': tickets_by_month.get(month_year_label, 0)
         })
-    
+
     # Usuários Mais Ativos
     tickets_by_user = defaultdict(int)
     for ticket in all_tickets:
         user_uid = ticket.to_dict().get('user_uid')
         if user_uid:
             tickets_by_user[user_uid] += 1
-    
+
     most_active_users = []
-    # Busca apenas os top 5 usuários mais ativos com uma query otimizada
-    users_with_tickets = [uid for uid, count in sorted(tickets_by_user.items(), key=lambda item: item[1], reverse=True)[:5]]
-    
+    users_with_tickets = [
+        uid for uid, count in sorted(
+            tickets_by_user.items(), key=lambda item: item[1], reverse=True
+        )[:5]
+    ]
+
     if users_with_tickets:
         docs = users_ref.stream()
         user_data_map = {doc.id: doc.to_dict() for doc in docs if doc.id in users_with_tickets}
-        
+
         for uid in users_with_tickets:
             user_data = user_data_map.get(uid, {})
             user_name = user_data.get('fullName', 'Usuário Desconhecido')
@@ -1736,25 +1751,23 @@ async def get_admin_feedback_stats():
                 'email': user_email,
                 'ticket_count': tickets_by_user[uid]
             })
-    
-    # Contagem de usuários ativos e totais
+
+    # Contagem de usuários
     all_users_count = len(list(users_ref.stream()))
     active_users_count = len(list(users_ref.where(filter=FieldFilter('status', '==', 'ativo')).stream()))
 
+    # ✅ Retorno final compatível com o front-end
     return {
-        "total_users": total_users,
-        "plan_distribution": {
-            "no_plan": plan_distribution['gratuito'],
-            "essencial": plan_distribution['essencial'],
-            "premium": plan_distribution['premium']
-        },
-        "slot_distribution": {
-            "zero_slots": slot_distribution['zero_slots'],
-            "one_two_slots": slot_distribution['one_two_slots'],
-            "three_five_slots": slot_distribution['three_five_slots'],
-            "six_plus_slots": slot_distribution['six_plus_slots']
-        },
-        "user_status_distribution": user_status_distribution
+        "total_tickets": total_tickets,
+        "response_rate": response_rate,
+        "avg_resolution_time_hours": avg_resolution_time_hours,
+        "pending_tickets": pending_tickets_count,
+        "ticket_status_distribution": ticket_status_distribution,
+        "tickets_by_category": tickets_by_category_list,
+        "monthly_trend": monthly_trend,
+        "most_active_users": most_active_users,
+        "total_users": all_users_count,
+        "active_users": active_users_count
     }
 
 # ========================================================================================================

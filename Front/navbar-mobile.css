@@ -1,0 +1,85 @@
+.navbar .menu-icon {
+    display: none;
+    cursor: pointer;
+    font-size: 1.5em; /* Tamanho do ícone */
+    color: var(--cor03); /* Cor do ícone */
+}
+
+
+/* menu */
+
+
+/* Sidebar Styling */
+/* Sidebar Styling */
+.sidebar {
+    margin-top:90px; /* Ajuste para descer após o header fixo de 90px de altura (padding + imagem) */
+    grid-row: 2 / -1; /* Ocupa as linhas restantes após o header */
+    background-color: #fcfcfc; /* Fundo do sidebar é um branco suave */
+    padding: 20px 10px;
+    font-weight: 700;
+    border-right: 1px solid var(--cor01); /* Borda direita laranja */
+}
+
+.sidebar .main-nav ul {
+    list-style: none;
+}
+
+.sidebar .main-nav li {
+    margin-bottom: 10px;
+}
+
+.sidebar .main-nav a {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 20px;
+    color: var(--cor03); /* Cor do texto padrão do link é preto */
+    text-decoration: none;
+    transition: background-color 0.5s ease, color 0.5s ease; /* Transição para fundo e cor do texto */
+    font-size: 15px;
+}
+
+.sidebar .main-nav a:hover {
+    background-color: var(--cor01); /* Fundo laranja no hover */
+    border-radius: 10px;
+    color: var(--cor02); /* Texto branco no hover */
+}
+
+.sidebar .main-nav i {
+    margin-right: 10px;
+    font-size: 16px;
+    color: var(--cor01); /* Cor do ícone padrão é laranja */
+    padding-right: 5px;
+    transition: color 0.5s ease; /* Transição suave para a cor do ícone */
+}
+
+.sidebar .main-nav a:hover i {
+    color: var(--cor02); /* Ícone branco no hover */
+}
+
+.sidebar .main-nav .new-tag {
+    background-color: #4CAF50;
+    /* Green for new tag */
+    color: var(--cor02);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-left: auto;
+    /* Pushes to the right */
+}
+
+
+
+@media (max-width: 768px) {
+
+    
+    /* O ícone do menu no mobile */
+    .navbar .menu-icon {
+        display: flex;
+        cursor: pointer;
+        font-size: 1.5em; /* Tamanho do ícone */
+        color: var(--cor01); /* Cor do ícone */
+    }
+
+}
