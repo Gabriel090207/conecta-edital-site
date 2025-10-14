@@ -2171,7 +2171,7 @@ section {
     padding: 9px 20px;
     font-size: 10px;
     margin-top: -60px;
-   margin-left: 660px;
+   margin-left: 290px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -2254,6 +2254,45 @@ section {
         padding: 20px;
         max-width: 350px;
         margin-bottom: 20px;
+    }
+    .btn-demonstracao-tag {
+        margin-top: 20px;
+        margin-bottom: -20px;
+    }
+
+    .btn-demo-action-tag{
+       margin-bottom: 30px ;
+    }
+
+    .faq-question h3 {
+        font-size: 9px;
+        font-weight: 600;
+        color: #343A40;
+        text-align: left;
+        flex-grow: 1;
+    }
+    
+    .faq-question i.fa-chevron-down {
+        transition: transform 0.3s ease;
+        font-size: 3px;
+        color: #6C757D;
+        flex-shrink: 0;
+        margin-left: 8px;
+    }
+    
+    .faq-meta {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 0.65rem;
+        color: #6C757D;
+        padding: 0 20px 10px 80px;
+        text-align: left;
+        margin-left: -30px;
+    }
+
+    .btn-faq-tag {
+        margin-bottom: -20px;
     }
 }
 
