@@ -726,7 +726,7 @@ ul {
 }
 
 .modal-content form .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .modal-content form label {
@@ -1423,27 +1423,32 @@ ul {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
-    background: linear-gradient(135deg, #05bc5b, #00823c);
-    color: #fff;
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 15px;
+    margin-top: 5px !important;
 }
 
 .btn-manage-subscription {
-    background: linear-gradient(135deg, #0cff85, #00823c);
+    background-color:  #08a853; 
 }
 
 .btn-cancel-form {
-    margin-top: 15px;
-    background: linear-gradient(135deg, #e23333, #ac0513);
-    color: #ffffff;
+     margin-top: -15px !important;
+     background-color: #e62727;
+    color: white;
+    border: none;
+    border-radius: 14px;
     padding: 12px 25px;
     font-size: 1rem;
     font-weight: 600;
     border: none;
-    border-radius: 8px;
+   
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
 }
@@ -1508,7 +1513,7 @@ ul {
 @media (max-width: 768px) {
     .modal-overlay .large-modal {
         max-width: 95%;
-        max-height: 95vh;
+        max-height: 15vh;
         padding: 1.5rem;
     }
 }
@@ -1598,6 +1603,9 @@ ul {
 
 /* Tablets (Telas de até 768px) */
 @media (max-width: 768px) {
+
+
+    
     .navbar-container {
         flex-wrap: wrap;
         justify-content: center;
@@ -1668,7 +1676,7 @@ ul {
     /* Modal de Perfil */
     .modal-overlay .large-modal {
         max-width: 95% !important;
-        max-height: 95vh !important;
+        max-height: 120vh !important;
         padding: 1.5rem !important;
     }
 
@@ -1681,6 +1689,42 @@ ul {
         font-size: 1rem !important;
         left: 10px !important;
     }
+
+    .sino{
+        margin-top: 10% !important;
+    }
+
+    .fa-user-tag.i{
+    margin-top: -10px !important;
+
+}
+
+.fa-envelope.i{
+    margin-top: -10px !important;
+
+}
+
+.fa-phone.i{
+    margin-top: 2px;
+
+}
+
+    
+}
+
+.fa-user-tag.i{
+    margin-top: 10px;
+
+}
+
+.fa-envelope.i{
+    margin-top: -10px;
+
+}
+
+.fa-phone.i{
+    margin-top: 2px;
+
 }
 
 /* Celulares (Telas de até 480px) */
@@ -1720,6 +1764,8 @@ ul {
         left: 10px !important;
         font-size: 1rem !important;
     }
+
+   
 }
 
 

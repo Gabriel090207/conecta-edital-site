@@ -1017,7 +1017,7 @@ ul {
 /* NOVO: Wrapper para o ícone e input */
 .form-group {
     position: relative; /* Adiciona a posição relativa ao contêiner pai */
-    margin-bottom: 1.5rem; /* Espaço entre os campos */
+    margin-bottom: 0.6rem; /* Espaço entre os campos */
 }
 
 /* Correção para o ícone dentro do label */
@@ -1089,8 +1089,10 @@ ul {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
-    background: linear-gradient(135deg, #05bc5b, #00823c);
-    color: #fff;
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1098,18 +1100,18 @@ ul {
 }
 
 .btn-manage-subscription {
-    background: linear-gradient(135deg, #0cff85, #00823c);
+   background-color:  #08a853;
 }
 
 .btn-cancel-form {
-    margin-top: 15px;
-    background: linear-gradient(135deg, #e23333, #ac0513);
-    color: #ffffff;
-    padding: 12px 25px;
-    font-size: 1rem;
-    font-weight: 600;
+    margin-top: -5px;
+     background-color: #e62727;
+    color: white;
     border: none;
     border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
 }
@@ -1300,3 +1302,325 @@ ul {
 .lockca{
     margin-top: 0px;
   }
+
+
+  .main-page-footer {
+    background-color: #121725;
+    color: #e0e0e0;
+    padding: 60px 30px 20px 30px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    width: 100%;
+}
+
+
+.form-group label i {
+    
+    margin-top: 10px;
+}
+
+.fa-user-tag.i{
+    margin-top: -10px;
+
+}
+
+.fa-envelope.i{
+    margin-top: -10px;
+
+}
+
+.fa-phone.i{
+    margin-top: 2px;
+
+}
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 250px;
+    flex: 1;
+}
+
+.footer-column.about-us {
+    flex: 1.5;
+    max-width: 350px;
+}
+
+.footer-logo  {
+    max-width: 190px;
+    height: auto;
+    margin-top: -18px;
+    margin-bottom: 0px;
+}
+
+.footer-column p {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+}
+
+.footer-column h3 {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    white-space: nowrap;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-column ul li a {
+    color: #b0b0b0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-column ul li a:hover {
+    color: white;
+}
+
+.footer-column ul li a i {
+    font-size: 1rem;
+    color: #b0b0b0;
+    transition: color 0.2s ease;
+}
+
+.footer-column ul li a:hover i {
+    color: white;
+}
+
+
+  /* ===========================
+   📱 RESPONSIVIDADE GERAL
+   =========================== */
+
+/* ---------- Notebooks (≤1024px) ---------- */
+@media (max-width: 1024px) {
+
+    .navbar-container {
+        padding: 0 20px;
+    }
+
+    .navbar-center ul {
+        gap: 20px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .differentials-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .plans-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .plan-card {
+        padding: 25px;
+    }
+}
+
+/* ---------- Tablets (≤768px) ---------- */
+@media (max-width: 768px) {
+
+    
+
+    .hero-section {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section p {
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .differentials-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .plan-card {
+        padding: 20px;
+    }
+
+    .differentials-section h2,
+    .plans-overview-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .differentials-section .subtitle,
+    .plans-overview-section .subtitle {
+        font-size: 1rem;
+    }
+
+    .call-to-action-button {
+        margin-top: 50px;
+        font-size: 0.85rem;
+        padding: 8px 20px;
+    }
+
+    .stat-card-index h3 {
+        font-size: 1rem;
+    }
+
+    .stat-card-index p {
+        font-size: 0.7rem;
+    }
+
+    .back-to-top-button {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+}
+
+/* ---------- Celulares (≤480px) ---------- */
+@media (max-width: 480px) {
+
+  
+
+    .hero-section h1 {
+        font-size: 1.6rem;
+        line-height: 1.3;
+    }
+
+    .hero-section p {
+        font-size: 0.8rem;
+        max-width: 90%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .differentials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-card {
+        padding: 15px;
+    }
+
+    .plan-card h3 {
+        font-size: 0.9rem;
+    }
+
+    .plan-card .price-value {
+        font-size: 1.6rem;
+    }
+
+    .plan-card .plan-description {
+        font-size: 0.75rem;
+    }
+
+    .plan-card ul li {
+        font-size: 0.6rem;
+    }
+
+    .choose-plan-btn {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    .differentials-section h2 {
+        font-size: 1.6rem;
+        text-align: center;
+    }
+
+    .differentials-section .subtitle {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .welcome-message {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 20px;
+        padding: 8px 15px;
+    }
+
+    .call-to-action-button {
+        font-size: 0.8rem;
+        padding: 8px 15px;
+    }
+
+    .back-to-top-button {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    .stat-card-index {
+        padding: 20px;
+    }
+
+    .stat-icon-wrapper-index {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+
+
+@media (max-width: 768px) {
+    .modal-overlay .large-modal {
+        margin-top: 120px;
+        max-width: 95%;
+        max-height: 110vh;
+        padding: 1.5rem;
+    }
+
+}

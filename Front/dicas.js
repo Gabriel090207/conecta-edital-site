@@ -90,11 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Define ícones e cores
 const topicStyles = {
-  "Geral":    { icon: "🌐", bg: "#d9f2f2", color: "#069999" },
-  "Monitoramento": { icon: "📈", bg: "#e6f1fb", color: "#2b7de9" },
-  "Estudos":  { icon: "📘", bg: "#eaf5e8", color: "#3b7a2d" },
-  "Notificação": { icon: "🔔", bg: "#fff7da", color: "#c28700" },
-  "Avançado": { icon: "⭐", bg: "#f4e3fa", color: "#a020f0" }
+  "Geral":    { icon: '<i class="fa-solid fa-globe"></i>', bg: "#d9f2f2", color: "#069999" },
+  "Monitoramento": { icon: '<i class="fa-solid fa-chart-line"></i>', bg: "#e6f1fb", color: "#2b7de9" },
+  "Estudos":  { icon: '<i class="fa-solid fa-book-open"></i>', bg: "#eaf5e8", color: "#3b7a2d" },
+  "Notificação": { icon: '<i class="fa-solid fa-bell"></i>', bg: "#fffde7", color: "#fbc02d" },
+  "Avançado": { icon: '<i class="fa-solid fa-star"></i>', bg: "#f4e3fa", color: "#8e24aa" }
 };
 
 const estilo = topicStyles[dica.topico] || { icon: "📄", bg: "#eee", color: "#555" };

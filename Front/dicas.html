@@ -4,15 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conecta Edital - Central de Conhecimento</title>
+
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="menu.css"> 
     <link rel="stylesheet" href="monitoramento.css"> 
     <link rel="stylesheet" href="notificacoes.css"> 
     <link rel="stylesheet" href="dicas.css"> 
+    
+    <link rel="stylesheet" href="navbar-mobile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
+
+
+        <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button>
+
+
         <div class="navbar-container">
             <div class="navbar-left">
                 <a href="#" class="logo">
@@ -52,6 +63,44 @@
             </div>
         </div>
     </header>
+
+
+     <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
+        <div class="sidebar-profile">
+          <img id="sidebarUserAvatar" src="" alt="Avatar" />
+          <div class="sidebar-user-info">
+            <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+            <div class="sidebar-actions">
+              <a href="#" id="open-profile-modal-btn" style="color: #505255;">
+                <i class="fas fa-user icon-perfil"></i> Perfil
+              </a>
+              <a href="planos.html">
+                <i class="fas fa-credit-card icon-planos"></i> Planos
+              </a>
+              <a href="#" id="logout-btn-mobile" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Sair
+              </a>
+            </div>
+          </div>
+        </div>
+      
+        <hr>
+      
+        <!-- itens de navegação -->
+        <ul>
+          <li><a href="monitoramento.html"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+          <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+          <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+          <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+          <hr>
+          <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
 
     <main class="content" >
         <div class="card knowledge-center-header" style=" margin-top: 110px;">
@@ -97,7 +146,7 @@
         <div class="footer-container">
             <div class="footer-column about-us">
                 <a href="#" class="footer-logo">
-                    <img src="Captura de tela 2025-07-16 145658.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                    <img src="logobranca.png" alt="Logo Conecta Edital" style="max-width:70%;">
                 </a>
                 <p>O Conecta Edital é a plataforma líder em monitoramento inteligente de diários oficiais, desenvolvida para concurseiros que não querem perder nenhuma atualização. Monitoramos diariamente todos os diários oficiais municipais, estaduais e federais e enviamos notificações em tempo real sempre que houver atualizações com seu nome.</p>
                 <div class="security-badges">
@@ -153,7 +202,7 @@
    
 
 
-    <div class="modal-overlay" id="profile-modal">
+     <div class="modal-overlay" id="profile-modal">
         <div class="modal-content large-modal">
             <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
             
@@ -185,21 +234,21 @@
                     <div id="info-tab" class="tab-content active">
                         <form id="profile-info-form">
                             <div class="form-group">
-                                <label for="profile-full-name"><i class="fas fa-user-tag i"></i> Nome Completo</label>
+                                <label for="profile-full-name" class="nomeperfil"><i class="fas fa-user-tag i"></i> Nome Completo</label>
                                 <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
                                 <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
                             </div>
                             <div class="form-group">
-                                <label for="profile-contact"><i class="fas fa-phone"></i> Telefone</label>
+                                <label for="profile-contact" class="telefoneperfil"><i class="fas fa-phone i"></i> Telefone</label>
                                 <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
                             </div>
                             <div class="form-group">
-                                <label for="profile-email"><i class="fas fa-envelope i"></i> E-mail</label>
+                                <label for="profile-email" class="emailperfil"><i class="fas fa-envelope i"></i> E-mail</label>
                                 <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
                                 <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
                             </div>
                             <div class="modal-actions">
-                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
                                 <button type="submit" class="btn-save-changes">Salvar Alterações</button>
                             </div>
                         </form>
@@ -223,7 +272,7 @@
                                 <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
                             </div>
                             <div class="modal-actions">
-                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
                                 <button type="submit" class="btn-change-password">Alterar Senha</button>
                             </div>
                         </form>
@@ -244,7 +293,7 @@
                                     <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
                                 </div>
                                 <div class="modal-actions">
-                                    <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
+                                    <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
                                     <button type="submit" class="btn-create-password">Criar Senha</button>
                                 </div>
                             </form>
@@ -280,6 +329,7 @@
     <script src="monitoramento.js"></script> 
     <script src="dicas.js"></script>
     <script src="notificacoes.js"></script> 
+    <script src="navbar-mobile.js"></script>
 
 </body>
 </html>

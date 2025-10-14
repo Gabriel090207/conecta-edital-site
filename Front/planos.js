@@ -195,6 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const displayName = userData.fullName || 'Usuário';
         userNameDisplay.textContent = displayName;
 
+        if (welcomeUserNameSpan) {
+        welcomeUserNameSpan.textContent = userData.username || userData.fullName || "Usuário";
+    }
+
         if (olaUsuarioElement) {
             const firstName = displayName.split(' ')[0];
             olaUsuarioElement.textContent = `Olá, ${firstName}!`;

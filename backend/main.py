@@ -567,16 +567,32 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     pdf_text_lower = pdf_text.lower()
     file_name_lower = file_name.lower()
 
-    for keyword in keywords_to_search:
-        keyword_lower = keyword.lower()
-        if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
-            found_keywords.append(keyword)
+   # 🔎 Verifica se as palavras-chave foram encontradas
+for keyword in keywords_to_search:
+    keyword_lower = keyword.lower()
+    if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
+        found_keywords.append(keyword)
 
-    if found_keywords:
+# ✅ Passo 5: ocorrência encontrada (mas agora filtramos)
+if found_keywords:
+    # 🔍 separa o que foi encontrado
+    nome_encontrado = (
+        monitoramento.candidate_name
+        and monitoramento.candidate_name.lower() in [k.lower() for k in found_keywords]
+    )
+    id_encontrado = (
+        monitoramento.edital_identifier
+        and monitoramento.edital_identifier.lower() in [k.lower() for k in found_keywords]
+    )
+
+    # 🔒 regra: notificar só se tiver nome (sozinho ou com id)
+    if nome_encontrado:
         monitoramento.occurrences += 1
-        doc_ref.update({'occurrences': firestore.Increment(1)})
+        doc_ref.update({
+            "occurrences": firestore.Increment(1),
+            "pdf_real_link": pdf_real_url
+        })
 
-        # 🔔 Cria notificação Firestore
         await create_notification(
             user_uid=monitoramento.user_uid,
             type_="nova_ocorrencia",
@@ -587,13 +603,16 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
         send_email_notification(
             monitoramento=monitoramento,
-            template_type='occurrence_found',
+            template_type="occurrence_found",
             to_email=monitoramento.user_email,
             found_keywords=found_keywords
         )
-        print(f"✅ Ocorrência detectada para {monitoramento.id} e notificação enviada!")
+
+        print(f"✅ Ocorrência detectada (nome presente) para {monitoramento.id}")
     else:
-        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
+        print(f"⚠️ Apenas ID encontrado — notificação ignorada para {monitoramento.id}")
+else:
+    print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
 
     print(f"--- Verificação para {monitoramento.id} concluída ---\n")
 
