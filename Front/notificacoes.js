@@ -328,11 +328,14 @@ async function carregarNotificacoesSidebar() {
   snapshot.forEach((doc) => {
     const n = doc.data();
     const data = n.created_at?.toDate?.() || new Date();
-    const diffDias = Math.floor((agora - data) / (1000 * 60 * 60 * 24));
+    const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+const dataNotificacao = new Date(data.getFullYear(), data.getMonth(), data.getDate());
 
-    if (diffDias === 0) grupos.hoje.push(n);
-    else if (diffDias === 1) grupos.ontem.push(n);
-    else grupos.anteriores.push(n);
+const diffDias = Math.floor((hoje - dataNotificacao) / (1000 * 60 * 60 * 24));
+
+if (diffDias === 0) grupos.hoje.push(n);
+else if (diffDias === 1) grupos.ontem.push(n);
+else grupos.anteriores.push(n);
   });
 
   const gerarSecao = (titulo, lista) =>

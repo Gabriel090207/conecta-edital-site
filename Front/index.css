@@ -1323,10 +1323,31 @@ section {
     width: 100%;
 }
 
+
+.form-group label i {
+    
+    margin-top: 10px;
+}
+
+.fa-user-tag.i{
+    margin-top: -10px;
+
+}
+
+.fa-envelope.i{
+    margin-top: -10px;
+
+}
+
+.fa-phone.i{
+    margin-top: 2px;
+
+}
 .footer-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: flex-start;
     gap: 40px;
     max-width: 1200px;
     margin: 0 auto;
@@ -1335,6 +1356,8 @@ section {
 }
 
 .footer-column {
+      align-items: flex-start; 
+    text-align: left;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -1355,6 +1378,7 @@ section {
 }
 
 .footer-column p {
+    text-align: left;
     color: #b0b0b0;
     font-size: 0.9rem;
 }
@@ -1365,6 +1389,7 @@ section {
     font-weight: 600;
     margin-bottom: 20px;
     white-space: nowrap;
+    text-align: left; 
 }
 
 .footer-column ul {
@@ -1400,7 +1425,6 @@ section {
     color: white;
 }
 
-/* Badges de Segurança (Sistema Online, Dados Seguros) */
 .security-badges {
     display: flex;
     flex-wrap: wrap;
@@ -2086,4 +2110,151 @@ section {
     font-size: 0.9em;
     display: none;
 }
+
+
+
+/* ========================================= */
+/* MELHORIAS DE RESPONSIVIDADE GERAL */
+/* ========================================= */
+
+/* Navbar - Corrige o comportamento em mobile */
+@media (max-width: 768px) {
+   .index-content {
+        padding: 30px 0;
+        gap: 40px;
+    }
+
+    section {
+        padding: 0 15px;
+    }
+
+    /* Navbar */
+    .navbar-index {
+        height: auto;
+        padding: 10px 15px;
+        flex-wrap: wrap;
+    }
+
+    .navbar-index .navbar-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Esconde o menu central por padrão */
+    .navbar-center-index {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.95);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 10px 0;
+    }
+
+    /* Quando estiver ativo (pelo JS com .active), o menu aparece */
+    .navbar-center-index.active {
+        display: flex;
+    }
+
+    /* Remove o hover antigo (que fazia o menu aparecer ao passar o mouse) */
+    .navbar-index:hover .navbar-center-index {
+        display: none;
+    }
+
+      
+.navbar-index .navbar-right-index .btn-entrar {
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 10px;
+    margin-top: -60px;
+   margin-left: 660px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    z-index: 1; /* Garante que o botão fique na frente */
+}
+
+.navbar-left .logo img {
+    margin-right: 80px;
+    border-radius: 4px;
+    margin-top: -20px !important;
+}
+
+}
+
+/* Corrige cards e seções para telas muito pequenas */
+@media (max-width: 480px) {
+    .monitoramento-demo-card,
+    .upload-form-card,
+    .plan-card-index {
+        width: 95%;
+        padding: 20px;
+        margin: 0 auto;
+    }
+
+    .plan-card-index h3 {
+        font-size: 1.4rem;
+    }
+
+    .plan-card-index .price-value-index {
+        font-size: 2rem;
+    }
+
+    .index-content h1 {
+        font-size: 1.6rem;
+        text-align: center;
+    }
+
+    .index-content .subtitle {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+}
+
+/* Footer totalmente empilhado em mobile */
+@media (max-width: 600px) {
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer-column {
+        max-width: 300px;
+    }
+
+    .footer-column h3 {
+        margin-bottom: 10px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+/* Modal e robô centralizado corretamente em telas pequenas */
+@media (max-width: 768px) {
+    .logo-robo-fora, .logo-robo-dentro {
+        width: 100px;
+        top: 10%;
+    }
+
+    .modal-content {
+        margin-top: 300px;
+        width: 90%;
+        padding: 20px;
+        max-width: 350px;
+        margin-bottom: 20px;
+    }
+}
+
 

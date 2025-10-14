@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conecta Edital - Ajuda e FAQ</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="monitoramento.css">
+
     <link rel="stylesheet" href="ajuda.css">
+        <link rel="stylesheet" href="monitoramento.css">
     <link rel="stylesheet" href="planos.css">
     <link rel="stylesheet" href="notificacoes.css"> 
    
     <link rel="stylesheet" href="ajuda.css">
-
+    <link rel="stylesheet" href="navbar-mobile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
+
+            <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button> 
+
+
         <div class="navbar-container">
             <div class="navbar-left">
                 <a href="index.html" class="logo">
@@ -55,6 +62,44 @@
             </div>
         </div>
     </header>
+
+    <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
+        <div class="sidebar-profile">
+          <img id="sidebarUserAvatar" src="" alt="Avatar" />
+          <div class="sidebar-user-info">
+            <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+            <div class="sidebar-actions">
+              <a href="#" id="open-profile-modal-btn" style="color: #505255;">
+                <i class="fas fa-user icon-perfil"></i> Perfil
+              </a>
+              <a href="planos.html">
+                <i class="fas fa-credit-card icon-planos"></i> Planos
+              </a>
+              <a href="#" id="logout-btn-mobile" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Sair
+              </a>
+            </div>
+          </div>
+        </div>
+      
+        <hr>
+      
+        <!-- itens de navegação -->
+        <ul>
+          <li><a href="monitoramento.html"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+          <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+          <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+          <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+          <hr>
+          <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
+
     <main class="ajuda-content">
         <div class="card help-center-header" style="margin-top: 60px;">
             <div class="icon-wrapper green-icon-bg">
@@ -112,7 +157,7 @@
         <div class="footer-container">
             <div class="footer-column about-us">
                 <a href="#" class="footer-logo">
-                    <img src="Captura de tela 2025-07-16 145658.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                    <img src="logobranca.png" alt="Logo Conecta Edital" style="max-width:70%;">
                 </a>
                 <p>O Conecta Edital é a plataforma líder em monitoramento inteligente de diários oficiais, desenvolvida para concurseiros que não querem perder nenhuma atualização. Monitoramos diariamente todos os diários oficiais municipais, estaduais e federais e enviamos notificações em tempo real sempre que houver atualizações com seu nome.</p>
                 <div class="security-badges">
@@ -278,6 +323,6 @@
     <script src="ajuda.js"></script>
     <script src="monitoramento.js"></script> 
     <script src="notificacoes.js"></script> 
-
+   <script src="navbar-mobile.js"></script>
 </body>
 </html>

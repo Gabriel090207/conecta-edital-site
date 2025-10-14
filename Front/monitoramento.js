@@ -193,10 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
                      1px  1px 0 #656766ff;">
                 </i>
                 <span>Palavras-chave Monitoradas</span>
-                <div class="keyword-tags">
+                <div class="keyword-tags" >
                     ${(mon.keywords || mon.candidate_name || '')
                         .split(',')
-                        .map(k => `<span class="keyword-tag">${k.trim()}</span>`)
+                        .map(k => `<span class="keyword-tag" style="color: #212dd4;">${k.trim()}</span>`)
                         .join('')}
                 </div>
             </div>
@@ -1285,6 +1285,27 @@ setTimeout(() => {
                 backToTopBtn.classList.remove('show');
             }
         });
+
+        // 🔹 Esconde o botão "Voltar ao Topo" quando qualquer modal estiver aberto
+function controlarVisibilidadeBotaoTopo() {
+    const backToTopBtn = document.querySelector('.back-to-top-button');
+    if (!backToTopBtn) return;
+
+    const observer = new MutationObserver(() => {
+        const anyModalOpen = document.querySelector('.modal-overlay.show-modal, .show-modal');
+        if (anyModalOpen) {
+            backToTopBtn.style.display = 'none';
+        } else {
+            backToTopBtn.style.display = '';
+        }
+    });
+
+    observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+}
+
+// ✅ Inicializa o controle do botão
+controlarVisibilidadeBotaoTopo();
+
 
         // Rolagem suave ao clicar
            // --- Botão Voltar ao Topo ---

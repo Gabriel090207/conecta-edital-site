@@ -858,8 +858,15 @@ ul {
     }
     .filter-btn {
         padding: 6px 15px;
-        font-size: 0.8rem;
+        font-size: 1.9rem;
     }
+    .chatbot-section {
+        margin-top: -90px;
+        margin-bottom: 90px;
+        width: 100%;
+        max-height: 600px;
+    }
+
 }
 
 @media (max-width: 576px) {
@@ -886,16 +893,17 @@ ul {
         font-size: 0.75rem;
     }
     .faq-question h3 {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
     }
     .faq-icon-wrapper {
         width: 35px;
         height: 35px;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     .faq-meta, .faq-answer {
-        padding-left: 60px;
+        padding-left: 30px;
         font-size: 0.85rem;
+        margin-top: 0px;
     }
 }
 
@@ -905,7 +913,7 @@ ul {
     padding: 2.5rem;
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
+    max-height: 89vh;
 }
 
 .modal-overlay .modal-content h2 {
@@ -1071,6 +1079,7 @@ ul {
 
 /* NOVO: Wrapper para o ícone e input */
 .form-group {
+    margin-top: -10px;
     position: relative; /* Adiciona a posição relativa ao contêiner pai */
     margin-bottom: 1.5rem; /* Espaço entre os campos */
 }
@@ -1137,34 +1146,39 @@ ul {
 
 /* Botões de Ação */
 .btn-save-changes, .btn-change-password, .btn-manage-subscription, .btn-create-password {
-    padding: 12px 25px;
+  
     font-size: 1rem;
     font-weight: 600;
-    border: none;
-    border-radius: 8px;
+ 
+
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
-    background: linear-gradient(135deg, #05bc5b, #00823c);
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
     color: #fff;
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 15px;
+    margin-top: -15px;
 }
 
 .btn-manage-subscription {
-    background: linear-gradient(135deg, #0cff85, #00823c);
+    background-color:  #08a853;
 }
 
 .btn-cancel-form {
-    margin-top: 15px;
-    background: linear-gradient(135deg, #e23333, #ac0513);
-    color: #ffffff;
-    padding: 12px 25px;
-    font-size: 1rem;
-    font-weight: 600;
+    margin-top: -37px;
+     background-color: #e62727;
+    color: white;
     border: none;
     border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    
+   
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
 }
@@ -1229,7 +1243,7 @@ ul {
 @media (max-width: 768px) {
     .modal-overlay .large-modal {
         max-width: 95%;
-        max-height: 95vh;
+        max-height: 105vh;
         padding: 1.5rem;
     }
 }
@@ -1357,3 +1371,10 @@ ul {
 .lockca{
     margin-top: 0px;
   }
+
+
+  /* ============================= */
+/* 🌐 RESPONSIVIDADE GERAL AJUSTADA */
+/* ============================= */
+
+/* --- Até 1024px (notebooks pequenos) --- */
