@@ -228,9 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="notification-status">
         ${
             currentStatusData.user_plan === 'Plano Essencial'
-                ? `<span class="notification-tag email-enabled">Email</span>`
+                ? `<span class="notification-tag email-enabled">E-mail</span>`
                 : `
-                    <span class="notification-tag email-enabled">Email</span>
+                    <span class="notification-tag email-enabled">E-mail</span>
                     <span class="notification-tag whatsapp-enabled">WhatsApp</span>
                   `
         }

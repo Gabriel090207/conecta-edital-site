@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await resp.json();
+      console.log("🔍 Dados do histórico recebidos:", data);
 
       if (!data || data.occurrences === 0) {
         historicoLista.innerHTML = `<p class="empty-text">Nenhuma ocorrência encontrada.</p>`;
@@ -94,63 +95,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ===============================
   // Renderiza o histórico no painel lateral
- // Renderiza o histórico no painel lateral
-function renderizarHistorico(data) {
-  const ocorrencias = Array.isArray(data) ? data : [data];
+  // ===============================
+  function renderizarHistorico(data) {
+    // Detecta se o backend retornou uma lista dentro de `data.data` ou `data.ocorrencias`
+    const ocorrencias = Array.isArray(data)
+      ? data
+      : Array.isArray(data.data)
+      ? data.data
+      : Array.isArray(data.ocorrencias)
+      ? data.ocorrencias
+      : [data];
 
-  historicoLista.innerHTML = ocorrencias
-    .map((oc) => {
-      // 🕓 Corrigir formato da data
-      let dataOcorrencia = "Data desconhecida";
-      if (oc.detected_at || oc.last_checked_at) {
-        try {
-          const base = oc.detected_at || oc.last_checked_at;
-          if (base._seconds) {
-            dataOcorrencia = new Date(base._seconds * 1000).toLocaleString("pt-BR");
-          } else {
-            dataOcorrencia = new Date(base).toLocaleString("pt-BR");
+    historicoLista.innerHTML = ocorrencias
+      .map((oc) => {
+        // 🕓 Corrigir formato da data
+        let dataOcorrencia = "Data desconhecida";
+        if (oc.detected_at || oc.last_checked_at) {
+          try {
+            const base = oc.detected_at || oc.last_checked_at;
+            if (base._seconds) {
+              dataOcorrencia = new Date(base._seconds * 1000).toLocaleString("pt-BR");
+            } else {
+              dataOcorrencia = new Date(base).toLocaleString("pt-BR");
+            }
+          } catch {
+            dataOcorrencia = "Data inválida";
           }
-        } catch {
-          dataOcorrencia = "Data inválida";
         }
-      }
 
-      // 🔗 Prioridade do link:
-      // 1️⃣ pdf_real_link (novo campo do backend)
-      // 2️⃣ official_gazette_link
-      // 3️⃣ link ou last_pdf_hash
-      let linkPdf =
-        oc.pdf_real_link ||
-        oc.official_gazette_link ||
-        oc.link ||
-        oc.last_pdf_hash;
+        // 🔗 Prioridade do link:
+        // 1️⃣ pdf_real_link (novo campo do backend)
+        // 2️⃣ official_gazette_link
+        // 3️⃣ link ou last_pdf_hash
+        let linkPdf =
+          oc.pdf_real_link ||
+          oc.official_gazette_link ||
+          oc.link ||
+          oc.last_pdf_hash;
 
-      if (linkPdf) {
-        if (!linkPdf.startsWith("http")) {
-          linkPdf = `${BACKEND_URL}/pdfs/${linkPdf}`;
+        if (linkPdf) {
+          if (!linkPdf.startsWith("http")) {
+            linkPdf = `${BACKEND_URL}/pdfs/${linkPdf}`;
+          }
         }
-      }
 
-      return `
-        <div class="historico-card">
-          <div class="historico-info">
-            <i class="fas fa-history"></i>
-            <div>
-              <strong>Ocorrência encontrada</strong>
-              <p>ID do edital: <b>${oc.edital_identifier || "-"}</b></p>
-              ${
-                linkPdf
-                  ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link historico-link" style="font-size: 12px; color: #0582ff !important; -webkit-text-stroke: 0px;"></i> Ver Ocorrência</a></p>`
-                  : "<p><i>Sem link disponível</i></p>"
-              }
-              <small>Data da ocorrência: ${dataOcorrencia}</small>
+        return `
+          <div class="historico-card">
+            <div class="historico-info">
+              <i class="fas fa-history"></i>
+              <div>
+                <strong>Ocorrência encontrada</strong>
+                <p>ID do edital: <b>${oc.edital_identifier || "-"}</b></p>
+                ${
+                  linkPdf
+                    ? `<p><a href="${linkPdf}" target="_blank" class="historico-link"><i class="fas fa-link historico-link" style="font-size: 12px; color: #0582ff !important; -webkit-text-stroke: 0px;"></i> Ver Ocorrência</a></p>`
+                    : "<p><i>Sem link disponível</i></p>"
+                }
+                <small>Data da ocorrência: ${dataOcorrencia}</small>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-    })
-    .join("");
-}
-
+        `;
+      })
+      .join("");
+  }
 });
