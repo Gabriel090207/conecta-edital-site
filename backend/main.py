@@ -592,7 +592,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     )
 
     # 🔒 regra: notificar só se tiver nome (sozinho ou com id)
-    if nome_encontrado:
+        if nome_encontrado:
         monitoramento.occurrences += 1
         doc_ref.update({
             "occurrences": firestore.Increment(1),
