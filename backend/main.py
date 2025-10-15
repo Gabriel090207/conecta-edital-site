@@ -574,13 +574,13 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     file_name_lower = file_name.lower()
 
     # 🔎 Verifica se as palavras-chave foram encontradas
-    for keyword in keywords_to_search:
-        keyword_lower = keyword.lower()
-        if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
-            found_keywords.append(keyword)
+for keyword in keywords_to_search:
+    keyword_lower = keyword.lower()
+    if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
+        found_keywords.append(keyword)
 
-    # ✅ Passo 5: ocorrência encontrada (mas agora filtramos)
-   if found_keywords:
+# ✅ Passo 5: ocorrência encontrada (mas agora filtramos)
+if found_keywords:
     # 🔍 separa o que foi encontrado
     nome_encontrado = (
         monitoramento.candidate_name
@@ -592,7 +592,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     )
 
     # 🔒 regra: notificar só se tiver nome (sozinho ou com id)
-        if nome_encontrado:
+    if nome_encontrado:
         monitoramento.occurrences += 1
         doc_ref.update({
             "occurrences": firestore.Increment(1),
