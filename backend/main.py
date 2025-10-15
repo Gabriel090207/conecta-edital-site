@@ -2232,9 +2232,8 @@ async def get_monitoramento_historico(
     user_uid: str = Depends(get_current_user_uid)
 ):
     """
-    Retorna o histórico básico (últimas verificações e número de ocorrências)
-    de um monitoramento específico.
-    Inclui o link do diário oficial para abrir o PDF real.
+    Retorna o histórico completo de ocorrências de um monitoramento específico.
+    Inclui o link do diário oficial e a data de cada ocorrência.
     """
     db = firestore.client()
     doc_ref = db.collection("monitorings").document(monitoramento_id)
@@ -2247,15 +2246,31 @@ async def get_monitoramento_historico(
     if data.get("user_uid") != user_uid:
         raise HTTPException(status_code=403, detail="Sem permissão para visualizar este monitoramento.")
 
+    # Busca a subcoleção de ocorrências (ajuste o nome conforme seu banco)
+    ocorrencias_ref = doc_ref.collection("occurrences")
+    ocorrencias_docs = ocorrencias_ref.order_by("detected_at", direction=firestore.Query.DESCENDING).stream()
+
+    ocorrencias = []
+    for oc in ocorrencias_docs:
+        odata = oc.to_dict()
+        ocorrencias.append({
+            "edital_identifier": odata.get("edital_identifier"),
+            "pdf_real_link": odata.get("pdf_real_link"),
+            "official_gazette_link": odata.get("official_gazette_link"),
+            "link": odata.get("link"),
+            "last_pdf_hash": odata.get("last_pdf_hash"),
+            "detected_at": odata.get("detected_at"),
+            "last_checked_at": odata.get("last_checked_at"),
+        })
+
     return {
         "monitoramento_id": monitoramento_id,
         "edital_identifier": data.get("edital_identifier"),
         "monitoring_type": data.get("monitoring_type"),
-        "occurrences": data.get("occurrences", 0),
-        "last_checked_at": data.get("last_checked_at"),
-        "last_pdf_hash": data.get("last_pdf_hash"),
-        "official_gazette_link": data.get("official_gazette_link"),  # 👈 ADICIONADO AQUI
+        "occurrences": len(ocorrencias),
+        "data": ocorrencias,  # 👈 lista de ocorrências aqui!
     }
+
 
 
 from fastapi import Body
