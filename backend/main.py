@@ -574,64 +574,66 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     file_name_lower = file_name.lower()
 
     # 🔎 Verifica se as palavras-chave foram encontradas
-for keyword in keywords_to_search:
-    keyword_lower = keyword.lower()
-    if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
-        found_keywords.append(keyword)
+    for keyword in keywords_to_search:
+        keyword_lower = keyword.lower()
+        if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
+            found_keywords.append(keyword)
 
-# ✅ Passo 5: ocorrência encontrada (mas agora filtramos)
-if found_keywords:
-    # 🔍 separa o que foi encontrado
-    nome_encontrado = (
-        monitoramento.candidate_name
-        and monitoramento.candidate_name.lower() in [k.lower() for k in found_keywords]
-    )
-    id_encontrado = (
-        monitoramento.edital_identifier
-        and monitoramento.edital_identifier.lower() in [k.lower() for k in found_keywords]
-    )
-
-    # 🔒 regra: notificar só se tiver nome (sozinho ou com id)
-    if nome_encontrado:
-        monitoramento.occurrences += 1
-        doc_ref.update({
-            "occurrences": firestore.Increment(1),
-            "pdf_real_link": pdf_real_url
-        })
-
-        # 🆕 Salva a ocorrência individual na subcoleção "occurrences"
-        ocorrencias_ref = doc_ref.collection("occurrences")
-        ocorrencias_ref.add({
-            "edital_identifier": monitoramento.edital_identifier,
-            "pdf_real_link": pdf_real_url,
-            "official_gazette_link": str(monitoramento.official_gazette_link),
-            "last_pdf_hash": current_pdf_hash,
-            "detected_at": firestore.SERVER_TIMESTAMP,
-            "last_checked_at": firestore.SERVER_TIMESTAMP
-        })
-        print(f"💾 Ocorrência salva em 'monitorings/{monitoramento.id}/occurrences'")
-
-        # ✅ await permitido aqui (dentro da função async)
-        await create_notification(
-            user_uid=monitoramento.user_uid,
-            type_="nova_ocorrencia",
-            title="Nova ocorrência encontrada!",
-            message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
-            link="/meus-monitoramentos"
+    # ✅ Passo 5: ocorrência encontrada (mas agora filtramos)
+    if found_keywords:
+        # 🔍 separa o que foi encontrado
+        nome_encontrado = (
+            monitoramento.candidate_name
+            and monitoramento.candidate_name.lower() in [k.lower() for k in found_keywords]
+        )
+        id_encontrado = (
+            monitoramento.edital_identifier
+            and monitoramento.edital_identifier.lower() in [k.lower() for k in found_keywords]
         )
 
-        send_email_notification(
-            monitoramento=monitoramento,
-            template_type="occurrence_found",
-            to_email=monitoramento.user_email,
-            found_keywords=found_keywords
-        )
+        # 🔒 regra: notificar só se tiver nome (sozinho ou com id)
+        if nome_encontrado:
+            monitoramento.occurrences += 1
+            doc_ref.update({
+                "occurrences": firestore.Increment(1),
+                "pdf_real_link": pdf_real_url
+            })
 
-        print(f"✅ Ocorrência detectada (nome presente) para {monitoramento.id}")
+            # 🆕 Salva a ocorrência individual na subcoleção "occurrences"
+            ocorrencias_ref = doc_ref.collection("occurrences")
+            ocorrencias_ref.add({
+                "edital_identifier": monitoramento.edital_identifier,
+                "pdf_real_link": pdf_real_url,
+                "official_gazette_link": str(monitoramento.official_gazette_link),
+                "last_pdf_hash": current_pdf_hash,
+                "detected_at": firestore.SERVER_TIMESTAMP,
+                "last_checked_at": firestore.SERVER_TIMESTAMP
+            })
+            print(f"💾 Ocorrência salva em 'monitorings/{monitoramento.id}/occurrences'")
+
+            # ✅ await permitido aqui (dentro da função async)
+            await create_notification(
+                user_uid=monitoramento.user_uid,
+                type_="nova_ocorrencia",
+                title="Nova ocorrência encontrada!",
+                message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
+                link="/meus-monitoramentos"
+            )
+
+            send_email_notification(
+                monitoramento=monitoramento,
+                template_type="occurrence_found",
+                to_email=monitoramento.user_email,
+                found_keywords=found_keywords
+            )
+
+            print(f"✅ Ocorrência detectada (nome presente) para {monitoramento.id}")
+        else:
+            print(f"⚠️ Apenas ID encontrado — notificação ignorada para {monitoramento.id}")
     else:
-        print(f"⚠️ Apenas ID encontrado — notificação ignorada para {monitoramento.id}")
-else:
-    print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
+        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
+
+    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
 
 # ===============================================================
 # 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
