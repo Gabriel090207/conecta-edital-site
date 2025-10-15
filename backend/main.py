@@ -2276,6 +2276,50 @@ async def get_monitoramento_historico(
     }
 
 
+from datetime import datetime
+from google.cloud import firestore
+
+def registrar_ocorrencia(monitoramento_id: str, edital_id: str, pdf_url: str, diario_url: str, user_uid: str):
+    """
+    Registra uma nova ocorrência no Firestore:
+    - Adiciona documento em monitorings/{id}/occurrences
+    - Incrementa contador de occurrences no documento principal
+    """
+    db = firestore.client()
+
+    # 1️⃣ Referência do documento principal
+    doc_ref = db.collection("monitorings").document(monitoramento_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        print("⚠️ Monitoramento não encontrado:", monitoramento_id)
+        return
+
+    data = doc.to_dict()
+    if data.get("user_uid") != user_uid:
+        print("🚫 Usuário sem permissão:", user_uid)
+        return
+
+    # 2️⃣ Adiciona a nova ocorrência na subcoleção
+    ocorrencias_ref = doc_ref.collection("occurrences")
+    ocorrencias_ref.add({
+        "edital_identifier": edital_id,
+        "pdf_real_link": pdf_url,
+        "official_gazette_link": diario_url,
+        "detected_at": datetime.utcnow(),
+        "last_checked_at": datetime.utcnow(),
+    })
+
+    # 3️⃣ Incrementa o contador no documento principal
+    doc_ref.update({
+        "occurrences": firestore.Increment(1),
+        "last_checked_at": datetime.utcnow(),
+        "official_gazette_link": diario_url,
+        "last_pdf_hash": pdf_url.split("/")[-1] if pdf_url else None
+    })
+
+    print(f"✅ Ocorrência registrada para {edital_id} em {monitoramento_id}")
+
 
 from fastapi import Body
 
