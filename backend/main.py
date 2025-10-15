@@ -2158,6 +2158,7 @@ async def get_monitoramento_historico(
     Retorna o histórico completo de ocorrências de um monitoramento específico.
     Inclui o link do diário oficial e a data de cada ocorrência.
     """
+
     db = firestore.client()
     doc_ref = db.collection("monitorings").document(monitoramento_id)
     doc = doc_ref.get()
@@ -2169,21 +2170,36 @@ async def get_monitoramento_historico(
     if data.get("user_uid") != user_uid:
         raise HTTPException(status_code=403, detail="Sem permissão para visualizar este monitoramento.")
 
-    # Busca a subcoleção de ocorrências (ajuste o nome conforme seu banco)
-    ocorrencias_ref = doc_ref.collection("occurrences")
-    ocorrencias_docs = ocorrencias_ref.order_by("detected_at", direction=firestore.Query.DESCENDING).stream()
-
     ocorrencias = []
-    for oc in ocorrencias_docs:
-        odata = oc.to_dict()
+
+    # 🔍 1️⃣ Tenta carregar subcoleção (caso exista)
+    try:
+        ocorrencias_ref = doc_ref.collection("occurrences")
+        ocorrencias_docs = ocorrencias_ref.order_by("detected_at", direction=firestore.Query.DESCENDING).stream()
+        for oc in ocorrencias_docs:
+            odata = oc.to_dict()
+            ocorrencias.append({
+                "edital_identifier": odata.get("edital_identifier"),
+                "pdf_real_link": odata.get("pdf_real_link"),
+                "official_gazette_link": odata.get("official_gazette_link"),
+                "link": odata.get("link"),
+                "last_pdf_hash": odata.get("last_pdf_hash"),
+                "detected_at": odata.get("detected_at"),
+                "last_checked_at": odata.get("last_checked_at"),
+            })
+    except Exception as e:
+        print(f"ℹ️ Nenhuma subcoleção encontrada: {e}")
+
+    # 🔁 2️⃣ Se não houver subcoleção, cria ocorrência única com base no próprio documento
+    if not ocorrencias:
         ocorrencias.append({
-            "edital_identifier": odata.get("edital_identifier"),
-            "pdf_real_link": odata.get("pdf_real_link"),
-            "official_gazette_link": odata.get("official_gazette_link"),
-            "link": odata.get("link"),
-            "last_pdf_hash": odata.get("last_pdf_hash"),
-            "detected_at": odata.get("detected_at"),
-            "last_checked_at": odata.get("last_checked_at"),
+            "edital_identifier": data.get("edital_identifier"),
+            "pdf_real_link": data.get("pdf_real_link"),
+            "official_gazette_link": data.get("official_gazette_link"),
+            "link": data.get("link"),
+            "last_pdf_hash": data.get("last_pdf_hash"),
+            "detected_at": data.get("last_checked_at"),
+            "last_checked_at": data.get("last_checked_at"),
         })
 
     return {
@@ -2191,9 +2207,8 @@ async def get_monitoramento_historico(
         "edital_identifier": data.get("edital_identifier"),
         "monitoring_type": data.get("monitoring_type"),
         "occurrences": len(ocorrencias),
-        "data": ocorrencias,  # 👈 lista de ocorrências aqui!
+        "data": ocorrencias,  # 👈 lista de ocorrências visível no histórico.js
     }
-
 
 
 from fastapi import Body
@@ -2348,3 +2363,4 @@ async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
     except Exception as e:
         print(f"❌ Erro ao atualizar slots do usuário {user_uid}: {e}")
         raise HTTPException(status_code=500, detail=f"Erro ao atualizar slots: {e}")
+
