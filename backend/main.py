@@ -527,7 +527,136 @@ def send_email_notification(
 # ===============================================================
 # 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
 # ===============================================================
+
+# ===============================================================
+# 🔍 Função principal de verificação de monitoramentos
+# ===============================================================
 async def perform_monitoring_check(monitoramento: Monitoring):
+    """
+    Executa a verificação para um monitoramento específico.
+    Dispara o envio de email se uma ocorrência for encontrada.
+    Agora armazena o link real do PDF onde a ocorrência foi detectada
+    e grava também o histórico na subcoleção "occurrences".
+    """
+    print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
+
+    db = firestore.client()
+    doc_ref = db.collection("monitorings").document(monitoramento.id)
+
+    # 🔍 Passo 1: tentar obter o PDF real
+    pdf_real_url = None
+    print(f"Tentando obter o PDF real de: {monitoramento.official_gazette_link}")
+
+    response = await fetch_content(monitoramento.official_gazette_link)
+    if not response:
+        print(f"❌ Falha ao acessar {monitoramento.official_gazette_link}")
+        return
+
+    content_type = response.headers.get("Content-Type", "").lower()
+    pdf_content = None
+
+    if "application/pdf" in content_type:
+        pdf_real_url = str(monitoramento.official_gazette_link)
+        pdf_content = response.content
+
+    elif "text/html" in content_type:
+        pdf_url_in_html = await find_pdf_in_html(response.content, monitoramento.official_gazette_link)
+        if pdf_url_in_html:
+            pdf_real_url = str(pdf_url_in_html)
+            print(f"🔗 PDF encontrado dentro da página: {pdf_real_url}")
+            pdf_response = await fetch_content(pdf_url_in_html)
+            if pdf_response and "application/pdf" in pdf_response.headers.get("Content-Type", "").lower():
+                pdf_content = pdf_response.content
+            else:
+                print(f"⚠️ O link encontrado não é um PDF válido: {pdf_url_in_html}")
+                return
+        else:
+            print(f"⚠️ Nenhum PDF encontrado na página {monitoramento.official_gazette_link}")
+            return
+    else:
+        print(f"⚠️ Tipo de conteúdo inesperado: {content_type}")
+        return
+
+    # 🔑 Passo 2: calcular hash do PDF e verificar se mudou
+    current_pdf_hash = hashlib.sha256(pdf_content).hexdigest()
+    doc = doc_ref.get()
+
+    if doc.exists and doc.to_dict().get("last_pdf_hash") == current_pdf_hash:
+        print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
+        doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
+        return
+
+    # Atualiza hash e timestamp no documento principal
+    doc_ref.update({
+        "last_pdf_hash": current_pdf_hash,
+        "last_checked_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # 🔤 Passo 3: extrair texto do PDF
+    pdf_text = await extract_text_from_pdf(pdf_content)
+    pdf_text_lower = pdf_text.lower()
+
+    # 🔎 Passo 4: verificar palavras-chave
+    found_keywords = []
+    keywords_to_search = [monitoramento.edital_identifier]
+    if monitoramento.monitoring_type == "personal" and monitoramento.candidate_name:
+        keywords_to_search.append(monitoramento.candidate_name)
+
+    try:
+        parsed_url = urlparse(str(pdf_real_url))
+        file_name = parsed_url.path.split("/")[-1]
+    except Exception:
+        file_name = ""
+
+    file_name_lower = file_name.lower()
+
+    for keyword in keywords_to_search:
+        keyword_lower = keyword.lower()
+        if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
+            found_keywords.append(keyword)
+
+    # ✅ Passo 5: ocorrência encontrada
+    if found_keywords:
+        monitoramento.occurrences += 1
+        doc_ref.update({
+            "occurrences": firestore.Increment(1),
+            "pdf_real_link": pdf_real_url
+        })
+
+        # 🆕 Grava a ocorrência individual na subcoleção "occurrences"
+        ocorrencias_ref = doc_ref.collection("occurrences")
+        ocorrencias_ref.add({
+            "edital_identifier": monitoramento.edital_identifier,
+            "pdf_real_link": pdf_real_url,
+            "official_gazette_link": str(monitoramento.official_gazette_link),
+            "last_pdf_hash": current_pdf_hash,
+            "detected_at": firestore.SERVER_TIMESTAMP,
+            "last_checked_at": firestore.SERVER_TIMESTAMP
+        })
+        print(f"💾 Ocorrência registrada em monitorings/{monitoramento.id}/occurrences")
+
+        # 🔔 Cria notificação
+        await create_notification(
+            user_uid=monitoramento.user_uid,
+            type_="nova_ocorrencia",
+            title="Nova ocorrência encontrada!",
+            message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
+            link="/meus-monitoramentos"
+        )
+
+        # ✉️ Envia e-mail
+        send_email_notification(
+            monitoramento=monitoramento,
+            template_type="occurrence_found",
+            to_email=monitoramento.user_email,
+            found_keywords=found_keywords
+        )
+
+        print(f"✅ Ocorrência detectada para {monitoramento.id}! PDF real: {pdf_real_url}")
+    else:
+        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
+
+    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
 
 # ===============================================================
 # 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
