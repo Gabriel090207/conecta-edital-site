@@ -25,7 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = historicoPanel.querySelector("#fechar-historico");
   const historicoLista = historicoPanel.querySelector("#historico-lista");
 
+  // ===============================
   // Funções de exibir/ocultar
+  // ===============================
   function abrirHistorico() {
     historicoPanel.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -39,7 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
   overlay.addEventListener("click", fecharHistorico);
   closeBtn.addEventListener("click", fecharHistorico);
 
+  // ===============================
   // Captura clique em "Ver Histórico"
+  // ===============================
   document.body.addEventListener("click", async (e) => {
     const btn = e.target.closest(".view-history-link");
     if (!btn) return;
@@ -60,7 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
     await carregarHistorico(monitoramentoId);
   });
 
+  // ===============================
   // Função principal para carregar histórico
+  // ===============================
   async function carregarHistorico(monitoramentoId) {
     const user = window.auth?.currentUser;
     if (!user) {
@@ -83,12 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await resp.json();
       console.log("🔍 Dados do histórico recebidos:", data);
 
-      if (!data || data.occurrences === 0) {
+      // Verifica se há dados válidos
+      const listaOcorrencias = data?.data || data?.ocorrencias || data?.occurrences || [];
+
+      if (!Array.isArray(listaOcorrencias) || listaOcorrencias.length === 0) {
         historicoLista.innerHTML = `<p class="empty-text">Nenhuma ocorrência encontrada.</p>`;
         return;
       }
 
-      renderizarHistorico(data);
+      renderizarHistorico(listaOcorrencias);
     } catch (err) {
       console.error(err);
       historicoLista.innerHTML = `<p class="error-text">❌ Erro ao carregar histórico.</p>`;
@@ -98,15 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================
   // Renderiza o histórico no painel lateral
   // ===============================
-  function renderizarHistorico(data) {
-    // Detecta se o backend retornou uma lista dentro de `data.data` ou `data.ocorrencias`
-    const ocorrencias = Array.isArray(data)
-      ? data
-      : Array.isArray(data.data)
-      ? data.data
-      : Array.isArray(data.ocorrencias)
-      ? data.ocorrencias
-      : [data];
+  function renderizarHistorico(ocorrencias) {
+    if (!Array.isArray(ocorrencias) || ocorrencias.length === 0) {
+      historicoLista.innerHTML = `<p class="empty-text">Nenhuma ocorrência encontrada.</p>`;
+      return;
+    }
 
     historicoLista.innerHTML = ocorrencias
       .map((oc) => {
