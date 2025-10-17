@@ -305,6 +305,96 @@
     }
   }
   
+
+  /* --- Responsividade: até 768px (celulares e tablets pequenos) --- */
+@media (max-width: 768px) {
+  /* Hero principal */
+  .hero-article {
+    flex-direction: column;
+    margin-top: 80px;
+  }
+
+  .hero-image-container {
+    min-width: 100%;
+    height: 200px;
+  }
+
+  .hero-content {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  .breadcrumbs {
+    font-size: 0.75rem;
+  }
+
+  /* Grid de artigos */
+  .articles-grid {
+    margin-top: 90px;
+    grid-template-columns: 1fr; /* Apenas 1 card por linha */
+    gap: 16px;
+    padding: 0 15px;
+  }
+
+  .article-card {
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .article-content {
+    padding: 15px;
+  }
+
+  .article-title {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .article-meta {
+    font-size: 0.8rem;
+  }
+
+  /* Ajuste da imagem do artigo */
+  .article-image-container {
+    padding-top: 60%; /* ligeiramente mais alta em telas pequenas */
+  }
+
+  /* Espaçamentos gerais */
+  .separator {
+    margin: 20px 0;
+  }
+
+  
+}
+
+/* --- Responsividade extra: até 480px (smartphones pequenos) --- */
+@media (max-width: 480px) {
+  .hero-content {
+    padding: 15px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.25rem;
+  }
+
+  .article-content {
+    padding: 12px;
+  }
+
+  .article-title {
+    font-size: 1rem;
+  }
+
+  .articles-grid {
+    gap: 12px;
+  }
+}
+
   /* --- Estilos para a página do Artigo --- */
   .article-page-main {
     max-width: 900px; /* Largura ideal para a leitura de texto */
@@ -435,6 +525,116 @@
   color: #333;
   font-weight: 600;
 }
+
+
+
+/* --- RESPONSIVIDADE: até 768px (celulares e tablets pequenos) --- */
+@media (max-width: 768px) {
+  .article-page-main {
+    margin-top: 120px;
+    padding: 0 15px; /* respiro lateral */
+  }
+
+  .article-content-wrapper {
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .article-title {
+    font-size: 1.8rem;
+    line-height: 1.3;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .article-meta-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+
+  .author-info {
+    font-size: 0.85rem;
+  }
+
+  .author-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .like-count {
+    font-size: 0.85rem;
+  }
+
+  .article-image-main {
+    margin: 20px 0;
+  }
+
+  .article-body h2 {
+    font-size: 1.4rem;
+    margin-top: 25px;
+    margin-bottom: 10px;
+  }
+
+  .article-body p,
+  .article-body li {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  /* Grid de artigos sugeridos */
+  .articles-grid1 {
+    grid-template-columns: 1fr; /* 1 por linha */
+    gap: 15px;
+    margin-top: 30px;
+    padding: 0 10px;
+  }
+
+  /* Seção de sugestões */
+  .suggested-articles-section {
+    margin-top: 30px;
+  }
+
+  .suggested-articles-section .section-title {
+    margin-top: 60px;
+    font-size: 1.3rem;
+    margin-bottom: -50px;
+    text-align: center;
+  }
+}
+
+/* --- RESPONSIVIDADE EXTRA: até 480px (smartphones pequenos) --- */
+@media (max-width: 480px) {
+  .article-content-wrapper {
+    padding: 15px;
+  }
+
+  .article-title {
+    font-size: 1.5rem;
+  }
+
+  .article-body h2 {
+    font-size: 1.2rem;
+  }
+
+  .article-body p,
+  .article-body li {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .author-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .articles-grid1 {
+    gap: 12px;
+  }
+}
+
 
 
 .main-page-footer {
@@ -687,8 +887,8 @@
   }
   /* HACK para mostrar o menu em telas pequenas. Ideal seria um botão de menu hamburguer. */
   .navbar-index:hover .navbar-center-index {
-      display: flex;
-  }
+    display: none;
+}
   .navbar-index .navbar-center-index ul {
       flex-direction: column;
       align-items: center;
@@ -1124,5 +1324,63 @@
   margin-top: 15px;
   font-size: 0.9em;
   display: none;
+}
+
+
+@media (max-width: 768px) {
+  .index-content {
+      padding: 30px 0;
+      gap: 40px;
+  }
+  section {
+      padding: 0 15px;
+  }
+  /* Navbar */
+  .navbar-index {
+      height: auto;
+  }
+  .navbar-index .navbar-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+  }
+  .navbar-center-index {
+      position: static;
+      transform: none;
+      width: 100%;
+      display: none; /* Esconde o menu de navegação central por padrão */
+  }
+  /* HACK para mostrar o menu em telas pequenas. Ideal seria um botão de menu hamburguer. */
+  
+  .navbar-index .navbar-center-index ul {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+  }
+  .navbar-left .logo img {
+      margin-right: 0;
+  }
+  
+
+  .navbar-index .navbar-right-index .btn-entrar {
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 10px;
+    margin-top: -60px;
+   margin-left: 210px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    z-index: 1; /* Garante que o botão fique na frente */
+}
+
+
 }
 
