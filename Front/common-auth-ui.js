@@ -4,7 +4,7 @@ const userDropdownToggle = document.getElementById('user-dropdown-toggle');
 const userProfilePicture = document.getElementById('userProfilePicture');
 const userDefaultAvatar = document.getElementById('userDefaultAvatar');
 const userNameDisplay = document.getElementById('userNameDisplay');
-const logoutBtn = document.getElementById('logout-btn');
+const logoutBtns = document.querySelectorAll('#logout-btn, .logout-link');
 const userEmailSpan = document.getElementById('user-email');
 const userFullNameSpan = document.getElementById('user-fullname');
 const userUsernameSpan = document.getElementById('user-username');
@@ -123,19 +123,20 @@ window.auth.onAuthStateChanged(async (user) => {
     }
 });
 
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
+logoutBtns.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
         e.preventDefault();
-        console.log('logoutBtn: Clique no botão de logout detectado.');
+        console.log('Logout detectado.');
         try {
             await window.auth.signOut();
             window.location.href = 'index.html';
         } catch (error) {
-            console.error('logoutBtn: Erro ao deslogar:', error);
+            console.error('Erro ao deslogar:', error);
             alert('Ocorreu um erro ao deslogar. Tente novamente.');
         }
     });
-}
+});
+
 
 if (userDropdownToggle) {
     userDropdownToggle.addEventListener('click', (event) => {

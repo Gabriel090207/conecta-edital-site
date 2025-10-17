@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Conecta Edital - Blog</title>
+ 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="blog.css">
+    <link rel="stylesheet" href="navbar-mobile.css">
 
 </head>
 <body>
 
     <header class="navbar-index">
+
+        <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button>
         <div class="navbar-container">
             <div class="navbar-left">
                 <a href="#" class="logo">
@@ -36,6 +42,22 @@
         </div>
     </header>
 
+    <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
+      
+        <!-- itens de navegação -->
+         <ul>
+                    <li><a href="#beneficios"><i class="fas fa-check"></i>Benefícios</a></li>
+                    <li><a href="#resultados"><i class="fas fa-trophy"></i>Resultados</a></li>
+                    <li><a href="#planos"> <i class="fas fa-credit-card"></i>Planos</a></li>
+                    <li><a href="blog.html"><i class="fas fa-book-open"></i>Blog</a></li>
+                    <li><a href="#faq"><i class="fas fa-circle-info"></i>FAQ</a></li>
+                </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
     <main class="container">
         <section class="articles-grid" id="articles-container">
             <p class="loading-message">Carregando artigos...</p>
@@ -167,5 +189,6 @@
     
     <script src="blog.js"></script>
     <script src="index.js"></script>
+    <script src="navbar-mobile.js"></script>
 </body>
 </html>
