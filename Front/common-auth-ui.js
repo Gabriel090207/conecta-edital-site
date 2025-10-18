@@ -45,6 +45,36 @@ async function fetchAndRenderHeaderData(user) {
 }
 
 
+// === Função para redefinir senha (Esqueceu a senha) ===
+function handleForgotPassword() {
+    const emailInput = document.getElementById('email-input');
+    const email = emailInput ? emailInput.value.trim() : '';
+
+    if (!email) {
+        alert('Por favor, insira o e-mail antes de solicitar a redefinição de senha.');
+        if (emailInput) emailInput.focus();
+        return;
+    }
+
+    firebase.auth().sendPasswordResetEmail(email)
+        .then(() => {
+            alert('Um e-mail de redefinição de senha foi enviado! Verifique sua caixa de entrada.');
+        })
+        .catch((error) => {
+            console.error('Erro ao enviar e-mail de redefinição:', error);
+            let message = 'Ocorreu um erro ao tentar redefinir sua senha.';
+
+            if (error.code === 'auth/user-not-found') {
+                message = 'Nenhuma conta foi encontrada com este e-mail.';
+            } else if (error.code === 'auth/invalid-email') {
+                message = 'O e-mail informado é inválido.';
+            }
+
+            alert(message);
+        });
+}
+
+
 window.auth.onAuthStateChanged(async (user) => {
     const currentPath = window.location.pathname;
     const BACKEND_URL = "https://conecta-edital-site.onrender.com"; // Defina a URL do seu backend aqui
@@ -158,3 +188,58 @@ if (userDropdownToggle) {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const forgotPasswordLink = document.querySelector('.forgot-password-text');
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleForgotPassword();
+        });
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado — preparando link de Esqueceu a senha...');
+    
+    const forgotPasswordLink = document.querySelector('.forgot-password-text');
+    const emailInput = document.getElementById('email-input');
+
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            if (!firebase.apps.length) {
+                alert('Erro: Firebase não foi inicializado.');
+                console.error('Firebase ainda não inicializado.');
+                return;
+            }
+
+            if (!emailInput || !emailInput.value.trim()) {
+                alert('Por favor, insira seu e-mail antes de solicitar a redefinição de senha.');
+                emailInput?.focus();
+                return;
+            }
+
+            const email = emailInput.value.trim();
+
+            try {
+                await firebase.auth().sendPasswordResetEmail(email);
+                alert('Um e-mail para redefinição de senha foi enviado! Verifique sua caixa de entrada.');
+                console.log('E-mail de redefinição enviado com sucesso para', email);
+            } catch (error) {
+                console.error('Erro ao enviar e-mail de redefinição:', error);
+                let message = 'Ocorreu um erro ao tentar redefinir sua senha.';
+                if (error.code === 'auth/user-not-found') {
+                    message = 'Nenhuma conta foi encontrada com este e-mail.';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'O e-mail informado é inválido.';
+                }
+                alert(message);
+            }
+        });
+    } else {
+        console.warn('⚠️ Link .forgot-password-text não encontrado no DOM.');
+    }
+});

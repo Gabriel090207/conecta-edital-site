@@ -522,4 +522,115 @@ document.addEventListener("DOMContentLoaded", () => {
             analyzeButton.innerHTML = '<i class="fas fa-lock"></i> Demonstração já utilizada';
         }
     });
+
+
+    // === Função e evento do "Esqueceu a senha?" ===
+window.addEventListener('load', () => {
+    console.log("✅ Página carregada — configurando 'Esqueceu a senha'...");
+
+    const forgotPasswordLink = document.querySelector('.forgot-password-text');
+    const emailInput = document.getElementById('email-input');
+
+    if (!forgotPasswordLink) {
+        console.warn("⚠️ Elemento '.forgot-password-text' não encontrado no DOM.");
+        return;
+    }
+
+    forgotPasswordLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        if (!window.auth) {
+            alert("Erro: Firebase Auth não foi inicializado.");
+            console.error("Firebase Auth ausente.");
+            return;
+        }
+
+        const email = emailInput?.value.trim();
+        if (!email) {
+            alert("Por favor, insira seu e-mail antes de solicitar a redefinição de senha.");
+            emailInput?.focus();
+            return;
+        }
+
+        try {
+            await window.auth.sendPasswordResetEmail(email);
+            alert(`📧 Um e-mail de redefinição foi enviado para: ${email}`);
+            console.log("E-mail de redefinição enviado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao enviar e-mail de redefinição:", error);
+            let message = "Ocorreu um erro ao enviar o e-mail de redefinição.";
+
+            if (error.code === "auth/user-not-found") {
+                message = "Nenhuma conta foi encontrada com este e-mail.";
+            } else if (error.code === "auth/invalid-email") {
+                message = "O e-mail informado é inválido.";
+            }
+
+            alert(message);
+        }
+    });
+});
+
+
+// === Função e evento do "Esqueceu a senha?" com detecção de login Google ===
+window.addEventListener('load', () => {
+    console.log("✅ Página carregada — configurando 'Esqueceu a senha'...");
+
+    const forgotPasswordLink = document.querySelector('.forgot-password-text');
+    const emailInput = document.getElementById('email-input');
+
+    if (!forgotPasswordLink) {
+        console.warn("⚠️ Elemento '.forgot-password-text' não encontrado no DOM.");
+        return;
+    }
+
+    forgotPasswordLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        if (!window.auth) {
+            alert("Erro: Firebase Auth não foi inicializado.");
+            console.error("Firebase Auth ausente.");
+            return;
+        }
+
+        const email = emailInput?.value.trim();
+        if (!email) {
+            alert("Por favor, insira seu e-mail antes de solicitar a redefinição de senha.");
+            emailInput?.focus();
+            return;
+        }
+
+        try {
+            // Verifica quais métodos de login existem para o e-mail digitado
+            const methods = await window.auth.fetchSignInMethodsForEmail(email);
+
+            if (methods.includes('password')) {
+                // Conta tradicional com e-mail e senha → envia redefinição normalmente
+                await window.auth.sendPasswordResetEmail(email);
+                alert(`📧 Um e-mail de redefinição foi enviado para: ${email}`);
+                console.log("E-mail de redefinição enviado com sucesso!");
+            } 
+            else if (methods.includes('google.com')) {
+                // Conta criada via Google → não tem senha para redefinir
+                alert('Esta conta usa login com Google. Use o botão "Entrar com Google" para acessar.');
+            } 
+            else if (methods.length === 0) {
+                alert('Nenhuma conta foi encontrada com este e-mail.');
+            } 
+            else {
+                alert('Este e-mail está vinculado a outro método de login.');
+            }
+
+        } catch (error) {
+            console.error("Erro ao processar redefinição:", error);
+            let message = "Ocorreu um erro ao enviar o e-mail de redefinição.";
+            if (error.code === "auth/invalid-email") {
+                message = "O e-mail informado é inválido.";
+            }
+            alert(message);
+        }
+    });
+});
+
+
 });
