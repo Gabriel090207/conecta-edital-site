@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title id="page-title">Conecta Edital - Artigo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="blog.css">
+    <link rel="stylesheet" href="navbar-mobile.css">
+</head>
+<body>
+    <header class="navbar-index">
+
+        <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button>
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="index.html" class="logo">
+                    <img src="logo.png.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+            </div>
+            <nav class="navbar-center-index">
+                <ul>
+                    <li><a href="blog.html"><i class="fas fa-arrow-left"></i>Voltar</a></li>
+                </ul>
+            </nav>
+           
+        </div>
+    </header>
+
+    <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
+      
+        <!-- itens de navegação -->
+         <ul>
+                    <li><a href="#beneficios"><i class="fas fa-check"></i>Benefícios</a></li>
+                    <li><a href="#resultados"><i class="fas fa-trophy"></i>Resultados</a></li>
+                    <li><a href="#planos"> <i class="fas fa-credit-card"></i>Planos</a></li>
+                    <li><a href="blog.html"><i class="fas fa-book-open"></i>Blog</a></li>
+                    <li><a href="#faq"><i class="fas fa-circle-info"></i>FAQ</a></li>
+                </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
+    
+    <main class="container article-page-main">
+        <article class="article-content-wrapper">
+            <div class="breadcrumbs">
+                <span>Início</span> > <span>Blog</span> > <span id="article-category">Carregando...</span>
+            </div>
+            <h1 class="article-title" id="article-title">Carregando...</h1>
+            <div class="article-meta-header">
+                <div class="author-info">
+                    <img src="capa.png" alt="Avatar do Autor" class="author-avatar">
+                    <span class="author-name" id="article-author">Carregando...</span>
+                    <span class="article-date" id="article-date">Carregando...</span>
+                    <span class="read-time" id="article-read-time">Carregando...</span>
+                </div>
+                <div class="social-share">
+                    <span class="like-count">7 curtidas(s)</span>
+                </div>
+            </div>
+            <figure class="article-image-main">
+                <img src="capa.png" alt="Imagem do artigo" id="article-image-main">
+                <figcaption id="article-image-caption"></figcaption>
+            </figure>
+            <section class="article-body" id="article-body-content">
+                <p class="loading-message">Carregando conteúdo do artigo...</p>
+            </section>
+        </article>
+        <section class="suggested-articles-section">
+            <h2 class="section-title">Sugestões de Leitura</h2>
+            <div class="articles-grid" id="suggested-articles-container">
+                <p class="loading-message" id="loading-suggested-articles">Carregando sugestões...</p>
+            </div>
+        </section>
+    </main>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="artigo.js"></script>
+    <script src="navbar-mobile.js"></script>
+</body>
+</html>

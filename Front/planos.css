@@ -1,0 +1,1626 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Reset Básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: white; 
+    color: #343a40;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(80px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    max-width: 1440px;
+    padding: 0 30px;
+    position: relative;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left .logo {
+    display: flex;
+    align-items: center;
+    font-weight: 300;
+    color: #007bff;
+}
+
+.navbar-left .logo img {
+    margin-right: 80px;
+    border-radius: 4px;
+}
+
+.navbar-center ul {
+    display: flex;
+    gap: 30px;
+}
+
+.navbar-center ul li a {
+    display: flex;
+    align-items: center;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 5px 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-center ul li a.ajuda {
+    display: flex;
+    align-items: center;
+    color:#08ac6d;
+    font-weight: 500;
+    padding: 5px 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-center ul li a.ajuda:hover {
+    color: #14a06a;
+    transform: translateY(-2px);
+}
+
+.navbar-center ul li a:hover,
+.navbar-center ul li a.active {
+    color: #007bff;
+    transform: scale(1.05);
+}
+
+.navbar-center ul li a i {
+    font-size: 17px;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+    color: transparent !important; /* Adicione !important aqui */
+    -webkit-text-stroke: 1px #6c757d;
+  }
+  
+  .navbar-center ul li a:hover i,
+  .navbar-center ul li a.active i {
+    transform: scale(1.1);
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #007bff;
+  }
+
+.navbar-center ul li a.ajuda i{
+    transform: scale(1.1);
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #08ac6d;
+  
+}
+    
+  .navbar-center ul li a.ajuda:hover i {
+    transform: scale(1.1);
+    color: transparent !important; /* Adicione !important aqui também */
+    -webkit-text-stroke: 1px #08ac6d;
+  }
+
+
+
+.fa-info-circle {
+    font-size: 0.8rem;
+    border-radius: 10px;
+    background-color: white;
+    border-color: solid 2px #b81414;
+    color: #08ac6d;
+}
+
+/* Ajuste para o conteúdo principal da página de planos */
+.planos-content {
+    flex-grow: 1;
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 1440px;
+    margin: 30px auto;
+    align-items: center;
+    text-align: center;
+}
+
+/* Hero Section */
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 10px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.call-to-action-button {
+    margin-top: 100px;
+    background-color: #e0f7fa;
+    color: #00838f;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+.call-to-action-button:hover {
+    background-color: #c0e7eb;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #343a40;
+    line-height: 1.2;
+}
+
+.hero-section h1 .highlight {
+    background-image: linear-gradient(135deg, #007BFF, #0056B3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.hero-section p {
+    font-size: 1.1rem;
+    color: #6c757d;
+    max-width: 700px;
+}
+
+.welcome-message {
+    background-color: white;
+    color: black;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-message i {
+    font-size: 1.2rem;
+}
+
+/* Stats Section */
+/* Stats Section */
+.stats-section {
+    padding: 10px 10px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: -60px;
+}
+
+/* O contêiner de grid que agrupa os cards de estatísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+.stat-card-index {
+    background-color: #ffffff;
+    border-radius: 19px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 1px solid #e0e0e0;
+}
+
+.stat-icon-wrapper-index {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.stat-card-index h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.stat-card-index p {
+    font-size: 0.70rem;
+    color: #6c757d;
+}
+
+/* Differentials Section */
+.differentials-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 50px;
+    margin-bottom: 80px;
+}
+
+.differentials-section h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.differentials-section h2 .highlight-purple {
+    background-image: linear-gradient(135deg, #b24bfc, #c803a4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.differentials-section .subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 30px;
+}
+
+/* O contêiner de grid que agrupa os cards de diferenciais */
+.differentials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    width: 100%;
+}
+
+.differential-card {
+    background-color: #ffffff;
+    border-radius: 21px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.differential-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.differential-icon-wrapper {
+    background: linear-gradient(135deg, #429aff, #0163c5); 
+    color: white;
+    border-radius: 20%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.differential-icon-wrapper1 {
+    background: linear-gradient(135deg, #05bc5b, #00823c); 
+    color: white;
+    border-radius: 20%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.differential-icon-wrapper2 {
+    background: linear-gradient(135deg, #9d1ee2, #6108c0); 
+    color: white;
+    border-radius: 20%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.differential-card h3 {
+    font-size: 1.0rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.differential-card p {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+/* Plans Overview Section */
+.plans-overview-section {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-top: 0px;
+}
+
+.plans-overview-section h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.plans-overview-section .subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 30px;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
+    width: 100%;
+    text-align: left;
+    margin-top: -30px;
+}
+
+.plan-card {
+
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid #e0e0e0;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card .plan-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.plan-card .plan-icon-wrapper {
+    color: blue;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+}
+
+.plan-card h3 {
+    font-size: 1.0rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.plan-card .plan-description {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #343a40;
+}
+
+.plan-card .plan-details {
+    font-size: 0.65rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.plan-card .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.plan-card .price-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #007bff;
+}
+
+.plan-card .price-unit {
+    font-size: 0.7rem;
+    color: #6c757d;
+}
+
+.plan-card .original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.7rem;
+}
+
+.plan-card .discount {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.plan-card .included-features,
+.plan-card .limitations {
+    margin-bottom: 15px;
+}
+
+.plan-card .included-features h4,
+.plan-card .limitations h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.plan-card .included-features h4 i {
+    color: #28a745;
+}
+
+.plan-card .limitations h4 i {
+    color: #dc3545;
+}
+
+.plan-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.plan-card ul li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.65rem;
+    color: #343a40;
+}
+
+.plan-card ul li i.fa-check {
+    color: #28a745;
+}
+
+.plan-card ul li i.fa-times {
+    color: #dc3545;
+}
+
+.choose-plan-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #429aff, #0163c5);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: auto;
+}
+
+.choose-plan-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Premium Plan Specific Styles */
+.plan-card.premium-plan {
+    background-color: white;
+    border-color: #ff9800;
+    box-shadow: 0 8px 16px rgba(255, 152, 0, 0.2);
+}
+
+.plan-card.premium-plan .plan-icon-wrapper {
+    color: #ff9800;
+}
+
+.plan-card.premium-plan .price-value {
+    color: #ff9800;
+}
+
+.plan-card.premium-plan .choose-plan-btn {
+    background: linear-gradient(135deg, #ff6d33, #dd2110);
+}
+
+.plan-card.premium-plan .choose-plan-btn:hover {
+    background-color: #925800;
+}
+
+.most-chosen {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.most-chosen i {
+    margin-right: 5px;
+}
+
+.plan-card.premium-plan {
+    position: relative;
+    border: 2px solid #ff74a7;
+}
+
+/* Differentials Section */
+.differentials-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 50px;
+    margin-bottom: 80px;
+}
+
+.differentials-section h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.differentials-section h2 .highlight-purple {
+    background-image: linear-gradient(135deg, #007BFF, #0056B3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.differentials-section .subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 30px;
+}
+
+.differentials-grid {
+    display: grid;
+    /* CORREÇÃO AQUI */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    width: 100%;
+}
+
+.differential-card {
+    background-color: #ffffff;
+    border-radius: 21px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.differential-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.differential-icon-wrapper {
+    background: linear-gradient(135deg, #429aff, #0163c5); 
+    color: white;
+    border-radius: 20%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.differential-icon-wrapper1 {
+    background: linear-gradient(135deg, #05bc5b, #00823c); 
+    color: white;
+    border-radius: 20%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.differential-icon-wrapper2 {
+    background: linear-gradient(135deg, #9d1ee2, #6108c0); 
+    color: white;
+    border-radius: 20%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.differential-card h3 {
+    font-size: 1.0rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.differential-card p {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Back to Top Button */
+.back-to-top-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #007bff;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+}
+
+.back-to-top-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+}
+
+/* Não há media queries para layouts de desktop, garantindo que os cards fiquem em uma linha */
+
+.most-chosen {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.most-chosen i {
+    margin-right: 5px;
+}
+
+.plan-card.premium-plan {
+    position: relative;
+    border: 2px solid #ff74a7;
+}
+
+/* Estilos para o status do plano */
+.plan-status-signed-index {
+    margin-top: auto;
+    padding: 12px 25px;
+    background-color: #c7c7c7;
+    color: rgb(146, 146, 146);
+    border-radius: 28px;
+    font-weight: bold;
+    font-size: 1em;
+    text-align: center;
+    width: 100%;
+}
+
+.plan-status-signed-index i {
+    margin-right: 8px;
+}
+
+.current-plan-name {
+    display: none;
+}
+
+.exclamacao {
+    margin-left: -10px;
+}
+
+
+.btn-secondary1 {
+    background: linear-gradient(135deg, #e51e39, #b30000);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-secondary1:hover {
+    background: linear-gradient(135deg, #b30018, #b30018);
+}
+
+/* Estilo para o botão de upgrade */
+.btn-primary1 {
+    /* Gradiente de cores para o fundo do botão */
+    background: linear-gradient(135deg, #1e88e5, #0056b3);
+    
+    color: white; /* Cor do texto */
+    border: none; /* Remove a borda padrão do botão */
+    padding: 12px 25px; /* Espaçamento interno */
+    border-radius: 8px; /* Cantos arredondados */
+    font-size: 1em; /* Tamanho da fonte */
+    font-weight: 600; /* Peso da fonte (negrito) */
+    cursor: pointer; /* Muda o cursor para "mãozinha" ao passar por cima */
+    
+    /* Transição suave para o efeito de hover */
+    transition: background 0.2s ease;
+}
+
+/* Efeito ao passar o mouse sobre o botão */
+.btn-primary1:hover {
+    /* Mude o gradiente ao passar o mouse para dar um efeito de profundidade */
+    background: linear-gradient(135deg, #0056b3, #003a70);
+}
+
+
+
+.modal-overlay .large-modal {
+    max-width: 600px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
+.modal-overlay .modal-content h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-top: 10px;
+}
+
+.modal-overlay .modal-content .modal-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+/* Abas */
+.tabs-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+.tab-button {
+    margin-top: -40px;
+    flex: 1;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s, border-bottom 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+    color: #0747a8;
+    border-bottom: 2px solid #0747a8;
+}
+
+/* Conteúdo das Abas */
+.tab-content-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-top: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-content {
+    display: none;
+    overflow-y: visible;
+    max-height: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Formulário de Informações */
+.profile-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.profile-avatar-container {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: -20px auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f0f2f5;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.profile-avatar-placeholder,
+#profileImagePreview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    color: #aaa;
+    object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+    font-weight: bold;
+}
+
+/* Novo wrapper para alinhar o nome de usuário e o botão de edição */
+.profile-username-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaço entre o nome e o botão */
+    margin-bottom: 2rem;
+}
+
+/* Estilo para o nome de usuário centralizado */
+.profile-username-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    display: block;
+   
+}
+
+/* Estilo para o botão de edição do nome de usuário */
+.edit-username-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.edit-username-btn:hover {
+    color: #0747a8;
+}
+
+.edit-avatar-btn {
+    position: absolute;
+    bottom: -10px; 
+    right: -10px;  
+    width: 35px;
+    height: 35px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    z-index: 2000;
+}
+
+.edit-avatar-btn i {
+    color: #0747a8;
+    font-size: 1rem;
+}
+
+.edit-avatar-btn:hover {
+    transform: scale(1.1);
+}
+
+/* NOVO: Wrapper para o ícone e input */
+.form-group {
+    position: relative; /* Adiciona a posição relativa ao contêiner pai */
+    margin-bottom: 0.6rem; /* Espaço entre os campos */
+}
+
+/* Correção para o ícone dentro do label */
+.form-group label i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.1rem;
+    z-index: 2;
+    -webkit-text-stroke: 0;
+}
+
+/* Correção para o input, ajustando o padding para não sobrepor o ícone */
+.form-group input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* Aumenta o padding-left */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: #333;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.form-group input[disabled] {
+    background-color: #eee;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.form-note {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+    flex-shrink: 0;
+}
+
+/* Formulário de Segurança (Ícone de olho) */
+.form-group .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 1rem;
+    z-index: 10;
+}
+
+/* Botões de Ação */
+.btn-save-changes, .btn-change-password, .btn-manage-subscription, .btn-create-password {
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.btn-manage-subscription {
+   background-color:  #08a853;
+}
+
+.btn-cancel-form {
+    margin-top: -5px;
+     background-color: #e62727;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-cancel-form:hover {
+    transform: translateY(-2px);
+    background-color: #d0d0d0;
+}
+
+.btn-save-changes:hover, .btn-change-password:hover, .btn-manage-subscription:hover, .btn-create-password:hover {
+    transform: translateY(-2px);
+    background-color: #218838;
+}
+
+/* Conteúdo da Assinatura */
+.subscription-status-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.subscription-status-card .plan-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.subscription-status-card .plan-icon-wrapper i {
+    color: #fff;
+}
+
+.subscription-status-card .plan-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.subscription-status-card .plan-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+/* Cores de fundo para os ícones */
+.gold-summary-bg { background-color: #FFC107; }
+
+/* Para evitar rolagem no modal principal em telas menores */
+@media (max-width: 768px) {
+    .modal-overlay .large-modal {
+        max-width: 95%;
+        max-height: 95vh;
+        padding: 1.5rem;
+    }
+}
+
+
+/* Para o Plano Premium (Cor Dourada/Amarela) */
+.gold-summary-bg {
+    background: linear-gradient(135deg, #ffef60, #ffc13a);/* Cor de fundo */
+}
+
+/* Para o ícone do plano Premium */
+.gold-summary-bg i {
+    color: #fff; /* Cor do ícone, geralmente branco para contraste */
+}
+
+/* Para os Planos Essencial e Básico (Cor Laranja) */
+.orange-summary-bg {
+    background: linear-gradient(135deg, #609FFF, #3A66FF);
+}
+
+/* Para o ícone dos planos Essencial e Básico */
+.orange-summary-bg i {
+    color: #fff;
+}
+
+/* Para o Plano Gratuito (Cor Cinza) */
+.grey-summary-bg {
+    background: linear-gradient(135deg, rgb(148, 148, 148), #50504e); 
+}
+
+/* Para o ícone do plano Gratuito */
+.grey-summary-bg i {
+    color: #fff;
+}
+
+.fa-eye{
+    margin-top: 23px;
+}
+
+.fa-phone{
+    margin-top: 13px;
+}
+
+.fa-lock{
+    margin-top: 13px;
+}
+
+.fa-unlock{
+    margin-top: 13px;
+}
+
+.fa-key{
+    margin-top: 13px;
+}
+
+/* Estilo para o wrapper que contém o nome de usuário e os botões */
+/* Estilo para o wrapper que contém o nome de usuário e os botões */
+.profile-username-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* <<< Alinhamento para a esquerda */
+    gap: 8px;
+    margin-bottom: 2rem;
+}
+/* Estilo para o input de edição do nome de usuário */
+.profile-username-wrapper .edit-username-input {
+    flex-grow: 1; /* Permite que o input ocupe o espaço disponível */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+    width: 250px; /* Largura fixa para manter o layout */
+    text-align: center;
+}
+
+/* Foco no input */
+.profile-username-wrapper .edit-username-input:focus {
+    border-color: #0747a8;
+    outline: none;
+}
+
+/* Estilo para o botão de salvar (ícone de check) */
+.profile-username-wrapper .save-username-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #05bc5b; /* Verde para confirmar */
+    font-size: 1.5rem;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.profile-username-wrapper .save-username-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Estilo para o botão de cancelar (ícone de X) */
+.profile-username-wrapper .cancel-username-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ac0513; /* Vermelho para cancelar */
+    font-size: 1.5rem;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.profile-username-wrapper .cancel-username-btn:hover {
+    transform: scale(1.1);
+}
+
+
+
+.eye-personal1{
+    margin-top: 23px;
+}
+
+.lockca{
+    margin-top: 0px;
+  }
+
+
+  .main-page-footer {
+    background-color: #121725;
+    color: #e0e0e0;
+    padding: 60px 30px 20px 30px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    width: 100%;
+}
+
+
+.form-group label i {
+    
+    margin-top: 10px;
+}
+
+.fa-user-tag.i{
+    margin-top: -10px;
+
+}
+
+.fa-envelope.i{
+    margin-top: -10px;
+
+}
+
+.fa-phone.i{
+    margin-top: 2px;
+
+}
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 250px;
+    flex: 1;
+}
+
+.footer-column.about-us {
+    flex: 1.5;
+    max-width: 350px;
+}
+
+.footer-logo  {
+    max-width: 190px;
+    height: auto;
+    margin-top: -18px;
+    margin-bottom: 0px;
+}
+
+.footer-column p {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+}
+
+.footer-column h3 {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    white-space: nowrap;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-column ul li a {
+    color: #b0b0b0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-column ul li a:hover {
+    color: white;
+}
+
+.footer-column ul li a i {
+    font-size: 1rem;
+    color: #b0b0b0;
+    transition: color 0.2s ease;
+}
+
+.footer-column ul li a:hover i {
+    color: white;
+}
+
+
+  /* ===========================
+   📱 RESPONSIVIDADE GERAL
+   =========================== */
+
+/* ---------- Notebooks (≤1024px) ---------- */
+@media (max-width: 1024px) {
+
+    .navbar-container {
+        padding: 0 20px;
+    }
+
+    .navbar-center ul {
+        gap: 20px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .differentials-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .plans-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .plan-card {
+        padding: 25px;
+    }
+}
+
+/* ---------- Tablets (≤768px) ---------- */
+@media (max-width: 768px) {
+
+    
+
+    .hero-section {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section p {
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .differentials-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .plan-card {
+        padding: 20px;
+    }
+
+    .differentials-section h2,
+    .plans-overview-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .differentials-section .subtitle,
+    .plans-overview-section .subtitle {
+        font-size: 1rem;
+    }
+
+    .call-to-action-button {
+        margin-top: 50px;
+        font-size: 0.85rem;
+        padding: 8px 20px;
+    }
+
+    .stat-card-index h3 {
+        font-size: 1rem;
+    }
+
+    .stat-card-index p {
+        font-size: 0.7rem;
+    }
+
+    .back-to-top-button {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+}
+
+/* ---------- Celulares (≤480px) ---------- */
+@media (max-width: 480px) {
+
+  
+
+    .hero-section h1 {
+        font-size: 1.6rem;
+        line-height: 1.3;
+    }
+
+    .hero-section p {
+        font-size: 0.8rem;
+        max-width: 90%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .differentials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-card {
+        padding: 15px;
+    }
+
+    .plan-card h3 {
+        font-size: 0.9rem;
+    }
+
+    .plan-card .price-value {
+        font-size: 1.6rem;
+    }
+
+    .plan-card .plan-description {
+        font-size: 0.75rem;
+    }
+
+    .plan-card ul li {
+        font-size: 0.6rem;
+    }
+
+    .choose-plan-btn {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    .differentials-section h2 {
+        font-size: 1.6rem;
+        text-align: center;
+    }
+
+    .differentials-section .subtitle {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .welcome-message {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 20px;
+        padding: 8px 15px;
+    }
+
+    .call-to-action-button {
+        font-size: 0.8rem;
+        padding: 8px 15px;
+    }
+
+    .back-to-top-button {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    .stat-card-index {
+        padding: 20px;
+    }
+
+    .stat-icon-wrapper-index {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+
+
+@media (max-width: 768px) {
+    .modal-overlay .large-modal {
+        margin-top: 120px;
+        max-width: 95%;
+        max-height: 110vh;
+        padding: 1.5rem;
+    }
+
+}

@@ -1,0 +1,1386 @@
+/* Variáveis para cores */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --text-color: #ecf0f1;
+    --link-color: #3498db;
+    --background-color: #f4f5f7;
+    --card-background: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+  }
+  
+  html, body {
+    overflow-x: hidden;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: white; /* Fundo geral claro */
+    color: #343A40; /* Cor de texto principal escuro */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-size: 16px; /* Base rem */
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  a { 
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* --- Cabeçalho --- */
+  .navbar-index {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(80px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar-index .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    max-width: 1440px;
+    padding: 0 30px;
+    position: relative; /* CRUCIAL: define este como o ponto de referência para a centralização */
+}
+
+/* O menu central agora é posicionado de forma absoluta */
+.navbar-center-index {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    z-index: 1; /* Garante que o logo fique na frente */
+}
+
+/* Os estilos do logo e do botão permanecem os mesmos */
+.navbar-left .logo {
+    display: flex;
+    align-items: center;
+    font-weight: 300;
+    color: #007bff;
+}
+
+.navbar-left .logo img {
+    margin-right: 80px;
+    border-radius: 4px;
+}
+
+.navbar-index .navbar-center-index ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 35px;
+}
+
+.navbar-index .navbar-center-index ul li a {
+    color: #6C757D;
+    font-weight: 500;
+    font-size: 1.15rem;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+}
+
+.navbar-index .navbar-center-index ul li a:hover {
+    color: #007BFF;
+}
+
+.navbar-center-index ul li a i {
+    font-size: 17px;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+
+    /* deixa o preenchimento transparente */
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #6c757d; /* largura e cor da borda */
+}
+
+
+.navbar-center-index ul li a:hover i,
+.navbar-center-index ul li a.active i {
+    transform: scale(1.1);
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #007bff;
+  
+    
+}
+
+.navbar-index .navbar-right-index .btn-entrar {
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    z-index: 1; /* Garante que o botão fique na frente */
+}
+
+.navbar-index .navbar-right-index .btn-entrar:hover {
+    background-color: #0056b3;
+}
+
+  
+  /* --- Seção de Destaque (Hero) --- */
+  .hero-article {
+    display: none;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 130px;
+    box-shadow: 0 4px 12px var(--card-shadow);
+  }
+  
+  .hero-image-container {
+    flex: 1;
+    min-width: 50%;
+  }
+  
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .hero-content {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .breadcrumbs {
+    color: #888;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .hero-content h1 {
+    font-size: 2rem;
+    margin: 0 0 10px;
+    line-height: 1.2;
+  }
+  
+  .article-meta .author {
+    font-weight: bold;
+  }
+  
+  .separator {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 40px 0;
+  }
+  
+  /* --- Grid de Artigos --- */
+  .articles-grid {
+    margin-top: 120px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1900px;
+  }
+  
+  .article-card {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    box-shadow: 0 2px 8px var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 105%;
+  }
+  
+  .article-card a {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .article-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .article-footer {
+    margin-top: auto;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .article-title {
+    font-size: 2px;
+  }
+  
+  .article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .article-image-container {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+  }
+  
+  .article-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* CORREÇÃO APLICADA AQUI PARA OS CARDS DO BLOG */
+  .article-content {
+    padding: 20px;
+    height: 100%;
+    overflow-wrap: break-word; /* Solução principal para quebra de texto em palavras longas */
+    word-break: break-all;    /* Solução alternativa para garantir quebra em qualquer caractere */
+  }
+  
+  .article-meta {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: auto;
+  }
+  
+  .article-meta span {
+    margin-right: 10px;
+  }
+  
+  .article-meta span:last-child {
+    margin-right: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .hero-article {
+      flex-direction: column;
+    }
+    .hero-content {
+      padding: 20px;
+    }
+  }
+  
+
+  /* --- Responsividade: até 768px (celulares e tablets pequenos) --- */
+@media (max-width: 768px) {
+  /* Hero principal */
+  .hero-article {
+    flex-direction: column;
+    margin-top: 80px;
+  }
+
+  .hero-image-container {
+    min-width: 100%;
+    height: 200px;
+  }
+
+  .hero-content {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  .breadcrumbs {
+    font-size: 0.75rem;
+  }
+
+  /* Grid de artigos */
+  .articles-grid {
+    margin-top: 90px;
+    grid-template-columns: 1fr; /* Apenas 1 card por linha */
+    gap: 16px;
+    padding: 0 15px;
+  }
+
+  .article-card {
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .article-content {
+    padding: 15px;
+  }
+
+  .article-title {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .article-meta {
+    font-size: 0.8rem;
+  }
+
+  /* Ajuste da imagem do artigo */
+  .article-image-container {
+    padding-top: 60%; /* ligeiramente mais alta em telas pequenas */
+  }
+
+  /* Espaçamentos gerais */
+  .separator {
+    margin: 20px 0;
+  }
+
+  
+}
+
+/* --- Responsividade extra: até 480px (smartphones pequenos) --- */
+@media (max-width: 480px) {
+  .hero-content {
+    padding: 15px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.25rem;
+  }
+
+  .article-content {
+    padding: 12px;
+  }
+
+  .article-title {
+    font-size: 1rem;
+  }
+
+  .articles-grid {
+    gap: 12px;
+  }
+}
+
+  /* --- Estilos para a página do Artigo --- */
+  .article-page-main {
+    max-width: 900px; /* Largura ideal para a leitura de texto */
+    margin-top: 130px;
+  }
+  
+  .article-content-wrapper {
+    background-color: var(--card-background);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--card-shadow);
+  }
+  
+  .article-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .article-meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+    font-size: 0.9rem;
+  }
+  
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .like-count {
+    color: #777;
+    font-size: 0.9rem;
+  }
+  
+  .article-image-main {
+    margin: 30px 0;
+    text-align: center;
+  }
+  
+  .article-image-main img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .article-image-main figcaption {
+    margin-top: 10px;
+    font-style: italic;
+    color: #888;
+    font-size: 0.9rem;
+  }
+  
+  .article-body h2 {
+    font-size: 1.8rem;
+    margin-top: 40px;
+    margin-bottom: 15px;
+  }
+  
+  /* CORREÇÃO APLICADA AQUI PARA OS PARÁGRAFOS DO ARTIGO COMPLETO */
+  .article-body p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.8;
+    overflow-wrap: break-word;
+    word-break: break-all;
+  }
+  
+  .article-body ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+  
+  /* CORREÇÃO APLICADA AQUI PARA ITENS DE LISTA DO ARTIGO COMPLETO */
+  .article-body li {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    overflow-wrap: break-word;
+    word-break: break-all;
+  }
+  
+  @media (max-width: 768px) {
+    .article-content-wrapper {
+      padding: 20px;
+    }
+    .article-title {
+      font-size: 1.8rem;
+    }
+    .article-body p, .article-body li {
+      font-size: 1rem;
+    }
+  }
+  
+  .articles-grid1 {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1900px;
+  }
+
+  /* Estilos para a nova seção de sugestões */
+.suggested-articles-section {
+  margin-top: 50px; /* Reduz a margem superior para a distância desejada */
+}
+
+/* Ajusta a margem do título da seção */
+.suggested-articles-section .section-title {
+  font-size: 1.5rem;
+  margin-bottom: -100px;
+  margin-top: 0; /* Remove a margem superior padrão do H2 para controle total do espaçamento */
+  color: #333;
+  font-weight: 600;
+}
+
+
+
+/* --- RESPONSIVIDADE: até 768px (celulares e tablets pequenos) --- */
+@media (max-width: 768px) {
+  .article-page-main {
+    margin-top: 120px;
+    padding: 0 15px; /* respiro lateral */
+  }
+
+  .article-content-wrapper {
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .article-title {
+    font-size: 1.8rem;
+    line-height: 1.3;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .article-meta-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+
+  .author-info {
+    font-size: 0.85rem;
+  }
+
+  .author-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .like-count {
+    font-size: 0.85rem;
+  }
+
+  .article-image-main {
+    margin: 20px 0;
+  }
+
+  .article-body h2 {
+    font-size: 1.4rem;
+    margin-top: 25px;
+    margin-bottom: 10px;
+  }
+
+  .article-body p,
+  .article-body li {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  /* Grid de artigos sugeridos */
+  .articles-grid1 {
+    grid-template-columns: 1fr; /* 1 por linha */
+    gap: 15px;
+    margin-top: 30px;
+    padding: 0 10px;
+  }
+
+  /* Seção de sugestões */
+  .suggested-articles-section {
+    margin-top: 30px;
+  }
+
+  .suggested-articles-section .section-title {
+    margin-top: 60px;
+    font-size: 1.3rem;
+    margin-bottom: -50px;
+    text-align: center;
+  }
+}
+
+/* --- RESPONSIVIDADE EXTRA: até 480px (smartphones pequenos) --- */
+@media (max-width: 480px) {
+  .article-content-wrapper {
+    padding: 15px;
+  }
+
+  .article-title {
+    font-size: 1.5rem;
+  }
+
+  .article-body h2 {
+    font-size: 1.2rem;
+  }
+
+  .article-body p,
+  .article-body li {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .author-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .articles-grid1 {
+    gap: 12px;
+  }
+}
+
+
+
+.main-page-footer {
+  background-color: #121725;
+  color: #e0e0e0;
+  padding: 60px 30px 20px 30px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  width: 100%;
+}
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 250px;
+  flex: 1;
+}
+
+.footer-column.about-us {
+  flex: 1.5;
+  max-width: 350px;
+}
+
+.footer-logo  {
+  max-width: 190px;
+  height: auto;
+  margin-top: -18px;
+  margin-bottom: 0px;
+}
+
+.footer-column p {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+.footer-column h3 {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-column ul li a {
+  color: #b0b0b0;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-column ul li a:hover {
+  color: white;
+}
+
+.footer-column ul li a i {
+  font-size: 1rem;
+  color: #b0b0b0;
+  transition: color 0.2s ease;
+}
+
+.footer-column ul li a:hover i {
+  color: white;
+}
+
+/* Badges de Segurança (Sistema Online, Dados Seguros) */
+.security-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.badge {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.badge i {
+  font-size: 0.8em;
+}
+
+/* Base do Footer (Copyright e Links de Políticas) */
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 20px auto 0 auto;
+  color: #b0b0b0;
+  font-size: 0.85rem;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  color: #b0b0b0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.footer-links a:hover {
+  color: white;
+}
+
+/* ========================================= */
+/* RESPONSIVIDADE (NOVO CÓDIGO) */
+/* ========================================= */
+/* Desktop de Largura Média (até 1440px) */
+@media (max-width: 1440px) {
+  .navbar-index .navbar-container,
+  section {
+      max-width: 1200px;
+  }
+}
+
+/* Tablets e Desktops Menores (até 992px) */
+@media (max-width: 992px) {
+  .index-content {
+      padding: 40px 0;
+      gap: 60px;
+  }
+  section {
+      padding: 0 20px;
+  }
+  .index-content h1 {
+      font-size: 2.2rem;
+  }
+  .index-content .subtitle {
+      font-size: 1rem;
+      margin-bottom: 30px;
+  }
+  .plans-grid-index {
+      grid-template-columns: 1fr;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  .monitoramento-demo-card,
+  .upload-form-card,
+  .faq-accordion {
+      max-width: 100%;
+      padding: 30px;
+  }
+  .faq-question, .faq-meta, .faq-answer {
+      padding-left: 25px;
+  }
+  .faq-answer {
+      padding-bottom: 15px;
+  }
+  .steps-grid, .benefits-grid, .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+  }
+  .step-card, .benefit-card, .stat-card-index {
+      padding: 25px;
+  }
+  /* Footer */
+  .footer-container {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 30px;
+  }
+  .footer-column {
+      min-width: unset;
+      width: 100%;
+      max-width: 400px;
+  }
+  .footer-column.about-us {
+      order: -1;
+      max-width: 400px;
+  }
+  .footer-column h3, .footer-column p, .security-badges {
+      text-align: center;
+      margin: 0 auto;
+  }
+  .footer-bottom {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+  }
+  .footer-links {
+      justify-content: center;
+  }
+}
+
+/* Celulares e Tablets em Modo Paisagem (até 768px) */
+@media (max-width: 768px) {
+  .index-content {
+      padding: 30px 0;
+      gap: 40px;
+  }
+  section {
+      padding: 0 15px;
+  }
+  /* Navbar */
+  .navbar-index {
+      height: auto;
+  }
+  .navbar-index .navbar-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+  }
+  .navbar-center-index {
+      position: static;
+      transform: none;
+      width: 100%;
+      display: none; /* Esconde o menu de navegação central por padrão */
+  }
+  /* HACK para mostrar o menu em telas pequenas. Ideal seria um botão de menu hamburguer. */
+  .navbar-index:hover .navbar-center-index {
+    display: none;
+}
+  .navbar-index .navbar-center-index ul {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+  }
+  .navbar-left .logo img {
+      margin-right: 0;
+  }
+  .navbar-index .navbar-right-index .btn-entrar {
+      margin-top: 10px;
+  }
+  
+  /* Hero Section */
+  .hero-section-index h1 {
+      font-size: 2rem;
+  }
+  .hero-section-index .subtitle {
+      font-size: 0.95rem;
+  }
+  .demo-actions {
+      flex-direction: column;
+      width: 100%;
+  }
+  .demo-actions .btn-primary, .demo-actions .btn-secondary {
+      width: 100%;
+      justify-content: center;
+  }
+  .demo-features {
+      flex-direction: column;
+      gap: 10px;
+  }
+  
+  /* Grids das Seções */
+  .steps-grid, .benefits-grid, .stats-grid {
+      grid-template-columns: 1fr;
+  }
+  .how-it-works-section .subtitle,
+  .why-choose-us-section .subtitle,
+  .numbers-section .subtitle,
+  .plans-section-index .subtitle,
+  .faq-section .subtitle {
+      max-width: 100%;
+  }
+  
+  /* Planos */
+  .plan-card-index {
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  .plan-card-index .price-value-index {
+      font-size: 2.2rem;
+  }
+  .plan-card-index h3 {
+      font-size: 1.5rem;
+  }
+  
+  /* Suporte */
+  .support-card {
+      padding: 30px 20px;
+      width: 90%;
+  }
+  .support-header {
+      font-size: 1.5rem;
+  }
+  .support-card p {
+      font-size: 0.9rem;
+  }
+  .btn-support {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+  }
+  
+  /* FAQ */
+  .faq-question {
+      flex-wrap: wrap;
+      padding: 15px 20px;
+      gap: 10px;
+  }
+  .faq-icon-wrapper {
+      width: 40px;
+      height: 40px;
+      font-size: 1.3rem;
+  }
+  .faq-question h3 {
+      font-size: 1rem;
+      flex-grow: 1;
+  }
+  .faq-meta, .faq-answer {
+      padding-left: 20px;
+      font-size: 0.85rem;
+  }
+}
+
+/* Celulares (até 480px) */
+@media (max-width: 480px) {
+  .index-content h1 {
+      font-size: 1.8rem;
+  }
+  .index-content .subtitle {
+      font-size: 0.85rem;
+  }
+  .btn-tag {
+      padding: 8px 18px;
+      font-size: 0.8rem;
+  }
+  .monitoramento-demo-card {
+      padding: 15px;
+  }
+  .demo-title {
+      font-size: 1.2rem;
+  }
+  .demo-subtitle-inner {
+      font-size: 0.8rem;
+  }
+  .demo-step .step-content {
+      font-size: 0.85rem;
+  }
+  .found-tag {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+  }
+  .upload-box p {
+      font-size: 1rem;
+  }
+  .input-with-icon input {
+      font-size: 0.85rem;
+      padding: 8px 10px 8px 35px;
+  }
+  .step-card h3, .benefit-card h3, .stat-card-index h3 {
+      font-size: 1.1rem;
+  }
+  .step-card p, .benefit-card p, .stat-card-index p {
+      font-size: 0.8rem;
+  }
+  .plan-card-index h3 {
+      font-size: 1.3rem;
+  }
+  .plan-card-index .price-value-index {
+      font-size: 1.8rem;
+  }
+  .plan-card-index .price-unit-index {
+      font-size: 0.9rem;
+  }
+  .choose-plan-btn-index {
+      padding: 12px;
+      font-size: 1rem;
+  }
+  .faq-question {
+      font-size: 0.9rem;
+      padding: 12px 15px;
+  }
+  .faq-icon-wrapper {
+      width: 35px;
+      height: 35px;
+      font-size: 1.1rem;
+  }
+  .support-card h2 {
+      font-size: 1.1rem;
+  }
+  .support-card p {
+      font-size: 0.85rem;
+  }
+  .btn-support {
+      padding: 8px 15px;
+      font-size: 0.85rem;
+  }
+  .footer-bottom {
+      font-size: 0.75rem;
+      flex-direction: column;
+      gap: 5px;
+  }
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  justify-content: center;
+  align-items: center;
+  padding-top: 50px;
+  overflow-y: auto;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+}
+.modal-overlay.show-modal {
+  display: flex;
+}
+
+/* Imagem do Robô */
+.logo-robo-fora {
+  position: absolute;
+  width: 170px;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: bounce 2s infinite;
+}
+
+.logo-robo-dentro {
+  position: absolute;
+  width: 110px;
+  top: -140px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: bounce 2s infinite;
+}
+
+/* Conteúdo do Modal (o pop-up branco) */
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 120%;
+  max-width: 400px;
+  padding: 10px 30px;
+  box-sizing: border-box;
+  text-align: center;
+  z-index: 20;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5em;
+  color: #888;
+  cursor: pointer;
+  background: none;
+  border: none;
+  z-index: 10;
+}
+
+.form-header {
+  margin-bottom: 25px;
+}
+
+.logo-robo {
+  width: 170px;
+  height: auto;
+  margin-bottom: 720px;
+}
+.close.btn {
+  color:rgb(240, 95, 95);
+}
+
+.logo-form-auth {
+  max-width: 250px;
+  margin-bottom: 5px;
+}
+
+.form-header h2 {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-top: -10px;
+  color: #333;
+}
+
+.form-header p {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+}
+
+.auth-buttons {
+  margin-bottom: 20px;
+}
+
+.google-btn {
+  background-color: #db4437;
+  color: white;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-left: 30px;
+  width: 80%;
+}
+
+.google-btn:hover {
+  background-color: #c23321;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 10px 0;
+  color: #ccc;
+  font-size: 0.9em;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.divider:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: .5em;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 6px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 10px 15px;
+  padding-left: 45px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.input-wrapper input:focus {
+  border-color: #4e79a7;
+  outline: none;
+}
+
+.input-wrapper .fas {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+}
+
+.input-wrapper .toggle-password {
+  right: 15px;
+  left: auto;
+  cursor: pointer;
+}
+
+.forgot-password-text {
+  display: block;
+  text-align: left;
+  font-size: 0.85em;
+  color: rgb(27, 99, 233);
+  text-decoration: none;
+  margin-top: -6px;
+  margin-bottom: 20px;
+}
+
+.forgot-password-text:hover {
+  text-decoration: underline;
+}
+
+.submit-btn {
+  background-color: rgb(27, 99, 233);
+  color: white;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.submit-btn:hover {
+  background-color: #3b5e8b;
+}
+
+.toggle-mode-text {
+  margin-top: 25px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.toggle-mode-text a {
+  color: rgb(27, 99, 233);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.toggle-mode-text a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #e15759;
+  margin-top: 15px;
+  font-size: 0.9em;
+  display: none;
+}
+
+
+@media (max-width: 768px) {
+  .index-content {
+      padding: 30px 0;
+      gap: 40px;
+  }
+  section {
+      padding: 0 15px;
+  }
+  /* Navbar */
+  .navbar-index {
+      height: auto;
+  }
+  .navbar-index .navbar-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+  }
+  .navbar-center-index {
+      position: static;
+      transform: none;
+      width: 100%;
+      display: none; /* Esconde o menu de navegação central por padrão */
+  }
+  /* HACK para mostrar o menu em telas pequenas. Ideal seria um botão de menu hamburguer. */
+  
+  .navbar-index .navbar-center-index ul {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+  }
+  .navbar-left .logo img {
+      margin-right: 0;
+  }
+  
+
+  .navbar-index .navbar-right-index .btn-entrar {
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 10px;
+    margin-top: -60px;
+   margin-left: 210px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    z-index: 1; /* Garante que o botão fique na frente */
+}
+
+
+}
+

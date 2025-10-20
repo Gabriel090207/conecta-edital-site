@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Administrativo - Conecta Edital</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="container">
+      <section class="admin-panel-header">
+        <div class="panel-title-block">
+          <i class="fas fa-cog panel-icon"></i>
+          <div>
+            <h1>Painel Administrativo</h1>
+            <p>Gerencie usuários, tickets e configurações do sistema.</p>
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button class="btn btn-primary" id="audit-users-btn">
+            <i class="fas fa-clipboard-check" style="margin-right: 3px"></i>
+            Usuários
+          </button>
+          <button class="btn btn-secondary" id="view-tickets-btn">
+            <i class="fas fa-ticket-alt" style="margin-right: 3px"></i> Ver
+            Tickets
+          </button>
+        </div>
+      </section>
+
+      <section class="admin-tools">
+        <h2>Ferramentas Administrativas</h2>
+        <p>Gerencie o conteúdo e o engajamento da plataforma.</p>
+        <div class="tools-grid">
+          <div class="tool-card marketing" id="manage-blog-btn">
+            <i class="fas fa-solid fa-note-sticky icon"></i>
+            <h3>Blog</h3>
+            <p>Gerenciar Blog</p>
+          </div>
+          <div class="tool-card feedback" id="view-feedback-btn">
+            <i class="fas fa-chart-line icon"></i>
+            <h3>Feedback</h3>
+            <p>Análise de tickets</p>
+          </div>
+          <div class="tool-card tips" id="manage-dicas-btn">
+            <i class="fas fa-lightbulb icon"></i>
+            <h3>Gerenciar Dicas</h3>
+            <p>Criar e editar dicas</p>
+          </div>
+          <div class="tool-card faq" id="manage-faq-btn">
+            <i class="fas fa-question-circle icon"></i>
+            <h3>Gerenciar FAQ</h3>
+            <p>Editar perguntas</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-overview">
+        <div class="stat-card plans-distribution">
+          <h3>
+            Distribuição de Planos
+            <span class="count" id="total-users-plans">0</span>
+          </h3>
+          <div class="plan-item">
+            <i class="fas fa-user-slash icon no-plan"></i>
+            <span>Sem plano</span>
+            <span class="percentage" id="no-plan-percentage">0.0%</span>
+            <span class="value" id="no-plan-value">0</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar no-plan-bar" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="plan-item">
+            <i class="fas fa-shield-alt icon essencial"></i>
+            <span>Essencial</span>
+            <span class="percentage" id="essencial-percentage">0.0%</span>
+            <span class="value" id="essencial-value">0</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar essencial-bar" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="plan-item">
+            <i class="fas fa-crown icon premium"></i>
+            <span>Premium</span>
+            <span class="percentage" id="premium-percentage">0.0%</span>
+            <span class="value" id="premium-value">0</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar premium-bar" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card slots-distribution">
+          <h3>
+            Distribuição de Slots
+            <span class="count" id="total-slots-users">0</span>
+          </h3>
+          <div class="slot-item">
+            <i class="fas fa-circle-notch icon zero-slots"></i>
+            <span>0 slots</span>
+            <span class="percentage" id="zero-slots-percentage">0.0%</span>
+            <span class="value" id="zero-slots-value">0</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar zero-slots-bar" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="slot-item">
+            <i class="fas fa-ellipsis-h icon one-two-slots"></i>
+            <span>1-2 slots</span>
+            <span class="percentage" id="one-two-slots-percentage">0.0%</span>
+            <span class="value" id="one-two-slots-value">0</span>
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar one-two-slots-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+          <div class="slot-item">
+            <i class="fas fa-ellipsis-h icon three-five-slots"></i>
+            <span>3-5 slots</span>
+            <span class="percentage" id="three-five-slots-percentage"
+              >0.0%</span
+            >
+            <span class="value" id="three-five-slots-value">0</span>
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar three-five-slots-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+          <div class="slot-item">
+            <i class="fas fa-plus-circle icon six-plus-slots"></i>
+            <span>6+ slots</span>
+            <span class="percentage" id="six-plus-slots-percentage">0.0%</span>
+            <span class="value" id="six-plus-slots-value">0</span>
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar six-plus-slots-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card user-status">
+          <h3>
+            Status dos Usuários
+            <span class="count" id="total-status-users">0</span>
+          </h3>
+          <div class="status-item">
+            <i class="fas fa-check-circle icon active-users"></i>
+            <span>Ativos</span>
+            <span class="percentage" id="active-users-percentage">0.0%</span>
+            <span class="value" id="active-users-value">0</span>
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar active-users-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+          <div class="status-item">
+            <i class="fas fa-times-circle icon inactive-users"></i>
+            <span>Inativos</span>
+            <span class="percentage" id="inactive-users-percentage">0.0%</span>
+            <span class="value" id="inactive-users-value">0</span>
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar inactive-users-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-overlay" id="dica-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Gerenciar Dicas e Artigos</h3>
+          <button class="modal-close-btn" data-modal-id="dica-modal">
+            &times;
+          </button>
+        </div>
+
+        <button class="btn-new-dica" id="open-new-dica-btn">
+          <i class="fas fa-plus"></i> Nova Dica
+        </button>
+
+        <div id="dicas-list-container" class="dicas-list-admin">
+          <p class="loading-message">Carregando dicas...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="dica-form-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="dica-modal-title">Criar Nova Dica</h3>
+          <button class="modal-close-btn" data-modal-id="dica-form-modal">
+            &times;
+          </button>
+        </div>
+        <form id="dica-form">
+          <input type="hidden" id="dica-id" />
+          <div class="form-group">
+            <label for="dica-titulo">Título *</label>
+            <input type="text" id="dica-titulo" required />
+          </div>
+          <div class="form-group">
+            <label for="dica-autor">Autor *</label>
+            <input type="text" id="dica-autor" required />
+          </div>
+
+          <div class="form-group">
+            <label for="dica-topico">Tópico *</label>
+            <select id="dica-topico" required>
+              <option value="">Selecione um tópico</option>
+              <option value="Geral">Geral</option>
+              <option value="Monitoramento">Monitoramento</option>
+              <option value="Estudos">Estudos</option>
+              <option value="Notificação">Notificação</option>
+              <option value="Avançado">Avançado</option>
+            </select>
+          </div>
+          
+
+          <div class="form-group">
+            <label for="dica-conteudo">Conteúdo *</label>
+            <textarea id="dica-conteudo" rows="10" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-cancelar"
+              data-modal-id="dica-form-modal"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-create" id="dica-submit-btn">
+              Salvar Dica
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="all-tickets-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Todos os Tickets de Suporte</h3>
+          <button class="modal-close-btn" data-modal-id="all-tickets-modal">
+            &times;
+          </button>
+        </div>
+
+        <div class="tickets-controls">
+          <div class="search-box-admin">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="ticket-search-admin"
+              placeholder="Buscar tickets por título, ID ou descrição..."
+            />
+          </div>
+
+          <div class="custom-select-container">
+            <label for="ticket-status-filter-custom">Filtrar por Status:</label>
+            <div class="custom-select-wrapper">
+              <div
+                class="select-selected"
+                id="ticket-status-filter-custom"
+                data-value="Todos"
+              >
+                Todos Status <i class="fas fa-chevron-down dropdown-icon"></i>
+              </div>
+              <div class="select-items select-hide">
+                <div data-value="Todos" class="select-item selected">
+                  Todos Status <i class="fas fa-check"></i>
+                </div>
+                <div data-value="Pendente" class="select-item">Pendente</div>
+                <div data-value="Em Andamento" class="select-item">
+                  Em Andamento
+                </div>
+
+                <div data-value="Finalizado" class="select-item">
+                  Finalizado
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tickets-list-admin" id="tickets-list-admin">
+          <p class="loading-tickets-message">Carregando tickets...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="ticket-detail-modal">
+      <div class="modal-content ticket-detail-content">
+        <button class="modal-close-btn" data-modal-id="ticket-detail-modal">
+          &times;
+        </button>
+
+        <!-- Cabeçalho -->
+        <div class="ticket-detail-header">
+          <div class="ticket-detail-meta">
+            <span class="ticket-id" id="ticket-detail-id"></span>
+            <h3 class="ticket-subject" id="ticket-detail-title"></h3>
+
+            <div class="ticket-detail-info-row">
+              <span class="ticket-created-at"
+                ><i class="fas fa-clock"></i> Criado em
+                <span id="ticket-detail-created-at"></span
+              ></span>
+              <span class="ticket-user-email"
+                ><i class="fas fa-envelope"></i>
+                <span id="ticket-detail-user-email"></span
+              ></span>
+            </div>
+            <span
+              class="ticket-status-tag"
+              id="ticket-detail-status-tag"
+            ></span>
+          </div>
+        </div>
+
+        <!-- Container de mensagens -->
+        <div
+          class="ticket-messages-container"
+          id="ticket-messages-container"
+        ></div>
+
+        <!-- Rodapé de resposta -->
+        <div class="ticket-reply-form-section">
+          <div class="status-change-container">
+            <label for="change-status-select">Alterar Status:</label>
+            <select id="change-status-select">
+              <option value="Pendente">Pendente</option>
+              <option value="Em Andamento">Em Andamento</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+          </div>
+          <textarea
+            id="admin-reply-message-input"
+            placeholder="Digite sua mensagem..."
+            rows="3"
+          ></textarea>
+          <div class="reply-actions">
+            <i class="fas fa-paperclip attach-icon" id="attach-file-btn"></i>
+            <button class="btn-send-reply" id="send-admin-reply-btn">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="audit-users-modal" class="modal-overlay">
+      <div class="modal-content">
+        <button class="modal-close-btn" data-modal-id="audit-users-modal">
+          &times;
+        </button>
+        <h3 class="modal-title">Auditoria de Usuários</h3>
+        <div class="modal-body">
+          <div class="search-box-admin">
+            <i class="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              id="user-search-input"
+              placeholder="Pesquisar por email..."
+            />
+          </div>
+          <div id="users-audit-list" class="audit-users-list"></div>
+          <p id="loading-audit-users" class="loading-message">
+            Carregando usuários...
+          </p>
+          <p id="no-audit-users" class="error-message" style="display: none">
+            Nenhum usuário encontrado.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="user-edit-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Perfil de Usuário</h3>
+          <button class="modal-close-btn" data-modal-id="user-edit-modal">
+            &times;
+          </button>
+        </div>
+
+        <form id="user-edit-form">
+          <input type="hidden" id="edit-user-uid" />
+
+          <div class="form-group">
+            <label for="edit-user-fullname">Nome Completo</label>
+            <input type="text" id="edit-user-fullname" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-user-email">E-mail</label>
+            <input type="email" id="edit-user-email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-user-plan">Plano</label>
+            <select id="edit-user-plan">
+              <option value="gratuito">Sem Plano</option>
+              <option value="essencial">Essencial</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+
+          <!-- 🔹 NOVO CAMPO: Controle de Slots -->
+          <div class="form-group" id="slot-wrapper" style="display: flex; flex-direction: column; gap: 8px;">
+            <label for="edit-user-slots">Slots Disponíveis</label>
+            <div class="slot-control" style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" class="slot-btn" id="decrease-slots">-</button>
+              <input type="number" id="edit-user-slots" value="0" min="0" />
+              <button type="button" class="slot-btn" id="increase-slots">+</button>
+            </div>
+          </div>
+          
+
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-cancelar"
+              data-modal-id="user-edit-modal"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-create">Salvar Alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="faq-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Gerenciar FAQs</h3>
+          <button class="modal-close-btn" data-modal-id="faq-modal">
+            &times;
+          </button>
+        </div>
+
+        <button class="btn-new-faq" id="open-new-faq-btn">
+          <i class="fas fa-plus"></i> Nova Pergunta
+        </button>
+
+        <div id="faq-list-container" class="faq-list-admin">
+          <p class="loading-message">Carregando FAQs...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="faq-form-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="faq-modal-title">Criar Nova Pergunta</h3>
+          <button class="modal-close-btn" data-modal-id="faq-form-modal">
+            &times;
+          </button>
+        </div>
+        <form id="faq-form">
+          <input type="hidden" id="faq-id" />
+          <div class="form-group">
+            <label for="faq-pergunta">Pergunta </label>
+            <input type="text" id="faq-pergunta" required />
+          </div>
+          <div class="form-group">
+            <label for="faq-resposta">Resposta </label>
+            <textarea id="faq-resposta" rows="10" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="faq-categoria">Categoria </label>
+            <select id="faq-categoria" required>
+              <option value="">Selecione uma categoria</option>
+              <option value="geral">Geral</option>
+              <option value="monitoramento">Monitoramento</option>
+              <option value="planos">Planos</option>
+              <option value="contato">Contato</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="faq-popular">
+              <input type="checkbox" id="faq-popular" class="checkbox1" />
+              Marcar como "Popular"
+            </label>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-cancelar"
+              data-modal-id="faq-form-modal"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-create" id="faq-submit-btn">
+              Salvar FAQ
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="feedback-modal">
+      <div class="modal-content modal-lg">
+        <button class="modal-close-btn" data-modal-id="feedback-modal">
+          &times;
+        </button>
+        <div class="feedback-dashboard">
+          <div class="dashboard-header">
+            <i class="fas fa-chart-bar header-icon"></i>
+            <h2>Análise Completa de Feedback do Sistema</h2>
+            <p>
+              Dashboard integrado com todos os dados de feedback, tickets e
+              satisfação dos usuários.
+            </p>
+          </div>
+
+          <div class="stats-cards-grid">
+            <div class="stat-card total-tickets">
+              <i class="fas fa-ticket-alt icon"></i>
+              <h3>Total de Tickets</h3>
+              <span class="value" id="total-tickets">0</span>
+              <p>Todos os tempos</p>
+            </div>
+            <div class="stat-card response-rate">
+              <i class="fas fa-check-circle icon"></i>
+              <h3>Taxa de Resposta</h3>
+              <span class="value" id="response-rate">0%</span>
+              <p>Tickets respondidos</p>
+            </div>
+            <div class="stat-card avg-time">
+              <i class="fas fa-clock icon"></i>
+              <h3>Tempo de Resolução</h3>
+              <span class="value" id="avg-resolution-time">0h</span>
+              <p>Média</p>
+            </div>
+            <div class="stat-card satisfaction">
+              <i class="fas fa-smile icon"></i>
+              <h3>Satisfação</h3>
+              <span class="value" id="satisfaction-rate">0%</span>
+              <p>Usuários satisfeitos</p>
+            </div>
+            <div class="stat-card pending">
+              <i class="fas fa-hourglass-half icon"></i>
+              <h3>Pendentes</h3>
+              <span class="value" id="pending-tickets">0</span>
+              <p>Aguardando resolução</p>
+            </div>
+            <div class="stat-card active-users">
+              <i class="fas fa-users icon"></i>
+              <h3>Usuários Ativos</h3>
+              <span class="value" id="active-users-count">0</span>
+              <p>de <span id="total-users-in-feedback">0</span> total</p>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-container">
+              <h3>Tickets por Categoria</h3>
+              <canvas id="ticketsByCategoryChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Status dos Tickets</h3>
+              <canvas id="ticketStatusChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Tendência Mensal</h3>
+              <canvas id="monthlyTrendChart"></canvas>
+            </div>
+          </div>
+
+          <div class="analytics-grid">
+            <div class="sentiment-analysis">
+              <h3>Análise de Sentimento</h3>
+              <p class="subtitle">Em breve</p>
+              <div class="sentiment-buttons">
+                <button class="sentiment-btn positive">
+                  <i class="fas fa-thumbs-up"></i>
+                </button>
+                <button class="sentiment-btn neutral">
+                  <i class="fas fa-meh"></i>
+                </button>
+                <button class="sentiment-btn negative">
+                  <i class="fas fa-thumbs-down"></i>
+                </button>
+              </div>
+            </div>
+            <div class="most-active-users">
+              <h3>Usuários Mais Ativos</h3>
+              <div id="active-users-list">
+                <p class="loading-message">Carregando usuários...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="blog-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Gerenciar Artigos do Blog</h3>
+          <button class="modal-close-btn" data-modal-id="blog-modal">
+            &times;
+          </button>
+        </div>
+
+        <button class="btn-new-article" id="open-new-article-btn">
+          <i class="fas fa-plus"></i> Novo Artigo
+        </button>
+
+        <div id="articles-list-container" class="articles-list-admin">
+          <p class="loading-message">Carregando artigos...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="blog-form-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="blog-modal-title">Criar Novo Artigo</h3>
+          <button class="modal-close-btn" data-modal-id="blog-form-modal">
+            &times;
+          </button>
+        </div>
+        <form id="blog-form">
+          <input type="hidden" id="blog-id" />
+          <div class="form-group">
+            <label for="blog-title">Título *</label>
+            <input type="text" id="blog-title" required />
+          </div>
+          <div class="form-group">
+            <label for="blog-author">Autor *</label>
+            <input type="text" id="blog-author" required />
+          </div>
+          <div class="form-group">
+            <label for="blog-topic">Tópico (Tag) *</label>
+            <select id="blog-topic" required>
+              <option value="">Selecione um tópico</option>
+              <option value="Notícias">Notícias</option>
+              <option value="Dicas">Dicas</option>
+              <option value="Tutoriais">Tutoriais</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="blog-content">Conteúdo *</label>
+            <textarea id="blog-content" rows="10" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-cancelar"
+              data-modal-id="blog-form-modal"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-create" id="blog-submit-btn">
+              Salvar Artigo
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="admin.js"></script>
+    <script src="admin_user.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </body>
+</html>
