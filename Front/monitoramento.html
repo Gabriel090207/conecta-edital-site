@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta Edital - Meus Monitoramentos</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="monitoramento.css"> 
+    <link rel="stylesheet" href="notificacoes.css"> 
+    <link rel="stylesheet" href="historico.css"> 
+     <link rel="stylesheet" href="navbar-mobile.css"> 
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+      
+          <!-- Botão menu (hambúrguer) — só aparecerá no mobile -->
+          <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button>
+      
+          <!-- Logo -->
+          <div class="navbar-left">
+            <a href="#" class="logo">
+              <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+            </a>
+          </div>
+      
+          <!-- Menu central (desktop) -->
+          <nav class="navbar-center">
+            <ul>
+              <li><a href="#l" class="active"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+              <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+              <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+              <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+              <li style="margin-top: 4px;"> | </li>
+              <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+            </ul>
+          </nav>
+      
+          <!-- Lado direito -->
+          <div class="navbar-right">
+            <a href="#" class="notification-icon">
+              <i class="fas fa-bell sino"></i>
+              <span class="notification-badge"></span>
+              <div class="notification-dropdown"></div>
+            </a>
+      
+            <div class="user-menu" id="user-dropdown-toggle">
+              <span class="user-avatar-placeholder" id="userDefaultAvatar"></span>
+              <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;">
+              <span id="userNameDisplay">Carregando...</span>
+              <i class="fas fa-chevron-down"></i>
+              <div class="dropdown-content">
+                <h3 class="olausuario" id="dropdownUserName">Olá, Usuário!</h3>
+                <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                <a href="planos.html"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                <hr>
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Sidebar mobile (menu lateral) -->
+      <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
+        <div class="sidebar-profile">
+          <img id="sidebarUserAvatar" src="" alt="Avatar" />
+          <div class="sidebar-user-info">
+            <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+            <div class="sidebar-actions">
+              <a href="#" id="open-profile-modal-btn" style="color: #505255;">
+                <i class="fas fa-user icon-perfil"></i> Perfil
+              </a>
+              <a href="planos.html">
+                <i class="fas fa-credit-card icon-planos"></i> Planos
+              </a>
+              <a href="#" id="logout-btn" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Sair
+              </a>
+            </div>
+          </div>
+        </div>
+      
+        <hr>
+      
+        <!-- itens de navegação -->
+        <ul>
+          <li><a href="#l"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+          <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+          <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+          <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+          <hr>
+          <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
+
+
+    
+
+    <main class="monitoramento-content">
+        <div class="header-section">
+            <div class="header-content-left">
+                <div class="title-wrapper">
+                    <div class="icon-header-wrapper">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <h2>Meus Monitoramentos</h2>
+                </div>
+                <p class="subtitle" style="margin-left: 0;">Acompanhe seus concursos e receba notificações.</p>
+            </div>
+            <button class="new-monitoramento-btn" id="open-new-monitoramento-modal">
+                <i class="fas fa-plus"></i> Novo Monitoramento
+            </button>
+        </div>
+
+        <section class="summary-cards-section">
+            <div class="summary-card available-slots">
+                <div class="summary-icon-wrapper green-summary-bg">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-title">Slots Disponíveis</span>
+                    <span class="summary-value" id="slots-available-value">0</span> 
+                    <span class="summary-status" id="slots-free-status">Nenhum Slot disponivel</span> 
+                </div>
+            </div>
+
+            <div class="summary-card monitors">
+                <div class="summary-icon-wrapper blue-summary-bg">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-title">Monitoramentos</span>
+                    <span class="summary-value" id="monitors-count-value">0</span> 
+                    <span class="summary-status" id="monitors-active-status">0 ativos</span> 
+                </div>
+            </div>
+
+            <div class="summary-card current-plan">
+                <div class="summary-icon-wrapper orange-summary-bg">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-title">Plano Atual</span>
+                    <span class="summary-value" id="plan-value">Sem Plano</span> 
+                    <span class="summary-status" id="plan-status">Recursos essenciais</span> 
+                </div>
+            </div>
+        </section>
+
+        <section class="monitoramento-list-section" id="monitoring-list"> 
+            <div class="no-monitoramentos-message" id="initial-no-monitoramento-message"> 
+                <div class="icon-no-monitoramento-wrapper green-light-background-type-choose">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3>Comece a Monitorar Seus Concursos Agora!</h3>
+                <p>Você ainda não possui monitoramentos.
+                    Parece que você também não tem slots disponíveis. Visite a página de planos para mais opções.</p>
+                <a href="planos.html" class="btn-create-first-monitoramento" id="create-first-monitoramento-btn">
+                    Ver planos
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="choose-type-modal">
+        <div class="modal-content">
+          <button class="modal-close-btn" data-modal-id="choose-type-modal">
+            <i class="fas fa-times"></i>
+          </button>
+      
+          <div class="modal-header-icon">
+            <i class="fas fa-bullseye"></i>
+          </div>
+      
+          <h2>Escolha o Tipo de Monitoramento</h2>
+          <p class="modal-subtitle">
+            Selecione o tipo que melhor atende às suas necessidades de acompanhamento
+          </p>
+      
+          <div class="monitoramento-type-options">
+            <!-- Card Pessoal -->
+            <div class="type-option-card type-personal-option" data-type="personal">
+              <div class="type-card-header">
+                <div class="type-icon-wrapper">
+                  <i class="fas fa-user"></i>
+                </div>
+                <h3>Pessoal</h3>
+              </div>
+              <p>
+                Monitore resultados e convocações diretamente relacionadas a você,
+                economizando tempo e evitando informações irrelevantes.
+              </p>
+      
+              <div class="type-footer">
+                <span class="footer-label">
+                  <i class="fas fa-eye"></i> Monitoramento Pessoal
+                </span>
+                <button class="btn-select-type select-personal">
+                  Selecionar <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+      
+            <!-- Card Radar -->
+            <div class="type-option-card type-radar-option" data-type="radar">
+              <div class="type-card-header">
+                <div class="type-icon-wrapper">
+                  <i class="fas fa-bullseye"></i>
+                </div>
+                <h3>Radar</h3>
+              </div>
+              <p>
+                Acompanhe qualquer novidade em diários oficiais e editais específicos
+                para cargos de interesse, mantendo você à frente.
+              </p>
+      
+              <div class="type-footer">
+                <span class="footer-label">
+                  <i class="fas fa-eye"></i> Monitoramento Radar
+                </span>
+                <button class="btn-select-type1 select-radar">
+                  Selecionar <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+      
+          <button class="btn-cancel-modal" data-modal-id="choose-type-modal">
+            Cancelar
+          </button>
+        </div>
+      </div>
+      
+
+    <div class="modal-overlay" id="personal-monitoramento-modal">
+        <div class="modal-content1">
+            <button class="modal-close-btn" data-modal-id="personal-monitoramento-modal"><i class="fas fa-times"></i></button>
+            <div class="modal-header-icon blue-gradient-type">
+                <i class="fas fa-user"></i>
+            </div>
+            <h2>Monitoramento Pessoal</h2>
+            <p class="modal-subtitle">Configure o monitoramento para acompanhar atualizações pessoais</p>
+            <form class="modal-form" id="personal-monitoring-form"> 
+                <div class="form-group mon1">
+                    <label for="personal-link"><i class="fas fa-link ic"></i> Link do Diário Oficial</label>
+                    <input type="text" id="personal-link" placeholder="https://diario.exemplo.gov.br">
+                    <span class="required-tag2">Obrigatório</span>
+                </div>
+                <div class="form-group mon1">
+                    <label for="personal-id"><i class="fas fa-id-card ic"></i> ID do Edital / Concurso</label>
+                    <input type="text" id="personal-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital">
+                    <span class="required-tag2">Obrigatório</span>
+                </div>
+                <div class="form-group mon1">
+                    <label for="personal-name"><i class="fas fa-user ic" style="font-size: 20px"></i> Nome Completo</label>
+                    <input type="text" id="personal-name" placeholder="Seu nome completo">
+                    <span class="required-tag2">Obrigatório</span>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel-form" data-modal-id="personal-monitoramento-modal">Cancelar</button>
+                    <button type="submit" class="btn-create-monitoramento">Criar Monitoramento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="radar-monitoramento-modal">
+        <div class="modal-content1">
+            <button class="modal-close-btn" data-modal-id="radar-monitoramento-modal"><i class="fas fa-times"></i></button>
+            <div class="modal-header-icon purple-gradient-type" style="background-color: #e1bafc">
+                <i class="fas fa-bullseye" style="color: #851fce"></i>
+            </div>
+            <h2>Monitoramento Radar</h2>
+            <p class="modal-subtitle">Configure o monitoramento para acompanhar atualizações do edital</p>
+            <form class="modal-form" id="radar-monitoring-form"> 
+                <div class="form-group mon">
+                    <label for="radar-link"><i class="fas fa-link ic" class="idinput"></i> Link do Diário Oficial</label>
+                    <input type="text" id="radar-link" placeholder="https://diario.exemplo.gov.br">
+                    <span class="required-tag1">Obrigatório</span>
+                </div>
+                <div class="form-group mon">
+                    <label for="radar-id" class="id" style="font-weight: 550; color: #222;"><i class="fas fa-id-card ic1"></i> ID do Edital / Concurso</label>
+                    <input type="text" id="radar-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital" >
+                    <span class="required-tag">Obrigatório</span>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel-form" data-modal-id="radar-monitoramento-modal">Cancelar</button>
+                    <button type="submit" class="btn-create-monitoramento">Criar Monitoramento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="monitoramento-ativado-modal">
+    <div class="modal-content monitoramento-modal">
+        <button class="modal-close-btn" data-modal-id="monitoramento-ativado-modal">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-header-icon success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h2 class="modal-title">Monitoramento Ativado!</h2>
+        <p class="modal-subtitle">Seu monitoramento está ativo e funcionando</p>
+
+        <div class="progress-section">
+            <span class="progress-label">Progresso</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+                
+            </div>
+            <span class="progress-percentage" id="progress-percentage">0%</span>
+        </div>
+
+        <div class="activation-steps">
+            <div class="activation-step" data-step="1">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Configurando monitoramento</h4>
+                    <p>Preparando as configurações iniciais...</p>
+                </div>
+            </div>
+            <div class="activation-step" data-step="2">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Verificando Diário Oficial</h4>
+                    <p>Validando acesso ao diário oficial...</p>
+                </div>
+            </div>
+            <div class="activation-step" data-step="3">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Ativando alertas em tempo real</h4>
+                    <p>Configurando sistema de notificações...</p>
+                </div>
+            </div>
+            <div class="activation-step" data-step="4">
+                <div class="step-status-icon">
+                    <i class="fas fa-sync-alt icon-spinning"></i>
+                    <i class="fas fa-check icon-check"></i>
+                </div>
+                <div class="step-text-content">
+                    <h4>Finalizando configuração</h4>
+                    <p>Últimos ajustes e ativação...</p>
+                </div>
+            </div>
+        </div>
+      
+       
+    </div>
+</div>
+
+    
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content large-modal">
+            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
+            
+            <div class="profile-header-content">
+                <div class="profile-avatar-container">
+                    <span class="profile-avatar-placeholder" id="profileDefaultAvatar">GB</span>
+                    <img id="profileImagePreview" src="" alt="Foto de Perfil" style="display:none;">
+                    <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
+                    <button type="button" class="edit-avatar-btn" id="editAvatarBtn">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+                <div class="profile-username-wrapper">
+                    <span class="profile-username-display" id="profile-username-display"></span>
+                    <button type="button" class="edit-username-btn" id="editUsernameBtn">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="info-tab">Informações</button>
+                    <button class="tab-button" data-tab="security-tab">Segurança</button>
+                    <button class="tab-button" data-tab="subscription-tab">Assinatura</button>
+                </div>
+    
+                <div class="tab-content-container">
+                    <div id="info-tab" class="tab-content active">
+                        <form id="profile-info-form">
+                            <div class="form-group">
+                                <label for="profile-full-name" class="nomeperfil"><i class="fas fa-user-tag i"></i> Nome Completo</label>
+                                <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
+                                <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-contact" class="telefoneperfil"><i class="fas fa-phone i"></i> Telefone</label>
+                                <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email" class="emailperfil"><i class="fas fa-envelope i"></i> E-mail</label>
+                                <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
+                                <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-save-changes">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+    
+                    <div id="security-tab" class="tab-content">
+                        <form id="change-password-form">
+                            <div class="form-group">
+                                <label for="current-password"><i class="fas fa-lock"></i> Senha Atual</label>
+                                <input type="password" id="current-password" placeholder="********">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
+                                <input type="password" id="new-password" placeholder="Nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                                <input type="password" id="confirm-password" placeholder="Confirme sua nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-change-password">Alterar Senha</button>
+                            </div>
+                        </form>
+                        
+                        <div id="create-password-container" style="display: none;">
+                            <div class="modal-info-message">
+                                <p>Você está logado usando sua conta Google. Para criar uma senha de acesso direto, preencha os campos abaixo.</p>
+                            </div>
+                            <form id="create-password-form">
+                                <div class="form-group">
+                                    <label for="create-new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
+                                    <input type="password" id="create-new-password" placeholder="Sua nova senha">
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                                    <input type="password" id="create-confirm-password" placeholder="Confirme sua nova senha">
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
+                                    <button type="submit" class="btn-create-password">Criar Senha</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+    
+                    <div id="subscription-tab" class="tab-content">
+                        <div class="subscription-status-card">
+                            <div class="plan-icon-wrapper grey-summary-bg">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="plan-title">Sem Plano</div>
+                            <div class="plan-description">Você não possui um plano ativo. Faça upgrade para mais recursos.</div>
+                            <button class="btn-manage-subscription" onclick="window.location.href='planos.html'">Gerenciar Assinatura</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <footer class="main-page-footer">
+        <div class="footer-container">
+            <div class="footer-column about-us">
+                <a href="#" class="footer-logo">
+                    <img src="logobranca.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+                <p>O Conecta Edital é a plataforma líder em monitoramento inteligente de diários oficiais, desenvolvida para concurseiros que não querem perder nenhuma atualização. Monitoramos diariamente todos os diários oficiais municipais, estaduais e federais e enviamos notificações em tempo real sempre que houver atualizações com seu nome.</p>
+                <div class="security-badges">
+                    <span class="badge online"><i class="fas fa-circle"></i> Sistema Online</span>
+                    <span class="badge secure"><i class="fas fa-lock lockca"></i> Dados Seguros</span>
+                </div>
+            </div>
+            <div class="footer-column navigation">
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="monitoramento.html">Meus Monitoramentos</a></li>
+                    <li><a href="planos.html">Planos </a></li>
+                    <li><a href="dicas.html">Dicas</a></li>
+                    <li><a href="suporte.html">Suporte</a></li>
+                    <li><a href="ajuda.html">Ajuda</a></li>
+                </ul>
+            </div>
+            <div class="footer-column support-contact">
+                <h3>Suporte</h3>
+                <ul>
+                    <li><a href="mailto:contato@conectaedital.com"><i class="fas fa-envelope"></i> contato@conectaedital.com</a></li>
+                    <li><a href="https://wa.me/seunumerodowhatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp 24/7</a></li>
+                    <li><a href="ajuda.html"><i class="fas fa-headset"></i> Central de Ajuda</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Conecta Edital. Todos os direitos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Termos de Uso</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">LGPD</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Histórico -->
+<div id="historico-modal" class="modal-overlay">
+  <div class="modal-content historico-modal-content">
+    <button id="historico-close-btn" class="modal-close-btn">
+      <i class="fas fa-times"></i>
+    </button>
+    <h2><i class="fas fa-history"></i> Histórico de Ocorrências</h2>
+    <div id="historico-content" class="historico-list">
+      <p>Carregando...</p>
+    </div>
+  </div>
+</div>
+
+
+     <a href="#top" class="back-to-top-button" aria-label="Voltar ao topo">
+            <i class="fas fa-arrow-up"></i>
+        </a>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script> 
+    <script src="common-auth-ui.js"></script> 
+    <script src="monitoramento.js"></script> 
+    <script src="notificacoes.js"></script> 
+    <script src="monitoramento-editar.js"></script>
+    <script src="historico.js"></script>
+    <script src="editar-nome-monitoramento.js"></script>
+    <script src="navbar-mobile.js"></script>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+.large-modal {
+    max-width: 600px;
+   
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 60vh;
+}
+
+.modal-overlay .modal-content h2 {
+    font-size: 1.5rem;
+    color: #333;
+      margin-top: -18px;
+  
+}
+
+.modal-overlay .large-modal {
+   margin-top: 20px;
+    max-width: 600px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 110vh;
+}
+
+.modal-overlay .modal-content .modal-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+      margin-top: -18px;
+}
+
+/* Abas */
+.tabs-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+.tab-button {
+    margin-top: -40px;
+    flex: 1;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s, border-bottom 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+    color: #0747a8;
+    border-bottom: 2px solid #0747a8;
+}
+
+/* Conteúdo das Abas */
+.tab-content-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-top: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-content {
+    display: none;
+    overflow-y: visible;
+    max-height: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Formulário de Informações */
+.profile-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* Estilos para o avatar padrão (placeholders) */
+.profile-avatar-container {
+    position: relative;
+    width: 100px; /* Ou o tamanho que você definiu para o avatar */
+    height: 100px; /* Mesma medida da largura */
+    border-radius: 50%;
+    background-color: #f0f2f5; /* Fundo cinza claro */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-avatar-placeholder {
+    position: absolute; /* Para centralizar a bolinha no círculo maior */
+    width: 60px; /* Tamanho da bolinha azul */
+    height: 60px; /* Mesma medida da largura */
+    background-color: #4285f4; /* Azul do Google */
+    color: white;
+    font-size: 2em; /* Tamanho da fonte para as iniciais */
+    font-weight: 500;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#profileImagePreview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    color: #aaa;
+    object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+    font-weight: bold;
+}
+
+/* Novo wrapper para alinhar o nome de usuário e o botão de edição */
+.profile-username-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaço entre o nome e o botão */
+    margin-bottom: 2rem;
+}
+
+/* Estilo para o nome de usuário centralizado */
+.profile-username-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    display: block;
+   
+}
+
+/* Estilo para o botão de edição do nome de usuário */
+.edit-username-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.edit-username-btn:hover {
+    color: #0747a8;
+}
+
+.edit-avatar-btn {
+    position: absolute;
+    bottom: -10px; 
+    right: -10px;  
+    width: 35px;
+    height: 35px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    z-index: 2000;
+}
+
+.edit-avatar-btn i {
+    color: #0747a8;
+    font-size: 1rem;
+}
+
+.edit-avatar-btn:hover {
+    transform: scale(1.1);
+}
+
+/* NOVO: Wrapper para o ícone e input */
+.form-group {
+    position: relative; /* Adiciona a posição relativa ao contêiner pai */
+    margin-bottom: 1.5rem; /* Espaço entre os campos */
+}
+
+/* Correção para o ícone dentro do label */
+.form-group label i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.1rem;
+    z-index: 2;
+    -webkit-text-stroke: 0;
+}
+
+/* Correção para o input, ajustando o padding para não sobrepor o ícone */
+.form-group input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* Aumenta o padding-left */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: #333;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.form-group input[disabled] {
+    background-color: #eee;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.form-note {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+    flex-shrink: 0;
+}
+
+/* Formulário de Segurança (Ícone de olho) */
+.form-group .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 1rem;
+    z-index: 10;
+}
+
+.btn-manage-subscription{
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+/* Botões de Ação */
+.btn-save-changes, .btn-change-password, .btn-create-password {
+    background-color:  #08a853; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: -10px;
+}
+
+
+.btn-cancel-form {
+    margin-bottom: -21px;
+   margin-top: -21px;
+ background-color: #e62727;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    align-self: center;
+}
+
+.btn-cancel-form1 {
+  margin-top: -10px;
+ 
+    background-color: #e62727;
+    color: #ffffff;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-cancel-form:hover {
+    background-color: #c2001c;
+    transform: translateY(-1px);
+}
+
+.btn-cancel-form1:hover {
+    background-color: #c2001c;
+    transform: translateY(-1px);
+}
+
+.btn-save-changes:hover, .btn-change-password:hover, .btn-manage-subscription:hover, .btn-create-password:hover {
+    transform: translateY(-2px);
+    background-color: #218838;
+}
+
+/* Conteúdo da Assinatura */
+.subscription-status-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.subscription-status-card .plan-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.subscription-status-card .plan-icon-wrapper i {
+    color: #fff;
+}
+
+.subscription-status-card .plan-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.subscription-status-card .plan-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}

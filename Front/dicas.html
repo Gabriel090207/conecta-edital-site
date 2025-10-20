@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta Edital - Central de Conhecimento</title>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="menu.css"> 
+    <link rel="stylesheet" href="monitoramento.css"> 
+    <link rel="stylesheet" href="notificacoes.css"> 
+    <link rel="stylesheet" href="dicas.css"> 
+    
+    <link rel="stylesheet" href="navbar-mobile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+
+
+        <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button>
+
+
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="logo">
+                    <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+            </div>
+            <nav class="navbar-center">
+                <ul>
+                    <li><a href="monitoramento.html" ><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+                    <li><a href="planos.html" ><i class="fas fa-credit-card"></i> Planos </a></li> 
+                    <li><a href="dicas.html" class="active"><i class="fas fa-lightbulb"></i> Dicas</a></li> 
+                    <li><a href="suporte.html"><i class="fas fa-headphones" ></i> Suporte     </a></li>
+                    <li style="margin-top: 4px;"> | </li>
+                    <li ><a href="ajuda.html" class="ajuda">      <i class="fas fa-info-circle"></i>   Ajuda</a></li>
+                </ul>
+            </nav>
+            <div class="navbar-right">
+                <a href="#" class="notification-icon">
+                    <i class="fas fa-bell sino"></i>
+                    <span class="notification-badge"></span>
+                    <div class="notification-dropdown"></div>
+                  </a>
+                  
+                <div class="user-menu" id="user-dropdown-toggle"> 
+                    <span class="user-avatar-placeholder" id="userDefaultAvatar"></span>
+                    <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;"> 
+                    <span id="userNameDisplay">Carregando...</span> 
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="dropdown-content">
+                        <h3 class="olausuario" id="dropdownUserName">Olá, Usuário!</h3>
+                        <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                        <a href="planos.html"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                        <hr>
+                        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+     <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
+        <div class="sidebar-profile">
+          <img id="sidebarUserAvatar" src="" alt="Avatar" />
+          <div class="sidebar-user-info">
+            <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+            <div class="sidebar-actions">
+              <a href="#" id="open-profile-modal-btn" style="color: #505255;">
+                <i class="fas fa-user icon-perfil"></i> Perfil
+              </a>
+              <a href="planos.html">
+                <i class="fas fa-credit-card icon-planos"></i> Planos
+              </a>
+              <a href="#" id="logout-btn-mobile" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Sair
+              </a>
+            </div>
+          </div>
+        </div>
+      
+        <hr>
+      
+        <!-- itens de navegação -->
+        <ul>
+          <li><a href="monitoramento.html"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+          <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+          <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+          <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+          <hr>
+          <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
+
+    <main class="content" >
+        <div class="card knowledge-center-header" style=" margin-top: 110px;">
+            <div class="icon-wrapper">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <div>
+                <h1>Central de Conhecimento</h1>
+                <p>Seu portal de insights para dominar os concursos públicos.</p>
+            </div>
+        </div>
+
+        <div class="card search-filter-section">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="dica-search-input" placeholder="Buscar dicas por título ou tags...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="todos"><i class="fas fa-list-ul"></i> Todos</button>
+                <button class="filter-btn tag-geral" data-filter="geral"><i class="fas fa-globe"></i> Geral</button>
+                <button class="filter-btn tag-monitoramento" data-filter="monitoramento"><i class="fas fa-chart-line"></i> Monitoramento</button>
+                <button class="filter-btn tag-estudos" data-filter="estudos"><i class="fas fa-book-open"></i> Estudos</button>
+                <button class="filter-btn tag-notificacao" data-filter="notificacao"><i class="fas fa-bell"></i> Notificação</button>
+                <button class="filter-btn tag-avancado" data-filter="avancado"><i class="fas fa-star"></i> Avançado</button>
+            </div>
+        </div>
+        
+        <div id="dicas-list-container" class="dicas-grid">
+            </div>
+
+        <div class="card no-articles-message" id="no-articles-message" style="display: none;">
+            <div class="icon-wrapper large">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <h2>Nenhum artigo encontrado.</h2>
+            <p>Tente ajustar os filtros ou os termos da sua busca.</p>
+        </div>
+    </main>
+
+
+  
+    <footer class="main-page-footer">
+        <div class="footer-container">
+            <div class="footer-column about-us">
+                <a href="#" class="footer-logo">
+                    <img src="logobranca.png" alt="Logo Conecta Edital" style="max-width:70%;">
+                </a>
+                <p>O Conecta Edital é a plataforma líder em monitoramento inteligente de diários oficiais, desenvolvida para concurseiros que não querem perder nenhuma atualização. Monitoramos diariamente todos os diários oficiais municipais, estaduais e federais e enviamos notificações em tempo real sempre que houver atualizações com seu nome.</p>
+                <div class="security-badges">
+                    <span class="badge online"><i class="fas fa-circle"></i> Sistema Online</span>
+                    <span class="badge secure"><i class="fas fa-lock lockca"></i> Dados Seguros</span>
+                </div>
+            </div>
+            <div class="footer-column navigation">
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="monitoramento.html">Meus Monitoramentos</a></li>
+                    <li><a href="planos.html">Planos </a></li>
+                    <li><a href="dicas.html">Dicas</a></li>
+                    <li><a href="suporte.html">Suporte</a></li>
+                    <li><a href="ajuda.html">Ajuda</a></li>
+                </ul>
+            </div>
+            <div class="footer-column support-contact">
+                <h3>Suporte</h3>
+                <ul>
+                    <li><a href="mailto:contato@conectaedital.com"><i class="fas fa-envelope"></i> contato@conectaedital.com</a></li>
+                    <li><a href="https://wa.me/seunumerodowhatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp 24/7</a></li>
+                    <li><a href="ajuda.html"><i class="fas fa-headset"></i> Central de Ajuda</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Conecta Edital. Todos os direitos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Termos de Uso</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">LGPD</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="dica-viewer-modal">
+        <div class="modal-content dica-viewer-content">
+            <div class="modal-header">
+                <h3 id="dica-viewer-title"></h3>
+                <button class="modal-close-btn" data-modal-id="dica-viewer-modal">&times;</button>
+            </div>
+            <div class="dica-viewer-meta">
+                <span id="dica-viewer-autor"></span>
+                <span id="dica-viewer-date"></span>
+            </div>
+            <div class="dica-viewer-content" id="dica-viewer-conteudo">
+                </div>
+        </div>
+    </div>
+
+   
+
+
+     <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content large-modal">
+            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
+            
+            <div class="profile-header-content">
+                <div class="profile-avatar-container">
+                    <span class="profile-avatar-placeholder" id="profileDefaultAvatar">GB</span>
+                    <img id="profileImagePreview" src="" alt="Foto de Perfil" style="display:none;">
+                    <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
+                    <button type="button" class="edit-avatar-btn" id="editAvatarBtn">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+                <div class="profile-username-wrapper">
+                    <span class="profile-username-display" id="profile-username-display"></span>
+                    <button type="button" class="edit-username-btn" id="editUsernameBtn">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="info-tab">Informações</button>
+                    <button class="tab-button" data-tab="security-tab">Segurança</button>
+                    <button class="tab-button" data-tab="subscription-tab">Assinatura</button>
+                </div>
+    
+                <div class="tab-content-container">
+                    <div id="info-tab" class="tab-content active">
+                        <form id="profile-info-form">
+                            <div class="form-group">
+                                <label for="profile-full-name" class="nomeperfil"><i class="fas fa-user-tag i"></i> Nome Completo</label>
+                                <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
+                                <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-contact" class="telefoneperfil"><i class="fas fa-phone i"></i> Telefone</label>
+                                <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email" class="emailperfil"><i class="fas fa-envelope i"></i> E-mail</label>
+                                <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
+                                <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-save-changes">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+    
+                    <div id="security-tab" class="tab-content">
+                        <form id="change-password-form">
+                            <div class="form-group">
+                                <label for="current-password"><i class="fas fa-lock"></i> Senha Atual</label>
+                                <input type="password" id="current-password" placeholder="********">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
+                                <input type="password" id="new-password" placeholder="Nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                                <input type="password" id="confirm-password" placeholder="Confirme sua nova senha">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
+                                <button type="submit" class="btn-change-password">Alterar Senha</button>
+                            </div>
+                        </form>
+                        
+                        <div id="create-password-container" style="display: none;">
+                            <div class="modal-info-message">
+                                <p>Você está logado usando sua conta Google. Para criar uma senha de acesso direto, preencha os campos abaixo.</p>
+                            </div>
+                            <form id="create-password-form">
+                                <div class="form-group">
+                                    <label for="create-new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
+                                    <input type="password" id="create-new-password" placeholder="Sua nova senha">
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                                    <input type="password" id="create-confirm-password" placeholder="Confirme sua nova senha">
+                                    <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-cancel-form1" data-modal-id="profile-modal">Cancelar</button>
+                                    <button type="submit" class="btn-create-password">Criar Senha</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+    
+                    <div id="subscription-tab" class="tab-content">
+                        <div class="subscription-status-card">
+                            <div class="plan-icon-wrapper grey-summary-bg">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="plan-title">Sem Plano</div>
+                            <div class="plan-description">Você não possui um plano ativo. Faça upgrade para mais recursos.</div>
+                            <button class="btn-manage-subscription" onclick="window.location.href='planos.html'">Gerenciar Assinatura</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+     <a href="#top" class="back-to-top-button" aria-label="Voltar ao topo">
+            <i class="fas fa-arrow-up"></i>
+        </a>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script> 
+    <script src="common-auth-ui.js"></script>
+    <script src="monitoramento.js"></script> 
+    <script src="dicas.js"></script>
+    <script src="notificacoes.js"></script> 
+    <script src="navbar-mobile.js"></script>
+
+</body>
+</html>

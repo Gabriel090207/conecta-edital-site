@@ -1,0 +1,25 @@
+# Ignorar pastas de ambiente virtual
+venv/
+.venv/
+
+# Ignorar arquivos de ambiente (onde ficam suas chaves)
+.env
+
+# Ignorar o arquivo de chave do Firebase (JÁ QUE VOCÊ COPIOU PARA VAR AMB NO RENDER)
+backend/chave-firebase.json
+
+# Ignorar arquivos de cache e logs do Python
+__pycache__/
+*.pyc
+*.log
+
+# Ignorar o banco de dados SQLite local, se estiver usando
+*.db
+*.sqlite3
+sql_app.db
+
+# Ignorar diretórios específicos de IDEs
+.idea/
+.vscode/
+
+chave-firebase.json
