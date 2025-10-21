@@ -453,6 +453,13 @@ def send_email_notification(
     to_email: str,
     found_keywords: Optional[List[str]] = None
 ):
+
+    print("📤 Iniciando envio de e-mail...")
+    print(f"➡️ Tipo de template: {template_type}")
+    print(f"➡️ Destinatário: {to_email}")
+    print(f"➡️ Edital: {monitoramento.edital_identifier}")
+    print(f"➡️ Link do PDF real: {getattr(monitoramento, 'pdf_real_link', 'N/A')}")
+
     """
     Envia uma notificação por e-mail com base no template especificado.
     """
@@ -662,6 +669,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
         monitoramento.pdf_real_link = pdf_real_url
         # ✉️ Envia e-mail
+        
         send_email_notification(
             monitoramento=monitoramento,
             template_type="occurrence_found",
