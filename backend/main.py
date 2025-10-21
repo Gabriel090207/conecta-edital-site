@@ -2053,8 +2053,8 @@ async def patch_monitoring(
     # 🔹 Permite atualizar o nome customizado do monitoramento (mas ignora strings vazias)
     if "nome_customizado" in data:
         nome_customizado = str(data["nome_customizado"]).strip()
-        if nome_customizado:  # só salva se tiver conteúdo
-            updates["nome_customizado"] = nome_customizado
+        updates["nome_customizado"] = nome_customizado or None  # salva None se vazio
+
 
     # 🔹 (Opcional) também permite alterar o status, se enviado
     if "status" in data and data["status"] in ["active", "inactive"]:
@@ -2099,7 +2099,8 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
             "last_checked_at": data.get("last_checked_at"),
             "user_uid": data.get("user_uid"),
             "user_email": data.get("user_email"),
-            "nome_customizado": data.get("nome_customizado") or "",  # 👈 garante string
+            "nome_customizado": data.get("nome_customizado") if data.get("nome_customizado") is not None else "",
+  # 👈 garante string
         })
 
     # 🔥 força a API a não ser cacheada (nem por Cloudflare nem por Render)
