@@ -858,7 +858,11 @@ async def create_radar_monitoramento(
     user_uid: str = Depends(get_current_user_uid)
 ):
     db_firestore_client = firestore.client()
-    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).stream()))
+    user_monitorings_count = len(list(
+        db_firestore_client.collection('monitorings')
+        .where(filter=FieldFilter('user_uid', '==', user_uid))
+        .stream()
+    ))
     
     user_plan_for_creation = await get_user_plan_from_firestore(user_uid)
     max_slots = get_max_slots_by_plan(user_plan_for_creation)
@@ -890,11 +894,32 @@ async def create_radar_monitoramento(
         'user_email': user_email
     }
     
+    # ✅ Cria o documento principal
     _, doc_ref = db_firestore_client.collection('monitorings').add(new_monitoring_dict)
+
+    # ✅ Cria uma ocorrência inicial (assim o Radar já tem subcoleção igual ao Pessoal)
+    try:
+        doc_ref.collection("occurrences").add({
+            "edital_identifier": monitoramento_data.id_edital,
+            "official_gazette_link": str(monitoramento_data.link_diario),
+            "pdf_real_link": str(monitoramento_data.link_diario),
+            "last_pdf_hash": None,
+            "detected_at": firestore.SERVER_TIMESTAMP,
+            "last_checked_at": firestore.SERVER_TIMESTAMP,
+        })
+        # atualiza contador
+        doc_ref.update({"occurrences": 1})
+        print(f"💾 Ocorrência inicial criada para monitoramento Radar {doc_ref.id}")
+    except Exception as e:
+        print(f"⚠️ Falha ao criar ocorrência inicial para Radar {doc_ref.id}: {e}")
+
+    # ✅ Cria o objeto Pydantic
     new_monitoring_obj = Monitoring(
         id=doc_ref.id,
-        **{**new_monitoring_dict, 'last_checked_at': datetime.now(), 'created_at': datetime.now()})
+        **{**new_monitoring_dict, 'last_checked_at': datetime.now(), 'created_at': datetime.now()}
+    )
 
+    # ✅ Tarefas de background
     background_tasks.add_task(
         send_email_notification,
         monitoramento=new_monitoring_obj,

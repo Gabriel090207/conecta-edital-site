@@ -2950,13 +2950,14 @@ ul {
     background: none;
     border: none;
     cursor: pointer;
-    color: #28a745;
+    color: #0056b3;
     font-size: 16px;
   }
   
   .save-monitoring-title-btn:hover {
-    color: #1e7e34;
+    color: #08ac6d;
     transform: scale(1.1);
+    background: none;
   }
   
 
