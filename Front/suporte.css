@@ -829,7 +829,7 @@ ul {
    background-color: #e62727;
     color: white;
     border: none;
-    border-radius: 14px;
+    border-radius: 8px;
     padding: 10px 20px;
     font-size: 0.95rem;
     font-weight: 600;
@@ -847,7 +847,7 @@ ul {
     background-color: #08a853;
     color: white;
     border: none;
-    border-radius: 14px;
+    border-radius: 8px;
     padding: 10px 20px;
     font-size: 1rem;
     cursor: pointer;

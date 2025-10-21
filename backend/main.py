@@ -1389,7 +1389,7 @@ async def admin_reply_to_ticket(ticket_id: str, reply: AdminReply):
 
     ticket_doc_ref.update({
         "messages": firestore.ArrayUnion([new_message]),
-        "status": "Respondido",
+        "status": "Em andamento",
         "last_updated_at": firestore.SERVER_TIMESTAMP
     })
 
@@ -1572,7 +1572,7 @@ async def get_admin_feedback_stats():
         tickets_by_category[category] += 1
 
         # Tempo médio de resolução
-        if status == 'Resolvido':
+        if status == 'Finalizado':
             last_updated_at = ticket_data.get('last_updated_at')
             if created_at and last_updated_at:
                 resolved_time = (last_updated_at - created_at).total_seconds()
