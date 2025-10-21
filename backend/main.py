@@ -491,11 +491,14 @@ def send_email_notification(
             return
 
         html_content = email_templates.get_occurrence_found_email_html(
-            user_full_name=user_full_name_from_monitoramento,
-            edital_identifier=monitoramento.edital_identifier,
-            official_gazette_link=str(monitoramento.official_gazette_link),
-            found_keywords=found_keywords
-        )
+        user_full_name=user_full_name_from_monitoramento,
+        edital_identifier=monitoramento.edital_identifier,
+        official_gazette_link=str(
+            getattr(monitoramento, "pdf_real_link", monitoramento.official_gazette_link)
+        ),
+        found_keywords=found_keywords
+    )
+
         subject = f"Conecta Edital: Nova Ocorrência Encontrada no Edital '{monitoramento.edital_identifier}'"
     else:
         print(f"ERRO: Tipo de template de email desconhecido: {template_type}")
