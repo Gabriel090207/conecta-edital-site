@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
     const articlesContainer = document.getElementById('articles-container');
 
     // --- FUNÇÃO AUXILIAR PARA CALCULAR O TEMPO DE LEITURA (COMO SEGURANÇA) ---

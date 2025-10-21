@@ -61,7 +61,7 @@ app = FastAPI(
 origins = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "https://conecta-edital-site.onrender.com",
+    "https://conecta-edital-site-927y.onrender.com",
     "https://paineldeadminconectaedital.netlify.app",
     "https://siteconectaedital.netlify.app"
 ]
@@ -891,7 +891,7 @@ async def create_preference(
         raise HTTPException(status_code=404, detail="Plano não encontrado.")
 
     YOUR_FRONTEND_BASE_URL = "https://siteconectaedital.netlify.app"
-    YOUR_BACKEND_BASE_URL = "https://conecta-edital-site.onrender.com"
+    YOUR_BACKEND_BASE_URL = "https://conecta-edital-site-927y.onrender.com"
 
     notification_url = f"{YOUR_BACKEND_BASE_URL}/webhook/mercadopago"
 

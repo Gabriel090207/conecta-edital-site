@@ -1,7 +1,7 @@
 // dicas.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
 
     const dicasListContainer = document.getElementById('dicas-list-container');
     const noArticlesMessage = document.getElementById('no-articles-message');
