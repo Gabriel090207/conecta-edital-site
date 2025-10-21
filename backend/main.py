@@ -659,6 +659,8 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             link="/meus-monitoramentos"
         )
 
+
+        monitoramento.pdf_real_link = pdf_real_url
         # ✉️ Envia e-mail
         send_email_notification(
             monitoramento=monitoramento,
