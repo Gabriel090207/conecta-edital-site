@@ -616,15 +616,17 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             found_keywords.append(keyword)
 
     # ✅ Passo 5: ocorrência encontrada
+        # ✅ Passo 5: ocorrência encontrada
     if found_keywords:
-        monitoramento.occurrences += 1
-        doc_ref.update({
-            "occurrences": firestore.Increment(1),
-            "pdf_real_link": pdf_real_url
-        })
+        print(f"✅ Ocorrência detectada: {found_keywords}")
 
-        # 🆕 Grava a ocorrência individual na subcoleção "occurrences"
+        # Incrementa o contador no objeto local (não obrigatório, apenas para log)
+        monitoramento.occurrences += 1
+
+        # 🔹 Referência da subcoleção
         ocorrencias_ref = doc_ref.collection("occurrences")
+
+        # 🆕 Grava nova ocorrência na subcoleção
         ocorrencias_ref.add({
             "edital_identifier": monitoramento.edital_identifier,
             "pdf_real_link": pdf_real_url,
@@ -634,6 +636,15 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             "last_checked_at": firestore.SERVER_TIMESTAMP
         })
         print(f"💾 Ocorrência registrada em monitorings/{monitoramento.id}/occurrences")
+
+        # 🔁 Conta o total real de ocorrências e sincroniza no documento principal
+        occ_total = len(list(ocorrencias_ref.stream()))
+        doc_ref.update({
+            "occurrences": occ_total,
+            "pdf_real_link": pdf_real_url
+        })
+
+        print(f"🔄 Contador sincronizado: occurrences = {occ_total}")
 
         # 🔔 Cria notificação
         await create_notification(
@@ -653,6 +664,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         )
 
         print(f"✅ Ocorrência detectada para {monitoramento.id}! PDF real: {pdf_real_url}")
+
     else:
         print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
 
@@ -731,6 +743,31 @@ async def periodic_monitoring_task():
 async def startup_event():
     asyncio.create_task(periodic_monitoring_task())
     print("Tarefa de monitoramento periódico iniciada.")
+
+
+@app.post("/api/sync-occurrences")
+async def sync_occurrences():
+    """
+    Sincroniza o campo 'occurrences' de cada monitoramento com
+    a quantidade real de documentos na subcoleção 'occurrences'.
+    """
+    db = firestore.client()
+    monitorings_ref = db.collection("monitorings")
+    monitorings_docs = monitorings_ref.stream()
+
+    updated_count = 0
+    for doc in monitorings_docs:
+        doc_id = doc.id
+        occ_ref = monitorings_ref.document(doc_id).collection("occurrences")
+        occ_docs = list(occ_ref.stream())
+        occ_total = len(occ_docs)
+
+        if doc.to_dict().get("occurrences", 0) != occ_total:
+            monitorings_ref.document(doc_id).update({"occurrences": occ_total})
+            updated_count += 1
+            print(f"📊 Atualizado monitoramento {doc_id} → occurrences = {occ_total}")
+
+    return {"message": f"Sincronização concluída! {updated_count} monitoramento(s) corrigido(s)."}
 
 # Endpoints da API
 @app.get("/")
