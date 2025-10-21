@@ -105,8 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
         width: 220px;
       }
       .save-monitoring-name-btn {
-        background: #007bff;
-        color: #fff;
+    
+        color: #007bff;
         border: none;
         border-radius: 6px;
         margin-left: 8px;
