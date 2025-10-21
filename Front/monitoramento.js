@@ -2111,19 +2111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       padding: 4px 8px;
       width: 220px;
     }
-    .save-monitoring-title-btn {
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      margin-left: 8px;
-      padding: 4px 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .save-monitoring-title-btn:hover {
-      background: #0056b3;
-    }
+    
   `;
   document.head.appendChild(styleEdit);
 

@@ -123,6 +123,7 @@ class Monitoring(BaseModel):
     user_uid: str
     user_email: str
     nome_customizado: Optional[str] = None
+    pdf_real_link: Optional[HttpUrl] = None  # Novo campo
 
     @field_validator("keywords", mode="before")
     def normalize_keywords(cls, v):
@@ -130,6 +131,7 @@ class Monitoring(BaseModel):
         if isinstance(v, list):
             return ", ".join(map(str, v))
         return v
+
 
 
 class CreatePreferenceRequest(BaseModel):
