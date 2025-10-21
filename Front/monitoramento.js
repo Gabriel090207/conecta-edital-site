@@ -297,22 +297,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="item-header-title">
     <i class="${titleIconClass}"></i>
 
-  <h3 class="editable-monitoring-title">
-<span class="monitoring-title-text">
-  ${
-    mon.nome_customizado && mon.nome_customizado.trim() !== ""
-      ? mon.nome_customizado
-      : `Monitoramento ${typeBadgeText} - ${mon.edital_identifier || mon.id}`
-  }
-</span>
+ <h3 class="editable-monitoring-title">
+  <span class="monitoring-title-text">
+    ${
+      mon.nome_customizado && mon.nome_customizado.trim() !== ""
+        ? mon.nome_customizado
+        : `Monitoramento ${mon.monitoring_type === "personal" ? "Pessoal" : "Radar"} - ${mon.edital_identifier || mon.id}`
+    }
+  </span>
 
-
-  <button class="edit-btn" data-id="${
-    mon.id
-  }" title="Editar nome do monitoramento">
+  <button class="edit-btn" data-id="${mon.id}" title="Editar nome do monitoramento">
     <i class="fas fa-pencil-alt"></i>
   </button>
 </h3>
+
 
 
     <button class="favorite-btn" data-id="${
@@ -2033,76 +2031,65 @@ document.addEventListener("DOMContentLoaded", () => {
       editBtn.style.display = "none";
 
       async function saveTitle() {
-        const newTitle = input.value.trim() || oldTitle;
+  const newTitle = input.value.trim() || oldTitle;
 
-        // Substitui novamente por <span>
-        const span = document.createElement("span");
-        span.className = "monitoring-title-text";
-        span.textContent = newTitle;
-        wrapper.replaceWith(span);
-        editBtn.style.display = "inline-block";
+  // Substitui novamente por <span>
+  const span = document.createElement("span");
+  span.className = "monitoring-title-text";
+  span.textContent = newTitle;
+  wrapper.replaceWith(span);
+  editBtn.style.display = "inline-block";
 
-        // Só envia se houver mudança
-        if (newTitle !== oldTitle) {
-          try {
-            const user = window.auth.currentUser;
-            if (!user) return alert("Você não está logado.");
-            const token = await user.getIdToken();
+  // Só envia se houver mudança
+  if (newTitle !== oldTitle) {
+    try {
+      const user = window.auth.currentUser;
+      if (!user) return alert("Você não está logado.");
+      const token = await user.getIdToken();
 
-            const response = await fetch(
-              `${BACKEND_URL}/api/monitoramentos/${id}`,
-              {
-                method: "PATCH",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ nome_customizado: newTitle }),
-              }
-            );
-
-            if (response.ok) {
-              const updated = await response.json();
-              console.log(`✅ Nome atualizado: ${updated.nome_customizado}`);
-
-              // Atualiza no array local
-              const item = currentMonitorings.find((m) => m.id === id);
-              if (item) item.nome_customizado = updated.nome_customizado;
-
-              // Atualiza visualmente os cards sem reload
-              loadMonitorings(currentMonitorings);
-
-              // ✅ Reaplica o listener de edição após recriar os cards
-              enableEditableTitles();
-
-              // Pausa o polling pra evitar conflito e reativa depois
-              if (pollingInterval) {
-                clearInterval(pollingInterval);
-                pollingInterval = null;
-                setTimeout(() => {
-                  pollingInterval = setInterval(
-                    checkMonitoringsForUpdates,
-                    5000
-                  );
-                }, 6000);
-              }
-            } else {
-              const err = await response.json();
-              console.error("❌ Erro ao atualizar nome:", err);
-              alert(err.detail || "Erro ao atualizar nome.");
-            }
-
-            if (item) {
-              item.nome_customizado = updated.nome_customizado;
-            }
-
-            // Atualiza DOM sem recarregar backend
-            loadMonitorings(currentMonitorings);
-          } catch (err) {
-            console.error("Erro:", err);
-          }
+      const response = await fetch(
+        `${BACKEND_URL}/api/monitoramentos/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ nome_customizado: newTitle }),
         }
+      );
+
+      if (response.ok) {
+        const updated = await response.json();
+        console.log(`✅ Nome atualizado: ${updated.nome_customizado}`);
+
+        // Atualiza no array local
+        const item = currentMonitorings.find((m) => m.id === id);
+        if (item) item.nome_customizado = updated.nome_customizado;
+
+        // Atualiza visualmente
+        loadMonitorings(currentMonitorings);
+        enableEditableTitles();
+
+        // Pausa polling e reativa
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+          setTimeout(() => {
+            pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+          }, 6000);
+        }
+      } else {
+        const err = await response.json();
+        console.error("❌ Erro ao atualizar nome:", err);
+        alert(err.detail || "Erro ao atualizar nome.");
       }
+    } catch (err) {
+      console.error("Erro:", err);
+    }
+  }
+}
+
 
       checkBtn.addEventListener("click", saveTitle);
       input.addEventListener("keydown", (e) => {
