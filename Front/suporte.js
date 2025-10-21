@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
 
     const createTicketModal = document.getElementById('create-ticket-modal');
     const openNewChamadoBtn = document.querySelector('#open-new-chamado-btn');

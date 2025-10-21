@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
 
     const chatMessages = document.getElementById('chat-messages');
     const userInput = document.getElementById('user-input');

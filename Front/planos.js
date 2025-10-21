@@ -1,6 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
 
     const currentPlanCard = document.getElementById('current-plan-card');
     const plansContainer = document.querySelector('.plans-grid-index');

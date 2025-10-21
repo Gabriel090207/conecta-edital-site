@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("admin.js: Script carregado e DOM content loaded.");
 
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
     
     // Removido: A variável 'token' foi removida para desabilitar a autenticação no painel de admin.
 

@@ -2,7 +2,7 @@
 // monitoramento-editar.js
 // ===============================
 
-const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
 let monitoramentoEditando = null; // controla o modo edição
 
 // 🔧 Evento para capturar clique no botão "⚙️ Configurar"

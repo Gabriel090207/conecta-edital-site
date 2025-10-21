@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com";
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com";
   
     // Função principal: ativa o modo de edição ao clicar no ícone de lápis
     function enableEditMonitoringName() {

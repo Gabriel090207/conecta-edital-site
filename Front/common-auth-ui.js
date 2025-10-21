@@ -77,7 +77,7 @@ function handleForgotPassword() {
 
 window.auth.onAuthStateChanged(async (user) => {
     const currentPath = window.location.pathname;
-    const BACKEND_URL = "https://conecta-edital-site.onrender.com"; // Defina a URL do seu backend aqui
+    const BACKEND_URL = "https://conecta-edital-site-927y.onrender.com"; // Defina a URL do seu backend aqui
 
     if (user) {
         // --- NOVO: Sincroniza dados do Firebase com o Firestore ---
