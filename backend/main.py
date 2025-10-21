@@ -122,6 +122,7 @@ class Monitoring(BaseModel):
     created_at: datetime
     user_uid: str
     user_email: str
+     nome_customizado: Optional[str] = None
 
     @field_validator("keywords", mode="before")
     def normalize_keywords(cls, v):

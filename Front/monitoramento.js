@@ -2033,45 +2033,36 @@ document.addEventListener("DOMContentLoaded", () => {
       async function saveTitle() {
   const newTitle = input.value.trim() || oldTitle;
 
-  // Substitui novamente por <span>
-  const span = document.createElement("span");
-  span.className = "monitoring-title-text";
-  span.textContent = newTitle;
-  wrapper.replaceWith(span);
-  editBtn.style.display = "inline-block";
-
-  // Só envia se houver mudança
   if (newTitle !== oldTitle) {
     try {
       const user = window.auth.currentUser;
       if (!user) return alert("Você não está logado.");
       const token = await user.getIdToken();
 
-      const response = await fetch(
-        `${BACKEND_URL}/api/monitoramentos/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ nome_customizado: newTitle }),
-        }
-      );
+      const response = await fetch(`${BACKEND_URL}/api/monitoramentos/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nome_customizado: newTitle }),
+      });
 
       if (response.ok) {
         const updated = await response.json();
         console.log(`✅ Nome atualizado: ${updated.nome_customizado}`);
 
-        // Atualiza no array local
         const item = currentMonitorings.find((m) => m.id === id);
         if (item) item.nome_customizado = updated.nome_customizado;
 
-        // Atualiza visualmente
-        loadMonitorings(currentMonitorings);
-        enableEditableTitles();
+        // Atualiza visualmente sem reload
+        const span = document.createElement("span");
+        span.className = "monitoring-title-text";
+        span.textContent = updated.nome_customizado || oldTitle;
+        wrapper.replaceWith(span);
+        editBtn.style.display = "inline-block";
 
-        // Pausa polling e reativa
+        // Reinicia polling depois de 6s
         if (pollingInterval) {
           clearInterval(pollingInterval);
           pollingInterval = null;
@@ -2087,8 +2078,13 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("Erro:", err);
     }
+  } else {
+    // Cancela edição se o nome não mudou
+    wrapper.replaceWith(titleSpan);
+    editBtn.style.display = "inline-block";
   }
 }
+
 
 
       checkBtn.addEventListener("click", saveTitle);
