@@ -711,11 +711,13 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
 # ===============================================================
 # 🕒 TAREFA AUTOMÁTICA DE VERIFICAÇÃO PERIÓDICA
 # ===============================================================
+# ===============================================================
+# 🕒 TAREFA AUTOMÁTICA DE VERIFICAÇÃO PERIÓDICA (SEGURA)
+# ===============================================================
 async def periodic_monitoring_task():
     print("⏳ Iniciando tarefa periódica de verificação de monitoramentos...")
     db = firestore.client()
-
-    sem = asyncio.Semaphore(5)  # até 5 execuções simultâneas
+    sem = asyncio.Semaphore(5)
 
     async def check_with_limit(mon_data, mon_id):
         async with sem:
@@ -748,7 +750,6 @@ async def periodic_monitoring_task():
             docs = list(monitorings_ref.stream())
             print(f"📄 {len(docs)} monitoramentos ativos encontrados.")
 
-            # roda em paralelo (até 5 de cada vez)
             await asyncio.gather(*[
                 check_with_limit(doc.to_dict(), doc.id)
                 for doc in docs
@@ -762,10 +763,21 @@ async def periodic_monitoring_task():
         await asyncio.sleep(3600)
 
 
+# ===============================================================
+# 🚀 EVENTO DE STARTUP (NÃO BLOQUEANTE)
+# ===============================================================
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(periodic_monitoring_task())
-    print("Tarefa de monitoramento periódico iniciada.")
+    """
+    Executa ao iniciar o servidor.
+    A tarefa de monitoramento é criada em background sem travar o app.
+    """
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(periodic_monitoring_task())
+        print("✅ Tarefa de monitoramento periódico iniciada em background.")
+    except Exception as e:
+        print(f"⚠️ Falha ao iniciar tarefa periódica: {e}")
 
 
 @app.post("/api/sync-occurrences")
