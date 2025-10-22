@@ -711,17 +711,25 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
 # ===============================================================
 # 🕒 TAREFA AUTOMÁTICA DE VERIFICAÇÃO PERIÓDICA
 # ===============================================================
-# ===============================================================
-# 🕒 TAREFA AUTOMÁTICA DE VERIFICAÇÃO PERIÓDICA (SEGURA)
-# ===============================================================
 async def periodic_monitoring_task():
-    print("⏳ Iniciando tarefa periódica de verificação de monitoramentos...")
-    db = firestore.client()
-    sem = asyncio.Semaphore(5)
+    """
+    Executa verificações automáticas de monitoramentos ativos a cada 30 minutos.
+    """
+    import asyncio
+    from datetime import datetime
 
-    async def check_with_limit(mon_data, mon_id):
-        async with sem:
-            try:
+    print("⏳ Iniciando tarefa periódica de verificação de monitoramentos...")
+
+    while True:
+        try:
+            db = firestore.client()
+            monitorings_ref = db.collection('monitorings').where('status', '==', 'active')
+            docs = monitorings_ref.stream()
+
+            for doc in docs:
+                mon_data = doc.to_dict()
+                mon_id = doc.id
+
                 monitoring = Monitoring(
                     id=mon_id,
                     user_uid=mon_data.get("user_uid"),
@@ -736,58 +744,21 @@ async def periodic_monitoring_task():
                     last_checked_at=mon_data.get("last_checked_at", datetime.now()),
                     user_email=mon_data.get("user_email"),
                 )
+
                 await perform_monitoring_check(monitoring)
-            except Exception as e:
-                print(f"⚠️ Erro ao processar {mon_id}: {e}")
-
-    while True:
-        try:
-            print(f"🕒 Iniciando verificação em {datetime.now()}")
-            monitorings_ref = (
-            db.collection("monitorings")
-            .where(filter=FieldFilter("status", "==", "active"))
-            .limit(10)  # 🔽 reduz as leituras por ciclo
-            )
-
-
-            docs = list(monitorings_ref.stream())
-            print(f"📄 {len(docs)} monitoramentos ativos encontrados.")
-
-            await asyncio.gather(*[
-                check_with_limit(doc.to_dict(), doc.id)
-                for doc in docs
-            ])
 
             print("✅ Verificação automática concluída com sucesso.")
         except Exception as e:
             print(f"⚠️ Erro durante a tarefa automática: {e}")
 
-        print("💤 Aguardando 1 hora para próxima execução...")
-        await asyncio.sleep(6600)
-
-
-# ===============================================================
-# 🚀 EVENTO DE STARTUP (NÃO BLOQUEANTE)
-# ===============================================================
+        # Espera 30 minutos antes de rodar de novo
+        await asyncio.sleep(3800)
 
 
 @app.on_event("startup")
 async def startup_event():
-    """
-    Executa apenas uma instância da tarefa de monitoramento.
-    (Evita múltiplos workers do Gunicorn rodando em paralelo.)
-    """
-    try:
-        # Apenas o primeiro worker (PID menor) executa a tarefa periódica
-        if os.getenv("RUN_MAIN", "true") == "true" and os.getpid() % 3 == 0:
-            loop = asyncio.get_running_loop()
-            loop.create_task(periodic_monitoring_task())
-            print(f"✅ Tarefa de monitoramento periódico iniciada no worker PID {os.getpid()}.")
-        else:
-            print(f"⏸️ Worker PID {os.getpid()} não executará a tarefa automática.")
-    except Exception as e:
-        print(f"⚠️ Falha ao iniciar tarefa periódica: {e}")
-
+    asyncio.create_task(periodic_monitoring_task())
+    print("Tarefa de monitoramento periódico iniciada.")
 
 
 @app.post("/api/sync-occurrences")
