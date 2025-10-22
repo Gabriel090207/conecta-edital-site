@@ -345,17 +345,14 @@ document.addEventListener("DOMContentLoaded", () => {
                       mon.id
                     }">${toggleLabelText}</label>
                 </div>
-                <div class="action-buttons">
-                    <button class="btn-action btn-configure" data-id="${
-                      mon.id
-                    }"><i class="fas fa-cog"></i> Configurar</button>
-                    <button class="btn-action btn-test" data-id="${
-                      mon.id
-                    }"><i class="fas fa-play"></i> Testar</button>
-                    <button class="btn-action btn-delete" data-id="${
-                      mon.id
-                    }"><i class="fas fa-trash-alt"></i> Excluir</button>
-                </div>
+              <div class="action-buttons">
+  <button class="btn-action btn-configure" data-id="${mon.id}">
+    <i class="fas fa-cog"></i> Configurar
+  </button>
+  <button class="btn-action btn-delete" data-id="${mon.id}">
+    <i class="fas fa-trash-alt"></i> Excluir
+  </button>
+</div>
             </div>
         `;
 

@@ -714,19 +714,26 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
 async def periodic_monitoring_task():
     """
     Executa verificações automáticas de monitoramentos ativos a cada 30 minutos.
+    Controla taxa de leitura e evita sobrecarga no Firestore.
     """
-    import asyncio
-    from datetime import datetime
-
     print("⏳ Iniciando tarefa periódica de verificação de monitoramentos...")
+
+    db = firestore.client()
 
     while True:
         try:
-            db = firestore.client()
-            monitorings_ref = db.collection('monitorings').where('status', '==', 'active')
-            docs = monitorings_ref.stream()
+            print(f"🕒 Iniciando verificação em {datetime.now()}")
 
-            for doc in docs:
+            # ✅ Corrige o aviso e limita a leitura a 50 documentos por execução
+            monitorings_ref = db.collection('monitorings').where(
+                filter=FieldFilter('status', '==', 'active')
+            ).limit(50)
+
+            docs = list(monitorings_ref.stream())
+            total_docs = len(docs)
+            print(f"📄 {total_docs} monitoramentos ativos encontrados.")
+
+            for i, doc in enumerate(docs, start=1):
                 mon_data = doc.to_dict()
                 mon_id = doc.id
 
@@ -745,13 +752,20 @@ async def periodic_monitoring_task():
                     user_email=mon_data.get("user_email"),
                 )
 
+                # ✅ Executa a checagem individual e pausa brevemente
                 await perform_monitoring_check(monitoring)
+                print(f"✅ [{i}/{total_docs}] Monitoramento {mon_id} processado com sucesso.")
+
+                # Pausa curta para evitar flood no Firestore
+                await asyncio.sleep(1)
 
             print("✅ Verificação automática concluída com sucesso.")
+
         except Exception as e:
             print(f"⚠️ Erro durante a tarefa automática: {e}")
 
-        # Espera 30 minutos antes de rodar de novo
+        # ✅ Intervalo controlado entre ciclos (30 minutos)
+        print("💤 Aguardando 30 minutos para próxima execução...")
         await asyncio.sleep(1800)
 
 
