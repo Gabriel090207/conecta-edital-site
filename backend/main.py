@@ -743,9 +743,12 @@ async def periodic_monitoring_task():
     while True:
         try:
             print(f"🕒 Iniciando verificação em {datetime.now()}")
-            monitorings_ref = db.collection("monitorings").where(
-                filter=FieldFilter("status", "==", "active")
-            ).limit(50)
+            monitorings_ref = (
+            db.collection("monitorings")
+            .where(filter=FieldFilter("status", "==", "active"))
+            .limit(10)  # 🔽 reduz as leituras por ciclo
+            )
+
 
             docs = list(monitorings_ref.stream())
             print(f"📄 {len(docs)} monitoramentos ativos encontrados.")
@@ -760,24 +763,31 @@ async def periodic_monitoring_task():
             print(f"⚠️ Erro durante a tarefa automática: {e}")
 
         print("💤 Aguardando 1 hora para próxima execução...")
-        await asyncio.sleep(3600)
+        await asyncio.sleep(6600)
 
 
 # ===============================================================
 # 🚀 EVENTO DE STARTUP (NÃO BLOQUEANTE)
 # ===============================================================
+
+
 @app.on_event("startup")
 async def startup_event():
     """
-    Executa ao iniciar o servidor.
-    A tarefa de monitoramento é criada em background sem travar o app.
+    Executa apenas uma instância da tarefa de monitoramento.
+    (Evita múltiplos workers do Gunicorn rodando em paralelo.)
     """
     try:
-        loop = asyncio.get_running_loop()
-        loop.create_task(periodic_monitoring_task())
-        print("✅ Tarefa de monitoramento periódico iniciada em background.")
+        # Apenas o primeiro worker (PID menor) executa a tarefa periódica
+        if os.getenv("RUN_MAIN", "true") == "true" and os.getpid() % 3 == 0:
+            loop = asyncio.get_running_loop()
+            loop.create_task(periodic_monitoring_task())
+            print(f"✅ Tarefa de monitoramento periódico iniciada no worker PID {os.getpid()}.")
+        else:
+            print(f"⏸️ Worker PID {os.getpid()} não executará a tarefa automática.")
     except Exception as e:
         print(f"⚠️ Falha ao iniciar tarefa periódica: {e}")
+
 
 
 @app.post("/api/sync-occurrences")
