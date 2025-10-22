@@ -712,31 +712,14 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
 # 🕒 TAREFA AUTOMÁTICA DE VERIFICAÇÃO PERIÓDICA
 # ===============================================================
 async def periodic_monitoring_task():
-    """
-    Executa verificações automáticas de monitoramentos ativos a cada 30 minutos.
-    Controla taxa de leitura e evita sobrecarga no Firestore.
-    """
     print("⏳ Iniciando tarefa periódica de verificação de monitoramentos...")
-
     db = firestore.client()
 
-    while True:
-        try:
-            print(f"🕒 Iniciando verificação em {datetime.now()}")
+    sem = asyncio.Semaphore(5)  # até 5 execuções simultâneas
 
-            # ✅ Corrige o aviso e limita a leitura a 50 documentos por execução
-            monitorings_ref = db.collection('monitorings').where(
-                filter=FieldFilter('status', '==', 'active')
-            ).limit(50)
-
-            docs = list(monitorings_ref.stream())
-            total_docs = len(docs)
-            print(f"📄 {total_docs} monitoramentos ativos encontrados.")
-
-            for i, doc in enumerate(docs, start=1):
-                mon_data = doc.to_dict()
-                mon_id = doc.id
-
+    async def check_with_limit(mon_data, mon_id):
+        async with sem:
+            try:
                 monitoring = Monitoring(
                     id=mon_id,
                     user_uid=mon_data.get("user_uid"),
@@ -751,22 +734,32 @@ async def periodic_monitoring_task():
                     last_checked_at=mon_data.get("last_checked_at", datetime.now()),
                     user_email=mon_data.get("user_email"),
                 )
-
-                # ✅ Executa a checagem individual e pausa brevemente
                 await perform_monitoring_check(monitoring)
-                print(f"✅ [{i}/{total_docs}] Monitoramento {mon_id} processado com sucesso.")
+            except Exception as e:
+                print(f"⚠️ Erro ao processar {mon_id}: {e}")
 
-                # Pausa curta para evitar flood no Firestore
-                await asyncio.sleep(1)
+    while True:
+        try:
+            print(f"🕒 Iniciando verificação em {datetime.now()}")
+            monitorings_ref = db.collection("monitorings").where(
+                filter=FieldFilter("status", "==", "active")
+            ).limit(50)
+
+            docs = list(monitorings_ref.stream())
+            print(f"📄 {len(docs)} monitoramentos ativos encontrados.")
+
+            # roda em paralelo (até 5 de cada vez)
+            await asyncio.gather(*[
+                check_with_limit(doc.to_dict(), doc.id)
+                for doc in docs
+            ])
 
             print("✅ Verificação automática concluída com sucesso.")
-
         except Exception as e:
             print(f"⚠️ Erro durante a tarefa automática: {e}")
 
-        # ✅ Intervalo controlado entre ciclos (30 minutos)
-        print("💤 Aguardando 30 minutos para próxima execução...")
-        await asyncio.sleep(1800)
+        print("💤 Aguardando 1 hora para próxima execução...")
+        await asyncio.sleep(3600)
 
 
 @app.on_event("startup")
