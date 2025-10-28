@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conecta Edital - Central de Suporte</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="profile-modal.css">
        <link rel="stylesheet" href="suporte.css">
+       <link rel="stylesheet" href="modalperfil.css">
     <link rel="stylesheet" href="monitoramento.css">
     <link rel="stylesheet" href="notificacoes.css"> 
      <link rel="stylesheet" href="navbar-mobile.css"> 
@@ -147,12 +149,13 @@
                     </button>
                     <div class="dropdown-menu" id="category-menu" data-filter="category">
                         <div class="dropdown-option active" data-value="all">Todas Categorias</div>
-                        <div class="dropdown-option" data-value="Suporte Técnico">Suporte Técnico</div>
-                        <div class="dropdown-option" data-value="Dúvidas Gerais">Dúvidas Gerais</div>
-                        <div class="dropdown-option" data-value="Reclamações">Reclamações</div>
-                        <div class="dropdown-option" data-value="Feedback/Sugestões">Feedback/Sugestões</div>
-                        <div class="dropdown-option" data-value="Relatório de Bugs">Relatório de Bugs</div>
-                        <div class="dropdown-option" data-value="Solicitações">Solicitações</div>
+                        <div class="dropdown-option" data-value="Suporte Técnico">Problemas com notificações</div>
+                        <div class="dropdown-option" data-value="Dúvidas Gerais">Monitoramento e palavras-chave</div>
+                        <div class="dropdown-option" data-value="Reclamações">Informações da conta</div>
+                        <div class="dropdown-option" data-value="Feedback/Sugestões">Assinatura e Pagamento</div>
+                        <div class="dropdown-option" data-value="Relatório de Bugs">Algo não está funcionando bem</div>
+                        <div class="dropdown-option" data-value="Solicitações">Ideias e melhorias</div>
+                        <div class="dropdown-option" data-value="Outros Assuntos">Outros assuntos</div>
                     </div>
                 </div>
                 <div class="dropdown-container">
@@ -193,16 +196,17 @@
                     <label for="ticket-category">Categoria *</label>
                     <select id="ticket-category" required>
                         <option value="">Selecione uma categoria</option>
-                        <option value="Suporte Técnico">Suporte Técnico</option>
-                        <option value="Dúvidas Gerais">Dúvidas Gerais</option>
-                        <option value="Reclamações">Reclamações</option>
-                        <option value="Feedback/Sugestões">Feedback/Sugestões</option>
-                        <option value="Relatório de Bugs">Relatório de Bugs</option>
-                        <option value="Solicitações">Solicitações</option>
+                        <option value="Suporte Técnico">Problemas com notificações</option>
+                        <option value="Dúvidas Gerais">Monitoramentos e palavras-chave</option>
+                        <option value="Reclamações">Informações da conta</option>
+                        <option value="Feedback/Sugestões">Assinatura e Pagamento</option>
+                        <option value="Relatório de Bugs">Algo não está funcionando bem</option>
+                        <option value="Solicitações">Ideias e melhorias</option>
+                        <option value="Outros Assuntos">Outros Assuntos</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="ticket-subject">Assunto *</label>
+                    <label for="ticket-subject">Título *</label>
                     <input type="text" id="ticket-subject" placeholder="Descreva brevemente o problema" required>
                 </div>
                 <div class="form-group">
@@ -295,121 +299,155 @@
         </div>
     </footer>
 
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-content large-modal">
-            <button class="modal-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
-            
-            <div class="profile-header-content">
-                <div class="profile-avatar-container">
-                    <span class="profile-avatar-placeholder" id="profileDefaultAvatar">GB</span>
-                    <img id="profileImagePreview" src="" alt="Foto de Perfil" style="display:none;">
-                    <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
-                    <button type="button" class="edit-avatar-btn" id="editAvatarBtn">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                </div>
-                <div class="profile-username-wrapper">
-                    <span class="profile-username-display" id="profile-username-display"></span>
-                    <button type="button" class="edit-username-btn" id="editUsernameBtn">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                </div>
+    
+   <div class="pm-overlay" id="profile-modal">
+  <div class="pm-content pm-large">
+    <button class="pm-close-btn" data-modal-id="profile-modal"><i class="fas fa-times"></i></button>
+
+    <div class="pm-header">
+      <div class="pm-avatar">
+        <span class="pm-avatar-placeholder" id="profileDefaultAvatar">GB</span>
+        <img id="profileImagePreview" src="" alt="Foto de Perfil" style="display:none;">
+        <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
+        <button type="button" class="pm-avatar-edit" id="editAvatarBtn">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+      </div>
+
+      <div class="pm-username">
+        <span class="pm-username-display" id="profile-username-display"></span>
+        <button type="button" class="pm-username-edit" id="editUsernameBtn">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Campo de edição de nome (oculto por padrão) -->
+<!-- Campo de edição do username -->
+<div id="editUsernameContainer" class="pm-edit-username-container">
+  <div class="pm-username-edit-box">
+    <input
+      type="text"
+      id="newUsernameInput"
+      placeholder="Novo nome de usuário"
+      class="pm-input"
+    >
+    <button id="cancelUsernameEdit" class="pm-icon-btn cancel" title="Cancelar">
+      <i class="fas fa-times"></i>
+    </button>
+    <button id="saveUsernameBtn" class="pm-icon-btn save" title="Salvar">
+      <i class="fas fa-check"></i>
+    </button>
+  </div>
+</div>
+
+
+
+    <div class="pm-tabs">
+      <div class="pm-tabs-header">
+        <button class="pm-tab-btn active" data-tab="info-tab">Informações</button>
+        <button class="pm-tab-btn" data-tab="security-tab">Segurança</button>
+        <button class="pm-tab-btn" data-tab="subscription-tab">Assinatura</button>
+      </div>
+
+      <div class="pm-tabs-body">
+        <!-- Aba: Informações -->
+        <div id="info-tab" class="pm-tab-content active">
+          <form id="profile-info-form">
+            <div class="pm-form-group">
+              <label for="profile-full-name" class="pm-label nomeperfil"><i class="fas fa-user-tag"></i> Nome Completo</label>
+              <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
+              <p class="pm-form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
             </div>
-            
-            <div class="tabs-container">
-                <div class="tab-header">
-                    <button class="tab-button active" data-tab="info-tab">Informações</button>
-                    <button class="tab-button" data-tab="security-tab">Segurança</button>
-                    <button class="tab-button" data-tab="subscription-tab">Assinatura</button>
-                </div>
-    
-                <div class="tab-content-container">
-                    <div id="info-tab" class="tab-content active">
-                        <form id="profile-info-form">
-                            <div class="form-group">
-                                <label for="profile-full-name"><i class="fas fa-user-tag i"></i> Nome Completo</label>
-                                <input type="text" id="profile-full-name" placeholder="Seu nome completo" disabled>
-                                <p class="form-note">Para alterar o nome, é necessário abrir um ticket com nosso suporte.</p>
-                            </div>
-                            <div class="form-group">
-                                <label for="profile-contact"><i class="fas fa-phone "></i> Telefone</label>
-                                <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
-                            </div>
-                            <div class="form-group">
-                                <label for="profile-email"><i class="fas fa-envelope i"></i> E-mail</label>
-                                <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
-                                <p class="form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
-                            </div>
-                            <div class="modal-actions">
-                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
-                                <button type="submit" class="btn-save-changes">Salvar Alterações</button>
-                            </div>
-                        </form>
-                    </div>
-    
-                    <div id="security-tab" class="tab-content">
-                        <form id="change-password-form">
-                            <div class="form-group">
-                                <label for="current-password"><i class="fas fa-lock"></i> Senha Atual</label>
-                                <input type="password" id="current-password" placeholder="********">
-                                <button type="button" class="toggle-password"><i class="fas fa-eye " style="margin-top: 13px;"></i>></i></button>
-                            </div>
-                            <div class="form-group">
-                                <label for="new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
-                                <input type="password" id="new-password" placeholder="Nova senha">
-                                <button type="button" class="toggle-password"><i class="fas fa-eye" style="margin-top: 13px;"></i>></i></button>
-                            </div>
-                            <div class="form-group">
-                                <label for="confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
-                                <input type="password" id="confirm-password" placeholder="Confirme sua nova senha">
-                                <button type="button" class="toggle-password"><i class="fas fa-eye " style="margin-top: 13px;"></i>></i></button>
-                            </div>
-                            <div class="modal-actions">
-                                <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
-                                <button type="submit" class="btn-change-password">Alterar Senha</button>
-                            </div>
-                        </form>
-                        
-                        <div id="create-password-container" style="display: none;">
-                            <div class="modal-info-message">
-                                <p>Você está logado usando sua conta Google. Para criar uma senha de acesso direto, preencha os campos abaixo.</p>
-                            </div>
-                            <form id="create-password-form">
-                                <div class="form-group">
-                                    <label for="create-new-password"><i class="fas fa-unlock"></i> Nova Senha</label>
-                                    <input type="password" id="create-new-password" placeholder="Sua nova senha">
-                                    <button type="button" class="toggle-password"><i class="fas fa-eye" style="margin-top: 13px;"></i></button>
-                                </div>
-                                <div class="form-group">
-                                    <label for="create-confirm-password"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
-                                    <input type="password" id="create-confirm-password" placeholder="Confirme sua nova senha">
-                                    <button type="button" class="toggle-password"><i class="fas fa-eye" style="margin-top: 13px;"></i></button>
-                                </div>
-                                <div class="modal-actions">
-                                    <button type="button" class="btn-cancel-form" data-modal-id="profile-modal">Cancelar</button>
-                                    <button type="submit" class="btn-create-password">Criar Senha</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-    
-                    <div id="subscription-tab" class="tab-content">
-                        <div class="subscription-status-card">
-                            <div class="plan-icon-wrapper grey-summary-bg">
-                                <i class="fas fa-times-circle"></i>
-                            </div>
-                            <div class="plan-title">Sem Plano</div>
-                            <div class="plan-description">Você não possui um plano ativo. Faça upgrade para mais recursos.</div>
-                            <button class="btn-manage-subscription" onclick="window.location.href='planos.html'">Gerenciar Assinatura</button>
-                        </div>
-                    </div>
-                </div>
+
+            <div class="pm-form-group">
+              <label for="profile-contact" class="pm-label telefoneperfil"><i class="fas fa-phone"></i> Telefone</label>
+              <input type="text" id="profile-contact" placeholder="(00) 00000-0000">
             </div>
+
+            <div class="pm-form-group">
+              <label for="profile-email" class="pm-label emailperfil"><i class="fas fa-envelope"></i> E-mail</label>
+              <input type="email" id="profile-email" placeholder="seu-email@exemplo.com" disabled>
+              <p class="pm-form-note">Para alterar o e-mail, é necessário abrir um ticket com nosso suporte.</p>
+            </div>
+
+            <div class="pm-actions">
+              <button type="button" class="pm-btn pm-btn-danger" data-modal-id="profile-modal">Cancelar</button>
+              <button type="submit" class="pm-btn pm-btn-primary">Salvar Alterações</button>
+            </div>
+          </form>
         </div>
 
+        <!-- Aba: Segurança -->
+        <div id="security-tab" class="pm-tab-content">
+          <form id="change-password-form">
+            <div class="pm-form-group">
+              <label for="current-password" class="pm-label"><i class="fas fa-lock"></i> Senha Atual</label>
+              <input type="password" id="current-password" placeholder="********">
+              
+              <button type="button" class="pm-toggle-password"><i class="fas fa-eye"></i></button>
+            </div>
 
+            <div class="pm-form-group">
+              <label for="new-password" class="pm-label"><i class="fas fa-unlock"></i> Nova Senha</label>
+              <input type="password" id="new-password" placeholder="Nova senha">
+              <button type="button" class="pm-toggle-password"><i class="fas fa-eye"></i></button>
+            </div>
 
+            <div class="pm-form-group">
+              <label for="confirm-password" class="pm-label"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+              <input type="password" id="confirm-password" placeholder="Confirme sua nova senha">
+              
+              <button type="button" class="pm-toggle-password"><i class="fas fa-eye"></i></button>
+            </div>
+
+            <div class="pm-actions">
+              <button type="button" class="pm-btn pm-btn-danger" data-modal-id="profile-modal">Cancelar</button>
+              <button type="submit" class="pm-btn pm-btn-primary">Alterar Senha</button>
+            </div>
+          </form>
+
+          <div id="create-password-container" style="display: none;">
+            <div class="pm-info-message">
+              <p>Você está logado usando sua conta Google. Para criar uma senha de acesso direto, preencha os campos abaixo.</p>
+            </div>
+
+            <form id="create-password-form">
+              <div class="pm-form-group">
+                <label for="create-new-password" class="pm-label"><i class="fas fa-unlock"></i> Nova Senha</label>
+                <input type="password" id="create-new-password" placeholder="Sua nova senha">
+                <button type="button" class="pm-toggle-password"><i class="fas fa-eye"></i></button>
+              </div>
+
+              <div class="pm-form-group">
+                <label for="create-confirm-password" class="pm-label"><i class="fas fa-key"></i> Confirmar Nova Senha</label>
+                <input type="password" id="create-confirm-password" placeholder="Confirme sua nova senha">
+                <button type="button" class="pm-toggle-password"><i class="fas fa-eye"></i></button>
+              </div>
+
+              <div class="pm-actions">
+                <button type="button" class="pm-btn pm-btn-danger" data-modal-id="profile-modal">Cancelar</button>
+                <button type="submit" class="pm-btn pm-btn-primary">Criar Senha</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Aba: Assinatura -->
+        <div id="subscription-tab" class="pm-tab-content">
+          <div class="pm-plan-card">
+            <div class="pm-plan-icon pm-grey">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="pm-plan-title">Sem Plano</div>
+            <div class="pm-plan-description">Você não possui um plano ativo. Faça upgrade para mais recursos.</div>
+            <button class="pm-btn pm-btn-primary" onclick="window.location.href='planos.html'">Gerenciar Assinatura</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
 
 
     

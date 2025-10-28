@@ -344,41 +344,9 @@ body {
 }
 
 
-.modal-overlay .large-modal {
-    max-width: 600px;
-    padding: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    max-height: 80vh;
-}
-
-.modal-overlay .modal-content h2 {
-    font-size: 1.5rem;
-    color: #333;
-    margin-top: 10px;
-}
-
-.modal-overlay .modal-content .modal-subtitle {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 2rem;
-}
-
 /* Abas */
 
 
-.subscription-status-card .plan-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.subscription-status-card .plan-description {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 1.5rem;
-}
 
 /* Cores de fundo para os ícones */
 .gold-summary-bg { background-color: #FFC107; }
@@ -393,120 +361,7 @@ body {
 }
 
 
-/* Para o Plano Premium (Cor Dourada/Amarela) */
-.gold-summary-bg {
-    background: linear-gradient(135deg, #ffef60, #ffc13a);/* Cor de fundo */
-}
 
-/* Para o ícone do plano Premium */
-.gold-summary-bg i {
-    color: #fff; /* Cor do ícone, geralmente branco para contraste */
-}
-
-/* Para os Planos Essencial e Básico (Cor Laranja) */
-.orange-summary-bg {
-    background: linear-gradient(135deg, #609FFF, #3A66FF);
-}
-
-/* Para o ícone dos planos Essencial e Básico */
-.orange-summary-bg i {
-    color: #fff;
-}
-
-/* Para o Plano Gratuito (Cor Cinza) */
-.grey-summary-bg {
-    background: linear-gradient(135deg, rgb(148, 148, 148), #50504e); 
-}
-
-/* Para o ícone do plano Gratuito */
-.grey-summary-bg i {
-    color: #fff;
-}
-
-.fa-eye{
-    margin-top: 23px;
-}
-
-.fa-phone{
-    margin-top: 13px;
-}
-
-.fa-lock{
-    margin-top: 13px;
-}
-
-.fa-unlock{
-    margin-top: 13px;
-}
-
-.fa-key{
-    margin-top: 13px;
-}
-
-/* Estilo para o wrapper que contém o nome de usuário e os botões */
-.profile-username-wrapper {
-    display: flex;
-    align-items: center; /* Centraliza verticalmente o nome e os botões */
-    justify-content: center;
-    gap: 8px; /* Espaçamento entre os elementos */
-    margin-bottom: 2rem;
-}
-
-/* Estilo para o input de edição do nome de usuário */
-.profile-username-wrapper .edit-username-input {
-    flex-grow: 1; /* Permite que o input ocupe o espaço disponível */
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333;
-    background-color: #fff;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: border-color 0.3s;
-    width: 250px; /* Largura fixa para manter o layout */
-    text-align: center;
-}
-
-/* Foco no input */
-.profile-username-wrapper .edit-username-input:focus {
-    border-color: #0747a8;
-    outline: none;
-}
-
-/* Estilo para o botão de salvar (ícone de check) */
-.profile-username-wrapper .save-username-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #05bc5b; /* Verde para confirmar */
-    font-size: 1.5rem;
-    padding: 0;
-    transition: transform 0.2s;
-}
-
-.profile-username-wrapper .save-username-btn:hover {
-    transform: scale(1.1);
-}
-
-/* Estilo para o botão de cancelar (ícone de X) */
-.profile-username-wrapper .cancel-username-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #ac0513; /* Vermelho para cancelar */
-    font-size: 1.5rem;
-    padding: 0;
-    transition: transform 0.2s;
-}
-
-.profile-username-wrapper .cancel-username-btn:hover {
-    transform: scale(1.1);
-}
-
-.lockca{
-    margin-top: 0px;
-  }
 
 
 
