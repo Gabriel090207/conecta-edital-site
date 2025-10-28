@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title id="page-title">Conecta Edital - Artigo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="termos.css">
+    <link rel="stylesheet" href="monitoramento.css">
+    <link rel="stylesheet" href="navbar-mobile.css">
+    
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+      
+          <!-- Botão menu (hambúrguer) — só aparecerá no mobile -->
+          <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu" aria-controls="mobile-sidebar" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+          </button>
+      
+          <!-- Logo -->
+          <div class="navbar-left">
+            <a href="#" class="logo">
+              <img src="logo.png" alt="Logo Conecta Edital" style="max-width:70%;">
+            </a>
+          </div>
+      
+          <!-- Menu central (desktop) -->
+          <nav class="navbar-center">
+            <ul>
+              <li><a href="monitoramento.html" ><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+              <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+              <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+              <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+              <li style="margin-top: 4px;"> | </li>
+              <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+            </ul>
+          </nav>
+      
+          <!-- Lado direito -->
+          <div class="navbar-right">
+            <a href="#" class="notification-icon">
+              <i class="fas fa-bell sino"></i>
+              <span class="notification-badge"></span>
+              <div class="notification-dropdown"></div>
+            </a>
+      
+            <div class="user-menu" id="user-dropdown-toggle">
+              <span class="user-avatar-placeholder" id="userDefaultAvatar"></span>
+              <img id="userProfilePicture" src="" alt="Foto de Perfil" style="display:none;">
+              <span id="userNameDisplay">Carregando...</span>
+              <i class="fas fa-chevron-down"></i>
+              <div class="dropdown-content">
+                <h3 class="olausuario" id="dropdownUserName">Olá, Usuário!</h3>
+                <a href="#" id="open-profile-modal-btn"><i class="fas fa-user icon-perfil" style="color:white"></i> Perfil</a>
+                <a href="planos.html"><i class="fas fa-credit-card icon-planos" style="color:white"></i> Planos</a>
+                <hr>
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt icon-sair" style="color:red"></i> Sair</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Sidebar mobile (menu lateral) -->
+      <nav id="mobile-sidebar" class="mobile-sidebar" aria-hidden="true">
+        <!-- topo com perfil -->
+        <div class="sidebar-profile">
+          <img id="sidebarUserAvatar" src="" alt="Avatar" />
+          <div class="sidebar-user-info">
+            <span id="sidebarUserName" class="sidebar-username">Usuário</span>
+            <div class="sidebar-actions">
+              <a href="#" id="open-profile-modal-btn" style="color: #505255;">
+                <i class="fas fa-user icon-perfil"></i> Perfil
+              </a>
+              <a href="planos.html">
+                <i class="fas fa-credit-card icon-planos"></i> Planos
+              </a>
+              <a href="#" id="logout-btn" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Sair
+              </a>
+            </div>
+          </div>
+        </div>
+      
+        <hr>
+      
+        <!-- itens de navegação -->
+        <ul>
+          <li><a href="#l"><i class="fas fa-tasks"></i> Meus monitoramentos</a></li>
+          <li><a href="planos.html"><i class="fas fa-credit-card"></i> Planos</a></li>
+          <li><a href="dicas.html"><i class="fas fa-lightbulb"></i> Dicas</a></li>
+          <li><a href="suporte.html"><i class="fas fa-headphones"></i> Suporte</a></li>
+          <hr>
+          <li><a href="ajuda.html" class="ajuda"><i class="fas fa-info-circle"></i> Ajuda</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Overlay (fundo escuro quando sidebar estiver aberta) -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      
+
+
+      
+    
+    <main class="container article-page-main">
+
+        <div class="breadcrumbs">
+            <span>Início</span> > <span id="article-category">Carregando...</span> > <span>Politica de Privacidade e LGPD</span> 
+          </div>
+        <h1>Politica de Privacidade e LGPD</h1>
+
+
+
+       
+        <article class="article-content-wrapper">
+           
+           
+            <section class="article-body" >
+                <p class="loading-message"><span class="topico">1. Introdução </span> <br>
+                    Bem-vindo(a) ao Conecta Edital, uma plataforma digital desenvolvida para monitorar
+                    publicações em Diários Oficiais (municipais, estaduais e federais) utilizando
+                    inteligência artificial (IA) para identificar nomes, IDs de editais ou palavras-chave
+                    específicas e enviar alertas instantâneos aos usuários.
+                    Estes Termos de Uso ("Termos") regem o acesso e a utilização da plataforma Conecta
+                    Edital, seus serviços e conteúdos, por qualquer usuário. Ao acessar ou utilizar a
+                    plataforma, você concorda em se vincular a estes Termos e à nossa Política de
+                    Privacidade.<br> <br>
+                    <span class="topico">2. O Serviço</span><br> 
+                    O Conecta Edital fornece um serviço de monitoramento automatizado de
+                    publicações em Diários Oficiais, conforme as seguintes características:
+
+                    <table class="funcionalidades-tabela">
+                        <thead>
+                          <tr>
+                            <th>Funcionalidade</th>
+                            <th>Descrição</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><strong>Monitoramento por IA</strong></td>
+                            <td>Utilização de algoritmos de IA para varrer e analisar o conteúdo de Diários Oficiais 24/7.</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Alertas Instantâneos</strong></td>
+                            <td>Envio de notificações por e-mail e/ou WhatsApp (dependendo do plano) quando uma palavra-chave monitorada for encontrada.</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Tipos de Monitoramento</strong></td>
+                            <td><b>Pessoal:</b> Focado em resultados e convocações individuais.<br>
+                                <b>Radar:</b> Focado em novidades em editais específicos ou cargos de interesse.</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Planos</strong></td>
+                            <td>Oferecemos planos gratuitos (se aplicável) e pagos (Essencial e Premium) com diferentes níveis de acesso e recursos.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    <br><br>
+                    <span class="topico">3. Cadastro e Conta de Usuário</span><br>
+                    Para utilizar os serviços, o usuário deve realizar um cadastro, fornecendo
+                    informações verdadeiras e atualizadas.<br>
+                    <span class="topico1">3.1. Dados de Cadastro:</span> usuário se compromete a fornecer Nome Completo, E-mail e
+                    Contato (WhatsApp), sendo o e-mail e/ou contato utilizados para fins de notificação
+                    do serviço.<br>
+                    <span class="topico1">3.2. Responsabilidade:</span> O usuário é o único responsável pela segurança e sigilo de sua
+                    senha e por todas as atividades realizadas em sua conta.<br><br>
+                    <span class="topico">4. Condições de Uso e Responsabilidades</span><br>
+                    <span class="topico1">4.1. Uso Adequado:</span> O usuário se compromete a utilizar a plataforma de forma lícita,
+                    respeitando a legislação brasileira, especialmente a Lei Geral de Proteção de Dados
+                    (LGPD). <br>
+                    <span class="topico1">4.2. Palavras-Chave:</span> As palavras-chave fornecidas para monitoramento devem ser
+                    estritamente relacionadas ao propósito do serviço (identificação em Diários Oficiais).
+                    O uso da plataforma para monitoramento de terceiros sem a devida autorização legal
+                    é estritamente proibido.<br>
+                    <span class="topico1">4.3. Limitações do Serviço:</span> O Conecta Edital se esforça para garantir a máxima
+                    precisão, mas não pode garantir que % das publicações relevantes serão
+                    encontradas, nem que os alertas serão entregues instantaneamente em todas as
+                    circunstâncias (devido a fatores externos como falhas de conexão ou indisponibilidade
+                    dos Diários Oficiais). O serviço de monitoramento é baseado no conteúdo
+                    disponibilizado publicamente pelos Diários Oficiais. <br>
+                    <span class="topico1">4.4. Planos Pagos:</span> A aquisição de planos pagos implica a aceitação das condições de
+                    pagamento, renovação e cancelamento específicas de cada plano, as quais serão
+                    detalhadas no momento da contratação.<br><br>
+                    <span class="topico">5. Propriedade Intelectual</span><br>
+                    Todo o conteúdo da plataforma, incluindo design, textos, gráficos, logotipos e a
+                    tecnologia de IA utilizada no monitoramento, são de propriedade exclusiva do
+                    Conecta Edital ou de seus licenciadores, e estão protegidos pelas leis de propriedade
+                    intelectual.<br><br>
+                    <span class="topico">6. Isenção de Garantias</span><br>
+                    O Conecta Edital não oferece garantias de qualquer tipo, expressas ou implícitas,
+                    sobre a adequação, confiabilidade, disponibilidade, pontualidade e precisão do
+                    serviço para qualquer finalidade. O usuário reconhece que o serviço é uma ferramenta
+                    auxiliar e que a confirmação final das publicações deve ser feita por meios oficiais.<br><br>
+                    <span class="topico">7. Disposições Gerais</span><br>
+                    <span class="topico1"> 7.1. Modificações:</span> Conecta Edital reserva-se o direito de modificar estes Termos a
+                    qualquer momento, mediante notificação aos usuários <br>
+                    <span class="topico1">7.2. Lei Aplicável:</span> Estes
+                    Termos são regidos pelas leis da República Federativa do Brasil.</span><br>
+                    <span class="topico1">7.3. Foro:</span> Fica eleito o Foro da Comarca Campinas/SP para dirimir quaisquer
+                    dúvidas ou conflitos decorrentes destes Termos, com renúncia a qualquer outro, por
+                    mais privilegiado que seja. <br><br>
+                    <span class="topico1">Em caso de dúvidas sobre estes Termos, entre em contato conosco através
+                    dos canais de suporte.</span>
+            </section>
+        </article>
+    
+    </main>
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script> 
+    <script src="common-auth-ui.js"></script> 
+    <script src="monitoramento.js"></script> 
+    
+    <script src="monitoramento-editar.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="termo.js"></script>
+
+    <script src="navbar-mobile.js"></script>
+</body>
+</html>

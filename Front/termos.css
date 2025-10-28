@@ -1,0 +1,594 @@
+/* Variáveis para cores */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --text-color: #ecf0f1;
+    --link-color: #3498db;
+    --background-color: #f4f5f7;
+    --card-background: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+  }
+  
+  html, body {
+    overflow-x: hidden;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: white; /* Fundo geral claro */
+    color: #343A40; /* Cor de texto principal escuro */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-size: 16px; /* Base rem */
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  a { 
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* --- Cabeçalho --- */
+  .navbar-index {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(80px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar-index .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    max-width: 1440px;
+    padding: 0 30px;
+    position: relative; /* CRUCIAL: define este como o ponto de referência para a centralização */
+}
+
+/* O menu central agora é posicionado de forma absoluta */
+.navbar-center-index {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    z-index: 1; /* Garante que o logo fique na frente */
+}
+
+/* Os estilos do logo e do botão permanecem os mesmos */
+.navbar-left .logo {
+    display: flex;
+    align-items: center;
+    font-weight: 300;
+    color: #007bff;
+}
+
+.navbar-left .logo img {
+    margin-right: 80px;
+    border-radius: 4px;
+}
+
+.navbar-index .navbar-center-index ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 35px;
+}
+
+.navbar-index .navbar-center-index ul li a {
+    color: #6C757D;
+    font-weight: 500;
+    font-size: 1.15rem;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+}
+
+.navbar-index .navbar-center-index ul li a:hover {
+    color: #007BFF;
+}
+
+.navbar-center-index ul li a i {
+    font-size: 17px;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+
+    /* deixa o preenchimento transparente */
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #6c757d; /* largura e cor da borda */
+}
+
+
+.navbar-center-index ul li a:hover i,
+.navbar-center-index ul li a.active i {
+    transform: scale(1.1);
+    color: transparent;
+
+    /* cria apenas o traço (contorno) */
+    -webkit-text-stroke: 1px #007bff;
+  
+    
+}
+
+.navbar-index .navbar-right-index .btn-entrar {
+    background: linear-gradient(135deg, #3a68ff, #0427c1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    z-index: 1; /* Garante que o botão fique na frente */
+}
+
+.navbar-index .navbar-right-index .btn-entrar:hover {
+    background-color: #0056b3;
+}
+
+  
+  /* --- Seção de Destaque (Hero) --- */
+  .hero-article {
+    display: none;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 130px;
+    box-shadow: 0 4px 12px var(--card-shadow);
+  }
+  
+  .hero-image-container {
+    flex: 1;
+    min-width: 50%;
+  }
+  
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .hero-content {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .breadcrumbs {
+    color: #888;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+  }
+
+h1 {
+    margin-top: -20px;
+    margin-bottom: 70px;
+    font-size: 2rem;
+    line-height: 1.2;
+    text-align: center; /* Centraliza o texto horizontalmente */
+}
+
+  
+  .article-meta .author {
+    font-weight: bold;
+  }
+  
+  .separator {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 40px 0;
+  }
+  
+  /* --- Grid de Artigos --- */
+  .articles-grid {
+    margin-top: 120px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1900px;
+  }
+  
+  .article-card {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    box-shadow: 0 2px 8px var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 105%;
+  }
+  
+  .article-card a {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .article-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .article-footer {
+    margin-top: auto;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .article-title {
+    font-size: 2px;
+  }
+  
+  .article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .article-image-container {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+  }
+  
+  .article-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* CORREÇÃO APLICADA AQUI PARA OS CARDS DO BLOG */
+  .article-content {
+    padding: 20px;
+    height: 100%;
+    overflow-wrap: break-word; /* Solução principal para quebra de texto em palavras longas */
+    word-break: break-all;    /* Solução alternativa para garantir quebra em qualquer caractere */
+  }
+  
+  .article-meta {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: auto;
+  }
+  
+  .article-meta span {
+    margin-right: 10px;
+  }
+  
+  .article-meta span:last-child {
+    margin-right: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .hero-article {
+      flex-direction: column;
+    }
+    .hero-content {
+      padding: 20px;
+    }
+  }
+  
+
+  /* --- Responsividade: até 768px (celulares e tablets pequenos) --- */
+@media (max-width: 768px) {
+  /* Hero principal */
+  .hero-article {
+    flex-direction: column;
+    margin-top: 80px;
+  }
+
+  .hero-image-container {
+    min-width: 100%;
+    height: 200px;
+  }
+
+  .hero-content {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  .breadcrumbs {
+    font-size: 0.75rem;
+  }
+
+  /* Grid de artigos */
+  .articles-grid {
+    margin-top: 90px;
+    grid-template-columns: 1fr; /* Apenas 1 card por linha */
+    gap: 16px;
+    padding: 0 15px;
+  }
+
+  .article-card {
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .article-content {
+    padding: 15px;
+  }
+
+  .article-title {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .article-meta {
+    font-size: 0.8rem;
+  }
+
+  /* Ajuste da imagem do artigo */
+  .article-image-container {
+    padding-top: 60%; /* ligeiramente mais alta em telas pequenas */
+  }
+
+  /* Espaçamentos gerais */
+  .separator {
+    margin: 20px 0;
+  }
+
+  
+}
+
+/* --- Responsividade extra: até 480px (smartphones pequenos) --- */
+@media (max-width: 480px) {
+  .hero-content {
+    padding: 15px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.25rem;
+  }
+
+  .article-content {
+    padding: 12px;
+  }
+
+  .article-title {
+    font-size: 1rem;
+  }
+
+  .articles-grid {
+    gap: 12px;
+  }
+}
+
+  /* --- Estilos para a página do Artigo --- */
+  .article-page-main {
+    max-width: 1300px; /* Largura ideal para a leitura de texto */
+    margin-top: 130px;
+  }
+  
+  .article-content-wrapper {
+    background-color: var(--card-background);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--card-shadow);
+  }
+  
+  .article-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .article-meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+    font-size: 0.9rem;
+  }
+  
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .like-count {
+    color: #777;
+    font-size: 0.9rem;
+  }
+  
+  .article-image-main {
+    margin: 30px 0;
+    text-align: center;
+  }
+  
+  .article-image-main img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .article-image-main figcaption {
+    margin-top: 10px;
+    font-style: italic;
+    color: #888;
+    font-size: 0.9rem;
+  }
+  
+  .article-body h2 {
+    font-size: 1.8rem;
+    margin-top: 40px;
+    margin-bottom: 15px;
+  }
+  
+  /* CORREÇÃO APLICADA AQUI PARA OS PARÁGRAFOS DO ARTIGO COMPLETO */
+  .article-body p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.8;
+    overflow-wrap: break-word; /* quebra apenas se necessário */
+    word-break: normal;   
+  }
+  
+  .article-body ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+  
+  /* CORREÇÃO APLICADA AQUI PARA ITENS DE LISTA DO ARTIGO COMPLETO */
+  .article-body li {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    overflow-wrap: break-word;
+    word-break: break-all;
+  }
+  
+  @media (max-width: 768px) {
+    .article-content-wrapper {
+      padding: 20px;
+    }
+    .article-title {
+      font-size: 1.8rem;
+    }
+    .article-body p, .article-body li {
+      font-size: 1rem;
+    }
+  }
+  
+  .articles-grid1 {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 2200px;
+  }
+
+  /* Estilos para a nova seção de sugestões */
+.suggested-articles-section {
+  margin-top: 50px; /* Reduz a margem superior para a distância desejada */
+}
+
+/* Ajusta a margem do título da seção */
+.suggested-articles-section .section-title {
+  font-size: 1.5rem;
+  margin-bottom: -100px;
+  margin-top: 0; /* Remove a margem superior padrão do H2 para controle total do espaçamento */
+  color: #333;
+  font-weight: 600;
+}
+
+
+
+.topico{
+  font-weight: 700;
+  font-size: 23px;
+}
+
+
+.topico1{
+  font-weight: 700;
+  font-size: 18px;
+}
+
+
+
+.caracteristicas-imagem {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.caracteristicas-imagem img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.funcionalidades-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0px;
+  font-size: 1rem;
+
+}
+
+.funcionalidades-tabela th,
+.funcionalidades-tabela td {
+  border: 1px solid #ccc;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.funcionalidades-tabela th {
+  background-color: #f5f5f5;
+  font-weight: 700;
+}
+
+.funcionalidades-tabela tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .funcionalidades-tabela {
+    font-size: 0.9rem;
+  }
+}
+
+
+.breadcrumbs {
+  margin-top: -30px;
+  color: #888;
+  font-size: 0.8rem;
+  margin-bottom: 30px;
+}

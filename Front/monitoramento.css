@@ -1893,7 +1893,7 @@ ul {
     padding: 2.5rem;
     display: flex;
     flex-direction: column;
-    max-height: 65vh;
+    max-height: 100vh;
 }
 
 .modal-overlay .modal-content .modal-subtitle {
@@ -2016,7 +2016,7 @@ ul {
 /* Estilo para o nome de usuário centralizado */
 .profile-username-display {
     font-size: 1.2rem;
-    margin-top: 10px;
+
     font-weight: bold;
     color: #333;
     text-align: center;

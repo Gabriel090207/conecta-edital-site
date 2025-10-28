@@ -848,7 +848,7 @@ ul {
     padding: 2.5rem;
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
+    max-height: 90vh;
 }
 
 .modal-overlay .modal-content h2 {
@@ -964,6 +964,7 @@ ul {
 
 /* Estilo para o nome de usuário centralizado */
 .profile-username-display {
+   margin-top: -5px;
     font-size: 1.2rem;
     font-weight: bold;
     color: #333;

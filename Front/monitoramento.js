@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (modalElement === radarMonitoramentoModal && radarMonitoringForm)
         radarMonitoringForm.reset();
 
-      const anyModalOpen = document.querySelector(".modal-overlay.show-modal");
+      const anyModalOpen = document.querySelector(".modal-overlay.show-modal .pm-overlay.show-modal");
       if (!anyModalOpen) {
         document.body.style.overflow = "";
       }
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function closeAllModals() {
-    document.querySelectorAll(".modal-overlay.show-modal").forEach((modal) => {
+    document.querySelectorAll(".modal-overlay.show-modal, .pm-overlay.show-modal").forEach((modal) => {
       modal.classList.remove("show-modal");
       if (modal === personalMonitoramentoModal && personalMonitoringForm)
         personalMonitoringForm.reset();
@@ -394,6 +394,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const userData = await response.json();
 
+     preencherPlanoUsuario(userData, currentStatusData);
+
+
       // Preenche os campos do formulário de informações
       profileFullNameInput.value = userData.fullName || "";
       profileContactInput.value = userData.contact || "";
@@ -437,46 +440,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Preenche a aba de Assinatura dinamicamente
-      const planTitleModal = document.querySelector(
-        "#subscription-tab .plan-title"
-      );
-      const planDescriptionModal = document.querySelector(
-        "#subscription-tab .plan-description"
-      );
-      const planIconWrapperModal = document.querySelector(
-        "#subscription-tab .plan-icon-wrapper"
-      );
-      const planIconModal = planIconWrapperModal
-        ? planIconWrapperModal.querySelector("i")
-        : null;
+// === Função para preencher o plano do usuário ===
 
-      const planType = (userData.plan_type || "gratuito").toLowerCase();
-
-      if (planTitleModal) {
-        planTitleModal.textContent =
-          planType === "gratuito"
-            ? "Sem Plano"
-            : planType.charAt(0).toUpperCase() + planType.slice(1);
-      }
-      if (planDescriptionModal) {
-        planDescriptionModal.textContent = getPlanDescription(planType);
-      }
-
-      if (planIconWrapperModal) {
-        planIconWrapperModal.className = "plan-icon-wrapper"; // Reseta a classe
-        if (planType === "premium") {
-          planIconWrapperModal.classList.add("gold-summary-bg");
-          if (planIconModal) planIconModal.className = "fas fa-crown";
-        } else if (planType === "essencial" || planType === "basico") {
-          planIconWrapperModal.classList.add("orange-summary-bg");
-          if (planIconModal) planIconModal.className = "fas fa-shield-alt";
-        } else {
-          // Plano Gratuito / Sem Plano
-          planIconWrapperModal.classList.add("grey-summary-bg");
-          if (planIconModal) planIconModal.className = "fas fa-shield-alt";
-        }
-      }
 
       // Atualiza a foto e o nome no dropdown
       const userProfilePicture = document.getElementById("userProfilePicture");
@@ -1273,7 +1238,7 @@ document.addEventListener("DOMContentLoaded", () => {
       openModal(chooseTypeModal);
     });
   });
-  document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+  document.querySelectorAll(".modal-overlay, .pm-modal").forEach((overlay) => {
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) {
         closeAllModals();
@@ -1489,6 +1454,8 @@ document.addEventListener("DOMContentLoaded", () => {
       closeAllModals();
       openModal(profileModal);
       fetchUserProfile();
+      checkAuthProviderAndRenderSecurityTab();
+
       // A verificação da aba de segurança foi movida para o listener das abas
     });
   }
@@ -2114,3 +2081,261 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===================== MODAL DE OCORRÊNCIAS =====================
 });
+
+
+// === ABRIR MODAL DE PERFIL ===
+document.querySelectorAll('[data-modal-id="profile-modal"]').forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const modal = document.getElementById("profile-modal");
+    if (modal && !btn.classList.contains("pm-btn-danger")) {
+      // Evita que o botão "Cancelar" também abra o modal
+      modal.classList.add("show-modal");
+    }
+  });
+});
+
+// === FECHAR MODAL DE PERFIL ===
+function closeProfileModal() {
+  const modal = document.getElementById("profile-modal");
+  if (modal) modal.classList.remove("show-modal");
+}
+
+// Botão de fechar (X)
+document.querySelectorAll('.pm-close-btn').forEach((btn) => {
+  btn.addEventListener("click", closeProfileModal);
+});
+
+// Botão de cancelar (tem data-modal-id="profile-modal" e classe .pm-btn-danger)
+document.querySelectorAll('.pm-btn-danger[data-modal-id="profile-modal"]').forEach((btn) => {
+  btn.addEventListener("click", closeProfileModal);
+});
+
+// Clique fora do conteúdo (overlay)
+document.querySelectorAll('.pm-overlay').forEach((overlay) => {
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      closeProfileModal();
+    }
+  });
+});
+
+
+// === TROCAR ABAS DO MODAL DE PERFIL ===
+document.querySelectorAll(".pm-tab-btn").forEach((tabBtn) => {
+  tabBtn.addEventListener("click", () => {
+    const tabId = tabBtn.getAttribute("data-tab");
+
+    // Remove o estado ativo de todas as abas e botões
+    document.querySelectorAll(".pm-tab-btn").forEach((btn) => btn.classList.remove("active"));
+    document.querySelectorAll(".pm-tab-content").forEach((tab) => tab.classList.remove("active"));
+
+    // Ativa o botão e o conteúdo da aba clicada
+    tabBtn.classList.add("active");
+    const activeTab = document.getElementById(tabId);
+    if (activeTab) {
+      activeTab.classList.add("active");
+    }
+  });
+});
+
+function preencherPlanoUsuario(userData, currentStatusData = {}) {
+  console.log("🧩 Dados recebidos para plano:", userData, currentStatusData);
+
+  // Detecta tipo de plano (normaliza o texto)
+  let planType = (
+    userData?.plan_type ||
+    userData?.user_plan ||
+    currentStatusData?.user_plan ||
+    "sem_plano"
+  )
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace("plano ", "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  console.log("✅ Plano detectado:", planType);
+
+  // Seleciona elementos do modal
+  const planCard = document.querySelector("#subscription-tab .pm-plan-card");
+  const iconDiv = planCard.querySelector(".pm-plan-icon");
+  const titleDiv = planCard.querySelector(".pm-plan-title");
+  const descDiv = planCard.querySelector(".pm-plan-description");
+  const manageBtn = planCard.querySelector("button");
+
+  // Configuração visual dos planos
+  const planoInfo = {
+    premium: {
+      gradient: "linear-gradient(135deg, #FFD700, #FFA500)",
+      icon: "fa-crown",
+      title: "Plano Premium",
+      desc: "Acesso ilimitado a todos os recursos de monitoramento.",
+      emoji: "",
+    },
+    essencial: {
+      gradient: "linear-gradient(135deg, #007bff, #00c6ff)",
+      icon: "fa-shield-alt",
+      title: "Plano Essencial",
+      desc: "Acesso aos recursos essenciais de monitoramento.",
+      emoji: "",
+    },
+    sem_plano: {
+      gradient: "linear-gradient(135deg, #b3b3b3, #8c8c8c)",
+      icon: "fa-shield-alt",
+      title: "Sem Plano",
+      desc: "Você não possui um plano ativo. Faça upgrade para mais recursos.",
+      emoji: "",
+    },
+  };
+
+  const plano = planoInfo[planType] || planoInfo["sem_plano"];
+
+  // Atualiza visual
+  iconDiv.innerHTML = `<i class="fas ${plano.icon}"></i>`;
+  iconDiv.style.background = plano.gradient;
+  titleDiv.innerHTML = `${plano.emoji} ${plano.title}`;
+  descDiv.textContent = plano.desc;
+
+  // ✅ Botão sempre verde (fixo)
+  if (manageBtn) {
+    manageBtn.style.background = "#08a853"; // verde padrão
+    manageBtn.style.color = "#fff";
+  }
+}
+
+
+// === Alternar visibilidade da senha ===
+document.querySelectorAll(".pm-toggle-password").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const input = btn.previousElementSibling; // o input está logo antes do botão
+
+    if (input && input.type === "password") {
+      input.type = "text";
+      btn.innerHTML = '<i class="fas fa-eye-slash"></i>'; // troca o ícone
+    } else if (input) {
+      input.type = "password";
+      btn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+  });
+});
+
+
+
+// Obtém os elementos HTML com os novos IDs e classes
+const editUsernameBtn = document.getElementById("editUsernameBtn");
+const usernameDisplay = document.getElementById("profile-username-display");
+const editContainer = document.getElementById("editUsernameContainer");
+const newUsernameInput = document.getElementById("newUsernameInput");
+const cancelUsernameEdit = document.getElementById("cancelUsernameEdit");
+const saveUsernameBtn = document.getElementById("saveUsernameBtn");
+
+// Lógica para editar o nome de usuário
+if (editUsernameBtn) {
+  editUsernameBtn.addEventListener("click", () => {
+    editContainer.style.display = "block";  // Mostra o campo de edição
+    newUsernameInput.value = usernameDisplay.textContent.replace("@", "");  // Preenche o campo com o nome atual
+    usernameDisplay.style.display = "none";  // Esconde o nome de usuário original
+    editUsernameBtn.style.display = "none";  // Esconde o botão de editar
+  });
+}
+
+// Lógica para cancelar a edição
+if (cancelUsernameEdit) {
+  cancelUsernameEdit.addEventListener("click", () => {
+    editContainer.style.display = "none";  // Esconde o campo de edição
+    usernameDisplay.style.display = "inline-block";  // Mostra o nome de usuário original
+    editUsernameBtn.style.display = "inline-block";  // Mostra o botão de editar novamente
+  });
+}
+
+// Função para atualizar o nome de usuário no backend
+async function updateUsername(newUsername) {
+  const user = window.auth.currentUser;
+  if (!user) {
+    alert("Você não está logado.");
+    return;
+  }
+
+  const idToken = await user.getIdToken();
+
+  try {
+    // Chama a API para atualizar o nome no backend
+    const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ username: newUsername }), // Envia o novo nome de usuário
+    });
+
+    if (response.ok) {
+      // Atualiza o nome no Firebase Auth
+      await user.updateProfile({
+        displayName: newUsername, // Atualiza o nome no Firebase Auth
+      });
+
+      alert("Nome de usuário atualizado com sucesso!");
+
+      // Atualiza a interface com o novo nome
+      usernameDisplay.textContent = `@${newUsername}`; // Atualiza diretamente a UI
+
+      // Esconde a área de edição
+      editContainer.style.display = "none";
+      usernameDisplay.style.display = "inline-block";
+      editUsernameBtn.style.display = "inline-block";
+
+    } else {
+      const errorData = await response.json();
+      alert(`Erro ao atualizar o nome de usuário: ${errorData.detail || "Erro desconhecido."}`);
+    }
+  } catch (error) {
+    console.error("Erro na requisição para atualizar o nome de usuário:", error);
+    alert("Ocorreu um erro ao se conectar com o servidor.");
+  }
+}
+
+// Evento de clique no botão de salvar
+if (saveUsernameBtn) {
+  saveUsernameBtn.addEventListener("click", async () => {
+    const newUsername = newUsernameInput.value.trim();
+    if (!newUsername) {
+      alert("Por favor, digite um nome de usuário válido.");
+      return;
+    }
+
+    // Atualiza o nome no backend e no Firebase
+    await updateUsername(newUsername);
+  });
+}
+
+// Função para buscar os dados do perfil do usuário
+async function fetchUserProfile() {
+  const user = window.auth.currentUser;
+  if (!user) {
+    alert("Usuário não encontrado.");
+    return;
+  }
+  const idToken = await user.getIdToken();
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`, // Passa o token para autenticação
+      },
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      // Atualiza a interface com os novos dados
+      document.getElementById('profile-username-display').textContent = `@${data.username}`;
+      // Adicione mais atualizações conforme necessário
+    } else {
+      alert("Erro ao buscar dados do usuário.");
+    }
+  } catch (error) {
+    console.error("Erro ao buscar dados do usuário:", error);
+    alert("Erro ao buscar dados do usuário.");
+  }
+}
