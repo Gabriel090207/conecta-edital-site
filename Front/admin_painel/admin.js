@@ -553,8 +553,8 @@ ticket.messages.forEach(message => {
             }
 
             ticketDetailStatusTag.textContent = newStatus;
-            ticketDetailStatusTag.className = `ticket-admin-status status-${newStatus.toLowerCase().replace(/ /g, '-') || 'desconhecido'}`;
-            
+ticketDetailStatusTag.className = `ticket-status-tag status-${newStatus.toLowerCase().replace(/ /g, '-') || 'desconhecido'}`;
+
             alert(`Status do ticket alterado para "${newStatus}" com sucesso!"`);
 
         } catch (error) {

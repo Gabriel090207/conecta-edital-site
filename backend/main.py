@@ -23,7 +23,8 @@ import os
 import asyncio
 from google.cloud.firestore_v1.base_query import FieldFilter
 from dateutil.relativedelta import relativedelta
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 # Mercado Pago SDK
 import mercadopago
 
@@ -709,56 +710,57 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
     print(f"🔔 Notificação criada para {user_uid}: {title}")
 
 # ===============================================================
-# 🕒 TAREFA AUTOMÁTICA DE VERIFICAÇÃO PERIÓDICA
 # ===============================================================
-async def periodic_monitoring_task():
+# 🕒 NOVO AGENDADOR DE VERIFICAÇÕES (05:45 e 23:45)
+# ===============================================================
+
+scheduler = AsyncIOScheduler()
+
+async def run_all_monitorings():
     """
-    Executa verificações automáticas de monitoramentos ativos a cada 30 minutos.
+    Executa verificações automáticas de TODOS os monitoramentos ativos.
     """
-    import asyncio
-    from datetime import datetime
+    print("🚀 Executando verificação automática de todos os monitoramentos ativos...")
+    db = firestore.client()
+    monitorings_ref = db.collection('monitorings').where('status', '==', 'active')
+    docs = monitorings_ref.stream()
 
-    print("⏳ Iniciando tarefa periódica de verificação de monitoramentos...")
+    tasks = []
+    for doc in docs:
+        data = doc.to_dict()
+        monitoring = Monitoring(
+            id=doc.id,
+            **data,
+            created_at=data.get('created_at', datetime.now()),
+            last_checked_at=data.get('last_checked_at', datetime.now())
+        )
+        tasks.append(perform_monitoring_check(monitoring))
 
-    while True:
-        try:
-            db = firestore.client()
-            monitorings_ref = db.collection('monitorings').where('status', '==', 'active')
-            docs = monitorings_ref.stream()
+    # Executa todos os monitoramentos em paralelo (sem travar)
+    await asyncio.gather(*tasks, return_exceptions=True)
+    print("✅ Verificação automática concluída com sucesso.")
 
-            for doc in docs:
-                mon_data = doc.to_dict()
-                mon_id = doc.id
-
-                monitoring = Monitoring(
-                    id=mon_id,
-                    user_uid=mon_data.get("user_uid"),
-                    monitoring_type=mon_data.get("monitoring_type"),
-                    edital_identifier=mon_data.get("edital_identifier"),
-                    candidate_name=mon_data.get("candidate_name"),
-                    official_gazette_link=mon_data.get("official_gazette_link"),
-                    keywords=mon_data.get("keywords", []),
-                    occurrences=mon_data.get("occurrences", 0),
-                    status=mon_data.get("status", "inactive"),
-                    created_at=mon_data.get("created_at", datetime.now()),
-                    last_checked_at=mon_data.get("last_checked_at", datetime.now()),
-                    user_email=mon_data.get("user_email"),
-                )
-
-                await perform_monitoring_check(monitoring)
-
-            print("✅ Verificação automática concluída com sucesso.")
-        except Exception as e:
-            print(f"⚠️ Erro durante a tarefa automática: {e}")
-
-        # Espera 30 minutos antes de rodar de novo
-        await asyncio.sleep(3800)
+    # Loga execução no Firestore (opcional)
+    try:
+        db.collection("system_logs").add({
+            "type": "cron_check",
+            "executed_at": firestore.SERVER_TIMESTAMP,
+            "total_monitorings": len(tasks)
+        })
+    except Exception as e:
+        print(f"⚠️ Erro ao salvar log da verificação: {e}")
 
 
 @app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(periodic_monitoring_task())
-    print("Tarefa de monitoramento periódico iniciada.")
+async def start_scheduler():
+    """
+    Inicia o agendador ao subir o servidor.
+    """
+    scheduler.add_job(run_all_monitorings, CronTrigger(hour=5, minute=45))
+    scheduler.add_job(run_all_monitorings, CronTrigger(hour=23, minute=45))
+    scheduler.start()
+    print("🕒 Agendador iniciado: verificações diárias às 05:45 e 23:45.")
+
 
 
 @app.post("/api/sync-occurrences")

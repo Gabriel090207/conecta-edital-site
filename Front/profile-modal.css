@@ -34,7 +34,7 @@
 
   /* 🔹 Ajuste automático da altura */
   height: auto;
-  max-height: 90vh;
+  max-height: 66vh;
 
   /* 🔹 Garante que não role internamente */
   overflow: visible;
@@ -413,7 +413,7 @@ footer {
     color: #fff;
     font-family: Arial, sans-serif;
     padding: 40px 0;
-    margin-top: 150px;
+    margin-top: 0px;
 }
 
 .footer-container {
@@ -483,7 +483,7 @@ footer {
 .footer-links {
     display: flex;
     justify-content: space-between;
-    width: 45%; /* Ajuste a largura para os links */
+    width: 46%; /* Ajuste a largura para os links */
     flex-wrap: wrap;
 }
 
@@ -518,5 +518,166 @@ footer {
     text-align: center;
     margin-top: 30px;
     font-size: 12px;
-    width: 29%;
+    width: 21%;
+}
+
+.footer-links ul li a {
+  display: flex;
+  align-items: center; /* Alinha o ícone e o texto verticalmente */
+  gap: 8px; /* Espaço entre ícone e texto */
+
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-links ul li a i {
+  font-size: 16px; /* Ajuste o tamanho do ícone */
+
+  vertical-align: middle;
+}
+
+
+/* ======== RESPONSIVIDADE ======== */
+
+/* ======== RESPONSIVIDADE ======== */
+
+/* Tablets (até 992px) */
+@media (max-width: 992px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: flex-start; /* alinha tudo à esquerda */
+    text-align: left;
+    padding: 0 30px;
+  }
+
+  .footer-about {
+    width: 100%;
+    align-items: flex-start; /* mantém o conteúdo alinhado à esquerda */
+  }
+
+  .footer-about-content p {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .social-links {
+    justify-content: flex-start;
+  }
+
+  .footer-links {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+    margin-top: 30px;
+  }
+
+  .footer-links div {
+    width: 100%;
+    margin-bottom: 25px;
+  }
+
+  .footer-bottom {
+    width: 100%;
+    margin-top: 40px;
+    text-align: left;
+    padding-left: 30px;
+  }
+}
+
+/* Celulares médios (até 768px) */
+@media (max-width: 768px) {
+  .footer-container {
+    padding: 0 20px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-links div {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .footer-links ul li a {
+    justify-content: flex-start;
+  }
+
+  .footer-about img {
+    width: 80px;
+  }
+
+  .footer-about-content p {
+    font-size: 13px;
+  }
+
+  .footer-bottom {
+    text-align: left;
+    padding-left: 20px;
+  }
+}
+
+/* Celulares pequenos (até 480px) */
+@media (max-width: 480px) {
+  footer {
+    padding: 25px 0;
+  }
+
+  .footer-container {
+    padding: 0 15px;
+  }
+
+  .footer-links div {
+    width: 100%;
+  }
+
+  .footer-links ul li {
+    margin-bottom: 8px;
+  }
+
+  .footer-bottom p {
+    font-size: 11px;
+    padding: 0 10px;
+    text-align: left;
+  }
+
+  .footer-links ul li a i {
+    font-size: 15px;
+  }
+}
+
+
+.btn-cancel {
+  background-color: #e62727;
+   color: white;
+   border: none;
+   border-radius: 8px;
+   padding: 10px 20px;
+   font-size: 0.95rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: background-color 0.2s ease, transform 0.1s ease;
+   align-self: center;
+}
+
+.btn-cancel:hover {
+   background-color: #c2001c;
+   transform: translateY(-1px);
+}
+
+.btn-submit {
+   background-color: #08a853;
+   color: white;
+   border: none;
+   border-radius: 8px;
+   padding: 10px 20px;
+   font-size: 1rem;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }

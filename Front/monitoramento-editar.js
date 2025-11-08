@@ -37,7 +37,7 @@ document.addEventListener("click", async (e) => {
     abrirModalEdicao(dados, tipo);
   } catch (err) {
     console.error("Erro ao carregar monitoramento:", err);
-    alert("Erro ao carregar monitoramento.");
+    
   }
 });
 
@@ -68,7 +68,7 @@ function abrirModalEdicao(dados, tipo) {
   // Altera cabeçalho
   const titulo = modal.querySelector(".modal-content h2");
   const icone = modal.querySelector(".modal-header-icon i");
-  const botao = modal.querySelector(".btn-create-monitoramento");
+  const botao = modal.querySelector(".btn-submit");
 
   if (titulo)
     titulo.textContent =
@@ -81,8 +81,8 @@ function abrirModalEdicao(dados, tipo) {
   // Troca botão
   const novoBotao = botao.cloneNode(true);
   novoBotao.textContent = "Salvar Alterações";
-  novoBotao.classList.remove("btn-create-monitoramento");
-  novoBotao.classList.add("btn-save-monitoramento");
+  novoBotao.classList.remove("btn-submit");
+  novoBotao.classList.add("btn-submit");
 
   botao.replaceWith(novoBotao);
 
@@ -177,7 +177,7 @@ function fecharModalEdicao(modal, tipo) {
 
   const titulo = modal.querySelector(".modal-content h2");
   const icone = modal.querySelector(".modal-header-icon i");
-  const botao = modal.querySelector(".btn-save-monitoramento");
+  const botao = modal.querySelector(".btn-submit");
 
   if (titulo)
     titulo.textContent =
@@ -187,7 +187,7 @@ function fecharModalEdicao(modal, tipo) {
 
   if (botao) {
     const novoBotao = botao.cloneNode(true);
-    novoBotao.textContent = "Criar Monitoramento";
+    novoBotao.textContent = "Salvar monitoramento";
     novoBotao.classList.remove("btn-save-monitoramento");
     novoBotao.classList.add("btn-create-monitoramento");
     botao.replaceWith(novoBotao);
