@@ -1076,21 +1076,43 @@ ul { list-style: none; }
     gap: 10px;
     margin-top: 20px;
 }
+
+
+
 .btn-cancel {
-    border: none;
-    background: linear-gradient(135deg,#ff3a3a, #b31818); ; 
-    color: white; 
-    border-radius: 4px; 
+    background-color: #e62727;
+     color: white;
+     border: none;
+     border-radius: 8px;
+     padding: 10px 20px;
+     font-size: 0.95rem;
+     font-weight: 600;
+     cursor: pointer;
+     transition: background-color 0.2s ease, transform 0.1s ease;
+     align-self: center;
+  }
+  
+  .btn-cancel:hover {
+     background-color: #c2001c;
+     transform: translateY(-1px);
+  }
+  
+  .btn-submit {
+     background-color: #08a853;
+     color: white;
+     border: none;
+     border-radius: 8px;
+     padding: 10px 20px;
+     font-size: 1rem;
+     cursor: pointer;
+     transition: background-color 0.3s ease;
+  }
+
+
+  .btn-submit:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
-.btn-submit {
-    border: none;
-    background: linear-gradient(135deg,#3a68ff, #0427c1); ; 
-    color: white; 
-    border-radius: 4px;
-}
-
-
-
 
 
 /* Estilos para a seção de Gerenciar FAQ */
@@ -1736,15 +1758,7 @@ body.modal-open {
     margin-top: 20px;
 }
 
-.btn-cancel {
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-}
+
 
 .btn-create {
    background-color:  #08a853; /* Verde */
@@ -1863,7 +1877,35 @@ body.modal-open {
 
 
 /* Banner do status */
-.ticket-status-tag {
+.ticket-status-tag.status-em-andamento{
+   
+    width: 95%;
+    display: block;
+    background-color: #3a68ff;
+    color: #fdfcfc;
+    text-align: center;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 19px;
+    margin: 0 auto;
+}
+
+.ticket-status-tag.status-finalizado{
+   
+    width: 95%;
+    display: block;
+    background-color: #05bc5b;
+    color: #ffffff;
+    text-align: center;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 19px;
+    margin: 0 auto;
+}
+
+.ticket-status-tag.status-pendente{
    
     width: 95%;
     display: block;
@@ -1876,6 +1918,22 @@ body.modal-open {
     border-radius: 19px;
     margin: 0 auto;
 }
+
+
+
+.ticket-admin-status.status-pendente {
+    background: linear-gradient(135deg, #ffef60, #ffc13a); /* Amarelo para "Aguardando" */
+    color: white; /* Texto escuro para contraste */
+}
+
+.ticket-admin-status.status-em-andamento {
+    background: linear-gradient(135deg, #3a68ff, #0427c1); /* Azul para "Em Atendimento" */
+}
+
+.ticket-admin-status.status-finalizado {
+    background:  linear-gradient(45deg, #05bc5b, #00823c); /* Cinza para "Fechado" */
+}
+
 
 /* Área de mensagens */
 .ticket-messages-container {
@@ -2044,32 +2102,9 @@ body.modal-open {
 
 
 
-.ticket-detail-status-tag.status-pendente {
-    display: block;
-    background-color: #ffeb3b;
-    color: #5d4037;
-    text-align: center;
-    padding: 8px 15px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border-radius: 0;
-    margin: 10px -20px 0;
-}
 
 
 
-.ticket-admin-status.status-pendente {
-    background: linear-gradient(135deg, #ffef60, #ffc13a); /* Amarelo para "Aguardando" */
-    color: white; /* Texto escuro para contraste */
-}
-
-.ticket-admin-status.status-em-andamento {
-    background: linear-gradient(135deg, #3a68ff, #0427c1); /* Azul para "Em Atendimento" */
-}
-
-.ticket-admin-status.status-finalizado {
-    background:  linear-gradient(45deg, #05bc5b, #00823c); /* Cinza para "Fechado" */
-}
 
 
 
