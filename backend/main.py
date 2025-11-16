@@ -20,6 +20,8 @@ from firebase_admin import credentials, auth, firestore, storage
 from firebase_admin.exceptions import FirebaseError
 import json
 import os
+from twilio.rest import Client
+
 import asyncio
 from google.cloud.firestore_v1.base_query import FieldFilter
 from dateutil.relativedelta import relativedelta
@@ -38,8 +40,15 @@ from email.utils import formataddr
 from dotenv import load_dotenv
 import smtplib
 
+
+
 # Importação dos templates de email (se existirem)
 import email_templates
+
+
+
+
+
 
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -50,6 +59,46 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 FIREBASE_STORAGE_BUCKET = os.getenv("FIREBASE_STORAGE_BUCKET")
+
+TWILIO_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
+
+twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
+
+
+def send_whatsapp(to_number: str, message: str):
+    """
+    Envia uma mensagem WhatsApp usando Twilio.
+    Formato do número: +5511999999999
+    """
+
+    # Remove espaços, parenteses e traços do número do usuário
+    cleaned_number = (
+        to_number.replace(" ", "")
+        .replace("(", "")
+        .replace(")", "")
+        .replace("-", "")
+    )
+
+    if not cleaned_number.startswith("+"):
+        cleaned_number = "+55" + cleaned_number  # Força Brasil se vier sem DDI
+
+    try:
+        msg = twilio_client.messages.create(
+            from_=TWILIO_WHATSAPP_FROM,
+            body=message,
+            to=f"whatsapp:{cleaned_number}"
+        )
+
+        print("WhatsApp enviado:", msg.sid)
+        return True
+
+    except Exception as e:
+        print("Erro ao enviar WhatsApp:", str(e))
+        return False
+
+
 
 # --- INICIALIZAÇÃO DO FASTAPI ---
 app = FastAPI(
@@ -545,12 +594,12 @@ def send_email_notification(
 # ===============================================================
 # 🔍 Função principal de verificação de monitoramentos
 # ===============================================================
+
 async def perform_monitoring_check(monitoramento: Monitoring):
     """
     Executa a verificação para um monitoramento específico.
-    Dispara o envio de email se uma ocorrência for encontrada.
-    Agora armazena o link real do PDF onde a ocorrência foi detectada
-    e grava também o histórico na subcoleção "occurrences".
+    Dispara o envio de email e WhatsApp se uma ocorrência for encontrada.
+    Armazena o link real do PDF e histórico na subcoleção "occurrences".
     """
     print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
 
@@ -578,6 +627,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         if pdf_url_in_html:
             pdf_real_url = str(pdf_url_in_html)
             print(f"🔗 PDF encontrado dentro da página: {pdf_real_url}")
+
             pdf_response = await fetch_content(pdf_url_in_html)
             if pdf_response and "application/pdf" in pdf_response.headers.get("Content-Type", "").lower():
                 pdf_content = pdf_response.content
@@ -613,6 +663,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     # 🔎 Passo 4: verificar palavras-chave
     found_keywords = []
     keywords_to_search = [monitoramento.edital_identifier]
+
     if monitoramento.monitoring_type == "personal" and monitoramento.candidate_name:
         keywords_to_search.append(monitoramento.candidate_name)
 
@@ -630,17 +681,14 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             found_keywords.append(keyword)
 
     # ✅ Passo 5: ocorrência encontrada
-        # ✅ Passo 5: ocorrência encontrada
     if found_keywords:
         print(f"✅ Ocorrência detectada: {found_keywords}")
 
-        # Incrementa o contador no objeto local (não obrigatório, apenas para log)
+        # Incrementa no objeto
         monitoramento.occurrences += 1
 
-        # 🔹 Referência da subcoleção
         ocorrencias_ref = doc_ref.collection("occurrences")
 
-        # 🆕 Grava nova ocorrência na subcoleção
         ocorrencias_ref.add({
             "edital_identifier": monitoramento.edital_identifier,
             "pdf_real_link": pdf_real_url,
@@ -649,9 +697,10 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             "detected_at": firestore.SERVER_TIMESTAMP,
             "last_checked_at": firestore.SERVER_TIMESTAMP
         })
+
         print(f"💾 Ocorrência registrada em monitorings/{monitoramento.id}/occurrences")
 
-        # 🔁 Conta o total real de ocorrências e sincroniza no documento principal
+        # Recontar total de ocorrências
         occ_total = len(list(ocorrencias_ref.stream()))
         doc_ref.update({
             "occurrences": occ_total,
@@ -660,7 +709,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
         print(f"🔄 Contador sincronizado: occurrences = {occ_total}")
 
-        # 🔔 Cria notificação
+        # Criar notificação interna
         await create_notification(
             user_uid=monitoramento.user_uid,
             type_="nova_ocorrencia",
@@ -669,10 +718,9 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             link="/meus-monitoramentos"
         )
 
-
         monitoramento.pdf_real_link = pdf_real_url
-        # ✉️ Envia e-mail
-        
+
+        # ✉️ Envio de EMAIL
         send_email_notification(
             monitoramento=monitoramento,
             template_type="occurrence_found",
@@ -680,14 +728,74 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             found_keywords=found_keywords
         )
 
-        print(f"✅ Ocorrência detectada para {monitoramento.id}! PDF real: {pdf_real_url}")
+        # 📲 Envio de WHATSAPP — Apenas usuários PREMIUM
+        try:
+            user_ref = db.collection("users").document(monitoramento.user_uid)
+            user_doc = user_ref.get()
+
+            if user_doc.exists:
+                user_data = user_doc.to_dict()
+
+                user_phone = user_data.get("contact")
+                user_plan = user_data.get("plan_type", "sem_plano").lower()
+
+                if user_plan == "premium":
+
+                    if user_phone:
+                        whatsapp_message = (
+                            f"📢 *Nova ocorrência encontrada!*\n\n"
+                            f"O edital *{monitoramento.edital_identifier}* teve uma nova ocorrência detectada.\n\n"
+                            f"🔎 Palavras encontradas: {', '.join(found_keywords)}\n"
+                            f"📄 Link do PDF: {monitoramento.pdf_real_link}\n\n"
+                            f"Equipe Conecta Edital 🚀"
+                        )
+
+                        send_whatsapp(user_phone, whatsapp_message)
+                        print(f"📲 WhatsApp enviado para {user_phone}")
+
+                    else:
+                        print(f"⚠️ Usuário PREMIUM {monitoramento.user_uid}, mas não possui número salvo.")
+
+                else:
+                    print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
+
+            else:
+                print(f"⚠️ Documento do usuário {monitoramento.user_uid} não encontrado.")
+
+        except Exception as e:
+            print(f"❌ ERRO ao enviar WhatsApp: {e}")
+
+        print(f"🏁 Ocorrência finalizada para {monitoramento.id} — PDF real: {pdf_real_url}")
 
     else:
         print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
 
     print(f"--- Verificação para {monitoramento.id} concluída ---\n")
 
-# ===============================================================
+
+async def get_user_plan(uid: str) -> str:
+    """
+    Retorna o tipo de plano do usuário baseado no Firestore.
+    Se não existir, retorna 'sem_plano'.
+    """
+    try:
+        db = firestore.client()
+        user_ref = db.collection("users").document(uid)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            return "sem_plano"
+
+        user_data = user_doc.to_dict()
+        plan_type = user_data.get("plan_type", "sem_plano")
+
+        return plan_type.lower()
+
+    except Exception as e:
+        print(f"Erro ao obter plano do usuário {uid}: {e}")
+        return "sem_plano"
+
+
 # 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
 # ===============================================================
 async def create_notification(user_uid: str, type_: str, title: str, message: str, link: str = "#"):
@@ -1007,55 +1115,80 @@ async def mercadopago_webhook(request: Request):
 
         payment_info = await asyncio.to_thread(sdk.payment().get, payment_id)
 
-        if payment_info["status"] == 200:
-            payment_data = payment_info["response"]
-            status_pagamento = payment_data.get("status")
-            external_reference = payment_data.get("external_reference")
-
-            if not external_reference:
-                print("ERRO no webhook: 'external_reference' não encontrado nos dados completos do pagamento.")
-                return {"status": "error"}, status.HTTP_400_BAD_REQUEST
-
-            parts = external_reference.split('_PLAN-')
-            if len(parts) != 2:
-                print("ERRO no webhook: Formato de 'external_reference' inválido.")
-                return {"status": "error"}, status.HTTP_400_BAD_REQUEST
-
-            user_id = parts[0].replace('USER-', '')
-            plan_id = parts[1]
-
-            internal_plan_type = None
-            if plan_id == "premium_plan":
-                internal_plan_type = "premium"
-            elif plan_id == "essencial_plan":
-                internal_plan_type = "essencial"
-            
-            if not internal_plan_type:
-                print(f"ERRO no webhook: plan_id desconhecido: {plan_id}")
-                return {"status": "error"}, status.HTTP_400_BAD_REQUEST
-
-            db_firestore_client = firestore.client()
-            user_doc_ref = db_firestore_client.collection('users').document(user_id)
-            
-            if status_pagamento == "approved":
-                print(f"Webhook: Pagamento para o usuário {user_id} e plano {plan_id} APROVADO.")
-                user_doc_ref.update({"plan_type": internal_plan_type})
-                print(f"Plano do usuário {user_id} atualizado para '{internal_plan_type}'.")
-                
-                return {"status": "ok"}, status.HTTP_200_OK
-            elif status_pagamento == "rejected":
-                print(f"Webhook: Pagamento para o usuário {user_id} e plano {plan_id} REJEITADO.")
-                return {"status": "ok"}, status.HTTP_200_OK
-            elif status_pagamento == "pending":
-                print(f"Webhook: Pagamento para o usuário {user_id} e plano {plan_id} PENDENTE.")
-                return {"status": "ok"}, status.HTTP_200_OK
-            else:
-                print(f"Webhook: Notificação de status desconhecido ({status_pagamento}) para o pagamento do plano {plan_id}.")
-                return {"status": "ignored"}, status.HTTP_200_OK
-        else:
-            print(f"ERRO no webhook: Falha ao buscar detalhes do pagamento na API do Mercado Pago. Status: {payment_info['status']}")
+        if payment_info["status"] != 200:
+            print(f"ERRO no webhook: Falha ao buscar detalhes do pagamento. Status: {payment_info['status']}")
             return {"status": "error"}, status.HTTP_500_INTERNAL_SERVER_ERROR
-            
+
+        payment_data = payment_info["response"]
+        status_pagamento = payment_data.get("status")
+        external_reference = payment_data.get("external_reference")
+
+        if not external_reference:
+            print("ERRO no webhook: 'external_reference' não encontrado.")
+            return {"status": "error"}, status.HTTP_400_BAD_REQUEST
+
+        parts = external_reference.split("_PLAN-")
+        if len(parts) != 2:
+            print("ERRO no webhook: Formato inválido de external_reference.")
+            return {"status": "error"}, status.HTTP_400_BAD_REQUEST
+
+        user_id = parts[0].replace("USER-", "")
+        plan_id = parts[1]
+
+        # Converter internal plan
+        internal_plan_type = {
+            "premium_plan": "premium",
+            "essencial_plan": "essencial"
+        }.get(plan_id)
+
+        if not internal_plan_type:
+            print(f"ERRO no webhook: plan_id desconhecido: {plan_id}")
+            return {"status": "error"}, status.HTTP_400_BAD_REQUEST
+
+        db = firestore.client()
+        user_doc_ref = db.collection("users").document(user_id)
+
+        # ---------------------------------------------------
+        # PAGAMENTO APROVADO
+        # ---------------------------------------------------
+        if status_pagamento == "approved":
+            print(f"Webhook: Pagamento APROVADO para usuário {user_id}, plano {internal_plan_type}.")
+            user_doc_ref.update({"plan_type": internal_plan_type})
+
+            # Buscar telefone
+            user_doc = user_doc_ref.get()
+            user_data = user_doc.to_dict()
+            user_phone = user_data.get("contact")
+
+            if user_phone:
+                whatsapp_message = (
+                    f"🎉 *Plano {internal_plan_type.capitalize()} Ativado!*\n\n"
+                    "Seu pagamento foi aprovado e seu plano está ativo!\n\n"
+                    "Agora você possui acesso liberado às funcionalidades premium 🚀\n\n"
+                    "Obrigado por utilizar o Conecta Edital ❤️"
+                )
+
+                send_whatsapp(user_phone, whatsapp_message)
+                print(f"📲 WhatsApp enviado para {user_phone}")
+            else:
+                print(f"⚠️ Usuário {user_id} não tem número salvo.")
+
+            return {"status": "ok"}, status.HTTP_200_OK
+
+        # ---------------------------------------------------
+        # REJEITADO / PENDENTE / OUTROS
+        # ---------------------------------------------------
+        if status_pagamento == "rejected":
+            print(f"Pagamento REJEITADO para {user_id}.")
+            return {"status": "ok"}, status.HTTP_200_OK
+
+        if status_pagamento == "pending":
+            print(f"Pagamento PENDENTE para {user_id}.")
+            return {"status": "ok"}, status.HTTP_200_OK
+
+        print(f"Status desconhecido no webhook: {status_pagamento}")
+        return {"status": "ignored"}, status.HTTP_200_OK
+
     except Exception as e:
         print(f"ERRO no Webhook: {e}")
         return {"status": "error", "message": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -1196,6 +1329,8 @@ async def test_monitoring_endpoint(
         to_email=email,
         found_keywords=[keyword] if found else None
     )
+
+    
 
     test_email_ref.set({
         "email": email,
