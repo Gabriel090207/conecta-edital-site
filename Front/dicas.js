@@ -20,17 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(modalElement) {
         if (modalElement) {
             modalElement.classList.add('show-modal');
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';   // BLOQUEIA ROLAGEM DO FUNDO
         }
     }
-
+    
     function closeModal(modalElement) {
         if (modalElement) {
             modalElement.classList.remove('show-modal');
-            document.body.style.overflow = '';
+            document.body.style.overflow = 'auto';     // LIBERA ROLAGEM DO FUNDO
         }
     }
-
+    
     document.querySelectorAll('.modal-close-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const modalId = e.currentTarget.dataset.modalId;

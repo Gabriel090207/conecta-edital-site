@@ -202,20 +202,51 @@
   </footer>
   
 
-    <div class="modal-overlay" id="dica-viewer-modal">
-        <div class="modal-content dica-viewer-content">
-            <div class="modal-header">
-                <h3 id="dica-viewer-title"></h3>
-                <button class="modal-close-btn" data-modal-id="dica-viewer-modal">&times;</button>
-            </div>
-            <div class="dica-viewer-meta">
-                <span id="dica-viewer-autor"></span>
-                <span id="dica-viewer-date"></span>
-            </div>
-            <div class="dica-viewer-content" id="dica-viewer-conteudo">
-                </div>
+  <div class="modal-overlay" id="dica-viewer-modal">
+    <div class="modal-content dica-new-modal">
+        
+        <!-- Header -->
+        <div class="dica-modal-header">
+            <h1 id="dica-viewer-title"></h1>
+            <button class="modal-close-btn" data-modal-id="dica-viewer-modal">&times;</button>
         </div>
+
+        <!-- Autor + Data -->
+        <div class="dica-modal-meta">
+            <span id="dica-viewer-autor"></span>
+            <span id="dica-viewer-date"></span>
+        </div>
+
+        <hr class="dica-divider">
+
+        <!-- Conteúdo -->
+        <div class="dica-modal-body" id="dica-viewer-conteudo"></div>
+
+        <!-- Rodapé -->
+        <div class="dica-modal-footer">
+
+            <!-- Lado esquerdo -->
+            <div class="footer-item">
+                <i class="fa-solid fa-eye"></i>
+                <span id="dica-visualizacoes">47 visualizações</span>
+            </div>
+
+            <!-- Lado direito (botões agrupados) -->
+            <div class="footer-actions">
+                <button class="footer-share-btn">
+                  <i class="fa-solid fa-share-alt"></i>
+                  Compartilhar
+                </button>
+
+                <button class="footer-like-btn">
+                    <i class="fa-solid fa-thumbs-up"></i> Útil (2)
+                </button>
+            </div>
+
+        </div>
+
     </div>
+</div>
 
    
 

@@ -948,7 +948,40 @@ ul {
     gap: 8px;
 }
 
-.ticket-status-banner {
+
+
+.ticket-status-banner.status-em-andamento{
+   
+    width: 95%;
+    display: block;
+    background-color: #3a68ff;
+    color: #fdfcfc;
+    text-align: center;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 19px;
+    margin: 0 auto;
+}
+
+.ticket-status-banner.status-finalizado{
+   
+    width: 95%;
+    display: block;
+    background-color: #05bc5b;
+    color: #ffffff;
+    text-align: center;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 19px;
+    margin: 0 auto;
+}
+
+.ticket-status-banner.status-pendente{
+   
+    width: 95%;
+    display: block;
     background-color: #ffeb3bc5;
     color: #5d4037;
     text-align: center;
@@ -956,9 +989,9 @@ ul {
     font-weight: 600;
     font-size: 0.9rem;
     border-radius: 19px;
-    width: 95%;
     margin: 0 auto;
 }
+
 
 .ticket-messages-container {
     padding: 20px;
