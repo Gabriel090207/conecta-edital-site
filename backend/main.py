@@ -86,10 +86,11 @@ def send_whatsapp(to_number: str, message: str):
 
     try:
         msg = twilio_client.messages.create(
-            from_=TWILIO_WHATSAPP_FROM,
+            from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
             body=message,
             to=f"whatsapp:{cleaned_number}"
         )
+
 
         print("WhatsApp enviado:", msg.sid)
         return True
