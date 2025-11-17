@@ -103,6 +103,37 @@ def send_whatsapp(to_number: str, message: str):
         return {"status": "error", "detail": str(e)}
 
 
+def send_whatsapp_template(to_number: str, titulo: str, data: str, link: str):
+    cleaned_number = (
+        to_number.replace(" ", "")
+        .replace("(", "")
+        .replace(")", "")
+        .replace("-", "")
+    )
+
+    if not cleaned_number.startswith("+"):
+        cleaned_number = "+55" + cleaned_number
+
+    try:
+        message = twilio_client.messages.create(
+            from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
+            to=f"whatsapp:{cleaned_number}",
+            content_sid="HX9acb7168e42e238b7ec1b7df635487ee",
+            content_variables=json.dumps({
+                "1": titulo,
+                "2": data,
+                "3": link
+            })
+        )
+
+        print("Mensagem enviada:", message.sid)
+        return {"status": "success", "sid": message.sid}
+
+    except Exception as e:
+        print("Erro ao enviar template:", str(e))
+        return {"status": "error", "detail": str(e)}
+
+
 # --- INICIALIZAÇÃO DO FASTAPI ---
 app = FastAPI(
     title="API Conecta Edital",
