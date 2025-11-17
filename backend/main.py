@@ -34,7 +34,7 @@ import mercadopago
 from payment_service import create_mercadopago_checkout_url, PREAPPROVAL_PLAN_IDS, PLANS
 
 # Envio de email e variáveis de ambiente
-from email.mime.text imprt MIMEText
+from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
 from dotenv import load_dotenv
