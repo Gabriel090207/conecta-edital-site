@@ -912,6 +912,27 @@ async def test_whatsapp(number: str = Query(..., description="Número destino no
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
+@app.get("/test-whatsapp-template")
+async def test_whatsapp_template(
+    number: str = Query(..., description="Número no formato +55DDDNUMERO")
+):
+    """
+    Envia um teste do TEMPLATE WhatsApp usando Twilio.
+    Exemplo:
+    /test-whatsapp-template?number=+5511999999999
+    """
+    try:
+        result = send_whatsapp_template(
+            to_number=number,
+            titulo="Nova ocorrência encontrada!",
+            data="Hoje",
+            link="https://conectaedital.com"
+        )
+        return {"status": "ok", "result": result}
+
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
 
 @app.get("/run-monitorings-cron")
 async def run_monitorings_cron():
