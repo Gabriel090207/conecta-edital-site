@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dicaViewerDate = document.getElementById('dica-viewer-date');
     const dicaViewerConteudo = document.getElementById('dica-viewer-conteudo');
 
+
+    const db = firebase.firestore();
+
     let allDicas = [];
 
     // --- Funções de Modal ---
@@ -149,25 +152,76 @@ dicaCard.innerHTML = `
     }
     
     // --- Lógica do Modal de Visualização (já corrigida anteriormente) ---
-    function openDicaViewerModal(dica) {
-        dicaViewerTitle.textContent = dica.titulo;
-        dicaViewerAutor.textContent = `Por: ${dica.autor}`;
-        dicaViewerDate.textContent = new Date(dica.data_criacao).toLocaleDateString('pt-BR');
+   // --- Lógica do Modal de Visualização ---
+function openDicaViewerModal(dica) {
 
-        // --- SOLUÇÃO PARA QUEBRA DE LINHA NO MODAL ---
-        const conteudoBruto = dica.conteudo;
-        const linhas = conteudoBruto.split('\n');
-        let htmlConteudo = '';
-        linhas.forEach(linha => {
-            if (linha.trim() !== '') {
-                htmlConteudo += `<p>${linha}</p>`;
-            }
-        });
-        dicaViewerConteudo.innerHTML = htmlConteudo;
-        // --- FIM DA SOLUÇÃO ---
+    console.log("🔎 ID recebido da dica:", dica.id);
 
-        openModal(dicaViewerModal);
+
+    // Preencher título, autor e data
+    dicaViewerTitle.textContent = dica.titulo;
+    dicaViewerAutor.textContent = dica.autor;
+    dicaViewerDate.textContent = new Date(dica.data_criacao).toLocaleDateString('pt-BR');
+
+    // Converte quebras de linha para <p>
+    const linhas = dica.conteudo.split('\n');
+    let htmlConteudo = '';
+    linhas.forEach(linha => {
+        if (linha.trim() !== '') {
+            htmlConteudo += `<p>${linha}</p>`;
+        }
+    });
+    dicaViewerConteudo.innerHTML = htmlConteudo;
+
+    // ==========================
+    // 🔵 REGISTRAR VISUALIZAÇÃO
+    // ==========================
+    registrarVisualizacao(dica.id, dica);
+
+    // ==========================
+    // 🟢 CONFIGURAR BOTÃO "ÚTIL"
+    // ==========================
+   setTimeout(() => {
+    const likeBtn = document.getElementById("btn-like");
+    const likeCount = document.getElementById("like-count");
+    db.collection("dicas").doc(dica.id).get().then(doc => {
+    if (doc.exists) {
+        const atual = doc.data().likes || 0;
+        likeCount.textContent = atual;
+        dica.likes = atual; // atualiza localmente
     }
+});
+
+
+    const uid = firebase.auth().currentUser?.uid;
+    if (!uid) return;
+
+    const likeUserRef = db.collection("dicas").doc(dica.id).collection("likes_users").doc(uid);
+
+    // Verificar se o usuário já curtiu
+    likeUserRef.get().then(doc => {
+        if (doc.exists) {
+            likeBtn.classList.add("liked");
+        }
+    });
+
+    likeBtn.onclick = () => registrarCurtida(dica.id, dica);
+}, 50);
+
+
+// 🟦 CONFIGURAR BOTÃO DE COMPARTILHAR
+const shareBtn = document.getElementById("btn-share");
+
+shareBtn.onclick = () => {
+    compartilharDica(dica);
+};
+
+
+
+    // Abrir modal
+    openModal(dicaViewerModal);
+}
+
 
     // --- Listeners ---
     tagButtons.forEach(button => {
@@ -181,6 +235,93 @@ dicaCard.innerHTML = `
     if (searchInput) {
         searchInput.addEventListener('input', applyFiltersAndSearch);
     }
+
+
+
+    // =============================
+// 🔵 SALVAR VISUALIZAÇÃO
+// =============================
+function registrarVisualizacao(id, dicaObj) {
+    const ref = db.collection("dicas").doc(id);
+
+    ref.update({
+        visualizacoes: firebase.firestore.FieldValue.increment(1)
+    })
+    .then(() => {
+        // Atualiza localmente também
+        dicaObj.visualizacoes = (dicaObj.visualizacoes || 0) + 1;
+
+        // Atualizar no modal
+        document.getElementById("dica-visualizacoes").textContent =
+            `${dicaObj.visualizacoes} visualizações`;
+    })
+    .catch(() => {});
+}
+
+
+// =============================
+// 🟢 SALVAR CURTIDA (Útil)
+// =============================
+function registrarCurtida(id, dicaObj) {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Faça login para curtir.");
+        return;
+    }
+
+    const uid = user.uid;
+
+    const ref = db.collection("dicas").doc(id);
+    const likeUserRef = ref.collection("likes_users").doc(uid);
+
+    // Verificar se o usuário já curtiu
+    likeUserRef.get().then(doc => {
+        if (doc.exists) {
+            console.log("Usuário já curtiu.");
+            return; // Impede curtida repetida
+        }
+
+        // Salvar que este usuário curtiu
+        likeUserRef.set({ curtido: true });
+
+        // Incrementar contador
+        ref.update({
+            likes: firebase.firestore.FieldValue.increment(1)
+        })
+        .then(() => {
+            dicaObj.likes = (dicaObj.likes || 0) + 1;
+            document.getElementById("like-count").textContent = dicaObj.likes;
+        });
+    });
+}
+
+function compartilharDica(dica) {
+
+    const link = window.location.origin + "/dicas.html?id=" + dica.id;
+    const titulo = dica.titulo;
+
+    // 💙 1) Se o navegador suportar Web Share API
+    if (navigator.share) {
+        navigator.share({
+            title: titulo,
+            text: "Achei essa dica útil no Conecta Edital!",
+            url: link
+        })
+        .catch(err => console.log("Compartilhamento cancelado", err));
+
+        return;
+    }
+
+    // 💚 2) Caso contrário, copia o link automaticamente:
+    navigator.clipboard.writeText(link)
+        .then(() => {
+            alert("🔗 Link copiado! Agora você pode colar e compartilhar onde quiser.");
+        })
+        .catch(() => {
+            alert("Não foi possível copiar o link.");
+        });
+}
+
 
     // Início da aplicação
     loadDicas();
