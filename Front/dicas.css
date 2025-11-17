@@ -810,11 +810,16 @@ body.modal-open {
 /* Remove o negrito dos textos dentro do modal */
 .dica-modal-body p,
 .dica-modal-body span,
-.dica-modal-body div,
-.dica-modal-body strong,
-.dica-modal-body b {
+.dica-modal-body div {
     font-weight: 400 !important;
 }
+
+/* Permitir negrito funcionar */
+.dica-modal-body strong,
+.dica-modal-body b {
+    font-weight: 700 !important;
+}
+
 
 /* Caso o JS coloque <p> em título, ajuste também */
 .dica-modal-body p:first-child {
@@ -929,4 +934,21 @@ body.modal-open {
     transition: .2s;
 }
 
+}
+
+.footer-like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; /* espaço apenas entre o ícone e o texto */
+}
+
+.footer-like-btn .like-text {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+#like-count {
+    margin: 0;
+    padding: 0;
 }

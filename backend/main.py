@@ -859,18 +859,14 @@ async def run_all_monitorings():
         print(f"⚠️ Erro ao salvar log da verificação: {e}")
 
 
-@app.on_event("startup")
-async def start_scheduler():
-    loop = asyncio.get_event_loop()
-
-    scheduler.configure(event_loop=loop)
-
-    scheduler.add_job(run_all_monitorings, CronTrigger(hour=5, minute=45))
-    scheduler.add_job(run_all_monitorings, CronTrigger(hour=23, minute=45))
-
-    scheduler.start()
-    print("🕒 Agendador iniciado: verificações diárias às 05:45 e 23:45.")
-
+@app.get("/run-monitorings-cron")
+async def run_monitorings_cron():
+    """
+    Endpoint para ser chamado manualmente ou via CRON no Render.
+    """
+    print("🌐 Endpoint /run-monitorings-cron chamado")
+    await run_all_monitorings()
+    return {"status": "ok"}
 
 
 @app.post("/api/sync-occurrences")

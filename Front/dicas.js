@@ -17,6 +17,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const db = firebase.firestore();
 
+    // Converte marcação simples *negrito* em <strong>negrito</strong>
+// Converte marcações simples tipo *negrito*, **negrito forte**, _itálico_, __itálico forte__
+function formatMarkdown(text) {
+    if (!text) return '';
+
+    return text
+        // **negrito forte**
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        
+        // *negrito*
+        .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+        
+        // __itálico forte__
+        .replace(/__(.*?)__/g, '<em>$1</em>')
+        
+        // _itálico_
+        .replace(/_(.*?)_/g, '<em>$1</em>');
+}
+
+
     let allDicas = [];
 
     // --- Funções de Modal ---
@@ -85,11 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- INÍCIO DA SOLUÇÃO PARA QUEBRA DE LINHA NO CARD ---
             // Substitui as quebras de linha (`\n`) por <br> e corta para 150 caracteres.
-            const conteudoFormatadoParaCard = dica.conteudo.replace(/\n/g, '<br>').substring(0, 150);
-            
-            // Adiciona "..." somente se o conteúdo for maior que 150 caracteres.
-            const exibirPontos = dica.conteudo.length > 150 ? '...' : '';
-            // --- FIM DA SOLUÇÃO ---
+            // Aplica markdown e quebra de linha no card
+let conteudoPreview = formatMarkdown(dica.conteudo).replace(/\n/g, '<br>');
+const exibirPontos = dica.conteudo.length > 150 ? '...' : '';
+conteudoPreview = conteudoPreview.substring(0, 150);
+
 
             // Define ícones e cores
 const topicStyles = {
@@ -108,7 +128,8 @@ dicaCard.innerHTML = `
         ${estilo.icon} ${dica.topico}
     </div>
     <h3>${dica.titulo}</h3>
-    <p>${conteudoFormatadoParaCard}${exibirPontos}</p>
+    <p>${conteudoPreview}${exibirPontos}</p>
+
     <div class="card-footer">
         <span class="autor">Por: ${dica.autor}</span>
         <span class="data">${dataCriacao}</span>
@@ -164,14 +185,18 @@ function openDicaViewerModal(dica) {
     dicaViewerDate.textContent = new Date(dica.data_criacao).toLocaleDateString('pt-BR');
 
     // Converte quebras de linha para <p>
-    const linhas = dica.conteudo.split('\n');
-    let htmlConteudo = '';
-    linhas.forEach(linha => {
-        if (linha.trim() !== '') {
-            htmlConteudo += `<p>${linha}</p>`;
-        }
-    });
-    dicaViewerConteudo.innerHTML = htmlConteudo;
+   // Converte quebras de linha para <p> e aplica *negrito*
+const linhas = dica.conteudo.split('\n');
+let htmlConteudo = '';
+
+linhas.forEach(linha => {
+    if (linha.trim() !== '') {
+        const formatada = formatMarkdown(linha);  // aplica *negrito*
+        htmlConteudo += `<p>${formatada}</p>`;
+    }
+});
+
+dicaViewerConteudo.innerHTML = htmlConteudo;  // usa innerHTML, NÃO textContent
 
     // ==========================
     // 🔵 REGISTRAR VISUALIZAÇÃO
