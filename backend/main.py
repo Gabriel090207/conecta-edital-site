@@ -70,10 +70,10 @@ twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 def send_whatsapp(to_number: str, message: str):
     """
     Envia uma mensagem WhatsApp usando Twilio.
-    Formato do número: +5511999999999
+    Formato do número esperado: +5511999999999
     """
 
-    # Remove espaços, parenteses e traços do número do usuário
+    # Limpa caracteres desnecessários
     cleaned_number = (
         to_number.replace(" ", "")
         .replace("(", "")
@@ -81,24 +81,26 @@ def send_whatsapp(to_number: str, message: str):
         .replace("-", "")
     )
 
+    # Se o número vier sem +55, adiciona automaticamente
     if not cleaned_number.startswith("+"):
-        cleaned_number = "+55" + cleaned_number  # Força Brasil se vier sem DDI
+        cleaned_number = "+55" + cleaned_number
 
     try:
+        from_number = f"whatsapp:{TWILIO_WHATSAPP_FROM}"
+        to_number = f"whatsapp:{cleaned_number}"
+
         msg = twilio_client.messages.create(
-            from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
+            from_=from_number,
             body=message,
-            to=f"whatsapp:{cleaned_number}"
+            to=to_number
         )
 
-
         print("WhatsApp enviado:", msg.sid)
-        return True
+        return {"status": "success", "sid": msg.sid}
 
     except Exception as e:
         print("Erro ao enviar WhatsApp:", str(e))
-        return False
-
+        return {"status": "error", "detail": str(e)}
 
 
 # --- INICIALIZAÇÃO DO FASTAPI ---
@@ -864,6 +866,20 @@ async def run_all_monitorings():
         })
     except Exception as e:
         print(f"⚠️ Erro ao salvar log da verificação: {e}")
+
+
+@app.get("/test-whatsapp")
+async def test_whatsapp(number: str = Query(..., description="Número destino no formato +55DDDNUMERO")):
+    """
+    Envia uma mensagem de teste via WhatsApp para validar o Twilio.
+    Exemplo:
+    /test-whatsapp?number=+5511999999999
+    """
+    try:
+        result = send_whatsapp(number, "🔔 Teste de mensagem WhatsApp via Conecta Edital!")
+        return {"status": "ok", "result": result}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
 
 
 @app.get("/run-monitorings-cron")
