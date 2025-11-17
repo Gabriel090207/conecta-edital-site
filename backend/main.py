@@ -835,13 +835,19 @@ async def run_all_monitorings():
 
     tasks = []
     for doc in docs:
+       
         data = doc.to_dict()
+
+        created_at = data.pop("created_at", datetime.now())
+        last_checked_at = data.pop("last_checked_at", datetime.now())
+
         monitoring = Monitoring(
             id=doc.id,
             **data,
-            created_at=data.get('created_at', datetime.now()),
-            last_checked_at=data.get('last_checked_at', datetime.now())
+            created_at=created_at,
+            last_checked_at=last_checked_at
         )
+
         tasks.append(perform_monitoring_check(monitoring))
 
     # Executa todos os monitoramentos em paralelo (sem travar)
