@@ -213,37 +213,46 @@
 
         <!-- Autor + Data -->
         <div class="dica-modal-meta">
-            <span id="dica-viewer-autor"></span>
-            <span id="dica-viewer-date"></span>
-        </div>
+    <img src="robo.png" class="meta-avatar">
+
+    <span class="meta-por">Por: </span>
+    <span class="meta-author" id="dica-viewer-autor"></span>
+
+    <i class="fa-regular fa-calendar meta-icon"></i>
+    <span class="meta-date" id="dica-viewer-date"></span>
+</div>
+
 
         <hr class="dica-divider">
 
         <!-- Conteúdo -->
-        <div class="dica-modal-body" id="dica-viewer-conteudo"></div>
+      <div class="dica-modal-body" id="dica-viewer-conteudo"></div>
 
-        <!-- Rodapé -->
-        <div class="dica-modal-footer">
+<!-- Rodapé -->
+<div class="dica-modal-footer">
 
-            <!-- Lado esquerdo -->
-            <div class="footer-item">
-                <i class="fa-solid fa-eye"></i>
-                <span id="dica-visualizacoes">47 visualizações</span>
-            </div>
+    <!-- Lado esquerdo -->
+    <div class="footer-item">
+        <i class="fa-regular fa-eye"></i>
+        <span id="dica-visualizacoes">0 visualizações</span>
+    </div>
 
-            <!-- Lado direito (botões agrupados) -->
-            <div class="footer-actions">
-                <button class="footer-share-btn">
-                  <i class="fa-solid fa-share-alt"></i>
-                  Compartilhar
-                </button>
+    <!-- Lado direito (botões agrupados) -->
+    <div class="footer-actions">
 
-                <button class="footer-like-btn">
-                    <i class="fa-solid fa-thumbs-up"></i> Útil (2)
-                </button>
-            </div>
+        <button class="footer-share-btn" id="btn-share">
+          <i class="fa-solid fa-share-nodes"></i>
+          Compartilhar
+        </button>
 
-        </div>
+        <button class="footer-like-btn" id="btn-like">
+            <i class="fa-regular fa-thumbs-up"></i> 
+            Útil (<span id="like-count">0</span>)
+        </button>
+
+    </div>
+</div>
+
 
     </div>
 </div>

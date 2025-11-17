@@ -861,11 +861,13 @@ async def run_all_monitorings():
 
 @app.on_event("startup")
 async def start_scheduler():
-    """
-    Inicia o agendador ao subir o servidor.
-    """
+    loop = asyncio.get_event_loop()
+
+    scheduler.configure(event_loop=loop)
+
     scheduler.add_job(run_all_monitorings, CronTrigger(hour=5, minute=45))
     scheduler.add_job(run_all_monitorings, CronTrigger(hour=23, minute=45))
+
     scheduler.start()
     print("🕒 Agendador iniciado: verificações diárias às 05:45 e 23:45.")
 

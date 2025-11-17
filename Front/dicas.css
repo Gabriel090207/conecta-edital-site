@@ -726,6 +726,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 14px 32px;
+    border-radius: 14px;
     background: #fafafa;
     border-top: 1px solid #eaeaea;
     position: sticky;
@@ -738,23 +739,30 @@ body {
     align-items: center;
     gap: 7px;
     font-size: .9rem;
-    color: #2d8cff !important; /* azul */
+    color: #6b6f76 !important; /* azul */
 }
 
 .footer-item i {
     margin-top: 0px;
-    color: #2d8cff !important;
+     color: transparent;
+    -webkit-text-stroke: 1px #2d8cff;
 }
 
 /* Botão compartilhar */
 .footer-share-btn {
-    background: #ededed;
-    border: none;
+    background: #ffffff;
+    border: solid 1px #6b6f76;
     padding: 8px 16px;
     border-radius: 6px;
     font-size: .85rem;
     cursor: pointer;
     transition: .2s;
+}
+
+
+.footer-share-btn i {
+   color: transparent;
+    -webkit-text-stroke: 1px black;
 }
 
 .footer-share-btn:hover {
@@ -818,4 +826,107 @@ body.modal-open {
     line-height: 1.6;
     margin-bottom: 12px;
     font-size: 1rem;
+}
+
+
+
+/* ============ META (autor + data) ============ */
+
+.dica-modal-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 30px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #6b6f76;
+}
+
+/* avatar */
+.meta-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+}
+
+/* "Por" */
+.meta-por {
+    color: #444;
+}
+
+/* Nome em azul */
+.meta-author {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+/* ícone calendário */
+.meta-icon {
+    font-size: 1rem;
+    margin-left: 10px;
+    color: #9aa0a6;
+}
+
+/* data */
+.meta-date {
+    color: #6b6f76;
+}
+
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding-top: 20px;
+    }
+
+
+    .footer-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .8rem;
+    color: #6b6f76 !important; /* azul */
+}
+
+.footer-item i {
+    margin-top: 0px;
+     color: transparent;
+    -webkit-text-stroke: 1px #2d8cff;
+}
+
+/* Botão compartilhar */
+.footer-share-btn {
+    background: #ffffff;
+    border: solid 1px #6b6f76;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: .58rem;
+    cursor: pointer;
+    transition: .2s;
+}
+
+
+.footer-share-btn i {
+   color: transparent;
+    -webkit-text-stroke: 1px black;
+}
+
+.footer-share-btn:hover {
+    opacity: .85;
+}
+
+/* Botão útil */
+.footer-like-btn {
+    background: #11a55e;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: .58rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: .2s;
+}
+
 }
