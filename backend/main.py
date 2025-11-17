@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Body, BackgroundTasks, Depends, Request, status, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Body, BackgroundTasks, Depends, Request, status, UploadFile, File, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl, EmailStr, Field
 from typing import List, Optional, Dict, Union
@@ -34,7 +34,7 @@ import mercadopago
 from payment_service import create_mercadopago_checkout_url, PREAPPROVAL_PLAN_IDS, PLANS
 
 # Envio de email e variáveis de ambiente
-from email.mime.text import MIMEText
+from email.mime.text imprt MIMEText
 from email.header import Header
 from email.utils import formataddr
 from dotenv import load_dotenv
@@ -295,7 +295,7 @@ class AdminProfileUpdate(BaseModel):
     slots_disponiveis: Optional[int] = Field(None, alias="slots_disponiveis")
 
     class Config:
-        allow_population_by_field_name = True
+        allow_popoulation_by_field_name = True
         allow_population_by_alias = True
 
 
