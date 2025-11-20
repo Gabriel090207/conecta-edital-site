@@ -1,8 +1,8 @@
 import asyncio
-from monitorings import run_all_monitorings  # importe sua função real
+from main import run_all_monitorings   # importar direto do main.py
 
-async def main():
+async def main_task():
     await run_all_monitorings()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main_task())
