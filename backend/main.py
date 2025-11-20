@@ -2572,21 +2572,3 @@ async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
         raise HTTPException(status_code=500, detail=f"Erro ao atualizar slots: {e}")
 
 
-# ========================================================================================================
-# 🔁 CRONJOB AUTOMÁTICO - EXECUTAR MONITORAMENTOS TODOS OS DIAS
-# ========================================================================================================
-
-# Executa às 05:45 e 23:45
-scheduler.add_job(run_all_monitorings, CronTrigger(hour="5,23", minute="45"))
-
-if __name__ == "__main__":
-    import uvicorn
-
-    print("⏳ Iniciando Scheduler de Monitoramentos...")
-    scheduler.start()
-
-    # Executa uma verificação 1 minuto após o servidor iniciar
-    asyncio.get_event_loop().call_later(60, lambda: asyncio.create_task(run_all_monitorings()))
-
-    print("🚀 Iniciando servidor FastAPI...")
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 10000)))
