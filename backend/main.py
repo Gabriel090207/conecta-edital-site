@@ -998,7 +998,11 @@ async def create_personal_monitoramento(
     user_uid: str = Depends(get_current_user_uid)
 ):
     db_firestore_client = firestore.client()
-    user_monitorings_count = len(list(db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid)).stream()))
+    user_monitorings_count = len(list(
+        db_firestore_client.collection('monitorings')
+        .where(filter=FieldFilter('user_uid', '==', user_uid))
+        .stream()
+    ))
     
     user_plan_for_creation = await get_user_plan_from_firestore(user_uid)
     max_slots = get_max_slots_by_plan(user_plan_for_creation)
@@ -1011,9 +1015,7 @@ async def create_personal_monitoramento(
     
     user_email = await get_user_email_from_firestore(user_uid)
     if not user_email:
-        raise HTTPException(
-            status_code=404, detail="E-mail do usuário não encontrado no Firestore."
-        )
+        raise HTTPException(status_code=404, detail="E-mail do usuário não encontrado no Firestore.")
 
     new_monitoring_dict = {
         'monitoring_type': 'personal',
@@ -1031,19 +1033,50 @@ async def create_personal_monitoramento(
     }
     
     _, doc_ref = db_firestore_client.collection('monitorings').add(new_monitoring_dict)
+
     new_monitoring_obj = Monitoring(
         id=doc_ref.id,
-        **{**new_monitoring_dict, 'last_checked_at': datetime.now(), 'created_at': datetime.now()})
+        **{**new_monitoring_dict, 'last_checked_at': datetime.now(), 'created_at': datetime.now()}
+    )
 
+    # 📧 Email
     background_tasks.add_task(
         send_email_notification,
         monitoramento=new_monitoring_obj,
         template_type='monitoring_active',
         to_email=new_monitoring_obj.user_email
     )
+
+    # 🔍 Primeira verificação automática
     background_tasks.add_task(perform_monitoring_check, new_monitoring_obj)
 
-    print(f"Novo Monitoramento Radar criado para UID {user_uid}: {new_monitoring_obj.dict()}")
+    # 📲 WHATSAPP (somente premium)
+    try:
+        user_ref = db_firestore_client.collection("users").document(user_uid)
+        user_doc = user_ref.get()
+
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            user_phone = user_data.get("contact")
+            user_plan = user_data.get("plan_type", "sem_plano").lower()
+
+            if user_plan == "premium" and user_phone:
+
+                background_tasks.add_task(
+                    send_whatsapp_template,
+                    to_number=user_phone,
+                    titulo="Seu monitoramento foi ativado!",
+                    data=new_monitoring_obj.edital_identifier,
+                    link=new_monitoring_obj.official_gazette_link
+                )
+
+                print(f"📲 WhatsApp enviado para {user_phone}")
+            else:
+                print("Usuário não é premium ou não possui número salvo.")
+    except Exception as e:
+        print("Erro ao enviar WhatsApp:", e)
+
+    print(f"Novo Monitoramento Pessoal criado para UID {user_uid}: {new_monitoring_obj.dict()}")
     return new_monitoring_obj
 
 @app.post("/api/monitoramentos/radar", response_model=Monitoring, status_code=201)
@@ -1065,14 +1098,12 @@ async def create_radar_monitoramento(
     if user_monitorings_count >= max_slots:
         raise HTTPException(
             status_code=403,
-            detail="Limite de slots de monitoramento atingido. Faça upgrade do seu plano para adicionar mais!"
+            detail="Limite de slots de monitoramento atingido."
         )
 
     user_email = await get_user_email_from_firestore(user_uid)
     if not user_email:
-        raise HTTPException(
-            status_code=404, detail="E-mail do usuário não encontrado no Firestore."
-        )
+        raise HTTPException(status_code=404, detail="E-mail do usuário não encontrado.")
 
     new_monitoring_dict = {
         'monitoring_type': 'radar',
@@ -1089,10 +1120,10 @@ async def create_radar_monitoramento(
         'user_email': user_email
     }
     
-    # ✅ Cria o documento principal
+    # Documento principal
     _, doc_ref = db_firestore_client.collection('monitorings').add(new_monitoring_dict)
 
-    # ✅ Cria uma ocorrência inicial (assim o Radar já tem subcoleção igual ao Pessoal)
+    # Ocorrência inicial
     try:
         doc_ref.collection("occurrences").add({
             "edital_identifier": monitoramento_data.id_edital,
@@ -1102,26 +1133,51 @@ async def create_radar_monitoramento(
             "detected_at": firestore.SERVER_TIMESTAMP,
             "last_checked_at": firestore.SERVER_TIMESTAMP,
         })
-        # atualiza contador
         doc_ref.update({"occurrences": 1})
-        print(f"💾 Ocorrência inicial criada para monitoramento Radar {doc_ref.id}")
     except Exception as e:
-        print(f"⚠️ Falha ao criar ocorrência inicial para Radar {doc_ref.id}: {e}")
+        print("Erro criando ocorrência inicial:", e)
 
-    # ✅ Cria o objeto Pydantic
     new_monitoring_obj = Monitoring(
         id=doc_ref.id,
         **{**new_monitoring_dict, 'last_checked_at': datetime.now(), 'created_at': datetime.now()}
     )
 
-    # ✅ Tarefas de background
+    # Email
     background_tasks.add_task(
         send_email_notification,
         monitoramento=new_monitoring_obj,
         template_type='monitoring_active',
         to_email=new_monitoring_obj.user_email
     )
+
+    # Primeira checagem
     background_tasks.add_task(perform_monitoring_check, new_monitoring_obj)
+
+    # 📲 WhatsApp Premium
+    try:
+        user_ref = db_firestore_client.collection("users").document(user_uid)
+        user_doc = user_ref.get()
+
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            user_phone = user_data.get("contact")
+            user_plan = user_data.get("plan_type", "sem_plano").lower()
+
+            if user_plan == "premium" and user_phone:
+
+                background_tasks.add_task(
+                    send_whatsapp_template,
+                    to_number=user_phone,
+                    titulo="Seu radar foi ativado!",
+                    data=new_monitoring_obj.edital_identifier,
+                    link=new_monitoring_obj.official_gazette_link
+                )
+
+                print(f"📲 WhatsApp enviado para {user_phone}")
+            else:
+                print("Usuário não é premium ou não possui número salvo.")
+    except Exception as e:
+        print("Erro no WhatsApp:", e)
 
     print(f"Novo Monitoramento Radar criado para UID {user_uid}: {new_monitoring_obj.dict()}")
     return new_monitoring_obj
