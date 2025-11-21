@@ -14,6 +14,9 @@ import hashlib
 import random
 import string
 
+from fastapi import APIRouter
+from utils.ultramsg import send_whatsapp_ultra
+
 # Firebase Admin SDK
 import firebase_admin
 from firebase_admin import credentials, auth, firestore, storage
@@ -48,7 +51,7 @@ import email_templates
 
 
 
-
+router = APIRouter()
 
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -904,34 +907,16 @@ async def run_all_monitorings():
         print(f"⚠️ Erro ao salvar log da verificação: {e}")
 
 
-@app.get("/test-whatsapp")
-async def test_whatsapp(number: str = Query(..., description="Número destino no formato +55DDDNUMERO")):
-    """
-    Envia uma mensagem de teste via WhatsApp para validar o Twilio.
-    Exemplo:
-    /test-whatsapp?number=+5511999999999
-    """
-    try:
-        result = send_whatsapp(number, "🔔 Teste de mensagem WhatsApp via Conecta Edital!")
-        return {"status": "ok", "result": result}
-    except Exception as e:
-        return {"status": "error", "detail": str(e)}
+@router.get("/teste-ultramsg")
+def teste_ultramsg():
+    numero = "+5516993072704"  # seu número
 
-@app.get("/testar-template-whatsapp")
-async def testar_template_whatsapp():
-    numero = "+5516993072704"
-
-    resposta = send_whatsapp_template(
-        to_number=numero,
-        titulo="🚨 Nova atualização no seu edital!",
-        data="Hoje",
-        link="https://conectaedital.com"
+    resposta = send_whatsapp_ultra(
+        number=numero,
+        message="🚀 UltraMSG integrado com sucesso!"
     )
 
-    return {
-        "enviado_para": numero,
-        "resultado": resposta
-    }
+    return resposta
 
 
 @app.get("/run-monitorings-cron")
