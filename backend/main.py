@@ -78,6 +78,7 @@ import json
 import httpx
 
 # Função para enviar uma mensagem do WhatsApp via UltraMSG
+# Função para enviar uma mensagem do WhatsApp via UltraMSG
 def send_whatsapp_ultra(to_number: str, message: str):
     """
     Envia uma mensagem pelo WhatsApp usando UltraMSG.
@@ -95,9 +96,10 @@ def send_whatsapp_ultra(to_number: str, message: str):
     if not cleaned_number.startswith("+"):
         cleaned_number = "+55" + cleaned_number
 
-    url = "https://api.ultramsg.com/api/v2/instance151632/messages/chat"
+    # Substitui na URL o ID da instância UltraMSG e o token da API
+    url = f"https://api.ultramsg.com/{ULTRA_INSTANCE_ID}/messages/chat"
     data = {
-        "token": "u2y2dk355ek0gr5i",  # Substitua com seu token de API
+        "token": ULTRA_TOKEN,  # Token de API
         "to": cleaned_number,
         "body": message
     }
@@ -795,7 +797,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                             f"Equipe Conecta Edital 🚀"
                         )
 
-                        send_whatsapp(user_phone, whatsapp_message)
+                        send_whatsapp_ultra(user_phone, whatsapp_message)
                         print(f"📲 WhatsApp enviado para {user_phone}")
 
                     else:
@@ -1273,7 +1275,7 @@ async def mercadopago_webhook(request: Request):
                     "Obrigado por utilizar o Conecta Edital ❤️"
                 )
 
-                send_whatsapp(user_phone, whatsapp_message)
+                send_whatsapp_ultra(user_phone, whatsapp_message)
                 print(f"📲 WhatsApp enviado para {user_phone}")
             else:
                 print(f"⚠️ Usuário {user_id} não tem número salvo.")
