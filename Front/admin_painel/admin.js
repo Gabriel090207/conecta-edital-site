@@ -74,6 +74,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadingAuditUsers = document.getElementById('loading-audit-users');
     const noAuditUsers = document.getElementById('no-audit-users');
     const userSearchInput = document.getElementById('user-search-input');
+    // Adiciona o evento input ao campo de pesquisa de usuários
+if (userSearchInput) {
+    userSearchInput.addEventListener('input', () => {
+        applyFilters();  // Chama a função de filtro para atualizar a lista de usuários
+    });
+}
     
     const manageDicasBtn = document.getElementById('manage-dicas-btn');
     const dicaModal = document.getElementById('dica-modal');
@@ -312,6 +318,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTicketsList(filteredTickets);
     }
     
+
+    // Função de filtro para pesquisar usuários por e-mail ou nome
+function applyFilters() {
+    const searchTerm = userSearchInput ? userSearchInput.value.trim() : ''; // Pega o valor da pesquisa no campo de busca de usuários
+
+    // Inicializa a lista de usuários filtrados a partir de todos os usuários carregados
+    let filteredUsers = [...allUsers]; // Usamos allUsers, que é onde todos os usuários estão armazenados
+
+    // Aplica o filtro de busca se o usuário digitou algo
+    if (searchTerm) {
+        const normalizedSearchTerm = normalizeString(searchTerm); // Normaliza o texto para uma busca mais eficiente
+
+        // Filtra os usuários pelo e-mail ou nome completo
+        filteredUsers = filteredUsers.filter(user =>
+            normalizeString(user.email).includes(normalizedSearchTerm) || // Verifica se o e-mail contém o termo de busca
+            normalizeString(user.full_name).includes(normalizedSearchTerm) // Verifica se o nome completo contém o termo de busca
+        );
+    }
+
+    // Chama a função de renderização para exibir os usuários filtrados
+    renderUserList(filteredUsers);
+}
+
     function renderTicketsList(tickets) {
         if (ticketsListAdmin) {
             ticketsListAdmin.innerHTML = '';
@@ -590,20 +619,23 @@ ticketDetailStatusTag.className = `ticket-status-tag status-${newStatus.toLowerC
     }
 
     function renderUserList(usersToRender) {
-        loadingAuditUsers.style.display = 'none';
-        usersAuditList.innerHTML = '';
+        loadingAuditUsers.style.display = 'none';  // Oculta a tela de carregamento
+        usersAuditList.innerHTML = '';  // Limpa a lista de usuários existente
+    
         if (usersToRender.length === 0) {
             noAuditUsers.style.display = 'block';
             noAuditUsers.textContent = 'Nenhum usuário encontrado com este e-mail.';
             return;
         }
+    
+        // Para cada usuário, cria um cartão de usuário
         usersToRender.forEach(user => {
             const userCard = document.createElement('div');
-            userCard.classList.add('user-audit-card');
-            
+            userCard.classList.add('user-audit-card'); // Classe para cada cartão de usuário
+    
             let planText = user.plan_type === 'gratuito' ? 'Sem plano' : user.plan_type;
             let planTagClass = user.plan_type === 'gratuito' ? 'no-plan' : user.plan_type;
-
+    
             userCard.innerHTML = `
                 <div class="user-audit-header">
                     <h4>UID: ${user.uid}</h4>
@@ -614,25 +646,25 @@ ticketDetailStatusTag.className = `ticket-status-tag status-${newStatus.toLowerC
                 <p><strong>Plano:</strong> <span class="plan-tag tag-${planTagClass}">${planText}</span></p>
                 <button class="btn-edit-user" data-uid="${user.uid}">Editar</button>
             `;
-            usersAuditList.appendChild(userCard);
+            usersAuditList.appendChild(userCard); // Adiciona o cartão do usuário à lista
         });
-
-        if(usersAuditList) {
+    
+        // Adiciona listeners para os botões de edição de usuário
+        if (usersAuditList) {
             usersAuditList.querySelectorAll('.btn-edit-user').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const userUid = e.target.dataset.uid;
                     const userData = allUsers.find(u => u.uid === userUid);
                     if (userData) {
-                      openEditUserModal(userData);
+                        openEditUserModal(userData); // Abre o modal de edição de usuário
                     } else {
-                      console.error("Usuário não encontrado:", userUid);
+                        console.error("Usuário não encontrado:", userUid);
                     }
-                  });
-                  
+                });
             });
         }
     }
-
+    
 
    // === FUNÇÃO PARA ABRIR O MODAL DE EDIÇÃO DE USUÁRIO ===
    function openEditUserModal(userData) {

@@ -74,8 +74,8 @@ TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
 twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 
 
-ULTRA_INSTANCE_ID = "instance151632"  # Substitua pelo ID da sua instância UltraMSG
-ULTRA_TOKEN = "u2y2dk355ek0gr5i"  # Substitua pelo seu token
+ULTRA_INSTANCE_ID = "instance151649"  # Substitua pelo ID da sua instância UltraMSG
+ULTRA_TOKEN = "fzzi92d48hnl0wjl"  # Substitua pelo seu token
 
 
 import json

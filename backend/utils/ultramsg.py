@@ -1,8 +1,8 @@
 import requests
 
-ULTRA_INSTANCE_ID = "instance151632"
-ULTRA_TOKEN = "u2y2dk355ek0gr5i"
-ULTRA_API_URL = f"https://api.ultramsg.com/instance151632/messages/chat"
+ULTRA_INSTANCE_ID = "instance151649"
+ULTRA_TOKEN = "fzzi92d48hnl0wjl "
+ULTRA_API_URL = f"https://api.ultramsg.com/instance151649/messages/chat"
 
 def send_whatsapp_ultra(number: str, message: str):
     payload = {
