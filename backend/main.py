@@ -74,6 +74,10 @@ TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
 twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 
 
+ULTRA_INSTANCE_ID = "instance151632"  # Substitua pelo ID da sua instância UltraMSG
+ULTRA_TOKEN = "u2y2dk355ek0gr5i"  # Substitua pelo seu token
+
+
 import json
 import httpx
 
@@ -92,7 +96,7 @@ def send_whatsapp_ultra(to_number: str, message: str):
         .replace("-", "")
     )
 
-    # Se o número vier sem +55, adiciona automaticamente
+    # Se o número não começar com +, adiciona automaticamente
     if not cleaned_number.startswith("+"):
         cleaned_number = "+55" + cleaned_number
 
@@ -130,9 +134,9 @@ def send_whatsapp_template_ultra(to_number: str, titulo: str, data: str, link: s
     if not cleaned_number.startswith("+"):
         cleaned_number = "+55" + cleaned_number
 
-    url = "https://api.ultramsg.com/api/v2/instance151632/messages/template"
+    url = f"https://api.ultramsg.com/{ULTRA_INSTANCE_ID}/messages/template"
     data = {
-        "token": "u2y2dk355ek0gr5i",  # Substitua com seu token de API
+        "token": ULTRA_TOKEN,  # Token de API
         "to": cleaned_number,
         "template": "seu_template_aqui",  # Substitua pelo seu template ID
         "params": json.dumps([titulo, data, link])  # Parametros do template
@@ -153,6 +157,15 @@ app = FastAPI(
     description="Backend para gerenciar monitoramentos de editais e concursos.",
     version="0.1.0"
 )
+
+@app.get("/")
+def read_root():
+    return {"message": "API Conecta Edital está funcionando!"}
+
+@app.post("/send-message/")
+async def send_message(to_number: str, message: str):
+    response = send_whatsapp_ultra(to_number, message)
+    return response
 
 # Configuração do CORS
 origins = [
