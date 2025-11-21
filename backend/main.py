@@ -115,18 +115,23 @@ def send_whatsapp_template(to_number: str, titulo: str, data: str, link: str):
         cleaned_number = "+55" + cleaned_number
 
     try:
-        message = twilio_client.messages.create(
-            from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
-            to=f"whatsapp:{cleaned_number}",
-            content_sid="HX9acb7168e42e238b7ec1b7df635487ee",
-            content_variables=json.dumps({
-                "1": str(titulo),
-                "2": str(data),
-                "3": str(link) if link else ""
-            })
-        )
+    # 🔥 forçar conversão para strings puras
+        titulo_str = str(titulo)
+        data_str = str(data)
+        link_str = str(link) if link else ""
 
-        print("Mensagem enviada:", message.sid)
+        message = twilio_client.messages.create(
+        from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
+        to=f"whatsapp:{cleaned_number}",
+        content_sid="HX9acb7168e42e238b7ec1b7df635487ee",
+        content_variables=json.dumps({
+            "1": titulo_str,
+            "2": data_str,
+            "3": link_str
+        })
+    )
+
+        print("Template enviado:", message.sid)
         return {"status": "success", "sid": message.sid}
 
     except Exception as e:
