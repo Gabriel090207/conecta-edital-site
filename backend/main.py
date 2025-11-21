@@ -123,7 +123,7 @@ def send_whatsapp_template(to_number: str, titulo: str, data: str, link: str):
         message = twilio_client.messages.create(
         from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
         to=f"whatsapp:{cleaned_number}",
-        content_sid="HX9acb7168e42e238b7ec1b7df635487ee",
+        content_sid="HXb72d33e0cf8dd972eeeca73bae04651f",
         content_variables=json.dumps({
             "1": titulo_str,
             "2": data_str,
