@@ -917,15 +917,21 @@ async def test_whatsapp(number: str = Query(..., description="Número destino no
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
-@app.get("/teste-whatsapp")
-def teste_whatsapp():
-    return send_whatsapp_template(
-        to_number="+5516993072704",
-        titulo="Novo Resultado Publicado!",
-        data="22/11/2025",
-        link="https://google.com"
+@app.get("/testar-template-whatsapp")
+async def testar_template_whatsapp():
+    numero = "+5516993072704"
+
+    resposta = send_whatsapp_template(
+        to_number=numero,
+        titulo="🚨 Nova atualização no seu edital!",
+        data="Hoje",
+        link="https://conectaedital.com"
     )
 
+    return {
+        "enviado_para": numero,
+        "resultado": resposta
+    }
 
 
 @app.get("/run-monitorings-cron")
