@@ -14,6 +14,10 @@ import hashlib
 import random
 import string
 
+
+import json
+import httpx
+
 from fastapi import APIRouter
 from utils.ultramsg import send_whatsapp_ultra
 
@@ -70,12 +74,15 @@ TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
 twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 
 
-def send_whatsapp(to_number: str, message: str):
+import json
+import httpx
+
+# Função para enviar uma mensagem do WhatsApp via UltraMSG
+def send_whatsapp_ultra(to_number: str, message: str):
     """
-    Envia uma mensagem WhatsApp usando Twilio.
+    Envia uma mensagem pelo WhatsApp usando UltraMSG.
     Formato do número esperado: +5511999999999
     """
-
     # Limpa caracteres desnecessários
     cleaned_number = (
         to_number.replace(" ", "")
@@ -88,25 +95,28 @@ def send_whatsapp(to_number: str, message: str):
     if not cleaned_number.startswith("+"):
         cleaned_number = "+55" + cleaned_number
 
+    url = "https://api.ultramsg.com/api/v2/instance151632/messages/chat"
+    data = {
+        "token": "u2y2dk355ek0gr5i",  # Substitua com seu token de API
+        "to": cleaned_number,
+        "body": message
+    }
+
     try:
-        from_number = f"whatsapp:{TWILIO_WHATSAPP_FROM}"
-        to_number = f"whatsapp:{cleaned_number}"
-
-        msg = twilio_client.messages.create(
-            from_=from_number,
-            body=message,
-            to=to_number
-        )
-
-        print("WhatsApp enviado:", msg.sid)
-        return {"status": "success", "sid": msg.sid}
-
-    except Exception as e:
-        print("Erro ao enviar WhatsApp:", str(e))
+        response = httpx.post(url, data=data)
+        response.raise_for_status()  # Levanta exceção em caso de erro na requisição
+        print("WhatsApp enviado:", response.text)
+        return {"status": "success", "response": response.json()}
+    except httpx.RequestError as e:
+        print(f"Erro ao enviar WhatsApp: {e}")
         return {"status": "error", "detail": str(e)}
 
-
-def send_whatsapp_template(to_number: str, titulo: str, data: str, link: str):
+# Função para enviar um template de WhatsApp via UltraMSG
+def send_whatsapp_template_ultra(to_number: str, titulo: str, data: str, link: str):
+    """
+    Envia uma mensagem de template do WhatsApp usando UltraMSG.
+    """
+    # Limpa caracteres desnecessários
     cleaned_number = (
         to_number.replace(" ", "")
         .replace("(", "")
@@ -114,33 +124,26 @@ def send_whatsapp_template(to_number: str, titulo: str, data: str, link: str):
         .replace("-", "")
     )
 
+    # Se o número não começar com +, adiciona o código do Brasil
     if not cleaned_number.startswith("+"):
         cleaned_number = "+55" + cleaned_number
 
+    url = "https://api.ultramsg.com/api/v2/instance151632/messages/template"
+    data = {
+        "token": "u2y2dk355ek0gr5i",  # Substitua com seu token de API
+        "to": cleaned_number,
+        "template": "seu_template_aqui",  # Substitua pelo seu template ID
+        "params": json.dumps([titulo, data, link])  # Parametros do template
+    }
+
     try:
-    # 🔥 forçar conversão para strings puras
-        titulo_str = str(titulo)
-        data_str = str(data)
-        link_str = str(link) if link else ""
-
-        message = twilio_client.messages.create(
-        from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
-        to=f"whatsapp:{cleaned_number}",
-        content_sid="HXb72d33e0cf8dd972eeeca73bae04651f",
-        content_variables=json.dumps({
-            "1": titulo_str,
-            "2": data_str,
-            "3": link_str
-        })
-    )
-
-        print("Template enviado:", message.sid)
-        return {"status": "success", "sid": message.sid}
-
-    except Exception as e:
-        print("Erro ao enviar template:", str(e))
+        response = httpx.post(url, data=data)
+        response.raise_for_status()
+        print(f"Template enviado com sucesso para {to_number}")
+        return {"status": "success", "response": response.json()}
+    except httpx.RequestError as e:
+        print(f"Erro ao enviar template do WhatsApp: {e}")
         return {"status": "error", "detail": str(e)}
-
 
 # --- INICIALIZAÇÃO DO FASTAPI ---
 app = FastAPI(
@@ -907,6 +910,34 @@ async def run_all_monitorings():
         print(f"⚠️ Erro ao salvar log da verificação: {e}")
 
 
+# Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
+async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
+    try:
+        if user_plan == "premium":
+            user_ref = firestore.client().collection("users").document(monitoramento.user_uid)
+            user_doc = user_ref.get()
+
+            if user_doc.exists:
+                user_data = user_doc.to_dict()
+                user_phone = user_data.get("contact")
+
+                if user_phone:
+                    whatsapp_message = (
+                        f"🚀 *Monitoramento Ativado!*\n\n"
+                        f"Seu monitoramento para o edital *{monitoramento.edital_identifier}* foi ativado com sucesso.\n\n"
+                        f"Acesse o link do edital: {monitoramento.official_gazette_link}\n"
+                        f"Boa sorte no processo! 🏆"
+                    )
+                    # Enviar mensagem
+                    send_whatsapp_ultra(user_phone, whatsapp_message)
+                else:
+                    print(f"⚠️ Usuário {monitoramento.user_uid} não tem número de telefone salvo.")
+            else:
+                print(f"⚠️ Documento do usuário {monitoramento.user_uid} não encontrado.")
+    except Exception as e:
+        print(f"Erro ao enviar notificação de WhatsApp para o monitoramento: {e}")
+
+
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
     numero = "+5516994288026"  # seu número
@@ -989,7 +1020,7 @@ async def create_personal_monitoramento(
         .where(filter=FieldFilter('user_uid', '==', user_uid))
         .stream()
     ))
-    
+
     user_plan_for_creation = await get_user_plan_from_firestore(user_uid)
     max_slots = get_max_slots_by_plan(user_plan_for_creation)
 
@@ -998,7 +1029,7 @@ async def create_personal_monitoramento(
             status_code=403,
             detail="Limite de slots de monitoramento atingido. Faça upgrade do seu plano para adicionar mais!"
         )
-    
+
     user_email = await get_user_email_from_firestore(user_uid)
     if not user_email:
         raise HTTPException(status_code=404, detail="E-mail do usuário não encontrado no Firestore.")
@@ -1017,7 +1048,7 @@ async def create_personal_monitoramento(
         'user_uid': user_uid,
         'user_email': user_email
     }
-    
+
     _, doc_ref = db_firestore_client.collection('monitorings').add(new_monitoring_dict)
 
     new_monitoring_obj = Monitoring(
@@ -1025,7 +1056,7 @@ async def create_personal_monitoramento(
         **{**new_monitoring_dict, 'last_checked_at': datetime.now(), 'created_at': datetime.now()}
     )
 
-    # 📧 Email
+    # 📧 Envio de e-mail
     background_tasks.add_task(
         send_email_notification,
         monitoramento=new_monitoring_obj,
@@ -1033,34 +1064,12 @@ async def create_personal_monitoramento(
         to_email=new_monitoring_obj.user_email
     )
 
-    # 🔍 Primeira verificação automática
-    background_tasks.add_task(perform_monitoring_check, new_monitoring_obj)
-
-    # 📲 WHATSAPP (somente premium)
-    try:
-        user_ref = db_firestore_client.collection("users").document(user_uid)
-        user_doc = user_ref.get()
-
-        if user_doc.exists:
-            user_data = user_doc.to_dict()
-            user_phone = user_data.get("contact")
-            user_plan = user_data.get("plan_type", "sem_plano").lower()
-
-            if user_plan == "premium" and user_phone:
-
-                background_tasks.add_task(
-                    send_whatsapp_template,
-                    to_number=user_phone,
-                    titulo="Seu monitoramento foi ativado!",
-                    data=new_monitoring_obj.edital_identifier,
-                    link=new_monitoring_obj.official_gazette_link
-                )
-
-                print(f"📲 WhatsApp enviado para {user_phone}")
-            else:
-                print("Usuário não é premium ou não possui número salvo.")
-    except Exception as e:
-        print("Erro ao enviar WhatsApp:", e)
+    # 📲 Envio de WhatsApp via UltraMSG (Somente Premium)
+    background_tasks.add_task(
+        send_whatsapp_notification,
+        monitoramento=new_monitoring_obj,
+        user_plan=user_plan_for_creation
+    )
 
     print(f"Novo Monitoramento Pessoal criado para UID {user_uid}: {new_monitoring_obj.dict()}")
     return new_monitoring_obj
@@ -1077,7 +1086,7 @@ async def create_radar_monitoramento(
         .where(filter=FieldFilter('user_uid', '==', user_uid))
         .stream()
     ))
-    
+
     user_plan_for_creation = await get_user_plan_from_firestore(user_uid)
     max_slots = get_max_slots_by_plan(user_plan_for_creation)
 
@@ -1128,7 +1137,7 @@ async def create_radar_monitoramento(
         **{**new_monitoring_dict, 'last_checked_at': datetime.now(), 'created_at': datetime.now()}
     )
 
-    # Email
+    # 📧 Envio de e-mail
     background_tasks.add_task(
         send_email_notification,
         monitoramento=new_monitoring_obj,
@@ -1139,31 +1148,12 @@ async def create_radar_monitoramento(
     # Primeira checagem
     background_tasks.add_task(perform_monitoring_check, new_monitoring_obj)
 
-    # 📲 WhatsApp Premium
-    try:
-        user_ref = db_firestore_client.collection("users").document(user_uid)
-        user_doc = user_ref.get()
-
-        if user_doc.exists:
-            user_data = user_doc.to_dict()
-            user_phone = user_data.get("contact")
-            user_plan = user_data.get("plan_type", "sem_plano").lower()
-
-            if user_plan == "premium" and user_phone:
-
-                background_tasks.add_task(
-                    send_whatsapp_template,
-                    to_number=user_phone,
-                    titulo="Seu radar foi ativado!",
-                    data=new_monitoring_obj.edital_identifier,
-                    link=new_monitoring_obj.official_gazette_link
-                )
-
-                print(f"📲 WhatsApp enviado para {user_phone}")
-            else:
-                print("Usuário não é premium ou não possui número salvo.")
-    except Exception as e:
-        print("Erro no WhatsApp:", e)
+    # 📲 Envio de WhatsApp via UltraMSG (Somente Premium)
+    background_tasks.add_task(
+        send_whatsapp_notification,
+        monitoramento=new_monitoring_obj,
+        user_plan=user_plan_for_creation
+    )
 
     print(f"Novo Monitoramento Radar criado para UID {user_uid}: {new_monitoring_obj.dict()}")
     return new_monitoring_obj
