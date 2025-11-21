@@ -918,6 +918,7 @@ def teste_ultramsg():
 
     return resposta
 
+app.include_router(router)
 
 @app.get("/run-monitorings-cron")
 async def run_monitorings_cron():
