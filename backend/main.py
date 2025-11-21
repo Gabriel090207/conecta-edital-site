@@ -909,7 +909,7 @@ async def run_all_monitorings():
 
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
-    numero = "+5516993072704"  # seu número
+    numero = "+5516994288026"  # seu número
 
     resposta = send_whatsapp_ultra(
         number=numero,
