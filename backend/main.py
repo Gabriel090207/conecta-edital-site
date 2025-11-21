@@ -356,7 +356,32 @@ class AdminProfileUpdate(BaseModel):
         allow_population_by_alias = True
 
 
-    
+ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
+    # Primeiro, envia a mensagem de monitoramento ativado
+    monitoramento_message = (
+        f"🚀 *Monitoramento Ativado!*\n\n"
+        f"Seu monitoramento para o edital *{monitoramento.edital_identifier}* foi ativado com sucesso.\n\n"
+        f"Acesse o link do edital: {monitoramento.official_gazette_link}\n"
+        f"Boa sorte no processo! 🏆"
+    )
+    send_whatsapp_ultra(user_phone, monitoramento_message)  # Envia a mensagem de monitoramento ativado
+
+    # Em seguida, envia a mensagem de nova ocorrência
+    ocorrencia_message = (
+        f"📢 *Nova ocorrência encontrada!*\n\n"
+        f"O edital *{monitoramento.edital_identifier}* teve uma nova ocorrência detectada.\n\n"
+        f"🔎 Palavras encontradas: {', '.join(monitoramento.keywords)}\n"
+        f"📄 Link do PDF: {monitoramento.pdf_real_link}\n\n"
+        f"Equipe Conecta Edital 🚀"
+    )
+    send_whatsapp_ultra(user_phone, ocorrencia_message)  # Envia a mensagem de ocorrência encontrada
+   
+# Quando você detectar uma nova ocorrência e ativar o monitoramento
+async def monitorar_ativacao(monitoramento: Monitoring):
+    # Se o usuário estiver com o plano Premium, envia as mensagens
+    user_phone = "número_do_usuário_aqui"  # Isso deve ser obtido do banco de dados
+    await send_monitoring_and_occurrence_notifications(monitoramento, user_phone)
+
 # Dependência de Autenticação Firebase
 async def get_current_user_uid(request: Request) -> str:
     """
