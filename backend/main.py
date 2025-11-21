@@ -364,7 +364,7 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
         f"Acesse o link do edital: {monitoramento.official_gazette_link}\n"
         f"Boa sorte no processo! 🏆"
     )
-    send_whatsapp_ultra(user_phone, monitoramento_message)  # Envia a mensagem de monitoramento ativado
+    await send_whatsapp_ultra(user_phone, monitoramento_message)  # Adicionando 'await' aqui
 
     # Em seguida, envia a mensagem de nova ocorrência
     ocorrencia_message = (
@@ -374,9 +374,8 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
         f"📄 Link do PDF: {monitoramento.pdf_real_link}\n\n"
         f"Equipe Conecta Edital 🚀"
     )
-    send_whatsapp_ultra(user_phone, ocorrencia_message)  # Envia a mensagem de ocorrência encontrada
-  # Envia a mensagem de ocorrência encontrada
-   
+    await send_whatsapp_ultra(user_phone, ocorrencia_message)  # Adicionando 'await' aqui também
+
 # Quando você detectar uma nova ocorrência e ativar o monitoramento
 async def monitorar_ativacao(monitoramento: Monitoring):
     # Se o usuário estiver com o plano Premium, envia as mensagens
