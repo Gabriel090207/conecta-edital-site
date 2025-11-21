@@ -356,7 +356,7 @@ class AdminProfileUpdate(BaseModel):
         allow_population_by_alias = True
 
 
- async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
+async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
     # Primeiro, envia a mensagem de monitoramento ativado
     monitoramento_message = (
         f"🚀 *Monitoramento Ativado!*\n\n"
@@ -375,6 +375,7 @@ class AdminProfileUpdate(BaseModel):
         f"Equipe Conecta Edital 🚀"
     )
     send_whatsapp_ultra(user_phone, ocorrencia_message)  # Envia a mensagem de ocorrência encontrada
+  # Envia a mensagem de ocorrência encontrada
    
 # Quando você detectar uma nova ocorrência e ativar o monitoramento
 async def monitorar_ativacao(monitoramento: Monitoring):
