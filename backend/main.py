@@ -120,9 +120,9 @@ def send_whatsapp_template(to_number: str, titulo: str, data: str, link: str):
             to=f"whatsapp:{cleaned_number}",
             content_sid="HX9acb7168e42e238b7ec1b7df635487ee",
             content_variables=json.dumps({
-                "1": titulo,
-                "2": data,
-                "3": link
+                "1": str(titulo),
+                "2": str(data),
+                "3": str(link) if link else ""
             })
         )
 
