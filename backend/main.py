@@ -170,6 +170,7 @@ async def send_message(to_number: str, message: str):
 # Configuração do CORS
 origins = [
     "http://127.0.0.1:5500",
+    "http://127.0.0.1:5501",
     "http://localhost:5500",
     "https://conecta-edital-site-927y.onrender.com",
     "https://paineldeadminconectaedital.netlify.app",
