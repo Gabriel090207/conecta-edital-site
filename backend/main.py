@@ -599,7 +599,7 @@ async def extract_text_from_pdf(pdf_content: bytes) -> str:
     try:
         reader = PdfReader(io.BytesIO(pdf_content))
         text = ""
-        for page in reader.pages:
+        for page in reader.pages[:3]:   # Só 3 páginas
             text += page.extract_text() or ""
         return text
     except Exception as e:
@@ -938,7 +938,13 @@ async def run_all_monitorings():
     print("🚀 Executando verificação automática de todos os monitoramentos ativos...")
     db = firestore.client()
     monitorings_ref = db.collection('monitorings').where('status', '==', 'active')
-    docs = monitorings_ref.stream()
+    docs = (
+    db.collection('monitorings')
+      .where('status', '==', 'active')
+      .limit(20)
+      .stream()
+    )
+
 
     tasks = []
     for doc in docs:
@@ -1367,7 +1373,7 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     .limit(100)  # evita estouro de memória e timeouts
     )
 
-    monitoramentos = list(monitoramentos_ref.stream())
+    monitoramentos = list(monitoramentos_ref.limit(50).stream())
 
     total_monitoramentos = len(monitoramentos)
     monitoramentos_ativos = len([m for m in monitoramentos if m.to_dict().get("status") == "active"])
