@@ -1353,52 +1353,43 @@ async def mercadopago_webhook(request: Request):
 
 @app.get("/api/status")
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
-    db = firestore.client()
+    db_firestore_client = firestore.client()
 
-    # Usuário
-    user_ref = db.collection('users').document(user_uid)
+    # 🔹 Busca o documento do usuário
+    user_ref = db_firestore_client.collection('users').document(user_uid)
     user_doc = user_ref.get()
+
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
     user_data = user_doc.to_dict()
 
-    # Plano (sem nova consulta ao Firestore)
-    plan_raw = (
-        user_data.get("plan_type")
-        or user_data.get("plano")
-        or user_data.get("plan")
-        or "sem_plano"
-    )
-    plan_normalizado = plan_raw.lower().strip()
+    # 🔹 Identifica plano do usuário com função existente
+    user_plan = await get_user_plan_from_firestore(user_uid)
 
-    if "premium" in plan_normalizado:
-        user_plan = "premium"
-    elif "essencial" in plan_normalizado:
-        user_plan = "essencial"
-    elif "basico" in plan_normalizado:
-        user_plan = "basico"
-    else:
-        user_plan = "sem_plano"
-
-    # Slots personalizados
+    # 🔹 Slots personalizados caso existam
     slots_personalizados = user_data.get("custom_slots") or user_data.get("slots_disponiveis")
 
-    # Monitoramentos — consulta rápida
+    # -------------------------------------------------------------------
+    # 🔥 OTIMIZAÇÃO CRUCIAL — busca monitoramentos LEVES
+    # Apenas campo "status" é carregado
+    # -------------------------------------------------------------------
     monitoramentos_ref = (
-        db.collection("monitorings")
+        db_firestore_client.collection("monitorings")
         .where("user_uid", "==", user_uid)
-        .limit(50)
+        .select(["status"])     # pega só 1 campo = super leve
+        .limit(200)             # limite seguro para evitar OOM
     )
 
-    docs = monitoramentos_ref.get()
-    monitoramentos = docs[:50]
+    monitoramentos = list(monitoramentos_ref.stream())
 
     # Contagem
     total_monitoramentos = len(monitoramentos)
-    monitoramentos_ativos = len([m for m in monitoramentos if m.to_dict().get("status") == "active"])
+    monitoramentos_ativos = sum(
+        1 for m in monitoramentos if m.to_dict().get("status") == "active"
+    )
 
-    # Nome amigável
+    # 🔹 Nomes amigáveis
     display_plan_name = {
         "sem_plano": "Sem Plano",
         "gratuito": "Sem Plano",
@@ -1407,7 +1398,9 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
         "premium": "Plano Premium"
     }.get(user_plan, "Sem Plano")
 
-    # Slots livres
+    # -------------------------------------------------------------------
+    # 🔹 Calculo de slots
+    # -------------------------------------------------------------------
     if slots_personalizados is not None:
         slots_livres = max(0, slots_personalizados - total_monitoramentos)
     elif user_plan == "premium":
@@ -1419,6 +1412,9 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     else:
         slots_livres = 0
 
+    # -------------------------------------------------------------------
+    # 🔹 Retorno final
+    # -------------------------------------------------------------------
     return {
         "status": "ok",
         "user_plan": display_plan_name,
@@ -2434,35 +2430,37 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
 
     db = firestore.client()
 
-    # Query rápida, ordenada e com limite
-    monitorings_ref = (
+    # ⚡ Query super leve e rápida
+    docs = (
         db.collection("monitorings")
         .where("user_uid", "==", user_uid)
+        .select([
+            "monitoring_type",
+            "edital_identifier",
+            "candidate_name",
+            "official_gazette_link",
+            "keywords",
+            "occurrences",
+            "status",
+            "last_checked_at",
+            "nome_customizado"
+        ])
         .order_by("created_at", direction=firestore.Query.DESCENDING)
         .limit(20)
+        .stream()
     )
-
-    docs = monitorings_ref.get()
 
     monitoramentos = []
 
-    for doc in docs:
-        data = doc.to_dict()
-
+    for d in docs:
+        data = d.to_dict()
         monitoramentos.append({
-            "id": doc.id,
-            "monitoring_type": data.get("monitoring_type"),
-            "edital_identifier": data.get("edital_identifier"),
-            "candidate_name": data.get("candidate_name"),
-            "official_gazette_link": data.get("official_gazette_link"),
-            "keywords": data.get("keywords", ""),
-            "occurrences": data.get("occurrences", 0),
-            "status": data.get("status", "inactive"),
-            "last_checked_at": str(data.get("last_checked_at")),
-            "nome_customizado": data.get("nome_customizado") or "",
+            "id": d.id,
+            **data
         })
 
     return monitoramentos
+
 
 @app.get("/api/monitoramentos/{monitoramento_id}/historico")
 async def get_monitoramento_historico(
