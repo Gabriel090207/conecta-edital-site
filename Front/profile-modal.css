@@ -34,7 +34,7 @@
 
   /* 🔹 Ajuste automático da altura */
   height: auto;
-  max-height: 66vh;
+  max-height: 86vh;
 
   /* 🔹 Garante que não role internamente */
   overflow: visible;
@@ -518,7 +518,7 @@ footer {
     text-align: center;
     margin-top: 30px;
     font-size: 12px;
-    width: 21%;
+    width: 15%;
 }
 
 .footer-links ul li a {
