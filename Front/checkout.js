@@ -14,13 +14,55 @@ const PLANS = {
     id: "essencial_plan",
     name: "Essencial",
     priceLabel: "R$ 15,90/mês",
-    amount: 15.9
+    amount: 15.9,
+    icon: "fas fa-shield-alt",
+    benefits: [
+      {
+        icon: "fas fa-file-alt",
+        title: "Monitoramento de Diários",
+        subtitle: "Monitore até 3 Diários Oficiais"
+      },
+      {
+        icon: "fas fa-envelope",
+        title: "Notificação via E-mail",
+        subtitle: "Receba atualização via e-mail"
+      },
+      {
+        icon: "fas fa-user-large",
+        title: "Suporte",
+        subtitle: "Ajuda prioritária quando precisar"
+      }
+    ]
   },
+
   premium_plan: {
     id: "premium_plan",
     name: "Premium",
     priceLabel: "R$ 35,90/mês",
-    amount: 35.9
+    amount: 35.9,
+    icon: "fas fa-crown",
+    benefits: [
+      {
+        icon: "fas fa-file-alt",
+        title: "Monitoramento de Diários",
+        subtitle: "Monitoramentos ilimitados"
+      },
+      {
+        icon: "fas fa-envelope",
+        title: "Notificação via E-mail",
+        subtitle: "Receba atualização por e-mail"
+      },
+      {
+        icon: "fab fa-whatsapp",
+        title: "Notificação via WhatsApp",
+        subtitle: "Receba notificações no seu celular"
+      },
+      {
+        icon: "fas fa-user-shield",
+        title: "Suporte Prioritário",
+        subtitle: "Atendimento rápido e avançado"
+      }
+    ]
   }
 };
 
@@ -113,16 +155,43 @@ async function fillUserName(user) {
 
 
 function fillPlanSummary(plan) {
-  const planNameEl = $("#planName");
-  const planPriceEl = $("#planPrice");
+  // Título e preço
+  $("#planName").textContent = plan.name;
+  $("#planPrice").textContent = plan.priceLabel;
+  $("#totalValue").textContent = plan.priceLabel;
 
-  if (planNameEl) planNameEl.textContent = plan.name;
-  if (planPriceEl) planPriceEl.textContent = plan.priceLabel;
+  // Ícone
+  const iconEl = document.querySelector(".summary-icon i");
+  if (iconEl) iconEl.className = plan.icon;
 
-  // total final
-  const totalValueEl = $("#totalValue");
-  if (totalValueEl) totalValueEl.textContent = plan.priceLabel;
+  // Benefícios
+  const benefitsContainer = document.querySelector(".benefits-block");
+  const benefitsTitle = document.querySelector(".benefits-title");
+
+  // limpa itens antigos
+  benefitsContainer.innerHTML = `
+    <h4 class="benefits-title">Benefícios do plano:</h4>
+  `;
+
+  // recria cada benefício dinamicamente
+  plan.benefits.forEach(b => {
+    const item = document.createElement("div");
+    item.classList.add("benefit-item");
+
+    item.innerHTML = `
+      <div class="benefit-icon">
+        <i class="${b.icon}"></i>
+      </div>
+      <div>
+        <strong class="benefit-title">${b.title}</strong>
+        <p class="benefit-subtitle">${b.subtitle}</p>
+      </div>
+    `;
+
+    benefitsContainer.appendChild(item);
+  });
 }
+
 
 
 // ==============================
