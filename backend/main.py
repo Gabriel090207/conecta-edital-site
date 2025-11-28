@@ -84,6 +84,8 @@ app.add_middleware(
 )
 
 
+router = APIRouter()
+
 
 app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
