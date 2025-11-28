@@ -200,25 +200,32 @@ async def send_message(to_number: str, message: str):
 # Configuração do CORS
 
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
-try:
-    firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
-    if firebase_credentials_json:
-        cred_dict = json.loads(firebase_credentials_json)
-        cred = credentials.Certificate(cred_dict)
-        print("Firebase Admin SDK inicializado com sucesso da variável de ambiente!")
-    else:
-        if os.path.exists("chave-firebase.json"):
-            cred = credentials.Certificate("chave-firebase.json")
-            print("Firebase Admin SDK inicializado com sucesso do arquivo local!")
-        else:
-            raise ValueError("Nenhum arquivo 'chave-firebase.json' ou variável de ambiente 'FIREBASE_CREDENTIALS_JSON' encontrado.")
-    
-    firebase_admin.initialize_app(cred, {'storageBucket': FIREBASE_STORAGE_BUCKET})
-    print("Firebase Admin SDK inicializado com sucesso!")
-except Exception as e:
-    print(f"ERRO ao inicializar Firebase Admin SDK: {e}")
-    print("Verifique se o arquivo 'chave-firebase.2json' está na raiz do seu projeto backend OU se a variável de ambiente 'FIREBASE_CREDENTIALS_JSON' está configurada.")
+# --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
+if not firebase_admin._apps:
+    try:
+        firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
 
+        if firebase_credentials_json:
+            cred_dict = json.loads(firebase_credentials_json)
+            cred = credentials.Certificate(cred_dict)
+            print("Firebase Admin inicializado com sucesso (variável de ambiente).")
+        else:
+            if os.path.exists("chave-firebase.json"):
+                cred = credentials.Certificate("chave-firebase.json")
+                print("Firebase Admin inicializado com sucesso (arquivo local).")
+            else:
+                raise ValueError(
+                    "Nenhuma credencial Firebase encontrada: variável FIREBASE_CREDENTIALS_JSON ou arquivo chave-firebase.json."
+                )
+
+        firebase_admin.initialize_app(cred, {
+            'storageBucket': FIREBASE_STORAGE_BUCKET
+        })
+
+    except Exception as e:
+        print(f"❌ ERRO ao inicializar Firebase Admin SDK: {e}")
+else:
+    print("Firebase Admin já estava inicializado — evitando reinicialização duplicada.")
 
 # Models Pydantic
 class NewPersonalMonitoring(BaseModel):
@@ -1354,7 +1361,12 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     slots_personalizados = user_data.get("custom_slots") or user_data.get("slots_disponiveis")
 
     # 🔹 Busca monitoramentos
-    monitoramentos_ref = db_firestore_client.collection("monitorings").where("user_uid", "==", user_uid)
+    monitoramentos_ref = (
+    db_firestore_client.collection("monitorings")
+    .where("user_uid", "==", user_uid)
+    .limit(100)  # evita estouro de memória e timeouts
+    )
+
     monitoramentos = list(monitoramentos_ref.stream())
 
     total_monitoramentos = len(monitoramentos)
@@ -2453,8 +2465,14 @@ async def get_monitoramento_historico(
     # 🔍 1️⃣ Tenta carregar subcoleção (caso exista)
     try:
         ocorrencias_ref = doc_ref.collection("occurrences")
-        ocorrencias_docs = ocorrencias_ref.order_by("detected_at", direction=firestore.Query.DESCENDING).stream()
-        for oc in ocorrencias_docs:
+        ocorrencias_docs = (
+            ocorrencias_ref
+            .order_by("detected_at", direction=firestore.Query.DESCENDING)
+            .limit(100)  # evita estouro de memória
+            .stream()
+        )
+
+        for oc in list(ocorrencias_docs):  # converte antes para liberar stream
             odata = oc.to_dict()
             ocorrencias.append({
                 "edital_identifier": odata.get("edital_identifier"),
@@ -2465,6 +2483,7 @@ async def get_monitoramento_historico(
                 "detected_at": odata.get("detected_at"),
                 "last_checked_at": odata.get("last_checked_at"),
             })
+
     except Exception as e:
         print(f"ℹ️ Nenhuma subcoleção encontrada: {e}")
 
