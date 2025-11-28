@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Assinatura - Conecta Edital</title>
+ 
+    <link rel="stylesheet" href="checkout.css">
+
+     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="profile-modal.css">
+    <link rel="stylesheet" href="monitoramento.css"> 
+    <link rel="stylesheet" href="notificacoes.css">
+
+    <link rel="stylesheet" href="historico.css"> 
+     <link rel="stylesheet" href="navbar-mobile.css"> 
+    
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+</head>
+
+<body>
+
+    <main class="checkout-container">
+
+        <h1 class="checkout-title">Finalize sua Assinatura</h1>
+        <p class="checkout-subtitle">
+            e fique por dentro das atualizações dos diários oficiais com o 
+            <span class="gradient-name">Conecta Edital</span>.
+        </p>
+
+        <div class="checkout-grid">
+
+            <!-- Área do formulário -->
+            <section class="checkout-form-card">
+
+                <a href="planos.html" class="back-button"><i class="fas fa-arrow-left"></i> Trocar Plano</a>
+
+                <h2 class="welcome-name">Olá, <span id="checkout-user-name" class="gradient-name" >Carregando...</span></h2>
+
+              <h3 class="section-title">
+    <span class="icon-wrapper">
+        <i class="fas fa-credit-card cartao1"></i>
+    </span>
+    Informações de Pagamento
+</h3>
+
+                <form id="payment-form">
+
+                    <input type="hidden" id="selectedPlanId">
+
+
+                    <div class="input-group">
+                        <label>Nome no Cartão</label>
+                        <input type="text" id="cardholderName" placeholder="Nome como aparece no cartão">
+                    </div>
+
+                    <div class="input-group card-number-wrapper">
+    <label>Número do Cartão</label>
+    <input type="text" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
+    <i class="fas fa-credit-card card-icon"></i>
+</div>
+
+
+                    <div class="row">
+                        <div class="input-group small">
+                            <label>Validade</label>
+                            <input type="text" id="cardExpiration" maxlength="5" placeholder="MM/AA">
+                        </div>
+
+                        <div class="input-group small">
+                            <label>CVC</label>
+                            <input type="text" id="cardCVC" maxlength="4" placeholder="123">
+                        </div>
+                    </div>
+
+                    <div class="checkbox-area">
+                        <input type="checkbox" id="termsCheckbox">
+                        <label for="terms" class="terms">Eu li e aceito os <a href="termosdeuso.html" class="gradient-name">Termos e Condições</a>.</label>
+                    </div>
+
+                    <button type="submit" class="pay-button disabled" id="payButton">
+
+                        Monitorar Diário Oficial →
+                    </button>
+                </form>
+            </section>
+
+            
+
+            <aside class="checkout-summary-card">
+
+    <h3 class="summary-title">Resumo da compra</h3>
+
+
+        <div class="divider"></div>
+
+    <div class="summary-header">
+        <div class="summary-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+
+        <div class="summary-plan-info">
+            <h4 id="planName">Essencial</h4>
+            <p id="planPrice">R$ 15,90/mês</p>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="benefits-block">
+
+        <h4 class="benefits-title">Benefícios do plano:</h4>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+                <strong class="benefit-title">Monitoramento de Diários</strong>
+                <p class="benefit-subtitle">Monitore até 3 Diários Oficiais</p>
+            </div>
+        </div>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div>
+                <strong class="benefit-title">Notificação via E-mail</strong>
+                <p class="benefit-subtitle">Receba atualização via e-mail</p>
+            </div>
+        </div>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <i class="fas fa-user-large"></i>
+            </div>
+            <div>
+                <strong class="benefit-title">Suporte</strong>
+                <p class="benefit-subtitle">Ajuda prioritária quando precisar</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="total-row">
+        <span>Valor total</span>
+        <strong id="totalValue">R$ 15,90</strong>
+    </div>
+
+    <div class="secure-info">
+       <i class="bi bi-shield-check"></i>
+
+        <div>
+            <strong    class="security-title">Pagamento 100% Seguro</strong>
+            <p class="security-subtitle">Seus dados são processados com criptografia SSL de 256 bits.</p>
+        </div>
+    </div>
+
+    <div class="help-section">
+        <h4><i class="fas fa-user-large usuario-ajuda"></i> PRECISA DE AJUDA?</h4>
+        <p class="help-subtitle">Fale agora com nosso time de suporte</p>
+
+        <div class="help-box-item">
+            <i class="fab fa-whatsapp help-zap"></i>
+            <div>
+                <strong>WhatsApp</strong>
+                <p>(19) 99817-5935</p>
+            </div>
+        </div>
+
+        <div class="help-box-item">
+            <i class="fas fa-envelope help-email"></i>
+            <div>
+                <strong>E-mail</strong>
+                <p>contato@conectaedital.com.br</p>
+            </div>
+        </div>
+    </div>
+
+</aside>
+
+
+        </div>
+
+    </main>
+
+
+    <footer>
+    <div class="footer-container">
+        <div class="footer-about">
+            <div class="footer-about-title">
+                <h2>SOBRE</h2>
+            </div>
+            <div class="footer-about-content">
+    <img src="logobranca.png" alt="Logo"> <!-- Atualize o caminho para logobranca.png -->
+    <p>O Conecta Edital é a plataforma líder em monitoramento inteligente de diários oficiais, desenvolvida para concurseiros que não querem perder nenhuma atualização. Monitoramos diariamente todos os diários oficiais municipais, estaduais e federais e enviamos notificações em tempo real sempre que houver atualizações com seu nome.</p>
+    <div class="social-links">
+        <a href="https://www.facebook.com/people/Conecta-Edital/61578001845939/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/conectaedital/" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+</div>
+
+        </div>
+        
+        <div class="footer-links">
+            <div class="footer-quick-access">
+                <h3>ACESSO RÁPIDO</h3>
+                <ul>
+                    <li><a href="monitoramento.html">Monitoramento</a></li>
+                    <li><a href="planos.html">Planos</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="index.html#faq">Perguntas frequentes</a></li>
+                    <li><a href="ajuda.html">Ajuda</a></li>
+                </ul>
+            </div>
+            
+          
+            <div class="footer-institutional">
+              <h3>INSTITUCIONAL</h3>
+              <ul>
+                  <li><a href="termosdeuso.html">Termos de uso</a></li>
+                
+                  <li><a href="lgpd.html">Política de privacidade</a></li>
+                  <li><a href="lgpd.html">LGPD</a></li>
+              
+              </ul>
+          </div>
+            
+            <div class="footer-institutional">
+              <h3>SUPORTE</h3>
+              <ul>
+                  <li><a href="mailto:contato@conectaedital.com"><i class="fas fa-envelope footer"></i> contato@conectaedital.com</a></li>
+                  <li><a href="https://wa.me/seunumerodowhatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                  <li><a href="ajuda.html"><i class="fas fa-headset"></i> Central de Ajuda</a></li>
+              </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>Copyright © 2025 Conecta Edital. Todos os direitos reservados.  </p>
+    </div>
+</footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script src="firebase-config.js"></script>
+
+
+    <script src="checkout.js"></script>
+
+</body>
+</html>

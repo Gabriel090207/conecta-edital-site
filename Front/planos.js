@@ -277,39 +277,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handlePlanButtonClick(planId) {
-        const token = await getAuthToken();
-        if (!token) {
-            alert('Você precisa estar logado para assinar um plano.');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${BACKEND_URL}/api/create-preference`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    'ngrok-skip-browser-warning': 'true'
-                },
-                body: JSON.stringify({
-                    plan_id: planId,
-                    user_email: window.firebase.auth().currentUser.email 
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Falha ao criar a preferência de pagamento.');
-            }
-
-            const data = await response.json();
-            window.location.href = data.checkout_url;
-
-        } catch (error) {
-            console.error('Erro ao processar o pagamento:', error);
-            alert(`Erro: ${error.message}`);
-        }
+    const token = await getAuthToken();
+    if (!token) {
+        alert('Você precisa estar logado para assinar um plano.');
+        return;
     }
+
+    try {
+        // Mantemos a chamada por enquanto (backend vai mudar depois)
+        await fetch(`${BACKEND_URL}/api/create-preference`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                plan_id: planId,
+                user_email: window.firebase.auth().currentUser.email 
+            })
+        });
+
+        // Agora redirecionamos para o checkout transparente
+        window.location.href = `checkout.html?plan=${planId}`;
+
+    } catch (error) {
+        console.error('Erro ao processar o pagamento:', error);
+        alert(`Erro: ${error.message}`);
+    }
+}
+
 
     if (plansContainer) {
         plansContainer.addEventListener('click', (e) => {

@@ -1,0 +1,495 @@
+/* ================================
+   CONFIGURAÇÕES GERAIS
+================================ */
+body {
+    font-family: "Poppins", sans-serif;
+    background: #f5f7fb;
+    margin: 0;
+    padding: 0;
+}
+
+/* ================================
+   CONTAINER PRINCIPAL
+================================ */
+.checkout-container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+
+.checkout-title {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #2e2e2e;
+}
+
+.checkout-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #556175;
+    margin-bottom: 30px;
+}
+
+.blue {
+    color: #246bfd;
+    font-weight: 600;
+}
+
+/* ================================
+   GRID PRINCIPAL
+================================ */
+.checkout-grid {
+    margin-top: 3%;
+    display: grid;
+    grid-template-columns: minmax(800px, 1fr) 480px;  /* AQUI libera largura maior */
+    gap: 30px;
+    align-items: flex-start;
+  
+}
+
+
+/* ================================
+   CARD DO FORMULÁRIO
+================================ */
+.checkout-form-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 22px rgba(0,0,0,0.06);
+
+    width: 100%;
+    max-width: 1850px;   /* TAMANHO IDEAL conforme sua referência */
+}
+
+
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 18px;
+    background: #fff;
+    border: 1px solid #e0e6ed;
+    border-radius: 50px;
+    color: #3b4452;
+    font-weight: 500;
+    font-size: 10px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 13px;
+}
+
+.back-button i {
+    font-size: 10px;
+    color: #7f8794;
+}
+
+.back-button:hover {
+    background: #e8eef6;
+    border-color: #d3dce6;
+    transform: translateX(-2px);
+}
+
+
+.welcome-name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: #2e2e2e;
+}
+
+.section-title {
+    font-size: 16px;
+    margin-bottom: 18px;
+    color: #2e2e2e;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* Ícone com fundo arredondado */
+.icon-wrapper {
+    background: #f1f5ff;        /* cor de fundo igual ao modelo */
+    padding: 10px;             /* controla o tamanho interno */
+    border-radius: 9px;       /* arredondamento */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;               /* tamanho fixo para centralizar */
+    height: 32px;
+}
+
+/* Ícone outline (contorno) */
+.cartao1 {
+    font-size: 14px;
+    color: transparent;            /* deixa o centro transparente */
+    -webkit-text-stroke: 1.8px #2e2e2e; /* contorno do ícone */
+}
+
+.icon-bg {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background: #f3f6fc;  /* fundo igual ao modelo */
+    padding: 6px;
+    border-radius: 10px; /* arredondado igual o exemplo */
+    margin-right: 1px;
+}
+
+
+.icon-badge {
+    width: 38px;            /* largura fixa */
+    height: 38px;           /* altura fixa */
+    background: #f3f6fc;    /* fundo suave (mesma cor da referência) */
+    border-radius: 10px;    /* cantos arredondados */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;     /* espaço antes do texto */
+}
+
+.icon-badge i {
+    font-size: 18px;
+    color: #1b2d4f;         /* cor do ícone */
+    -webkit-text-stroke: 1px transparent; 
+}
+
+.input-group {
+    margin-bottom: 18px;
+}
+
+
+
+
+.input-group label {
+    display: block;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #2e2e2e;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #d9e2ef;
+    border-radius: 7px;
+    background: #fff;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.input-group input:focus {
+    border-color: #d9e2ef;
+    background: #f9fbff;
+    outline: none;
+}
+
+/* A linha vai permitir 2 inputs largos e bonitos */
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dois campos iguais */
+    gap: 20px;
+}
+
+/* Agora cada input ocupa toda a largura possível */
+.input-group.small input {
+    width: 100%;
+    padding: 14px;
+    background: #fff; /* Mesmo fundo do modelo final */
+    border: 1px solid #dce3f0;
+    border-radius: 7px;
+    font-size: 15px;
+}
+
+
+/* ================================
+   CHECKBOX & BOTÃO DE PAGAR
+================================ */
+.checkbox-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0px 0;
+    margin-bottom: 20px;
+}
+
+.checkbox-area label a {
+    color: #246bfd;
+    font-weight: 600;
+}
+
+.terms {
+    font-size: 10px;
+}
+.pay-button {
+    width: 100%;
+    background: #246bfd;
+    color: #fff;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.pay-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+
+
+.gradient-name {
+     background-image: linear-gradient(135deg, #007BFF, #0056B3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+
+
+.input-group.card-number-wrapper {
+    position: relative;
+}
+
+.input-group.card-number-wrapper input {
+    padding-right: 40px; /* espaço para o ícone */
+}
+
+.card-icon {
+    position: absolute;
+    right: 14px;
+    top: 70%;
+    transform: translateY(-50%);
+    
+    font-size: 13px;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+    color: transparent;
+    -webkit-text-stroke: 1px #6c757da4;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+@media (max-width: 900px) {
+    .checkout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* CARD PRINCIPAL */
+.checkout-summary-card {
+    background: #fff;
+    padding: 28px;
+    border-radius: 7px;
+    box-shadow: 0 4px 22px rgba(0,0,0,0.06);
+}
+
+/* Título */
+.summary-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2e2e2e;
+    margin-bottom: -10px;
+}
+
+/* Header com ícone */
+.summary-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.summary-icon {
+    width: 48px;
+    height: 48px;
+     background: linear-gradient(135deg, #429aff, #0163c5);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.summary-icon i {
+    font-size: 22px;
+    color: #fff;
+}
+
+
+.summary-plan-info h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.summary-plan-info p {
+    margin: 0;
+    color: #556175;
+    font-size: 14px;
+}
+
+
+/* Divisor */
+.divider {
+    height: 1px;
+    background: #e6ecf5;
+    margin: 20px 0;
+}
+
+/* Benefícios */
+.benefits-title {
+    color: #2e2e2e;
+    font-size: 15px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.benefit-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.benefit-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.benefit-subtitle{
+    font-size: 12px;
+}
+
+.benefit-icon {
+    background: #edf3ff;        /* cor do fundo */
+    width: 32px;                /* largura da bolinha */
+    height: 32px;               /* altura da bolinha */
+    border-radius: 50%;         /* transforma em círculo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px; 
+    color: transparent;         /* deixa o ícone “contornado” */
+    -webkit-text-stroke: 1.8px #007bff; /* contorno azul */
+
+    margin-right: 2px;
+    transition: transform 0.3s ease;
+}
+
+
+/* Linha total */
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Segurança */
+.secure-info {
+    display: flex;
+    gap: 12px;
+    background: #f7f8f9;
+    border: solid 1px #e0e6ed;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 20px;
+    align-items: flex-start;
+}
+
+.secure-info i {
+    color: #28a745;
+    font-size: 22px;
+}
+
+.security-title{
+    
+    font-size: 13px;
+}
+
+.security-subtitle{
+    font-size: 10px;
+}
+/* Área de ajuda */
+.help-section {
+    background: #f7faff;
+    border: 1px solid #d8e2f3;
+    padding: 18px;
+    border-radius: 12px;
+    margin-top: 25px;
+}
+
+.help-section h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #246bfd;
+    font-weight: 700;
+    text-align: center;
+}
+
+.help-subtitle {
+    text-align: center;
+    margin: 5px 0 15px;
+    color: #7b8796;
+    font-size: 13px;
+}
+
+.usuario-ajuda {
+    font-size: 17px;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+    color: transparent;
+    -webkit-text-stroke: 2px #007bff;
+}
+
+.help-box-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #e5edf5;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+
+
+.help-box-item strong {
+    font-size: 12px;
+}
+
+.help-box-item p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #475569;
+}
+
+
+.help-zap {
+    font-size: 20px;
+    color: #28a745;;
+}
+
+
+
+.help-email {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+    color: transparent;
+    -webkit-text-stroke: 1px #007bff;
+}

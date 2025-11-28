@@ -15,6 +15,7 @@ import random
 import string
 
 
+
 import json
 import httpx
 
@@ -52,7 +53,12 @@ import smtplib
 # Importação dos templates de email (se existirem)
 import email_templates
 
+from subscriptions import router as subscriptions_router
+from webhook_mp import router as mp_webhook_router
 
+
+app.include_router(subscriptions_router)
+app.include_router(mp_webhook_router)
 
 
 router = APIRouter()
