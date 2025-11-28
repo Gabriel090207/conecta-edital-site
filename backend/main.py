@@ -57,13 +57,6 @@ from subscriptions import router as subscriptions_router
 from webhook_mp import router as mp_webhook_router
 
 
-# --- INICIALIZAÇÃO DO FASTAPI ---
-app = FastAPI(
-    title="API Conecta Edital",
-    description="Backend para gerenciar monitoramentos de editais e concursos.",
-    version="0.1.0"
-)
-
 app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
 
@@ -164,7 +157,12 @@ def send_whatsapp_template_ultra(to_number: str, titulo: str, data: str, link: s
         print(f"Erro ao enviar template do WhatsApp: {e}")
         return {"status": "error", "detail": str(e)}
 
-
+# --- INICIALIZAÇÃO DO FASTAPI ---
+app = FastAPI(
+    title="API Conecta Edital",
+    description="Backend para gerenciar monitoramentos de editais e concursos.",
+    version="0.1.0"
+)
 
 @app.get("/")
 def read_root():

@@ -43,12 +43,6 @@ async def create_subscription(
         card_response = mp.card().create(customer_id, {"token": req.card_token})
         card_id = card_response["response"]["id"]
 
-# Define o cartão como principal (importante para recorrência)
-        mp.customer().update(customer_id, {
-        "default_card": card_id
-        })
-
-
         # Definir plano
         if req.plan_id == "essencial_plan":
             amount = 15.9
@@ -61,7 +55,7 @@ async def create_subscription(
 
         # Criar assinatura recorrente
         preapproval = {
-            "payer_email": None,
+            "payer_email": user_email,
             "card_id": card_id,
             "auto_recurring": {
                 "frequency": 1,
@@ -90,23 +84,4 @@ async def create_subscription(
 
     except Exception as e:
         print("Erro:", e)
-
-    # Tratamento de erros comuns
-        msg = str(e)
-
-        if "invalid parameter" in msg:
-            raise HTTPException(status_code=400, detail="Dados do cartão inválidos. Verifique as informações.")
-
-        if "106" in msg:
-            raise HTTPException(status_code=400, detail="Cartão sem saldo disponível.")
-
-        if "204" in msg or "205" in msg:
-            raise HTTPException(status_code=400, detail="Número de cartão inválido.")
-
-        if "208" in msg or "209" in msg:
-            raise HTTPException(status_code=400, detail="Data de validade inválida.")
-
-        if "212" in msg or "213" in msg or "214" in msg:
-            raise HTTPException(status_code=400, detail="Documento inválido.")
-
-        raise HTTPException(status_code=500, detail="Falha inesperada ao criar assinatura.")
+        raise HTTPException(status_code=500, detail=str(e))
