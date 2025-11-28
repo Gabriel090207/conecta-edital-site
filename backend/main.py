@@ -4,7 +4,7 @@ from pydantic import BaseModel, HttpUrl, EmailStr, Field
 from typing import List, Optional, Dict, Union
 import uuid
 from datetime import datetime, timezone
-import httpx
+
 import io
 from PyPDF2 import PdfReader
 from bs4 import BeautifulSoup
@@ -56,15 +56,42 @@ import email_templates
 from subscriptions import router as subscriptions_router
 from webhook_mp import router as mp_webhook_router
 
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
+
+# --- INICIALIZAÇÃO DO FASTAPI ---
+app = FastAPI(
+    title="API Conecta Edital",
+    description="Backend para gerenciar monitoramentos de editais e concursos.",
+    version="0.1.0"
+)
+
+origins = [
+    "http://127.0.0.1:5500",
+    "http://127.0.0.1:5501",
+    "http://localhost:5500",
+    "https://conecta-edital-site-927y.onrender.com",
+    "https://paineldeadminconectaedital.netlify.app",
+    "https://siteconectaedital.netlify.app"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 
 app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
 
 
-router = APIRouter()
 
-# Carrega as variáveis de ambiente do arquivo .env
-load_dotenv()
+
+
 
 # --- LEIA AS VARIÁVEIS DE AMBIENTE AQUI ---
 SMTP_HOST = os.getenv("SMTP_HOST")
@@ -157,12 +184,7 @@ def send_whatsapp_template_ultra(to_number: str, titulo: str, data: str, link: s
         print(f"Erro ao enviar template do WhatsApp: {e}")
         return {"status": "error", "detail": str(e)}
 
-# --- INICIALIZAÇÃO DO FASTAPI ---
-app = FastAPI(
-    title="API Conecta Edital",
-    description="Backend para gerenciar monitoramentos de editais e concursos.",
-    version="0.1.0"
-)
+
 
 @app.get("/")
 def read_root():
@@ -174,22 +196,6 @@ async def send_message(to_number: str, message: str):
     return response
 
 # Configuração do CORS
-origins = [
-    "http://127.0.0.1:5500",
-    "http://127.0.0.1:5501",
-    "http://localhost:5500",
-    "https://conecta-edital-site-927y.onrender.com",
-    "https://paineldeadminconectaedital.netlify.app",
-    "https://siteconectaedital.netlify.app"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
 try:
