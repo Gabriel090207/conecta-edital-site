@@ -1350,35 +1350,55 @@ async def mercadopago_webhook(request: Request):
         print(f"ERRO no Webhook: {e}")
         return {"status": "error", "message": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
+
 @app.get("/api/status")
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
-    db_firestore_client = firestore.client()
+    db = firestore.client()
 
-    # 🔹 Busca o documento do usuário
-    user_ref = db_firestore_client.collection('users').document(user_uid)
+    # Usuário
+    user_ref = db.collection('users').document(user_uid)
     user_doc = user_ref.get()
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
     user_data = user_doc.to_dict()
 
-    # 🔹 Usa função unificada (garante consistência)
-    user_plan = await get_user_plan_from_firestore(user_uid)
+    # Plano (sem nova consulta ao Firestore)
+    plan_raw = (
+        user_data.get("plan_type")
+        or user_data.get("plano")
+        or user_data.get("plan")
+        or "sem_plano"
+    )
+    plan_normalizado = plan_raw.lower().strip()
+
+    if "premium" in plan_normalizado:
+        user_plan = "premium"
+    elif "essencial" in plan_normalizado:
+        user_plan = "essencial"
+    elif "basico" in plan_normalizado:
+        user_plan = "basico"
+    else:
+        user_plan = "sem_plano"
+
+    # Slots personalizados
     slots_personalizados = user_data.get("custom_slots") or user_data.get("slots_disponiveis")
 
-    # 🔹 Busca monitoramentos
+    # Monitoramentos — consulta rápida
     monitoramentos_ref = (
-    db_firestore_client.collection("monitorings")
-    .where("user_uid", "==", user_uid)
-    .limit(100)  # evita estouro de memória e timeouts
+        db.collection("monitorings")
+        .where("user_uid", "==", user_uid)
+        .limit(50)
     )
 
-    monitoramentos = list(monitoramentos_ref.limit(50).stream())
+    docs = monitoramentos_ref.get()
+    monitoramentos = docs[:50]
 
+    # Contagem
     total_monitoramentos = len(monitoramentos)
     monitoramentos_ativos = len([m for m in monitoramentos if m.to_dict().get("status") == "active"])
 
-    # 🔹 Nome amigável
+    # Nome amigável
     display_plan_name = {
         "sem_plano": "Sem Plano",
         "gratuito": "Sem Plano",
@@ -1387,7 +1407,7 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
         "premium": "Plano Premium"
     }.get(user_plan, "Sem Plano")
 
-    # 🔹 Calcula slots disponíveis
+    # Slots livres
     if slots_personalizados is not None:
         slots_livres = max(0, slots_personalizados - total_monitoramentos)
     elif user_plan == "premium":
@@ -1406,7 +1426,6 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
         "monitoramentos_ativos": monitoramentos_ativos,
         "slots_livres": slots_livres
     }
-
 
 @app.delete("/api/monitoramentos/{monitoring_id}", status_code=204)
 async def delete_monitoring_endpoint(
