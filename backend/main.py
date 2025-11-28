@@ -1046,22 +1046,6 @@ async def read_root():
     return {"message": "Bem-vindo à API Conecta Edital!"}
 
 # --- ROTA LISTAR MONITORAMENTOS ---
-@app.get("/api/monitoramentos", response_model=List[Monitoring])
-async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
-    """
-    Retorna a lista de todos os monitoramentos do usuário atual.
-    """
-    print(f"Buscando monitoramentos para UID: {user_uid}")
-    db_firestore_client = firestore.client()
-    monitorings_ref = db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid))
-    monitorings_docs = monitorings_ref.stream()
-    
-    monitorings_list = []
-    for doc in monitorings_docs:
-        monitorings_list.append(Monitoring(id=doc.id, **doc.to_dict()))
-        
-    return monitorings_list
-
 
 @app.post("/api/monitoramentos/pessoal", response_model=Monitoring, status_code=201)
 async def create_personal_monitoramento(
@@ -2415,7 +2399,7 @@ async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
     """
     db = firestore.client()
     monitorings_ref = db.collection("monitorings").where("user_uid", "==", user_uid)
-    docs = monitorings_ref.stream()
+    docs = monitorings_ref.limit(50).stream()
 
     monitoramentos = []
     for doc in docs:
