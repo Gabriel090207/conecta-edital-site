@@ -4,7 +4,7 @@ from pydantic import BaseModel, HttpUrl, EmailStr, Field
 from typing import List, Optional, Dict, Union
 import uuid
 from datetime import datetime, timezone
-
+import httpx
 import io
 from PyPDF2 import PdfReader
 from bs4 import BeautifulSoup
@@ -56,8 +56,6 @@ import email_templates
 from subscriptions import router as subscriptions_router
 from webhook_mp import router as mp_webhook_router
 
-# Carrega as variáveis de ambiente do arquivo .env
-load_dotenv()
 
 # --- INICIALIZAÇÃO DO FASTAPI ---
 app = FastAPI(
@@ -66,34 +64,14 @@ app = FastAPI(
     version="0.1.0"
 )
 
-origins = [
-    "http://127.0.0.1:5500",
-    "http://127.0.0.1:5501",
-    "http://localhost:5500",
-    "https://conecta-edital-site-927y.onrender.com",
-    "https://paineldeadminconectaedital.netlify.app",
-    "https://siteconectaedital.netlify.app"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-router = APIRouter()
-
-
 app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
 
 
+router = APIRouter()
 
-
-
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 # --- LEIA AS VARIÁVEIS DE AMBIENTE AQUI ---
 SMTP_HOST = os.getenv("SMTP_HOST")
@@ -198,34 +176,43 @@ async def send_message(to_number: str, message: str):
     return response
 
 # Configuração do CORS
+origins = [
+    "http://127.0.0.1:5500",
+    "http://127.0.0.1:5501",
+    "http://localhost:5500",
+    "https://conecta-edital-site-927y.onrender.com",
+    "https://paineldeadminconectaedital.netlify.app",
+    "https://siteconectaedital.netlify.app"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
-# --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
-if not firebase_admin._apps:
-    try:
-        firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
-
-        if firebase_credentials_json:
-            cred_dict = json.loads(firebase_credentials_json)
-            cred = credentials.Certificate(cred_dict)
-            print("Firebase Admin inicializado com sucesso (variável de ambiente).")
+try:
+    firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+    if firebase_credentials_json:
+        cred_dict = json.loads(firebase_credentials_json)
+        cred = credentials.Certificate(cred_dict)
+        print("Firebase Admin SDK inicializado com sucesso da variável de ambiente!")
+    else:
+        if os.path.exists("chave-firebase.json"):
+            cred = credentials.Certificate("chave-firebase.json")
+            print("Firebase Admin SDK inicializado com sucesso do arquivo local!")
         else:
-            if os.path.exists("chave-firebase.json"):
-                cred = credentials.Certificate("chave-firebase.json")
-                print("Firebase Admin inicializado com sucesso (arquivo local).")
-            else:
-                raise ValueError(
-                    "Nenhuma credencial Firebase encontrada: variável FIREBASE_CREDENTIALS_JSON ou arquivo chave-firebase.json."
-                )
+            raise ValueError("Nenhum arquivo 'chave-firebase.json' ou variável de ambiente 'FIREBASE_CREDENTIALS_JSON' encontrado.")
+    
+    firebase_admin.initialize_app(cred, {'storageBucket': FIREBASE_STORAGE_BUCKET})
+    print("Firebase Admin SDK inicializado com sucesso!")
+except Exception as e:
+    print(f"ERRO ao inicializar Firebase Admin SDK: {e}")
+    print("Verifique se o arquivo 'chave-firebase.2json' está na raiz do seu projeto backend OU se a variável de ambiente 'FIREBASE_CREDENTIALS_JSON' está configurada.")
 
-        firebase_admin.initialize_app(cred, {
-            'storageBucket': FIREBASE_STORAGE_BUCKET
-        })
-
-    except Exception as e:
-        print(f"❌ ERRO ao inicializar Firebase Admin SDK: {e}")
-else:
-    print("Firebase Admin já estava inicializado — evitando reinicialização duplicada.")
 
 # Models Pydantic
 class NewPersonalMonitoring(BaseModel):
@@ -599,7 +586,7 @@ async def extract_text_from_pdf(pdf_content: bytes) -> str:
     try:
         reader = PdfReader(io.BytesIO(pdf_content))
         text = ""
-        for page in reader.pages[:3]:   # Só 3 páginas
+        for page in reader.pages:
             text += page.extract_text() or ""
         return text
     except Exception as e:
@@ -938,13 +925,7 @@ async def run_all_monitorings():
     print("🚀 Executando verificação automática de todos os monitoramentos ativos...")
     db = firestore.client()
     monitorings_ref = db.collection('monitorings').where('status', '==', 'active')
-    docs = (
-    db.collection('monitorings')
-      .where('status', '==', 'active')
-      .limit(20)
-      .stream()
-    )
-
+    docs = monitorings_ref.stream()
 
     tasks = []
     for doc in docs:
@@ -1059,6 +1040,22 @@ async def read_root():
     return {"message": "Bem-vindo à API Conecta Edital!"}
 
 # --- ROTA LISTAR MONITORAMENTOS ---
+@app.get("/api/monitoramentos", response_model=List[Monitoring])
+async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
+    """
+    Retorna a lista de todos os monitoramentos do usuário atual.
+    """
+    print(f"Buscando monitoramentos para UID: {user_uid}")
+    db_firestore_client = firestore.client()
+    monitorings_ref = db_firestore_client.collection('monitorings').where(filter=FieldFilter('user_uid', '==', user_uid))
+    monitorings_docs = monitorings_ref.stream()
+    
+    monitorings_list = []
+    for doc in monitorings_docs:
+        monitorings_list.append(Monitoring(id=doc.id, **doc.to_dict()))
+        
+    return monitorings_list
+
 
 @app.post("/api/monitoramentos/pessoal", response_model=Monitoring, status_code=201)
 async def create_personal_monitoramento(
@@ -1350,7 +1347,6 @@ async def mercadopago_webhook(request: Request):
         print(f"ERRO no Webhook: {e}")
         return {"status": "error", "message": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
-
 @app.get("/api/status")
 async def get_status(user_uid: str = Depends(get_current_user_uid)):
     db_firestore_client = firestore.client()
@@ -1358,38 +1354,23 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     # 🔹 Busca o documento do usuário
     user_ref = db_firestore_client.collection('users').document(user_uid)
     user_doc = user_ref.get()
-
     if not user_doc.exists:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
     user_data = user_doc.to_dict()
 
-    # 🔹 Identifica plano do usuário com função existente
+    # 🔹 Usa função unificada (garante consistência)
     user_plan = await get_user_plan_from_firestore(user_uid)
-
-    # 🔹 Slots personalizados caso existam
     slots_personalizados = user_data.get("custom_slots") or user_data.get("slots_disponiveis")
 
-    # -------------------------------------------------------------------
-    # 🔥 OTIMIZAÇÃO CRUCIAL — busca monitoramentos LEVES
-    # Apenas campo "status" é carregado
-    # -------------------------------------------------------------------
-    monitoramentos_ref = (
-        db_firestore_client.collection("monitorings")
-        .where("user_uid", "==", user_uid)
-        .select(["status"])     # pega só 1 campo = super leve
-        .limit(200)             # limite seguro para evitar OOM
-    )
-
+    # 🔹 Busca monitoramentos
+    monitoramentos_ref = db_firestore_client.collection("monitorings").where("user_uid", "==", user_uid)
     monitoramentos = list(monitoramentos_ref.stream())
 
-    # Contagem
     total_monitoramentos = len(monitoramentos)
-    monitoramentos_ativos = sum(
-        1 for m in monitoramentos if m.to_dict().get("status") == "active"
-    )
+    monitoramentos_ativos = len([m for m in monitoramentos if m.to_dict().get("status") == "active"])
 
-    # 🔹 Nomes amigáveis
+    # 🔹 Nome amigável
     display_plan_name = {
         "sem_plano": "Sem Plano",
         "gratuito": "Sem Plano",
@@ -1398,9 +1379,7 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
         "premium": "Plano Premium"
     }.get(user_plan, "Sem Plano")
 
-    # -------------------------------------------------------------------
-    # 🔹 Calculo de slots
-    # -------------------------------------------------------------------
+    # 🔹 Calcula slots disponíveis
     if slots_personalizados is not None:
         slots_livres = max(0, slots_personalizados - total_monitoramentos)
     elif user_plan == "premium":
@@ -1412,9 +1391,6 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
     else:
         slots_livres = 0
 
-    # -------------------------------------------------------------------
-    # 🔹 Retorno final
-    # -------------------------------------------------------------------
     return {
         "status": "ok",
         "user_plan": display_plan_name,
@@ -1422,6 +1398,7 @@ async def get_status(user_uid: str = Depends(get_current_user_uid)):
         "monitoramentos_ativos": monitoramentos_ativos,
         "slots_livres": slots_livres
     }
+
 
 @app.delete("/api/monitoramentos/{monitoring_id}", status_code=204)
 async def delete_monitoring_endpoint(
@@ -2424,42 +2401,40 @@ async def patch_monitoring(
 
 from fastapi.responses import JSONResponse
 
-
 @app.get("/api/monitoramentos")
 async def list_monitoramentos(user_uid: str = Depends(get_current_user_uid)):
-
+    """
+    Retorna todos os monitoramentos do usuário autenticado,
+    incluindo nome_customizado (se existir).
+    """
     db = firestore.client()
-
-    # ⚡ Query super leve e rápida
-    docs = (
-        db.collection("monitorings")
-        .where("user_uid", "==", user_uid)
-        .select([
-            "monitoring_type",
-            "edital_identifier",
-            "candidate_name",
-            "official_gazette_link",
-            "keywords",
-            "occurrences",
-            "status",
-            "last_checked_at",
-            "nome_customizado"
-        ])
-        .order_by("created_at", direction=firestore.Query.DESCENDING)
-        .limit(20)
-        .stream()
-    )
+    monitorings_ref = db.collection("monitorings").where("user_uid", "==", user_uid)
+    docs = monitorings_ref.stream()
 
     monitoramentos = []
+    for doc in docs:
+        data = doc.to_dict()
+        data["id"] = doc.id
 
-    for d in docs:
-        data = d.to_dict()
         monitoramentos.append({
-            "id": d.id,
-            **data
+            "id": doc.id,
+            "monitoring_type": data.get("monitoring_type"),
+            "edital_identifier": data.get("edital_identifier"),
+            "candidate_name": data.get("candidate_name"),
+            "official_gazette_link": data.get("official_gazette_link"),
+            "keywords": data.get("keywords", ""),
+            "occurrences": data.get("occurrences", 0),
+            "status": data.get("status", "inactive"),
+            "last_checked_at": data.get("last_checked_at"),
+            "user_uid": data.get("user_uid"),
+            "user_email": data.get("user_email"),
+            "nome_customizado": data.get("nome_customizado") if data.get("nome_customizado") is not None else "",
+  # 👈 garante string
         })
 
-    return monitoramentos
+    # 🔥 força a API a não ser cacheada (nem por Cloudflare nem por Render)
+    return JSONResponse(content=monitoramentos, headers={"Cache-Control": "no-store, max-age=0"})
+
 
 
 @app.get("/api/monitoramentos/{monitoramento_id}/historico")
@@ -2488,14 +2463,8 @@ async def get_monitoramento_historico(
     # 🔍 1️⃣ Tenta carregar subcoleção (caso exista)
     try:
         ocorrencias_ref = doc_ref.collection("occurrences")
-        ocorrencias_docs = (
-            ocorrencias_ref
-            .order_by("detected_at", direction=firestore.Query.DESCENDING)
-            .limit(100)  # evita estouro de memória
-            .stream()
-        )
-
-        for oc in list(ocorrencias_docs):  # converte antes para liberar stream
+        ocorrencias_docs = ocorrencias_ref.order_by("detected_at", direction=firestore.Query.DESCENDING).stream()
+        for oc in ocorrencias_docs:
             odata = oc.to_dict()
             ocorrencias.append({
                 "edital_identifier": odata.get("edital_identifier"),
@@ -2506,7 +2475,6 @@ async def get_monitoramento_historico(
                 "detected_at": odata.get("detected_at"),
                 "last_checked_at": odata.get("last_checked_at"),
             })
-
     except Exception as e:
         print(f"ℹ️ Nenhuma subcoleção encontrada: {e}")
 
