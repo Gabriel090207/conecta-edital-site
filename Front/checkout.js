@@ -272,16 +272,9 @@ function initMercadoPagoCheckout(plan) {
         placeholder: "0000 0000 0000 0000",
       },
   
-      cardExpirationMonth: {
-        id: "cardExpiration",
-        placeholder: "MM/AA",
-      },
-  
-      cardExpirationYear: {
-        id: "cardExpiration",
-        placeholder: "MM/AA",
-      },
-  
+      cardExpirationMonth: { id: "cardExpirationMonth" },
+      cardExpirationYear: { id: "cardExpirationYear" },
+      
       securityCode: {
         id: "cardCVC",
         placeholder: "CVC",
