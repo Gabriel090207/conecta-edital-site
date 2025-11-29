@@ -197,5 +197,5 @@ function initMercadoPagoCheckout(plan) {
       }
     }
   });
-  
+   
 }

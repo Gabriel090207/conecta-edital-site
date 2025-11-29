@@ -367,8 +367,17 @@ class AdminProfileUpdate(BaseModel):
 
 async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
 
+    # ================
+    # Monta lista keywords
+    # ================
+    keywords_formatted = "  ".join(
+        [f"`{kw}`" for kw in monitoramento.keywords]
+    )
+
+    keywords_plain = "  ".join(monitoramento.keywords)
+
     # ================================
-    # 1️⃣ MENSAGEM DE MONITORAMENTO ATIVADO
+    # 1️⃣ MONITORAMENTO ATIVADO
     # ================================
     monitoramento_message = (
         f"> *MONITORAMENTO ATIVADO ✅*\n\n"
@@ -377,7 +386,7 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
         f"*📰 DIÁRIO OFICIAL CONFIGURADO*\n"
         f"{monitoramento.official_gazette_link}\n\n"
         f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
-        f"{'  '.join([f'`{kw}`' for kw in monitoramento.keywords])}\n\n"
+        f"{keywords_formatted}\n\n"
         f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
         f"MONITORAMENTO ATIVO\n\n"
         f"RADAR"
@@ -386,17 +395,17 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
     await send_whatsapp_ultra(user_phone, monitoramento_message)
 
     # ================================
-    # 2️⃣ MENSAGEM DE NOVA OCORRÊNCIA
+    # 2️⃣ NOVA OCORRÊNCIA
     # ================================
     ocorrencia_message = (
         f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
         f"Olá, *{monitoramento.user_name}!* \n\n"
         f"Encontramos uma atualização relevante no seu monitoramento. Recomendamos que confira o quanto antes.\n\n"
         f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
-        f"{'  '.join(monitoramento.keywords)}\n\n"
+        f"{keywords_plain}\n\n"
         f"📎 Quer todos os detalhes da ocorrência?\n"
         f"Acesse o link abaixo:\n{monitoramento.pdf_real_link}\n\n"
-        f"#Nomeação #ConcursoPúbIico #ConectaEdital #SuaVagaGarantida\n\n"
+        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida\n\n"
         f"QUANDO ENCONTRAR ATUALIZAÇÃO\n\n"
         f"RADAR"
     )
