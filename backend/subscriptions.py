@@ -6,17 +6,13 @@ import os
 
 router = APIRouter()
 
+# Mercado Pago SDK
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 mp = mercadopago.SDK(MP_ACCESS_TOKEN)
 
-# ------------------------------
-# MODELO RECEBIDO DO FRONT
-# ------------------------------
+# Apenas o plano chega do frontend
 class SubscriptionRequest(BaseModel):
     plan_id: str
-    card_token: str
-    payment_method_id: str
-    issuer_id: str | None = None
 
 
 from utils.auth_utils import verify_firebase_token
@@ -33,80 +29,68 @@ async def create_subscription(
 
         db = firestore.client()
 
-        print("\n\n=== [DEBUG] Dados recebidos do frontend ===")
+        print("\n\n=== [DEBUG] Criando assinatura via LINK ===")
         print("Plano:", req.plan_id)
-        print("Card Token:", req.card_token)
-        print("Método:", req.payment_method_id)
-        print("Issuer:", req.issuer_id)
+        print("UID:", user_uid)
+        print("Email:", user_email)
 
         # --------------------------
         # DEFINIR O PLANO
         # --------------------------
         if req.plan_id == "essencial_plan":
-            amount = 15.9
+            amount = 15.90
             reason = "Plano Essencial"
         elif req.plan_id == "premium_plan":
-            amount = 35.9
+            amount = 35.90
             reason = "Plano Premium"
         else:
             raise HTTPException(status_code=400, detail="Plano inválido")
 
         # --------------------------
-        # PAYLOAD (ASSINATURA REAL)
+        # PAYLOAD DO PREAPPROVAL LINK
         # --------------------------
-        preapproval_payload = {
+        payload = {
+            "reason": reason,
+            "external_reference": user_uid,
             "payer_email": user_email,
-            "card_token_id": req.card_token,
-            "issuer_id": req.issuer_id,
+
             "auto_recurring": {
                 "frequency": 1,
                 "frequency_type": "months",
                 "transaction_amount": amount,
                 "currency_id": "BRL"
             },
-            "reason": reason,
-            "external_reference": user_uid,
 
-            # 🔥 URLs DE RETORNO DO NETLIFY
-            "back_url": "https://siteconectaedital.netlify.app/sucesso.html",
-            "back_urls": {
-                "success": "https://siteconectaedital.netlify.app/sucesso.html",
-                "pending": "https://siteconectaedital.netlify.app/pendente.html",
-                "failure": "https://siteconectaedital.netlify.app/erro.html"
-            }
+            "back_url": "https://siteconectaedital.netlify.app/sucesso.html"
         }
 
-        print("\n=== [DEBUG] Preapproval enviado ao MP ===")
-        print(preapproval_payload)
+        print("\n=== [DEBUG] Payload enviado ao Mercado Pago ===")
+        print(payload)
 
         # --------------------------
-        # CRIA A ASSINATURA
+        # CRIAR LINK DE ASSINATURA
         # --------------------------
-        preapproval_response = mp.preapproval().create(preapproval_payload)
+        response = mp.preapproval().create(payload)
 
-        print("\n=== [DEBUG] Resposta do MP ===")
-        print(preapproval_response)
+        print("\n=== [DEBUG] Resposta MP ===")
+        print(response)
 
-        # --------------------------
-        # ERRO NO MERCADO PAGO
-        # --------------------------
-        if "id" not in preapproval_response.get("response", {}):
-            raise Exception(preapproval_response.get("response"))
+        if "init_point" not in response.get("response", {}):
+            raise Exception(response.get("response"))
 
-        subscription_id = preapproval_response["response"]["id"]
+        approval_url = response["response"]["init_point"]
+        subscription_id = response["response"]["id"]
 
-        # --------------------------
         # SALVAR NO FIRESTORE
-        # --------------------------
         db.collection("users").document(user_uid).set({
-            "subscription_status": "active",
+            "subscription_status": "pending_approval",
             "subscription_plan": req.plan_id,
             "subscription_id": subscription_id
         }, merge=True)
 
         return {
-            "message": "Assinatura criada com sucesso!",
-            "subscription_id": subscription_id
+            "message": "Link gerado com sucesso",
+            "checkout_url": approval_url
         }
 
     except Exception as e:
