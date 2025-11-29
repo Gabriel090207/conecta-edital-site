@@ -719,16 +719,18 @@ def send_email_notification(
 async def perform_monitoring_check(monitoramento: Monitoring):
     """
     Executa a verificação para um monitoramento específico.
-    Dispara o envio de email e WhatsApp se uma ocorrência for encontrada.
-    Armazena o link real do PDF e histórico na subcoleção "occurrences".
+    Dispara email e WhatsApp (modelo novo) quando uma ocorrência é encontrada.
+    Armazena o link real do PDF e o histórico.
     """
+
     print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
 
     db = firestore.client()
     doc_ref = db.collection("monitorings").document(monitoramento.id)
 
-    # 🔍 Passo 1: tentar obter o PDF real
-    pdf_real_url = None
+    # ======================================================
+    # 1️⃣ TENTAR OBTER O PDF REAL
+    # ======================================================
     print(f"Tentando obter o PDF real de: {monitoramento.official_gazette_link}")
 
     response = await fetch_content(monitoramento.official_gazette_link)
@@ -738,6 +740,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
     content_type = response.headers.get("Content-Type", "").lower()
     pdf_content = None
+    pdf_real_url = None
 
     if "application/pdf" in content_type:
         pdf_real_url = str(monitoramento.official_gazette_link)
@@ -745,24 +748,27 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
     elif "text/html" in content_type:
         pdf_url_in_html = await find_pdf_in_html(response.content, monitoramento.official_gazette_link)
-        if pdf_url_in_html:
-            pdf_real_url = str(pdf_url_in_html)
-            print(f"🔗 PDF encontrado dentro da página: {pdf_real_url}")
-
-            pdf_response = await fetch_content(pdf_url_in_html)
-            if pdf_response and "application/pdf" in pdf_response.headers.get("Content-Type", "").lower():
-                pdf_content = pdf_response.content
-            else:
-                print(f"⚠️ O link encontrado não é um PDF válido: {pdf_url_in_html}")
-                return
-        else:
+        if not pdf_url_in_html:
             print(f"⚠️ Nenhum PDF encontrado na página {monitoramento.official_gazette_link}")
             return
+
+        pdf_real_url = str(pdf_url_in_html)
+        print(f"🔗 PDF encontrado dentro da página: {pdf_real_url}")
+
+        pdf_response = await fetch_content(pdf_url_in_html)
+        if pdf_response and "application/pdf" in pdf_response.headers.get("Content-Type", "").lower():
+            pdf_content = pdf_response.content
+        else:
+            print(f"⚠️ O link encontrado não é um PDF válido: {pdf_url_in_html}")
+            return
+
     else:
         print(f"⚠️ Tipo de conteúdo inesperado: {content_type}")
         return
 
-    # 🔑 Passo 2: calcular hash do PDF e verificar se mudou
+    # ======================================================
+    # 2️⃣ CALCULAR HASH → VER SE O PDF MUDOU
+    # ======================================================
     current_pdf_hash = hashlib.sha256(pdf_content).hexdigest()
     doc = doc_ref.get()
 
@@ -771,57 +777,54 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
         return
 
-    # Atualiza hash e timestamp no documento principal
     doc_ref.update({
         "last_pdf_hash": current_pdf_hash,
         "last_checked_at": firestore.SERVER_TIMESTAMP
     })
 
-    # 🔤 Passo 3: extrair texto do PDF
+    # ======================================================
+    # 3️⃣ EXTRAIR TEXTO DO PDF
+    # ======================================================
     pdf_text = await extract_text_from_pdf(pdf_content)
     pdf_text_lower = pdf_text.lower()
 
-    # 🔎 Passo 4: verificar palavras-chave
+    # ======================================================
+    # 4️⃣ VERIFICAR PALAVRAS-CHAVE
+    # ======================================================
     found_keywords = []
     keywords_to_search = [monitoramento.edital_identifier]
 
     if monitoramento.monitoring_type == "personal" and monitoramento.candidate_name:
         keywords_to_search.append(monitoramento.candidate_name)
 
+    # Verifica no texto e no nome do arquivo
     try:
-        parsed_url = urlparse(str(pdf_real_url))
-        file_name = parsed_url.path.split("/")[-1]
-    except Exception:
+        parsed_url = urlparse(pdf_real_url)
+        file_name = parsed_url.path.split("/")[-1].lower()
+    except:
         file_name = ""
 
-    file_name_lower = file_name.lower()
+    for kw in keywords_to_search:
+        if kw.lower() in pdf_text_lower or kw.lower() in file_name:
+            found_keywords.append(kw)
 
-    for keyword in keywords_to_search:
-        keyword_lower = keyword.lower()
-        if keyword_lower in pdf_text_lower or keyword_lower in file_name_lower:
-            found_keywords.append(keyword)
-
-    # ✅ Passo 5: ocorrência encontrada
+    # ======================================================
+    # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
+    # ======================================================
     if found_keywords:
         print(f"✅ Ocorrência detectada: {found_keywords}")
 
-        # Incrementa no objeto
-        monitoramento.occurrences += 1
-
+        # Armazena ocorrência no Firestore
         ocorrencias_ref = doc_ref.collection("occurrences")
-
         ocorrencias_ref.add({
             "edital_identifier": monitoramento.edital_identifier,
             "pdf_real_link": pdf_real_url,
             "official_gazette_link": str(monitoramento.official_gazette_link),
             "last_pdf_hash": current_pdf_hash,
-            "detected_at": firestore.SERVER_TIMESTAMP,
-            "last_checked_at": firestore.SERVER_TIMESTAMP
+            "detected_at": firestore.SERVER_TIMESTAMP
         })
 
-        print(f"💾 Ocorrência registrada em monitorings/{monitoramento.id}/occurrences")
-
-        # Recontar total de ocorrências
+        # Atualiza contador
         occ_total = len(list(ocorrencias_ref.stream()))
         doc_ref.update({
             "occurrences": occ_total,
@@ -830,7 +833,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
         print(f"🔄 Contador sincronizado: occurrences = {occ_total}")
 
-        # Criar notificação interna
+        # Notificação interna (painel)
         await create_notification(
             user_uid=monitoramento.user_uid,
             type_="nova_ocorrencia",
@@ -841,7 +844,9 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
         monitoramento.pdf_real_link = pdf_real_url
 
-        # ✉️ Envio de EMAIL
+        # ==================================================
+        # ✉️ EMAIL (template atualizado)
+        # ==================================================
         send_email_notification(
             monitoramento=monitoramento,
             template_type="occurrence_found",
@@ -849,39 +854,46 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             found_keywords=found_keywords
         )
 
-        # 📲 Envio de WHATSAPP — Apenas usuários PREMIUM
+        # ==================================================
+        # 📲 WHATSAPP (template moderno da nova função)
+        # ==================================================
         try:
-            user_ref = db.collection("users").document(monitoramento.user_uid)
-            user_doc = user_ref.get()
-
+            user_doc = db.collection("users").document(monitoramento.user_uid).get()
             if user_doc.exists:
                 user_data = user_doc.to_dict()
 
                 user_phone = user_data.get("contact")
                 user_plan = user_data.get("plan_type", "sem_plano").lower()
+                user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
 
-                if user_plan == "premium":
+                if user_plan == "premium" and user_phone:
 
-                    if user_phone:
-                        whatsapp_message = (
-                            f"📢 *Nova ocorrência encontrada!*\n\n"
-                            f"O edital *{monitoramento.edital_identifier}* teve uma nova ocorrência detectada.\n\n"
-                            f"🔎 Palavras encontradas: {', '.join(found_keywords)}\n"
-                            f"📄 Link do PDF: {monitoramento.pdf_real_link}\n\n"
-                            f"Equipe Conecta Edital 🚀"
-                        )
-
-                        send_whatsapp_ultra(user_phone, whatsapp_message)
-                        print(f"📲 WhatsApp enviado para {user_phone}")
-
+                    # Corrige keywords caso estejam em string
+                    if isinstance(monitoramento.keywords, str):
+                        kws = [kw.strip() for kw in monitoramento.keywords.split(",")]
                     else:
-                        print(f"⚠️ Usuário PREMIUM {monitoramento.user_uid}, mas não possui número salvo.")
+                        kws = monitoramento.keywords
+
+                    keywords_plain = "  ".join(kws)
+
+                    occurs_msg = (
+                        f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
+                        f"Olá, *{user_name}!* \n\n"
+                        f"Encontramos uma atualização relevante no seu monitoramento. Recomendamos que confira o quanto antes.\n\n"
+                        f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
+                        f"{keywords_plain}\n\n"
+                        f"📎 Quer todos os detalhes da ocorrência?\n"
+                        f"Acesse o link abaixo:\n{monitoramento.pdf_real_link}\n\n"
+                        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida\n\n"
+                        f"QUANDO ENCONTRAR ATUALIZAÇÃO\n\n"
+                        f"RADAR"
+                    )
+
+                    send_whatsapp_ultra(user_phone, occurs_msg)
+                    print(f"📲 WhatsApp enviado para {user_phone}")
 
                 else:
-                    print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
-
-            else:
-                print(f"⚠️ Documento do usuário {monitoramento.user_uid} não encontrado.")
+                    print("ℹ️ Usuário não premium ou sem número salvo.")
 
         except Exception as e:
             print(f"❌ ERRO ao enviar WhatsApp: {e}")
@@ -989,30 +1001,49 @@ async def run_all_monitorings():
 # Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
 async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
     try:
-        if user_plan == "premium":
-            user_ref = firestore.client().collection("users").document(monitoramento.user_uid)
-            user_doc = user_ref.get()
+        if user_plan != "premium":
+            print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
+            return
 
-            if user_doc.exists:
-                user_data = user_doc.to_dict()
-                user_phone = user_data.get("contact")
+        user_ref = firestore.client().collection("users").document(monitoramento.user_uid)
+        user_doc = user_ref.get()
 
-                if user_phone:
-                    whatsapp_message = (
-                        f"🚀 *Monitoramento Ativado!*\n\n"
-                        f"Seu monitoramento para o edital *{monitoramento.edital_identifier}* foi ativado com sucesso.\n\n"
-                        f"Acesse o link do edital: {monitoramento.official_gazette_link}\n"
-                        f"Boa sorte no processo! 🏆"
-                    )
-                    # Enviar mensagem
-                    send_whatsapp_ultra(user_phone, whatsapp_message)
-                else:
-                    print(f"⚠️ Usuário {monitoramento.user_uid} não tem número de telefone salvo.")
-            else:
-                print(f"⚠️ Documento do usuário {monitoramento.user_uid} não encontrado.")
+        if not user_doc.exists:
+            print(f"⚠️ Documento do usuário {monitoramento.user_uid} não encontrado.")
+            return
+
+        user_data = user_doc.to_dict()
+        user_phone = user_data.get("contact")
+        user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
+
+        if not user_phone:
+            print(f"⚠️ Usuário {monitoramento.user_uid} (Premium) não possui número salvo.")
+            return
+
+        keywords = monitoramento.keywords
+        if isinstance(keywords, str):
+            keywords = [kw.strip() for kw in keywords.split(",")]
+
+        keywords_formatted = "  ".join(f"`{kw}`" for kw in keywords)
+
+        message = (
+            f"> *MONITORAMENTO ATIVADO ✅*\n\n"
+            f"Olá, *{user_name}!* \n"
+            f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar as atualizações automaticamente.\n\n"
+            f"*📰 DIÁRIO OFICIAL CONFIGURADO*\n"
+            f"{monitoramento.official_gazette_link}\n\n"
+            f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
+            f"{keywords_formatted}\n\n"
+            f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
+            f"MONITORAMENTO ATIVO\n\n"
+            f"RADAR"
+        )
+
+        send_whatsapp_ultra(user_phone, message)
+        print(f"📲 WhatsApp enviado (ativação) para {user_phone}")
+
     except Exception as e:
-        print(f"Erro ao enviar notificação de WhatsApp para o monitoramento: {e}")
-
+        print(f"Erro ao enviar WhatsApp de ativação: {e}")
 
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
