@@ -366,24 +366,42 @@ class AdminProfileUpdate(BaseModel):
 
 
 async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
-    # Primeiro, envia a mensagem de monitoramento ativado
-    monitoramento_message = (
-        f"🚀 *Monitoramento Ativado!*\n\n"
-        f"Seu monitoramento para o edital *{monitoramento.edital_identifier}* foi ativado com sucesso.\n\n"
-        f"Acesse o link do edital: {monitoramento.official_gazette_link}\n"
-        f"Boa sorte no processo! 🏆"
-    )
-    await send_whatsapp_ultra(user_phone, monitoramento_message)  # Adicionando 'await' aqui
 
-    # Em seguida, envia a mensagem de nova ocorrência
-    ocorrencia_message = (
-        f"📢 *Nova ocorrência encontrada!*\n\n"
-        f"O edital *{monitoramento.edital_identifier}* teve uma nova ocorrência detectada.\n\n"
-        f"🔎 Palavras encontradas: {', '.join(monitoramento.keywords)}\n"
-        f"📄 Link do PDF: {monitoramento.pdf_real_link}\n\n"
-        f"Equipe Conecta Edital 🚀"
+    # ================================
+    # 1️⃣ MENSAGEM DE MONITORAMENTO ATIVADO
+    # ================================
+    monitoramento_message = (
+        f"> *MONITORAMENTO ATIVADO ✅*\n\n"
+        f"Olá, *{monitoramento.user_name}!* \n"
+        f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar as atualizações automaticamente.\n\n"
+        f"*📰 DIÁRIO OFICIAL CONFIGURADO*\n"
+        f"{monitoramento.official_gazette_link}\n\n"
+        f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
+        f"{'  '.join([f'`{kw}`' for kw in monitoramento.keywords])}\n\n"
+        f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
+        f"MONITORAMENTO ATIVO\n\n"
+        f"RADAR"
     )
-    await send_whatsapp_ultra(user_phone, ocorrencia_message)  # Adicionando 'await' aqui também
+
+    await send_whatsapp_ultra(user_phone, monitoramento_message)
+
+    # ================================
+    # 2️⃣ MENSAGEM DE NOVA OCORRÊNCIA
+    # ================================
+    ocorrencia_message = (
+        f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
+        f"Olá, *{monitoramento.user_name}!* \n\n"
+        f"Encontramos uma atualização relevante no seu monitoramento. Recomendamos que confira o quanto antes.\n\n"
+        f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
+        f"{'  '.join(monitoramento.keywords)}\n\n"
+        f"📎 Quer todos os detalhes da ocorrência?\n"
+        f"Acesse o link abaixo:\n{monitoramento.pdf_real_link}\n\n"
+        f"#Nomeação #ConcursoPúbIico #ConectaEdital #SuaVagaGarantida\n\n"
+        f"QUANDO ENCONTRAR ATUALIZAÇÃO\n\n"
+        f"RADAR"
+    )
+
+    await send_whatsapp_ultra(user_phone, ocorrencia_message)
 
 # Quando você detectar uma nova ocorrência e ativar o monitoramento
 async def monitorar_ativacao(monitoramento: Monitoring):
