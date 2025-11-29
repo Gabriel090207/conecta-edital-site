@@ -493,3 +493,20 @@ body {
     color: transparent;
     -webkit-text-stroke: 1px #007bff;
 }
+
+/* ================================
+   TEMA EXCLUSIVO DO PLANO PREMIUM
+   ================================ */
+
+
+/* Quadrado do ícone no Premium */
+.premium-theme .summary-icon {
+    background: linear-gradient(135deg, #9d1ee2, #6108c0);
+  
+}
+
+/* Ícone dentro do quadrado */
+.premium-theme .summary-icon i {
+    color: white !important;
+    font-size: 28px;
+}

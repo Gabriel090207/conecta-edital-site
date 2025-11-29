@@ -51,6 +51,9 @@
 
                 <form id="payment-form">
 
+
+                    
+
                     <input type="hidden" id="selectedPlanId">
 
 
@@ -59,11 +62,14 @@
                         <input type="text" id="cardholderName" placeholder="Nome como aparece no cartão">
                     </div>
 
-                    <div class="input-group card-number-wrapper">
-    <label>Número do Cartão</label>
-    <input type="text" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
-    <i class="fas fa-credit-card card-icon"></i>
-</div>
+                    <div class="input-group card-number-wrapper" style="position: relative;">
+                        <label>Número do Cartão</label>
+                        <input type="text" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
+                    </div>
+                    
+                    <!-- Ícone movido para NÃO ficar dentro do wrapper -->
+                    <i class="fas fa-credit-card card-icon" style="position:absolute; right:10px; top: 38px;"></i>
+                    
 
 
                     <div class="row">
@@ -82,6 +88,9 @@
                         <input type="checkbox" id="termsCheckbox">
                         <label for="terms" class="terms">Eu li e aceito os <a href="termosdeuso.html" class="gradient-name">Termos e Condições</a>.</label>
                     </div>
+
+                    <select id="installments" style="display:none;"></select>
+    <select id="issuer" style="display:none;"></select>
 
                     <button type="submit" class="pay-button disabled" id="payButton">
 
