@@ -97,15 +97,42 @@ function initMercadoPagoCheckout(plan) {
   const cardForm = mp.cardForm({
     amount: String(plan.amount.toFixed(2)),
     autoMount: true,
+  
     form: {
-      cardholderName: { id: "cardholderName" },
-      cardNumber: { id: "cardNumber" },
-      cardExpirationMonth: { id: "cardExpirationMonth" },
-      cardExpirationYear: { id: "cardExpirationYear" },
-      securityCode: { id: "cardCVC" },
-      installments: { id: "installments" },
-      issuer: { id: "issuer" },
+      id: "payment-form",
+  
+      cardholderName: {
+        id: "cardholderName",
+        placeholder: "Nome como no cartão",
+      },
+  
+      cardNumber: {
+        id: "cardNumber",
+        placeholder: "0000 0000 0000 0000",
+      },
+  
+      cardExpirationMonth: {
+        id: "cardExpirationMonth",
+      },
+  
+      cardExpirationYear: {
+        id: "cardExpirationYear",
+      },
+  
+      securityCode: {
+        id: "cardCVC",
+        placeholder: "CVC",
+      },
+  
+      issuer: {
+        id: "issuer",
+      },
+  
+      installments: {
+        id: "installments",
+      },
     },
+  
     callbacks: {
       onFormMounted: (error) => {
         if (error) console.warn("Erro ao montar o form:", error);
