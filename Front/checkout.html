@@ -75,10 +75,17 @@
                     <div class="row">
                         <div class="input-group small">
                             <label>Validade</label>
-                            <input type="text" id="cardExpiration" maxlength="5" placeholder="MM/AA">
+                            <input type="text" id="cardExpirationMonth" maxlength="2" placeholder="MM">
                         </div>
-
+                    
                         <div class="input-group small">
+                            <label>&nbsp;</label> <!-- deixa alinhado -->
+                            <input type="text" id="cardExpirationYear" maxlength="4" placeholder="AAAA">
+                        </div>
+               
+                    
+
+                        <div class="input-group small cvc">
                             <label>CVC</label>
                             <input type="text" id="cardCVC" maxlength="4" placeholder="123">
                         </div>
