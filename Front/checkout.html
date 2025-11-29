@@ -49,61 +49,54 @@
     Informações de Pagamento
 </h3>
 
-                <form id="payment-form">
+<form id="payment-form">
 
+    <input type="hidden" id="selectedPlanId">
 
-                    
+    <div class="input-group">
+        <label>Nome no Cartão</label>
+        <input type="text" id="form-checkout__cardholderName" placeholder="Nome como aparece no cartão">
+    </div>
 
-                    <input type="hidden" id="selectedPlanId">
+    <div class="input-group card-number-wrapper" style="position: relative;">
+        <label>Número do Cartão</label>
+        <input type="text" id="form-checkout__cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
+    </div>
 
+    <!-- Ícone -->
+    <i class="fas fa-credit-card card-icon" style="position:absolute; right:10px; top: 38px;"></i>
 
-                    <div class="input-group">
-                        <label>Nome no Cartão</label>
-                        <input type="text" id="cardholderName" placeholder="Nome como aparece no cartão">
-                    </div>
+    <div class="row">
+        <div class="input-group small">
+            <label>Validade</label>
+            <input type="text" id="form-checkout__expirationMonth" maxlength="2" placeholder="MM">
+        </div>
 
-                    <div class="input-group card-number-wrapper" style="position: relative;">
-                        <label>Número do Cartão</label>
-                        <input type="text" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
-                    </div>
-                    
-                    <!-- Ícone movido para NÃO ficar dentro do wrapper -->
-                    <i class="fas fa-credit-card card-icon" style="position:absolute; right:10px; top: 38px;"></i>
-                    
+        <div class="input-group small">
+            <label>&nbsp;</label>
+            <input type="text" id="form-checkout__expirationYear" maxlength="4" placeholder="AAAA">
+        </div>
 
+        <div class="input-group small cvc">
+            <label>CVC</label>
+            <input type="text" id="form-checkout__securityCode" maxlength="4" placeholder="123">
+        </div>
+    </div>
 
-                    <div class="row">
-                        <div class="input-group small">
-                            <label>Validade</label>
-                            <input type="text" id="cardExpirationMonth" maxlength="2" placeholder="MM">
-                        </div>
-                    
-                        <div class="input-group small">
-                            <label>&nbsp;</label> <!-- deixa alinhado -->
-                            <input type="text" id="cardExpirationYear" maxlength="4" placeholder="AAAA">
-                        </div>
-               
-                    
+    <div class="checkbox-area">
+        <input type="checkbox" id="termsCheckbox">
+        <label class="terms">Eu li e aceito os <a href="termosdeuso.html" class="gradient-name">Termos e Condições</a>.</label>
+    </div>
 
-                        <div class="input-group small cvc">
-                            <label>CVC</label>
-                            <input type="text" id="cardCVC" maxlength="4" placeholder="123">
-                        </div>
-                    </div>
+    <!-- Campos invisíveis obrigatórios -->
+    <select id="form-checkout__installments" style="display:none;"></select>
+    <select id="form-checkout__issuer" style="display:none;"></select>
 
-                    <div class="checkbox-area">
-                        <input type="checkbox" id="termsCheckbox">
-                        <label for="terms" class="terms">Eu li e aceito os <a href="termosdeuso.html" class="gradient-name">Termos e Condições</a>.</label>
-                    </div>
+    <button type="submit" class="pay-button disabled" id="payButton">
+        Monitorar Diário Oficial →
+    </button>
+</form>
 
-                    <select id="installments" style="display:none;"></select>
-    <select id="issuer" style="display:none;"></select>
-
-                    <button type="submit" class="pay-button disabled" id="payButton">
-
-                        Monitorar Diário Oficial →
-                    </button>
-                </form>
             </section>
 
             
