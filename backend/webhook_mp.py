@@ -8,87 +8,75 @@ router = APIRouter()
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 mp = mercadopago.SDK(MP_ACCESS_TOKEN)
 
-# =====================================================
-#  🔔 WEBHOOK MERCADO PAGO — ASSINATURAS RECORRENTES
-# =====================================================
-@router.post("/webhook/mercadopago")
-async def mercadopago_webhook(request: Request):
+@router.post("/webhook/preapproval")
+async def mercadopago_preapproval_webhook(request: Request):
     try:
         data = await request.json()
-        print("\n📩 WEBHOOK RECEBIDO:", data)
+        print("\n📬 [WEBHOOK RECEBIDO - PREAPPROVAL]")
+        print(data)
 
-        action = data.get("action")
-        if not action:
-            return {"status": "ignored"}
-
-        # Identifica o ID da assinatura (preapproval_id)
-        preapproval_id = None
-
-        if action in ["created", "updated", "paused", "cancelled"]:
-            preapproval_id = data["data"]["id"]
-
+        # Mercado Pago envia apenas { "id": "...", "type": "preapproval" }
+        preapproval_id = data.get("id")
         if not preapproval_id:
-            print("⚠️ Webhook sem preapproval_id")
             return {"status": "ignored"}
 
-        # ============================================
-        # 🔍 Buscar detalhes da assinatura no Mercado Pago
-        # ============================================
-        sub_info = mp.preapproval().get(preapproval_id)
-        sub_data = sub_info.get("response", {})
+        # Buscar assinatura completa
+        response = mp.preapproval().get(preapproval_id)
+        info = response.get("response", {})
 
-        status_ = sub_data.get("status")
-        external_reference = sub_data.get("external_reference")  # nosso UID do usuário
-        plan_reason = sub_data.get("reason")
+        print("\n🔍 [PREAPPROVAL INFO]")
+        print(info)
 
-        if not external_reference:
-            print("⚠️ Sem external_reference")
+        user_uid = info.get("external_reference")
+        status_assinatura = info.get("status")     # active, paused, cancelled
+        amount = info.get("auto_recurring", {}).get("transaction_amount", 0)
+        reason = info.get("reason", "")
+
+        if not user_uid:
+            print("⚠️ Sem UID no external_reference")
             return {"status": "ignored"}
 
-        user_uid = external_reference
+        # Determinar plano
+        if amount == 15.9:
+            plano = "essencial"
+        elif amount == 35.9:
+            plano = "premium"
+        else:
+            plano = "desconhecido"
 
         db = firestore.client()
         user_ref = db.collection("users").document(user_uid)
 
-        print(f"🔎 Assinatura do usuário {user_uid} nova situação: {status_}")
-
-        # ============================================
-        #  🟢 STATUS: APROVADO / ATIVO
-        # ============================================
-        if status_ == "authorized" or status_ == "active":
+        # Atualiza de acordo com o status
+        if status_assinatura in ["authorized", "active"]:
             user_ref.update({
                 "subscription_status": "active",
-                "subscription_plan": plan_reason,
+                "subscription_plan": plano,
                 "subscription_id": preapproval_id
             })
-            print("✔ Assinatura marcada como ativa.")
+            print("✔ Assinatura ativada!")
 
-        # ============================================
-        #  🔁 RENOVAÇÃO MENSAL OK
-        # ============================================
-        if status_ == "authorized":
-            print("🔔 Renovação mensal bem-sucedida!")
+        elif status_assinatura == "paused":
+            user_ref.update({
+                "subscription_status": "pending"
+            })
+            print("⏸ Assinatura pausada/pendente")
 
-        # ============================================
-        #  ❌ CARTÃO RECUSADO / COBRANÇA FALHOU
-        # ============================================
-        if status_ == "pending" or status_ == "paused":
-            user_ref.update({"subscription_status": "pending"})
-            print("⚠️ Cobrança pendente (aguardando pagamento).")
+        elif status_assinatura == "cancelled":
+            user_ref.update({
+                "subscription_status": "cancelled",
+                "subscription_plan": None
+            })
+            print("❌ Assinatura cancelada!")
 
-        if status_ == "expired":
-            user_ref.update({"subscription_status": "expired"})
-            print("⚠️ Assinatura expirada.")
-
-        # ============================================
-        #  🛑 CANCELADA PELO CLIENTE
-        # ============================================
-        if status_ == "cancelled":
-            user_ref.update({"subscription_status": "cancelled"})
-            print("🛑 Assinatura cancelada.")
+        elif status_assinatura == "expired":
+            user_ref.update({
+                "subscription_status": "expired"
+            })
+            print("⚠️ Assinatura expirada!")
 
         return {"status": "ok"}
 
     except Exception as e:
-        print("❌ ERRO NO WEBHOOK:", e)
+        print("❌ ERRO NO WEBHOOK DE PREAPPROVAL:", e)
         raise HTTPException(status_code=500, detail=str(e))
