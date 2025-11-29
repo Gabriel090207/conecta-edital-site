@@ -367,18 +367,15 @@ class AdminProfileUpdate(BaseModel):
 
 async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
 
-    # ================
-    # Monta lista keywords
-    # ================
-    keywords_formatted = "  ".join(
-        [f"`{kw}`" for kw in monitoramento.keywords]
-    )
-
+    # ------------------------------
+    # Formatação das keywords
+    # ------------------------------
+    keywords_formatted = "  ".join([f"`{kw}`" for kw in monitoramento.keywords])
     keywords_plain = "  ".join(monitoramento.keywords)
 
-    # ================================
-    # 1️⃣ MONITORAMENTO ATIVADO
-    # ================================
+    # ------------------------------
+    # 1️⃣ MENSAGEM: MONITORAMENTO ATIVADO
+    # ------------------------------
     monitoramento_message = (
         f"> *MONITORAMENTO ATIVADO ✅*\n\n"
         f"Olá, *{monitoramento.user_name}!* \n"
@@ -387,16 +384,14 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
         f"{monitoramento.official_gazette_link}\n\n"
         f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
         f"{keywords_formatted}\n\n"
-        f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
-        f"MONITORAMENTO ATIVO\n\n"
-        f"RADAR"
+        f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado."
     )
 
     await send_whatsapp_ultra(user_phone, monitoramento_message)
 
-    # ================================
-    # 2️⃣ NOVA OCORRÊNCIA
-    # ================================
+    # ------------------------------
+    # 2️⃣ MENSAGEM: NOVA OCORRÊNCIA
+    # ------------------------------
     ocorrencia_message = (
         f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
         f"Olá, *{monitoramento.user_name}!* \n\n"
@@ -405,9 +400,7 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
         f"{keywords_plain}\n\n"
         f"📎 Quer todos os detalhes da ocorrência?\n"
         f"Acesse o link abaixo:\n{monitoramento.pdf_real_link}\n\n"
-        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida\n\n"
-        f"QUANDO ENCONTRAR ATUALIZAÇÃO\n\n"
-        f"RADAR"
+        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida"
     )
 
     await send_whatsapp_ultra(user_phone, ocorrencia_message)
