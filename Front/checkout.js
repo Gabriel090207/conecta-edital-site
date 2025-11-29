@@ -155,18 +155,23 @@ async function fillUserName(user) {
 
 
 function fillPlanSummary(plan) {
-  // Título e preço
+  // -----------------------------
+  // TÍTULO E PREÇO
+  // -----------------------------
   $("#planName").textContent = plan.name;
   $("#planPrice").textContent = plan.priceLabel;
   $("#totalValue").textContent = plan.priceLabel;
 
-  // Ícone
+  // -----------------------------
+  // ÍCONE DO PLANO
+  // -----------------------------
   const iconEl = document.querySelector(".summary-icon i");
   if (iconEl) iconEl.className = plan.icon;
 
-  // Benefícios
+  // -----------------------------
+  // BENEFÍCIOS DO PLANO
+  // -----------------------------
   const benefitsContainer = document.querySelector(".benefits-block");
-  const benefitsTitle = document.querySelector(".benefits-title");
 
   // limpa itens antigos
   benefitsContainer.innerHTML = `
@@ -174,7 +179,7 @@ function fillPlanSummary(plan) {
   `;
 
   // recria cada benefício dinamicamente
-  plan.benefits.forEach(b => {
+  plan.benefits.forEach((b) => {
     const item = document.createElement("div");
     item.classList.add("benefit-item");
 
@@ -190,6 +195,17 @@ function fillPlanSummary(plan) {
 
     benefitsContainer.appendChild(item);
   });
+
+  // -----------------------------
+  // TEMA ESPECIAL DO PLANO PREMIUM
+  // -----------------------------
+  const summaryCard = document.querySelector(".checkout-summary-card");
+
+  if (plan.id === "premium_plan") {
+    summaryCard.classList.add("premium-theme");
+  } else {
+    summaryCard.classList.remove("premium-theme");
+  }
 }
 
 
@@ -223,6 +239,7 @@ function setupTermsAndButton() {
 // MERCADO PAGO – CARD FORM
 // ==============================
 
+
 function initMercadoPagoCheckout(plan) {
   if (!window.MercadoPago) {
     console.error("MercadoPago.js não foi carregado.");
@@ -238,71 +255,99 @@ function initMercadoPagoCheckout(plan) {
 
   if (!form || !payButton) return;
 
-  // Configura o CardForm do Mercado Pago
   const cardForm = mp.cardForm({
     amount: String(plan.amount.toFixed(2)),
     autoMount: true,
+  
     form: {
       id: "payment-form",
+  
       cardholderName: {
         id: "cardholderName",
         placeholder: "Nome como no cartão",
       },
+  
       cardNumber: {
         id: "cardNumber",
         placeholder: "0000 0000 0000 0000",
       },
-      cardExpirationDate: {
+  
+      cardExpirationMonth: {
         id: "cardExpiration",
         placeholder: "MM/AA",
       },
+  
+      cardExpirationYear: {
+        id: "cardExpiration",
+        placeholder: "MM/AA",
+      },
+  
       securityCode: {
         id: "cardCVC",
         placeholder: "CVC",
       },
-      // campos extras (não estamos usando agora, mas o SDK espera alguns)
-      // removidos porque não são usados no checkout transparente
-installments: {
-  id: null,
-},
-identificationType: {
-  id: null,
-},
-identificationNumber: {
-  id: null,
-},
-cardholderEmail: {
-  id: null,
-},
-
+  
+      installments: {
+        id: "installments",
+        placeholder: "",
+      },
+  
+      issuer: {
+        id: "issuer",
+        placeholder: "",
+      },
     },
+  
     callbacks: {
+  
+      // ✅ AGORA NO LUGAR CERTO
+      onFormMounted: (error) => {
+        if (error) {
+          console.warn("Erro ao montar o form:", error);
+        } else {
+          console.log("CardForm montado com sucesso!");
+        }
+      },
+  
       onSubmit: async (event) => {
         event.preventDefault();
-
+  
+        const cardNumberInput = document.querySelector("#cardNumber");
+        if (cardNumberInput) {
+          cardNumberInput.value = cardNumberInput.value.replace(/\s+/g, "");
+        }
+  
         const terms = $("#termsCheckbox");
         if (!terms.checked) {
           alert("Você precisa aceitar os Termos e Condições.");
           return;
         }
-
+  
         try {
           payButton.disabled = true;
           payButton.textContent = "Processando...";
-
-          const {
-            token,
-            paymentMethodId,
-          } = cardForm.getCardFormData();
-
+  
+          const formData = cardForm.getCardFormData();
+  
+          const token = formData.token;
+          const paymentMethodId = formData.paymentMethodId;
+          const issuerId = formData.issuerId;
+  
+          console.log("=== [DEBUG FRONT] Dados do cartão ===");
+          console.log("Token:", token);
+          console.log("Payment Method:", paymentMethodId);
+          console.log("Issuer:", issuerId);
+  
+          if (!token) {
+            alert("Não foi possível gerar o token do cartão.");
+            payButton.disabled = false;
+            payButton.textContent = "Monitorar Diário Oficial →";
+            return;
+          }
+  
           const firebaseUser = firebase.auth().currentUser;
           const idToken = await firebaseUser.getIdToken();
-
-          // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-          // AQUI é onde vamos chamar o backend no PASSO 4
-          // Enviar token do cartão + plano selecionado
-          // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+  
           const res = await fetch(`${API_BASE_URL}/api/subscriptions`, {
             method: "POST",
             headers: {
@@ -313,27 +358,26 @@ cardholderEmail: {
               plan_id: plan.id,
               card_token: token,
               payment_method_id: paymentMethodId,
+              issuer_id: issuerId,
             }),
           });
-
+  
           const data = await res.json();
-
+  
+          console.log("=== [DEBUG FRONT] Resposta da API ===", data);
+  
           if (!res.ok) {
-            console.error("Erro na API:", data);
-            alert(
-              data.detail ||
-                "Não foi possível processar o pagamento. Tente novamente."
-            );
+            alert(data.detail || "Erro ao criar assinatura.");
             payButton.disabled = false;
             payButton.textContent = "Monitorar Diário Oficial →";
             return;
           }
-
-          // Sucesso! Aqui você pode redirecionar para página de obrigado
+  
           alert("Assinatura criada com sucesso! 🎉");
           window.location.href = "monitoramento.html";
+  
         } catch (error) {
-          console.error(error);
+          console.error("Erro inesperado:", error);
           alert("Erro inesperado ao processar o pagamento.");
           payButton.disabled = false;
           payButton.textContent = "Monitorar Diário Oficial →";
@@ -341,4 +385,5 @@ cardholderEmail: {
       },
     },
   });
+  
 }
