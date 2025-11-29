@@ -92,36 +92,26 @@ function setupTermsAndButton() {
 // MERCADO PAGO
 // ==============================
 function initMercadoPagoCheckout(plan) {
-
-  const mp = new MercadoPago(MP_PUBLIC_KEY, {
-    locale: "pt-BR",
-    advancedFraudPrevention: true
-  });
-
-  // Necessário para Device ID (APROVAÇÃO)
-  mp.getDeviceId();
+  const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
 
   const cardForm = mp.cardForm({
-    amount: plan.amount,
+    amount: String(plan.amount.toFixed(2)),
     autoMount: true,
-
     form: {
-      id: "payment-form",
-
-      cardholderName: { id: "form-checkout__cardholderName", placeholder: "Nome como aparece no cartão" },
-      cardNumber: { id: "form-checkout__cardNumber", placeholder: "0000 0000 0000 0000" },
-      securityCode: { id: "form-checkout__securityCode", placeholder: "CVC" },
-      cardExpirationMonth: { id: "form-checkout__expirationMonth" },
-      cardExpirationYear: { id: "form-checkout__expirationYear" },
-
-      installments: { id: "form-checkout__installments" },
-      issuer: { id: "form-checkout__issuer" }
+      cardholderName: { id: "cardholderName" },
+      cardNumber: { id: "cardNumber" },
+      cardExpirationMonth: { id: "cardExpirationMonth" },
+      cardExpirationYear: { id: "cardExpirationYear" },
+      securityCode: { id: "cardCVC" },
+      installments: { id: "installments" },
+      issuer: { id: "issuer" },
     },
-
     callbacks: {
       onFormMounted: (error) => {
-        if (error) console.warn("Erro ao montar cardForm:", error);
+        if (error) console.warn("Erro ao montar o form:", error);
+        else console.log("CardForm montado com sucesso!");
       },
+
 
       onSubmit: async (event) => {
         event.preventDefault();
