@@ -102,34 +102,34 @@ function initMercadoPagoCheckout(plan) {
       id: "payment-form",
   
       cardholderName: {
-        id: "cardholderName",
+        id: "form-checkout__cardholderName",
         placeholder: "Nome como no cartão",
       },
   
       cardNumber: {
-        id: "cardNumber",
+        id: "form-checkout__cardNumber",
         placeholder: "0000 0000 0000 0000",
       },
   
       cardExpirationMonth: {
-        id: "cardExpirationMonth",
+        id: "form-checkout__expirationMonth",
       },
   
       cardExpirationYear: {
-        id: "cardExpirationYear",
+        id: "form-checkout__expirationYear",
       },
   
       securityCode: {
-        id: "cardCVC",
+        id: "form-checkout__securityCode",
         placeholder: "CVC",
       },
   
       issuer: {
-        id: "issuer",
+        id: "form-checkout__issuer",
       },
   
       installments: {
-        id: "installments",
+        id: "form-checkout__installments",
       },
     },
   
@@ -138,32 +138,31 @@ function initMercadoPagoCheckout(plan) {
         if (error) console.warn("Erro ao montar o form:", error);
         else console.log("CardForm montado com sucesso!");
       },
-
-
+  
       onSubmit: async (event) => {
         event.preventDefault();
-
+  
         const payButton = $("#payButton");
         payButton.disabled = true;
         payButton.textContent = "Processando...";
-
+  
         try {
           const data = cardForm.getCardFormData();
-
+  
           const token = data.token;
           const paymentMethod = data.paymentMethodId;
           const issuerId = data.issuerId;
-
+  
           if (!token) {
             alert("Erro ao gerar token do cartão.");
             payButton.disabled = false;
             payButton.textContent = "Monitorar Diário Oficial →";
             return;
           }
-
+  
           const firebaseUser = firebase.auth().currentUser;
           const idToken = await firebaseUser.getIdToken();
-
+  
           const response = await fetch(`${API_BASE_URL}/api/subscriptions`, {
             method: "POST",
             headers: {
@@ -177,18 +176,18 @@ function initMercadoPagoCheckout(plan) {
               issuer_id: issuerId
             })
           });
-
+  
           const result = await response.json();
-
+  
           if (!response.ok) {
             alert(result.message || result.detail || "Erro ao criar assinatura.");
             payButton.disabled = false;
             payButton.textContent = "Monitorar Diário Oficial →";
             return;
           }
-
+  
           window.location.href = "sucesso.html";
-
+  
         } catch (err) {
           console.error("Erro no pagamento:", err);
           alert("Erro inesperado ao processar assinatura.");
@@ -198,4 +197,5 @@ function initMercadoPagoCheckout(plan) {
       }
     }
   });
+  
 }
