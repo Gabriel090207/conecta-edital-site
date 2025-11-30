@@ -991,7 +991,50 @@ async def run_all_monitorings():
 
 
 # Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
+async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
+    try:
+        if user_plan != "premium":
+            print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
+            return
 
+        user_ref = firestore.client().collection("users").document(monitoramento.user_uid)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            print(f"⚠️ Documento do usuário {monitoramento.user_uid} não encontrado.")
+            return
+
+        user_data = user_doc.to_dict()
+        user_phone = user_data.get("contact")
+        user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
+
+        if not user_phone:
+            print(f"⚠️ Usuário {monitoramento.user_uid} (Premium) não possui número salvo.")
+            return
+
+        keywords = monitoramento.keywords
+        if isinstance(keywords, str):
+            keywords = [kw.strip() for kw in keywords.split(",")]
+
+        keywords_formatted = "  ".join(f"`{kw}`" for kw in keywords)
+
+        message = (
+            f"> *MONITORAMENTO ATIVADO ✅*\n\n"
+            f"Olá, *{user_name}!* \n"
+            f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar as atualizações automaticamente.\n\n"
+            f"*📰 DIÁRIO OFICIAL CONFIGURADO*\n"
+            f"{monitoramento.official_gazette_link}\n\n"
+            f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
+            f"{keywords_formatted}\n\n"
+            f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
+           
+        )
+
+        send_whatsapp_ultra(user_phone, message)
+        print(f"📲 WhatsApp enviado (ativação) para {user_phone}")
+
+    except Exception as e:
+        print(f"Erro ao enviar WhatsApp de ativação: {e}")
 
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
@@ -1328,7 +1371,7 @@ async def mercadopago_webhook(request: Request):
                     "Obrigado por utilizar o Conecta Edital ❤️"
                 )
 
-                await send_monitoring_and_occurrence_notifications(monitoramento, user_phone)
+                send_whatsapp_ultra(user_phone, whatsapp_message)
                 print(f"📲 WhatsApp enviado para {user_phone}")
             else:
                 print(f"⚠️ Usuário {user_id} não tem número salvo.")
