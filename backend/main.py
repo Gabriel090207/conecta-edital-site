@@ -878,8 +878,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                         f"📎 Quer todos os detalhes da ocorrência?\n"
                         f"Acesse o link abaixo:\n{monitoramento.pdf_real_link}\n\n"
                         f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida\n\n"
-                        f"QUANDO ENCONTRAR ATUALIZAÇÃO\n\n"
-                        f"RADAR"
+                      
                     )
 
                     send_whatsapp_ultra(user_phone, occurs_msg)
