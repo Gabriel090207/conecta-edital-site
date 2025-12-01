@@ -26,6 +26,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const fullNameInput = document.getElementById('full-name');
     const usernameInput = document.getElementById('username');
     const contactInput = document.getElementById('contact');
+
+    // Permitir apenas números no campo de WhatsApp
+// Permitir apenas números e limitar a 11 dígitos
+if (contactInput) {
+    contactInput.addEventListener("input", () => {
+        // Remove tudo que não for número
+        contactInput.value = contactInput.value.replace(/\D/g, "");
+
+        // Limita para no máximo 11 dígitos
+        if (contactInput.value.length > 11) {
+            contactInput.value = contactInput.value.slice(0, 11);
+        }
+    });
+}
+
     
     // Referência para o robô
     const robotImage = document.querySelector('.logo-robo-dentro');
@@ -48,15 +63,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (openModalNavbar) {
         openModalNavbar.addEventListener('click', (e) => {
             e.preventDefault();
+    
+            // limpamos redirect quando o usuário clica em ENTRAR
+            localStorage.removeItem("redirect_after_login"); 
+    
             openModal();
         });
     }
+    
     if (openModalDemo) {
         openModalDemo.addEventListener('click', (e) => {
             e.preventDefault();
             openModal();
         });
     }
+
+    // BOTÕES "Escolher Plano" — abre o modal e define redirecionamento
+document.querySelectorAll(".choose-plan-btn-index").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        // Marca o redirecionamento desejado
+        localStorage.setItem("redirect_after_login", "planos.html");
+
+        // Abre o modal normalmente
+        openModal();
+    });
+});
+
 
     // Evento de clique para fechar o modal
     if (closeModalBtn) {
@@ -157,8 +191,20 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 if (isLoginMode) {
                     await window.auth.signInWithEmailAndPassword(email, password);
-                    console.log('Login bem-sucedido!');
-                    window.location.href = 'monitoramento.html';
+
+                    // Verifica se existe intenção de ir para Planos
+                    // Verifica se existe intenção de ir para Planos
+const redirect = localStorage.getItem("redirect_after_login");
+
+if (redirect) {
+    localStorage.removeItem("redirect_after_login");
+    window.location.href = redirect;
+} else {
+    window.location.href = 'monitoramento.html';
+}
+
+
+                    
                 } else {
                     const fullName = fullNameInput.value;
                     const username = usernameInput.value;
@@ -239,7 +285,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                         console.log('Dados do usuário Google salvos no Firestore.');
                     }
-                    window.location.href = 'monitoramento.html';
+                    const redirect = localStorage.getItem("redirect_after_login");
+
+                    if (redirect) {
+                        localStorage.removeItem("redirect_after_login");
+                        window.location.href = redirect;
+                    } else {
+                        window.location.href = 'monitoramento.html';
+                    }
+                    
                 } catch (firestoreErrorGoogle) {
                     console.error('Erro ao salvar/verificar dados do usuário Google no Firestore:', firestoreErrorGoogle);
                     errorMessage.textContent = `Falha ao salvar dados via Google: ${firestoreErrorGoogle.message || 'Erro desconhecido.'}`;
