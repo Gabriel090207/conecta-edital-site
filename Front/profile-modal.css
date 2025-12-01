@@ -518,7 +518,7 @@ footer {
     text-align: center;
     margin-top: 30px;
     font-size: 12px;
-    width: 15%;
+    width: 21%;
 }
 
 .footer-links ul li a {
@@ -680,4 +680,108 @@ footer {
 .btn-submit:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+}
+
+
+@media (min-width: 1920px) {
+  .pm-content.pm-large {
+    /* 🔹 Ajuste automático da altura */
+    height: auto;
+    max-height: 66vh;
+    /* 🔹 Garante que não role internamente */
+  
+  }
+
+  .footer-bottom {
+
+    width: 21%;
+
+  }
+  
+}
+
+/* NOTEBOOK 1536px */
+@media (min-width: 1536px) and (max-width: 1919px) {
+  .pm-content.pm-large {
+    /* 🔹 Ajuste automático da altura */
+    height: auto;
+    max-height: 79vh;
+    /* 🔹 Garante que não role internamente */
+  
+  }
+
+  .footer-bottom {
+
+    width: 25%;
+
+  }
+}
+
+
+/* ----- DESKTOP COMUM (1366px / 1440px / 1600px) ----- */
+@media (min-width: 1280px) and (max-width: 1535px) {
+  .pm-content.pm-large {
+    /* 🔹 Ajuste automático da altura */
+    height: auto;
+    max-height: 79vh;
+    /* 🔹 Garante que não role internamente */
+  
+  }
+
+  .footer-bottom {
+
+    width: 31%;
+
+  }
+}
+
+/* ----- NOTEBOOK (1024px–1279px) ----- */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .pm-content.pm-large {
+    /* 🔹 Ajuste automático da altura */
+    height: auto;
+    max-height: 79vh;
+    /* 🔹 Garante que não role internamente */
+  
+  }
+
+  .footer-bottom {
+
+    width: 38%;
+
+  }
+}
+
+/* ----- TABLET (768px–1023px) ----- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .pm-content.pm-large {
+    /* 🔹 Ajuste automático da altura */
+    height: auto;
+    max-height: 77vh;
+    /* 🔹 Garante que não role internamente */
+  
+  }
+
+  .footer-bottom {
+
+    width: 21%;
+
+  }
+}
+
+/* ----- MOBILE (<768px) ----- */
+@media (max-width: 767px) {
+  .pm-content.pm-large {
+    /* 🔹 Ajuste automático da altura */
+    height: auto;
+    max-height: 77vh;
+    /* 🔹 Garante que não role internamente */
+  
+  }
+
+  .footer-bottom {
+
+    width: 21%;
+
+  }
 }

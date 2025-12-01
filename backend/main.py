@@ -372,6 +372,8 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
     # ------------------------------
     keywords_formatted = "  ".join([f"`{kw}`" for kw in monitoramento.keywords])
     keywords_plain = "  ".join(monitoramento.keywords)
+    keywords_formatted = "\n".join([f"> `{kw}`" for kw in monitoramento.keywords])
+
 
     # ------------------------------
     # 1️⃣ MENSAGEM: MONITORAMENTO ATIVADO
@@ -868,6 +870,8 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                         kws = monitoramento.keywords
 
                     keywords_plain = "  ".join(kws)
+                    keywords_formatted = "\n".join([f"> `{kw}`" for kw in monitoramento.keywords])
+
 
                     occurs_msg = (
                         f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
@@ -1017,6 +1021,8 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             keywords = [kw.strip() for kw in keywords.split(",")]
 
         keywords_formatted = "  ".join(f"`{kw}`" for kw in keywords)
+        keywords_formatted = "\n".join([f"> `{kw}`" for kw in monitoramento.keywords])
+
 
         message = (
             f"> *MONITORAMENTO ATIVADO ✅*\n\n"
