@@ -368,12 +368,20 @@ class AdminProfileUpdate(BaseModel):
 async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
 
     # ------------------------------
-    # Formatação das keywords
+    # Formatação correta das keywords
     # ------------------------------
-    keywords_formatted = "  ".join([f"`{kw}`" for kw in monitoramento.keywords])
-    keywords_plain = "  ".join(monitoramento.keywords)
-    keywords_formatted = "\n".join([f"> `{kw}`" for kw in monitoramento.keywords])
 
+    # Se vier string, normaliza
+    if isinstance(monitoramento.keywords, str):
+        keywords_list = [kw.strip() for kw in monitoramento.keywords.split(",")]
+    else:
+        keywords_list = monitoramento.keywords
+
+    # Formato bonito para ativação
+    keywords_formatted = "\n".join([f"> `{kw}`" for kw in keywords_list])
+
+    # Formato simples para ocorrência
+    keywords_plain = ", ".join(keywords_list)
 
     # ------------------------------
     # 1️⃣ MENSAGEM: MONITORAMENTO ATIVADO
@@ -381,12 +389,14 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
     monitoramento_message = (
         f"> *MONITORAMENTO ATIVADO ✅*\n\n"
         f"Olá, *{monitoramento.user_name}!* \n"
-        f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar as atualizações automaticamente.\n\n"
+        f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar "
+        f"as atualizações automaticamente.\n\n"
         f"*📰 DIÁRIO OFICIAL CONFIGURADO*\n"
         f"{monitoramento.official_gazette_link}\n\n"
         f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
         f"{keywords_formatted}\n\n"
-        f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado."
+        f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas "
+        f"atualizações relacionadas às palavras-chave configuradas, você será notificado."
     )
 
     await send_whatsapp_ultra(user_phone, monitoramento_message)
@@ -397,11 +407,11 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
     ocorrencia_message = (
         f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
         f"Olá, *{monitoramento.user_name}!* \n\n"
-        f"Encontramos uma atualização relevante no seu monitoramento. Recomendamos que confira o quanto antes.\n\n"
-        f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
+        f"Encontramos uma atualização relevante no seu monitoramento.\n\n"
+        f"*🔠 PALAVRAS-CHAVE MONITORADAS*\n"
         f"{keywords_plain}\n\n"
-        f"📎 Quer todos os detalhes da ocorrência?\n"
-        f"Acesse o link abaixo:\n{monitoramento.pdf_real_link}\n\n"
+        f"📎 Confira os detalhes completos no PDF:\n"
+        f"{monitoramento.pdf_real_link}\n\n"
         f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida"
     )
 
@@ -1016,13 +1026,22 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             print(f"⚠️ Usuário {monitoramento.user_uid} (Premium) não possui número salvo.")
             return
 
+        # =====================================================
+        # 📌 FORMATAÇÃO CORRETA DAS PALAVRAS-CHAVE
+        # =====================================================
+
         keywords = monitoramento.keywords
+
+        # Se for string, transforma em lista
         if isinstance(keywords, str):
-            keywords = [kw.strip() for kw in keywords.split(",")]
+            keywords_list = [kw.strip() for kw in keywords.split(",")]
+        else:
+            keywords_list = keywords
 
-        keywords_formatted = "  ".join(f"`{kw}`" for kw in keywords)
-        keywords_formatted = "\n".join([f"> `{kw}`" for kw in monitoramento.keywords])
+        # Formatação estilo WhatsApp com > `keyword`
+        keywords_formatted = "\n".join([f"> `{kw}`" for kw in keywords_list])
 
+        # =====================================================
 
         message = (
             f"> *MONITORAMENTO ATIVADO ✅*\n\n"
@@ -1033,7 +1052,6 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
             f"{keywords_formatted}\n\n"
             f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
-           
         )
 
         send_whatsapp_ultra(user_phone, message)
@@ -1041,6 +1059,7 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
 
     except Exception as e:
         print(f"Erro ao enviar WhatsApp de ativação: {e}")
+
 
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
