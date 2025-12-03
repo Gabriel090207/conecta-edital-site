@@ -104,20 +104,12 @@ import httpx
 # FUNÇÃO PARA ENVIAR TEXTO VIA Z-API
 # =====================================
 def send_whatsapp_zapi(to_number: str, message: str):
-    cleaned = (
-        to_number.replace(" ", "")
-        .replace("(", "")
-        .replace(")", "")
-        .replace("-", "")
-    )
-
-    # remover tudo que não for número
     cleaned = "".join(filter(str.isdigit, to_number))
 
-# garantir DDI 55 sem +
-    if not cleaned.startswith("55"):
-        cleaned = "55" + cleaned
+    if cleaned.startswith("55") and len(cleaned) > 12:
+        cleaned = cleaned[2:]
 
+    cleaned = "55" + cleaned
 
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-text"
 
@@ -127,14 +119,18 @@ def send_whatsapp_zapi(to_number: str, message: str):
     }
 
     try:
+        print("DEBUG ZAPI ENVIANDO PAYLOAD:", payload)
+        print("DEBUG ZAPI URL:", url)
+
         response = httpx.post(url, json=payload)
         response.raise_for_status()
+
         print("Z-API enviado:", response.text)
         return {"status": "success", "response": response.json()}
+
     except Exception as e:
         print("Erro ao enviar pela Z-API:", str(e))
         return {"status": "error", "detail": str(e)}
-
 
 def send_template_visual_zapi(to_number: str, titulo: str, data: str, link: str):
     """
