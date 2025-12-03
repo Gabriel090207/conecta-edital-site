@@ -112,6 +112,10 @@ def send_whatsapp_zapi(to_number: str, message: str):
 
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-messages"
 
+    headers = {
+        "client-token": os.getenv("ZAPI_CLIENT_TOKEN")
+    }
+
     payload = {
         "messages": [
             {
@@ -126,7 +130,7 @@ def send_whatsapp_zapi(to_number: str, message: str):
         print("DEBUG ZAPI PAYLOAD:", payload)
         print("DEBUG ZAPI URL:", url)
 
-        response = httpx.post(url, json=payload)
+        response = httpx.post(url, json=payload, headers=headers)
         print("DEBUG ZAPI RESPONSE:", response.text)
 
         response.raise_for_status()
