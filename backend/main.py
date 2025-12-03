@@ -110,12 +110,16 @@ def send_whatsapp_zapi(to_number: str, message: str):
 
     cleaned = "55" + cleaned
 
-    # API LEGACY (a única que sua instância aceita)
-    url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-message"
+    url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-messages"
 
     payload = {
-        "phone": cleaned,
-        "message": message
+        "messages": [
+            {
+                "type": "text",
+                "text": message,
+                "to": cleaned
+            }
+        ]
     }
 
     try:
@@ -126,8 +130,6 @@ def send_whatsapp_zapi(to_number: str, message: str):
         print("DEBUG ZAPI RESPONSE:", response.text)
 
         response.raise_for_status()
-
-        print("Z-API enviado:", response.text)
         return {"status": "success", "response": response.json()}
 
     except Exception as e:
