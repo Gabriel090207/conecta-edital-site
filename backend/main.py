@@ -111,8 +111,13 @@ def send_whatsapp_zapi(to_number: str, message: str):
         .replace("-", "")
     )
 
-    if not cleaned.startswith("+"):
-        cleaned = "+55" + cleaned
+    # remover tudo que não for número
+    cleaned = "".join(filter(str.isdigit, to_number))
+
+# garantir DDI 55 sem +
+    if not cleaned.startswith("55"):
+        cleaned = "55" + cleaned
+
 
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-text"
 
