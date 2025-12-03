@@ -102,25 +102,20 @@ import httpx
 
 # =====================================
 # FUNÇÃO PARA ENVIAR TEXTO VIA Z-API
-# =====================================
 def send_whatsapp_zapi(to_number: str, message: str):
-    # Sanitizar número
     cleaned = "".join(filter(str.isdigit, to_number))
 
-    # Remove duplicação de código do país
     if cleaned.startswith("55"):
         cleaned = cleaned[2:]
 
-    # Adiciona o DDI correto
     cleaned = "55" + cleaned
 
-    # Endpoint oficial corretíssimo
-    url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-text"
+    # API LEGACY (a única que sua instância aceita)
+    url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-message"
 
-    # Payload final (sem delayMessage)
     payload = {
         "phone": cleaned,
-        "text": message
+        "message": message
     }
 
     try:
@@ -128,8 +123,6 @@ def send_whatsapp_zapi(to_number: str, message: str):
         print("DEBUG ZAPI URL:", url)
 
         response = httpx.post(url, json=payload)
-
-        # Debug completo da resposta da API
         print("DEBUG ZAPI RESPONSE:", response.text)
 
         response.raise_for_status()
