@@ -117,11 +117,11 @@ def send_whatsapp_zapi(to_number: str, message: str):
     }
 
     payload = {
+        "phone": cleaned,
         "messages": [
             {
                 "type": "text",
-                "text": message,
-                "to": cleaned
+                "text": message
             }
         ]
     }
