@@ -20,7 +20,7 @@ import json
 import httpx
 
 from fastapi import APIRouter
-from utils.ultramsg import send_whatsapp_ultra
+
 
 # Firebase Admin SDK
 import firebase_admin
@@ -87,84 +87,65 @@ TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
 twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 
 
-ULTRA_INSTANCE_ID = "instance151649"  # Substitua pelo ID da sua instância UltraMSG
-ULTRA_TOKEN = "fzzi92d48hnl0wjl"  # Substitua pelo seu token
+# ============================
+# CONFIGURAÇÃO DA Z-API
+# ============================
+
+ZAPI_INSTANCE_ID = os.getenv("ZAPI_INSTANCE_ID")
+ZAPI_TOKEN = os.getenv("ZAPI_TOKEN")
+ # Substitua pelo seu token
 
 
 import json
 import httpx
 
-# Função para enviar uma mensagem do WhatsApp via UltraMSG
-# Função para enviar uma mensagem do WhatsApp via UltraMSG
-def send_whatsapp_ultra(to_number: str, message: str):
-    """
-    Envia uma mensagem pelo WhatsApp usando UltraMSG.
-    Formato do número esperado: +5511999999999
-    """
-    # Limpa caracteres desnecessários
-    cleaned_number = (
+
+# =====================================
+# FUNÇÃO PARA ENVIAR TEXTO VIA Z-API
+# =====================================
+def send_whatsapp_zapi(to_number: str, message: str):
+    cleaned = (
         to_number.replace(" ", "")
         .replace("(", "")
         .replace(")", "")
         .replace("-", "")
     )
 
-    # Se o número não começar com +, adiciona automaticamente
-    if not cleaned_number.startswith("+"):
-        cleaned_number = "+55" + cleaned_number
+    if not cleaned.startswith("+"):
+        cleaned = "+55" + cleaned
 
-    # Substitui na URL o ID da instância UltraMSG e o token da API
-    url = f"https://api.ultramsg.com/{ULTRA_INSTANCE_ID}/messages/chat"
-    data = {
-        "token": ULTRA_TOKEN,  # Token de API
-        "to": cleaned_number,
-        "body": message
+    url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-text"
+
+    payload = {
+        "phone": cleaned,
+        "message": message
     }
 
     try:
-        response = httpx.post(url, data=data)
-        response.raise_for_status()  # Levanta exceção em caso de erro na requisição
-        print("WhatsApp enviado:", response.text)
-        return {"status": "success", "response": response.json()}
-    except httpx.RequestError as e:
-        print(f"Erro ao enviar WhatsApp: {e}")
-        return {"status": "error", "detail": str(e)}
-
-# Função para enviar um template de WhatsApp via UltraMSG
-def send_whatsapp_template_ultra(to_number: str, titulo: str, data: str, link: str):
-    """
-    Envia uma mensagem de template do WhatsApp usando UltraMSG.
-    """
-    # Limpa caracteres desnecessários
-    cleaned_number = (
-        to_number.replace(" ", "")
-        .replace("(", "")
-        .replace(")", "")
-        .replace("-", "")
-    )
-
-    # Se o número não começar com +, adiciona o código do Brasil
-    if not cleaned_number.startswith("+"):
-        cleaned_number = "+55" + cleaned_number
-
-    url = f"https://api.ultramsg.com/{ULTRA_INSTANCE_ID}/messages/template"
-    data = {
-        "token": ULTRA_TOKEN,  # Token de API
-        "to": cleaned_number,
-        "template": "seu_template_aqui",  # Substitua pelo seu template ID
-        "params": json.dumps([titulo, data, link])  # Parametros do template
-    }
-
-    try:
-        response = httpx.post(url, data=data)
+        response = httpx.post(url, json=payload)
         response.raise_for_status()
-        print(f"Template enviado com sucesso para {to_number}")
+        print("Z-API enviado:", response.text)
         return {"status": "success", "response": response.json()}
-    except httpx.RequestError as e:
-        print(f"Erro ao enviar template do WhatsApp: {e}")
+    except Exception as e:
+        print("Erro ao enviar pela Z-API:", str(e))
         return {"status": "error", "detail": str(e)}
 
-# --- INICIALIZAÇÃO DO FASTAPI ---
+
+def send_template_visual_zapi(to_number: str, titulo: str, data: str, link: str):
+    """
+    Replica o mesmo visual do template UltraMSG usando texto normal no Z-API.
+    """
+    mensagem = (
+        f"📢 *ATUALIZAÇÃO NO EDITAL*\n\n"
+        f"*Título:* {titulo}\n"
+        f"*Data:* {data}\n\n"
+        f"📄 Acesse o documento completo:\n{link}\n\n"
+        f"Conecta Edital — Monitoramento Inteligente de Editais."
+    )
+
+    return send_whatsapp_zapi(to_number, mensagem)
+
+
 
 @app.get("/")
 def read_root():
@@ -172,7 +153,7 @@ def read_root():
 
 @app.post("/send-message/")
 async def send_message(to_number: str, message: str):
-    response = send_whatsapp_ultra(to_number, message)
+    response = send_whatsapp_zapi(to_number, message)
     return response
 
 # Configuração do CORS
@@ -399,7 +380,7 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
         f"atualizações relacionadas às palavras-chave configuradas, você será notificado."
     )
 
-    await send_whatsapp_ultra(user_phone, monitoramento_message)
+    await send_whatsapp_zapi(user_phone, monitoramento_message)
 
     # ------------------------------
     # 2️⃣ MENSAGEM: NOVA OCORRÊNCIA
@@ -415,7 +396,7 @@ async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring
         f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida"
     )
 
-    await send_whatsapp_ultra(user_phone, ocorrencia_message)
+    await send_whatsapp_zapi(user_phone, ocorrencia_message)
 
 # Quando você detectar uma nova ocorrência e ativar o monitoramento
 async def monitorar_ativacao(monitoramento: Monitoring):
@@ -895,7 +876,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                       
                     )
 
-                    send_whatsapp_ultra(user_phone, occurs_msg)
+                    send_whatsapp_zapi(user_phone, occurs_msg)
                     print(f"📲 WhatsApp enviado para {user_phone}")
 
                 else:
@@ -1054,7 +1035,13 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
         )
 
-        send_whatsapp_ultra(user_phone, message)
+        send_template_visual_zapi(
+            to_number=user_phone,
+            titulo=f"Monitoramento ativado — {monitoramento.edital_identifier}",
+            data=datetime.now().strftime("%d/%m/%Y"),
+            link=str(monitoramento.official_gazette_link)
+        )
+
         print(f"📲 WhatsApp enviado (ativação) para {user_phone}")
 
     except Exception as e:
@@ -1396,7 +1383,7 @@ async def mercadopago_webhook(request: Request):
                     "Obrigado por utilizar o Conecta Edital ❤️"
                 )
 
-                send_whatsapp_ultra(user_phone, whatsapp_message)
+                send_whatsapp_zapi(user_phone, whatsapp_message)
                 print(f"📲 WhatsApp enviado para {user_phone}")
             else:
                 print(f"⚠️ Usuário {user_id} não tem número salvo.")

@@ -705,7 +705,7 @@ footer {
   .pm-content.pm-large {
     /* 🔹 Ajuste automático da altura */
     height: auto;
-    max-height: 79vh;
+    max-height: 85vh;
     /* 🔹 Garante que não role internamente */
   
   }

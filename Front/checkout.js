@@ -38,6 +38,8 @@ function $(selector) {
 // ==============================
 document.addEventListener("DOMContentLoaded", async () => {
   await ensureUserLogged();
+  await loadUserName();
+
 
   const planId = getQueryParam("plan") || "essencial_plan";
   const selectedPlan = PLANS[planId];
@@ -76,6 +78,34 @@ function fillPlanSummary(plan) {
 // ==============================
 // TERMOS & BOTÃO
 // ==============================
+
+
+
+  async function loadUserName() {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+
+  const doc = await firebase.firestore().collection("users").doc(user.uid).get();
+
+  let name = "Usuário";
+
+  if (doc.exists) {
+    const data = doc.data();
+
+    // tenta pegar várias chaves que podem conter nome completo
+    name =
+      data.fullName ||
+      data.nomeCompleto ||
+      data.nome ||
+      data.name ||
+      user.displayName ||
+      "Usuário";
+  }
+
+  document.getElementById("checkout-user-name").textContent = name;
+}
+
+
 function setupTermsAndButton() {
   const checkbox = $("#termsCheckbox");
   const payButton = $("#payButton");
@@ -197,5 +227,8 @@ function initMercadoPagoCheckout(plan) {
       }
     }
   });
+
+
+
    
 }

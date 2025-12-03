@@ -58,26 +58,36 @@
         <input type="text" id="form-checkout__cardholderName" placeholder="Nome como aparece no cartão">
     </div>
 
+    <div class="input-group">
+    <label>CPF</label>
+    <input 
+        type="text" 
+        id="form-checkout__cardholderCPF" 
+        placeholder="000.000.000-00" 
+        maxlength="14"
+    >
+</div>
+
+
     <div class="input-group card-number-wrapper" style="position: relative;">
         <label>Número do Cartão</label>
         <input type="text" id="form-checkout__cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
     </div>
 
-    <!-- Ícone -->
-    <i class="fas fa-credit-card card-icon" style="position:absolute; right:10px; top: 38px;"></i>
 
     <div class="row">
-        <div class="input-group small">
-            <label>Validade</label>
-            <input type="text" id="form-checkout__expirationMonth" maxlength="2" placeholder="MM">
-        </div>
+       <div class="input-group small">
+    <label>Validade</label>
+    <input 
+        type="text" 
+        id="form-checkout__expiration" 
+        placeholder="MM/AAAA"
+        maxlength="7"
+    >
+</div>
+
 
         <div class="input-group small">
-            <label>&nbsp;</label>
-            <input type="text" id="form-checkout__expirationYear" maxlength="4" placeholder="AAAA">
-        </div>
-
-        <div class="input-group small cvc">
             <label>CVC</label>
             <input type="text" id="form-checkout__securityCode" maxlength="4" placeholder="123">
         </div>
