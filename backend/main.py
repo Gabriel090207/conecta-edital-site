@@ -140,13 +140,17 @@ def send_template_visual_zapi(to_number: str, titulo: str, data: str, link: str)
     """
     Replica o mesmo visual do template UltraMSG usando texto normal no Z-API.
     """
-    mensagem = (
-        f"📢 *ATUALIZAÇÃO NO EDITAL*\n\n"
+    def sanitize(text: str) -> str:
+    return text.replace("\n\n", "\n").replace("  ", " ").strip()
+
+    mensagem = sanitize(
+        f"📢 *ATUALIZAÇÃO NO EDITAL*\n"
         f"*Título:* {titulo}\n"
-        f"*Data:* {data}\n\n"
-        f"📄 Acesse o documento completo:\n{link}\n\n"
+        f"*Data:* {data}\n"
+        f"📄 Acesse o documento completo: {link}\n"
         f"Conecta Edital — Monitoramento Inteligente de Editais."
     )
+
 
     return send_whatsapp_zapi(to_number, mensagem)
 
