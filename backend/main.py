@@ -107,21 +107,20 @@ def send_whatsapp_zapi(to_number: str, message: str):
     # Sanitizar número
     cleaned = "".join(filter(str.isdigit, to_number))
 
-# Remove qualquer duplicação de código do país
+    # Remove duplicação de código do país
     if cleaned.startswith("55"):
         cleaned = cleaned[2:]
 
-# Garante padrão correto da Z-API
+    # Adiciona o DDI correto
     cleaned = "55" + cleaned
 
-
-    # Endpoint correto (legacy MD)
+    # Endpoint oficial corretíssimo
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-text"
 
+    # Payload final (sem delayMessage)
     payload = {
         "phone": cleaned,
-        "text": message,
-        "delayMessage": 1  # evita erro 400 com emojis
+        "text": message
     }
 
     try:
@@ -129,6 +128,10 @@ def send_whatsapp_zapi(to_number: str, message: str):
         print("DEBUG ZAPI URL:", url)
 
         response = httpx.post(url, json=payload)
+
+        # Debug completo da resposta da API
+        print("DEBUG ZAPI RESPONSE:", response.text)
+
         response.raise_for_status()
 
         print("Z-API enviado:", response.text)
