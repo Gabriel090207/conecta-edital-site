@@ -153,7 +153,7 @@ async def send_whatsapp_safe(to_number: str, message: str):
     try:
         async with whatsapp_lock:
             send_whatsapp_zapi(to_number, message)
-            await asyncio.sleep(4)  # delay obrigatório anti-spam
+            await asyncio.sleep(12)  # delay obrigatório anti-spam
         return {"status": "success"}
 
     except Exception as e:
