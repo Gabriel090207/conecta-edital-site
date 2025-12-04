@@ -845,6 +845,10 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                     send_whatsapp_zapi(user_phone, occurs_msg)
                     print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
 
+# ⏳ Delay fixo para evitar filtro anti-spam
+                    await asyncio.sleep(12)
+
+
 
                 else:
                     print("ℹ️ Usuário não premium ou sem número salvo.")
@@ -953,6 +957,7 @@ async def run_all_monitorings():
 
 
 # Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
+# Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
 async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
     try:
         if user_plan != "premium":
@@ -973,7 +978,7 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             print("⚠️ Usuário sem telefone cadastrado, WhatsApp não enviado.")
             return
 
-        # Format keywords corretamente
+        # Formatação correta das keywords
         keywords = monitoramento.keywords
         if isinstance(keywords, str):
             keywords_list = [kw.strip() for kw in keywords.split(",")]
@@ -995,9 +1000,13 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
         send_whatsapp_zapi(user_phone, activation_message)
         print(f"📲 WhatsApp de ativação enviado para {user_phone}")
 
+        # ⏳ Delay fixo para não bloquear WhatsApp (evita ghost)
+        await asyncio.sleep(12)
+
     except Exception as e:
         print(f"❌ ERRO ao enviar WhatsApp de ativação: {e}")
 
+     
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
     numero = "+5516994288026"  # seu número
