@@ -144,13 +144,16 @@ from asyncio import Lock
 whatsapp_lock = Lock()
 
 async def send_whatsapp_safe(to_number: str, message: str):
-    async with whatsapp_lock:
-        send_whatsapp_zapi(to_number, message)
-        await asyncio.sleep(4)
-
+    try:
+        async with whatsapp_lock:
+            send_whatsapp_zapi(to_number, message)
+            await asyncio.sleep(4)  # delay obrigatório entre mensagens
+        return {"status": "success"}
+        
     except Exception as e:
         print("Erro ao enviar pela Z-API:", str(e))
         return {"status": "error", "detail": str(e)}
+
 
 
 def send_template_visual_zapi(to_number: str, titulo: str, data: str, link: str):
