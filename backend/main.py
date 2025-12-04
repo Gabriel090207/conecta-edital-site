@@ -140,6 +140,14 @@ def send_whatsapp_zapi(to_number: str, message: str):
         response.raise_for_status()
         return {"status": "success", "response": response.json()}
 
+from asyncio import Lock
+whatsapp_lock = Lock()
+
+async def send_whatsapp_safe(to_number: str, message: str):
+    async with whatsapp_lock:
+        send_whatsapp_zapi(to_number, message)
+        await asyncio.sleep(4)
+
     except Exception as e:
         print("Erro ao enviar pela Z-API:", str(e))
         return {"status": "error", "detail": str(e)}
@@ -842,11 +850,11 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                         f"Conecta Edital — Monitoramento Inteligente."
                     )
 
-                    send_whatsapp_zapi(user_phone, occurs_msg)
+                    await send_whatsapp_safe(user_phone, occurs_msg)
                     print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
 
 # ⏳ Delay fixo para evitar filtro anti-spam
-                    await asyncio.sleep(12)
+                    
 
 
 
@@ -997,11 +1005,11 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             f"Conecta Edital — Monitoramento Inteligente."
         )
 
-        send_whatsapp_zapi(user_phone, activation_message)
+        await send_whatsapp_safe(user_phone, activation_message)
         print(f"📲 WhatsApp de ativação enviado para {user_phone}")
 
         # ⏳ Delay fixo para não bloquear WhatsApp (evita ghost)
-        await asyncio.sleep(12)
+        
 
     except Exception as e:
         print(f"❌ ERRO ao enviar WhatsApp de ativação: {e}")
@@ -1134,11 +1142,8 @@ async def create_personal_monitoramento(
     )
 
     # 📲 Envio de WhatsApp via UltraMSG (Somente Premium)
-    background_tasks.add_task(
-        send_whatsapp_notification,
-        monitoramento=new_monitoring_obj,
-        user_plan=user_plan_for_creation
-    )
+    asyncio.create_task(send_whatsapp_notification(new_monitoring_obj, user_plan_for_creation))
+
 
     print(f"Novo Monitoramento Pessoal criado para UID {user_uid}: {new_monitoring_obj.dict()}")
     return new_monitoring_obj
@@ -1218,11 +1223,8 @@ async def create_radar_monitoramento(
     background_tasks.add_task(perform_monitoring_check, new_monitoring_obj)
 
     # 📲 Envio de WhatsApp via UltraMSG (Somente Premium)
-    background_tasks.add_task(
-        send_whatsapp_notification,
-        monitoramento=new_monitoring_obj,
-        user_plan=user_plan_for_creation
-    )
+    asyncio.create_task(send_whatsapp_notification(new_monitoring_obj, user_plan_for_creation))
+
 
     print(f"Novo Monitoramento Radar criado para UID {user_uid}: {new_monitoring_obj.dict()}")
     return new_monitoring_obj
