@@ -119,7 +119,6 @@ def send_whatsapp_zapi(to_number: str, message: str):
         "Content-Type": "application/json"
     }
 
-
     payload = {
         "phone": cleaned,
         "messages": [
@@ -140,16 +139,23 @@ def send_whatsapp_zapi(to_number: str, message: str):
         response.raise_for_status()
         return {"status": "success", "response": response.json()}
 
+    except Exception as e:
+        print("Erro ao enviar pela Z-API:", str(e))
+        return {"status": "error", "detail": str(e)}
+
+
+# 🔐 LOCK GLOBAL PARA EVITAR DUPLICAÇÃO
 from asyncio import Lock
 whatsapp_lock = Lock()
+
 
 async def send_whatsapp_safe(to_number: str, message: str):
     try:
         async with whatsapp_lock:
             send_whatsapp_zapi(to_number, message)
-            await asyncio.sleep(4)  # delay obrigatório entre mensagens
+            await asyncio.sleep(4)  # delay obrigatório anti-spam
         return {"status": "success"}
-        
+
     except Exception as e:
         print("Erro ao enviar pela Z-API:", str(e))
         return {"status": "error", "detail": str(e)}
