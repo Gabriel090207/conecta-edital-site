@@ -113,8 +113,12 @@ def send_whatsapp_zapi(to_number: str, message: str):
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-messages"
 
     headers = {
-        "client-token": os.getenv("ZAPI_CLIENT_TOKEN")
+        "client-token": os.getenv("ZAPI_CLIENT_TOKEN"),
+        "instance-token": ZAPI_TOKEN,
+        "Authorization": f"Bearer {ZAPI_TOKEN}",
+        "Content-Type": "application/json"
     }
+
 
     payload = {
         "phone": cleaned,
@@ -359,57 +363,7 @@ class AdminProfileUpdate(BaseModel):
         allow_population_by_alias = True
 
 
-async def send_monitoring_and_occurrence_notifications(monitoramento: Monitoring, user_phone: str):
 
-    # ------------------------------
-    # Formatação correta das keywords
-    # ------------------------------
-
-    # Se vier string, normaliza
-    if isinstance(monitoramento.keywords, str):
-        keywords_list = [kw.strip() for kw in monitoramento.keywords.split(",")]
-    else:
-        keywords_list = monitoramento.keywords
-
-    # Formato bonito para ativação
-    keywords_formatted = "\n".join([f"> `{kw}`" for kw in keywords_list])
-
-    # Formato simples para ocorrência
-    keywords_plain = ", ".join(keywords_list)
-
-    # ------------------------------
-    # 1️⃣ MENSAGEM: MONITORAMENTO ATIVADO
-    # ------------------------------
-    monitoramento_message = (
-        f"> *MONITORAMENTO ATIVADO ✅*\n\n"
-        f"Olá, *{monitoramento.user_name}!* \n"
-        f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar "
-        f"as atualizações automaticamente.\n\n"
-        f"*📰 DIÁRIO OFICIAL CONFIGURADO*\n"
-        f"{monitoramento.official_gazette_link}\n\n"
-        f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
-        f"{keywords_formatted}\n\n"
-        f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas "
-        f"atualizações relacionadas às palavras-chave configuradas, você será notificado."
-    )
-
-    await send_whatsapp_zapi(user_phone, monitoramento_message)
-
-    # ------------------------------
-    # 2️⃣ MENSAGEM: NOVA OCORRÊNCIA
-    # ------------------------------
-    ocorrencia_message = (
-        f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
-        f"Olá, *{monitoramento.user_name}!* \n\n"
-        f"Encontramos uma atualização relevante no seu monitoramento.\n\n"
-        f"*🔠 PALAVRAS-CHAVE MONITORADAS*\n"
-        f"{keywords_plain}\n\n"
-        f"📎 Confira os detalhes completos no PDF:\n"
-        f"{monitoramento.pdf_real_link}\n\n"
-        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida"
-    )
-
-    await send_whatsapp_zapi(user_phone, ocorrencia_message)
 
 # Quando você detectar uma nova ocorrência e ativar o monitoramento
 async def monitorar_ativacao(monitoramento: Monitoring):
@@ -878,19 +832,19 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
 
                     occurs_msg = (
-                        f"🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n\n"
-                        f"Olá, *{user_name}!* \n\n"
-                        f"Encontramos uma atualização relevante no seu monitoramento. Recomendamos que confira o quanto antes.\n\n"
-                        f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
-                        f"{keywords_plain}\n\n"
-                        f"📎 Quer todos os detalhes da ocorrência?\n"
-                        f"Acesse o link abaixo:\n{monitoramento.pdf_real_link}\n\n"
-                        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida\n\n"
-                      
+                        f"🚨 *NOVA OCORRÊNCIA DETECTADA* 🚨\n\n"
+                        f"Olá, *{user_name}!* 👋\n\n"
+                        f"Uma atualização importante foi encontrada no seu monitoramento.\n\n"
+                        f"*🔎 Edital:* {monitoramento.edital_identifier}\n"
+                        f"*🔠 Palavras-chave:* {keywords_plain}\n\n"
+                        f"📎 *Acesse o documento completo:*\n{monitoramento.pdf_real_link}\n\n"
+                        f"🔔 Continue atento! Enviaremos novas notificações assim que surgirem.\n"
+                        f"Conecta Edital — Monitoramento Inteligente."
                     )
 
                     send_whatsapp_zapi(user_phone, occurs_msg)
-                    print(f"📲 WhatsApp enviado para {user_phone}")
+                    print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
+
 
                 else:
                     print("ℹ️ Usuário não premium ou sem número salvo.")
@@ -1048,14 +1002,21 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
         )
 
-        send_template_visual_zapi(
-            to_number=user_phone,
-            titulo=f"Monitoramento ativado — {monitoramento.edital_identifier}",
-            data=datetime.now().strftime("%d/%m/%Y"),
-            link=str(monitoramento.official_gazette_link)
+        activation_message = (
+            f"📢 *MONITORAMENTO ATIVADO*\n\n"
+            f"Olá, *{user_name}!* 🎯\n\n"
+            f"Seu monitoramento foi configurado com sucesso!\n\n"
+            f"*📰 Diário:* {monitoramento.official_gazette_link}\n\n"
+            f"*🔠 Palavras-chave monitoradas*\n{keywords_formatted}\n\n"
+            f"A partir de agora, sempre que alguma atualização ocorrer no edital, você receberá um alerta automático 📲"
         )
 
-        print(f"📲 WhatsApp enviado (ativação) para {user_phone}")
+        send_whatsapp_zapi(user_phone, activation_message)
+
+        print(f"📲 WhatsApp enviado (ativação única) para {user_phone}")
+
+
+        
 
     except Exception as e:
         print(f"Erro ao enviar WhatsApp de ativação: {e}")
@@ -2727,3 +2688,32 @@ async def admin_update_user_slots(user_uid: str, data: dict = Body(...)):
         raise HTTPException(status_code=500, detail=f"Erro ao atualizar slots: {e}")
 
 
+
+@app.post("/webhook/whatsapp-status")
+async def whatsapp_status_webhook(request: Request):
+    data = await request.json()
+    
+    print("\n📩 WEBHOOK WHATSAPP RECEBIDO")
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+
+    try:
+        message_id = data.get("messageId")
+        status_value = data.get("status") or data.get("event")
+        phone = data.get("phone")
+
+        print(f"🔎 MSG: {message_id} | STATUS: {status_value} | DESTINO: {phone}")
+
+        # (Opcional) salvar no Firestore depois
+        # db = firestore.client()
+        # db.collection("whatsapp_logs").add({
+        #     "message_id": message_id,
+        #     "status": status_value,
+        #     "phone": phone,
+        #     "timestamp": firestore.SERVER_TIMESTAMP
+        # })
+
+        return {"received": True}
+
+    except Exception as e:
+        print(f"❌ Erro processando webhook: {e}")
+        return {"received": False}
