@@ -959,11 +959,10 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
             return
 
-        user_ref = firestore.client().collection("users").document(monitoramento.user_uid)
-        user_doc = user_ref.get()
-
+        db = firestore.client()
+        user_doc = db.collection("users").document(monitoramento.user_uid).get()
         if not user_doc.exists:
-            print(f"⚠️ Documento do usuário {monitoramento.user_uid} não encontrado.")
+            print("⚠️ Usuário não encontrado para WhatsApp")
             return
 
         user_data = user_doc.to_dict()
@@ -971,36 +970,17 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
         user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
 
         if not user_phone:
-            print(f"⚠️ Usuário {monitoramento.user_uid} (Premium) não possui número salvo.")
+            print("⚠️ Usuário sem telefone cadastrado, WhatsApp não enviado.")
             return
 
-        # =====================================================
-        # 📌 FORMATAÇÃO CORRETA DAS PALAVRAS-CHAVE
-        # =====================================================
-
+        # Format keywords corretamente
         keywords = monitoramento.keywords
-
-        # Se for string, transforma em lista
         if isinstance(keywords, str):
             keywords_list = [kw.strip() for kw in keywords.split(",")]
         else:
             keywords_list = keywords
 
-        # Formatação estilo WhatsApp com > `keyword`
         keywords_formatted = "\n".join([f"> `{kw}`" for kw in keywords_list])
-
-        # =====================================================
-
-        message = (
-            f"> *MONITORAMENTO ATIVADO ✅*\n\n"
-            f"Olá, *{user_name}!* \n"
-            f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar as atualizações automaticamente.\n\n"
-            f"*📰 DIÁRIO OFICIAL CONFIGURADO*\n"
-            f"{monitoramento.official_gazette_link}\n\n"
-            f"*🔠 PALAVRAS-CHAVE SENDO MONITORADAS*\n"
-            f"{keywords_formatted}\n\n"
-            f"A partir de agora, você não precisa fazer mais nada. Sempre que surgirem novas atualizações relacionadas às palavras-chave configuradas, você será notificado.\n\n"
-        )
 
         activation_message = (
             f"📢 *MONITORAMENTO ATIVADO*\n\n"
@@ -1008,19 +988,15 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             f"Seu monitoramento foi configurado com sucesso!\n\n"
             f"*📰 Diário:* {monitoramento.official_gazette_link}\n\n"
             f"*🔠 Palavras-chave monitoradas*\n{keywords_formatted}\n\n"
-            f"A partir de agora, sempre que alguma atualização ocorrer no edital, você receberá um alerta automático 📲"
+            f"A partir de agora, sempre que houver atualização, você receberá um alerta automático 📲\n"
+            f"Conecta Edital — Monitoramento Inteligente."
         )
 
         send_whatsapp_zapi(user_phone, activation_message)
-
-        print(f"📲 WhatsApp enviado (ativação única) para {user_phone}")
-
-
-        
+        print(f"📲 WhatsApp de ativação enviado para {user_phone}")
 
     except Exception as e:
-        print(f"Erro ao enviar WhatsApp de ativação: {e}")
-
+        print(f"❌ ERRO ao enviar WhatsApp de ativação: {e}")
 
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
