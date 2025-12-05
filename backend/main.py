@@ -1037,7 +1037,7 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
         print(f"❌ ERRO ao enviar WhatsApp de ativação: {e}")
 
      
-@router.get("/teste-ultramsg")
+@app.get("/teste-ultramsg")
 def teste_ultramsg():
     numero = "+5516994288026"  # seu número
 
