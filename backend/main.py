@@ -838,8 +838,8 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                         kws = monitoramento.keywords
 
                     # formatar keywords sem repetir ">"
-                    keywords_list = monitoramento.keywords
-                    keywords_plain = "\n".join([f"> `{kw}`" for kw in keywords_list])
+                    
+                    keywords_formatted = "\n".join([f"`{kw}`" for kw in keywords_list])
 
                     occurs_msg = (
                         f"> 🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n"
@@ -850,12 +850,12 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                         f"Recomendamos que confira o quanto antes.\n"
                         f"\n"
                         f"🔠 *PALAVRA-CHAVE SENDO MONITORADA*\n"
-                        f"{keywords_plain}\n"
+                        f"> {keywords_formatted}\n"
                         f"\n"
-                        f"📎 *Link do documento:* \n"
+                        f"📎 *Quer todos os detalhes da ocorrência? Acesse o link abaixo:* \n"
                         f"{monitoramento.pdf_real_link}\n"
                         f"\n"
-                        f"_Conecta Edital — Monitoramento Inteligente._"
+                        f"#Nomeação #ConcursoPúbIico #ConectaEdital #SuaVagaGarantida"
                     )
 
 
@@ -1008,17 +1008,17 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             f"> *MONITORAMENTO ATIVADO* ✅\n"
             f"\n"
             f"Olá, *{user_name}!* 👋\n"
+            f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar as atualizações automaticamente.\n"
             f"\n"
             f"📰 *DIÁRIO OFICIAL CONFIGURADO*\n"
             f"{monitoramento.official_gazette_link}\n"
             f"\n"
             f"🔠 *PALAVRA-CHAVE SENDO MONITORADA*\n"
-            f"> `{keywords_formatted}`\n"
+            f"> {keywords_formatted}\n"
             f"\n"
             f"A partir de agora, você não precisa fazer mais nada.\n"
-            f"Sempre que surgir atualização, você será notificado automaticamente 📲\n"
-            f"\n"
-            f"_Conecta Edital — Monitoramento Inteligente._"
+            f"Sempre que surgirem novas atualizações relacionadas à palavra-chave configurada, você será notificado.\n"
+            
         )
 
 
