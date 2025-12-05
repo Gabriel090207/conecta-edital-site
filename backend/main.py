@@ -70,6 +70,11 @@ app.include_router(mp_webhook_router)
 
 router = APIRouter()
 
+
+from whatsapp_bot import router as whatsapp_router
+app.include_router(whatsapp_router)
+
+
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
