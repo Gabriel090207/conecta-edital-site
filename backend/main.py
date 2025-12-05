@@ -101,13 +101,11 @@ import httpx
 
 
 # =====================================
-# FUNÇÃO PARA ENVIAR TEXTO VIA Z-API
 def send_whatsapp_zapi(to_number: str, message: str):
     cleaned = "".join(filter(str.isdigit, to_number))
 
     if cleaned.startswith("55"):
         cleaned = cleaned[2:]
-
     cleaned = "55" + cleaned
 
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-messages"
@@ -115,7 +113,6 @@ def send_whatsapp_zapi(to_number: str, message: str):
     headers = {
         "client-token": os.getenv("ZAPI_CLIENT_TOKEN"),
         "instance-token": ZAPI_TOKEN,
-        "Authorization": f"Bearer {ZAPI_TOKEN}",
         "Content-Type": "application/json"
     }
 
@@ -129,19 +126,17 @@ def send_whatsapp_zapi(to_number: str, message: str):
         ]
     }
 
+    print("DEBUG ZAPI PAYLOAD:", payload)
+
     try:
-        print("DEBUG ZAPI PAYLOAD:", payload)
-        print("DEBUG ZAPI URL:", url)
-
-        response = httpx.post(url, json=payload, headers=headers)
+        response = httpx.post(url, json=payload, headers=headers, timeout=30)
         print("DEBUG ZAPI RESPONSE:", response.text)
-
         response.raise_for_status()
         return {"status": "success", "response": response.json()}
-
     except Exception as e:
         print("Erro ao enviar pela Z-API:", str(e))
         return {"status": "error", "detail": str(e)}
+
 
 
 # 🔐 LOCK GLOBAL PARA EVITAR DUPLICAÇÃO
