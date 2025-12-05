@@ -68,7 +68,7 @@ app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
 
 
-router = APIRouter()
+
 
 
 from whatsapp_bot import router as whatsapp_router
