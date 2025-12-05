@@ -68,12 +68,7 @@ app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
 
 
-
-
-
-from whatsapp_bot import router as whatsapp_router
-app.include_router(whatsapp_router)
-
+router = APIRouter()
 
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -1037,7 +1032,7 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
         print(f"❌ ERRO ao enviar WhatsApp de ativação: {e}")
 
      
-@app.get("/teste-ultramsg")
+@router.get("/teste-ultramsg")
 def teste_ultramsg():
     numero = "+5516994288026"  # seu número
 
