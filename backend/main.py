@@ -837,20 +837,27 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                     else:
                         kws = monitoramento.keywords
 
-                    keywords_plain = "  ".join(kws)
-                    keywords_formatted = "\n".join([f"> `{kw}`" for kw in monitoramento.keywords])
-
+                    # formatar keywords sem repetir ">"
+                    keywords_list = monitoramento.keywords
+                    keywords_plain = "\n".join([f"> `{kw}`" for kw in keywords_list])
 
                     occurs_msg = (
-                        f"🚨 *NOVA OCORRÊNCIA DETECTADA* 🚨\n\n"
-                        f"Olá, *{user_name}!* 👋\n\n"
-                        f"Uma atualização importante foi encontrada no seu monitoramento.\n\n"
-                        f"*🔎 Edital:* {monitoramento.edital_identifier}\n"
-                        f"*🔠 Palavras-chave:* {keywords_plain}\n\n"
-                        f"📎 *Acesse o documento completo:*\n{monitoramento.pdf_real_link}\n\n"
-                        f"🔔 Continue atento! Enviaremos novas notificações assim que surgirem.\n"
-                        f"Conecta Edital — Monitoramento Inteligente."
+                        f"> 🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n"
+                        f"\n"
+                        f"Olá, *{user_name}!* 👋\n"
+                        f"\n"
+                        f"Encontramos uma atualização relevante no seu monitoramento. "
+                        f"Recomendamos que confira o quanto antes.\n"
+                        f"\n"
+                        f"🔠 *PALAVRA-CHAVE SENDO MONITORADA*\n"
+                        f"{keywords_plain}\n"
+                        f"\n"
+                        f"📎 *Link do documento:* \n"
+                        f"{monitoramento.pdf_real_link}\n"
+                        f"\n"
+                        f"_Conecta Edital — Monitoramento Inteligente._"
                     )
+
 
                     await send_whatsapp_safe(user_phone, occurs_msg)
                     print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
@@ -995,17 +1002,25 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
         else:
             keywords_list = keywords
 
-        keywords_formatted = "\n".join([f"> `{kw}`" for kw in keywords_list])
+        keywords_formatted = "\n".join([f"`{kw}`" for kw in keywords_list])
 
         activation_message = (
-            f"📢 *MONITORAMENTO ATIVADO*\n\n"
-            f"Olá, *{user_name}!* 🎯\n\n"
-            f"Seu monitoramento foi configurado com sucesso!\n\n"
-            f"*📰 Diário:* {monitoramento.official_gazette_link}\n\n"
-            f"*🔠 Palavras-chave monitoradas*\n{keywords_formatted}\n\n"
-            f"A partir de agora, sempre que houver atualização, você receberá um alerta automático 📲\n"
-            f"Conecta Edital — Monitoramento Inteligente."
+            f"> *MONITORAMENTO ATIVADO* ✅\n"
+            f"\n"
+            f"Olá, *{user_name}!* 👋\n"
+            f"\n"
+            f"📰 *DIÁRIO OFICIAL CONFIGURADO*\n"
+            f"{monitoramento.official_gazette_link}\n"
+            f"\n"
+            f"🔠 *PALAVRA-CHAVE SENDO MONITORADA*\n"
+            f"> `{keywords_formatted}`\n"
+            f"\n"
+            f"A partir de agora, você não precisa fazer mais nada.\n"
+            f"Sempre que surgir atualização, você será notificado automaticamente 📲\n"
+            f"\n"
+            f"_Conecta Edital — Monitoramento Inteligente._"
         )
+
 
         await send_whatsapp_safe(user_phone, activation_message)
         print(f"📲 WhatsApp de ativação enviado para {user_phone}")
