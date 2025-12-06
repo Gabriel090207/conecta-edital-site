@@ -5,9 +5,9 @@ import pytz
 import os
 import asyncio
 from memoria import salvar_mensagem, obter_historico, limpar_conversa
-from openai import OpenAI
 
-# Inicializa o cliente OpenAI com sua chave de API
+# Atualize seu client OpenAI
+from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Z-API configurações
@@ -109,7 +109,6 @@ async def webhook_whatsapp(request: Request):
 
         # Redireciona para o atendente correspondente
         if modo == "monitoramento":
-            print(f"📝 Atendendo {numero} com o atendente Carlos.")
             from atendente_monitoramento import responder
             return await responder(numero, texto)
 
@@ -158,11 +157,6 @@ async def webhook_whatsapp(request: Request):
     if texto == "1":
         atendimento_humano[numero] = "monitoramento"
         await send_whatsapp(numero, "👨‍💼 Um atendente chamado *Carlos* será enviado para responder suas dúvidas sobre monitoramento.")
-        
-        # Log para verificar se o fluxo está chegando aqui
-        print(f"📝 Enviando para atendimento de Carlos para o número {numero}.")
-        
-        # Chama a função responder para o atendimento de Carlos
         from atendente_monitoramento import responder
         return await responder(numero, texto)
 

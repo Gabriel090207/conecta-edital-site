@@ -23,7 +23,7 @@ async def responder(numero, texto):
     # Monta o prompt com o histórico das últimas mensagens
     prompt = [
         {"role": "system", "content": "Você é Carlos, atendente de suporte..."}  # Instruções para o bot Carlos
-    ] + historico[-10:]  # Usa os 10 últimos turnos para manter o contexto da conversa
+    ] + historico[-10:]  # Usa os 10 últimos turnos para manter o contexto
 
     try:
         # Chama a API do OpenAI para gerar a resposta com base no prompt
@@ -36,7 +36,7 @@ async def responder(numero, texto):
         # Extrai a resposta gerada pelo modelo
         texto_resposta = resposta.choices[0].message["content"]
 
-        # Salva a resposta do atendente (bot) na memória
+        # Salva a resposta do atendente Carlos
         salvar_mensagem(numero, "assistant", texto_resposta)
 
         # Envia a resposta para o WhatsApp do usuário
@@ -47,6 +47,6 @@ async def responder(numero, texto):
         return {"status": "ok"}
 
     except Exception as e:
-        # Caso ocorra algum erro, registra e retorna um erro
+        # Caso ocorra algum erro
         print(f"Erro ao gerar resposta: {e}")
         return {"status": "error", "message": str(e)}
