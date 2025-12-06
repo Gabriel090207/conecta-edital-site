@@ -48,6 +48,7 @@ from email.utils import formataddr
 from dotenv import load_dotenv
 import smtplib
 
+from whatapp_bot import router as whatsapp_router
 
 
 # Importação dos templates de email (se existirem)
@@ -66,6 +67,7 @@ app = FastAPI(
 
 app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
+app.include_router(whatsapp_router)
 
 
 router = APIRouter()
