@@ -18,25 +18,17 @@ async def responder(numero, texto):
     # Obtém o histórico de mensagens do usuário para fornecer contexto para o modelo GPT
     historico = obter_historico(numero)
 
-    # Monta o prompt com o histórico das últimas mensagens (aqui limitamos a 10 últimas)
+    # Monta o prompt com o histórico das últimas mensagens
     prompt = [
-        {"role": "system", "content": 
-        """
-        Você é Carlos, atendente de suporte do Conecta Edital.
-        Você fala como humano: amigável, claro, explicando sem ser robótico.
-        Nunca peça dados de monitoramento, nem link, nem ID.
-        Seu papel é APENAS tirar dúvidas e orientar.
-        Use sempre tom humano: "certo, entendi", "claro", "vamos lá".
-        Respostas curtas e úteis, sem blocos enormes.
-        """}
+        {"role": "system", "content": "Você é Carlos, atendente de suporte..."}  # Instruções para o bot Carlos
     ] + historico[-10:]  # Usa os 10 últimos turnos para manter o contexto da conversa
 
     try:
         # Chama a API do OpenAI para gerar a resposta com base no prompt
         resposta = client.chat.completions.create(
-            model="gpt-4.1-mini",  # Modelo GPT-4.1 mini (você pode usar outro modelo se preferir)
+            model="gpt-4.1-mini",  # Modelo GPT-4.1 mini (pode ser outro modelo)
             messages=prompt,
-            temperature=0.6  # Ajusta a criatividade da resposta (0.6 é um valor equilibrado)
+            temperature=0.6  # Ajusta a criatividade da resposta
         )
 
         # Extrai a resposta gerada pelo modelo
@@ -55,4 +47,3 @@ async def responder(numero, texto):
         # Caso ocorra algum erro, registra e retorna um erro
         print(f"Erro ao gerar resposta: {e}")
         return {"status": "error", "message": str(e)}
-
