@@ -21,6 +21,9 @@ SEND_TYPING_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_T
 RATE_LIMIT_DELAY = 45
 ultima_interacao = {}
 
+router = APIRouter()
+
+
 # Controle de quem está sendo atendido
 atendimento_humano = {}
 
