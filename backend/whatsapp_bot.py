@@ -109,6 +109,7 @@ async def webhook_whatsapp(request: Request):
 
         # Redireciona para o atendente correspondente
         if modo == "monitoramento":
+            print(f"📝 Atendendo {numero} com o atendente Carlos.")
             from atendente_monitoramento import responder
             return await responder(numero, texto)
 
@@ -157,6 +158,9 @@ async def webhook_whatsapp(request: Request):
     if texto == "1":
         atendimento_humano[numero] = "monitoramento"
         await send_whatsapp(numero, "👨‍💼 Um atendente chamado *Carlos* será enviado para responder suas dúvidas sobre monitoramento.")
+        
+        # Log para verificar se o fluxo está chegando aqui
+        print(f"📝 Enviando para atendimento de Carlos para o número {numero}.")
         
         # Chama a função responder para o atendimento de Carlos
         from atendente_monitoramento import responder
