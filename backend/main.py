@@ -48,7 +48,7 @@ from email.utils import formataddr
 from dotenv import load_dotenv
 import smtplib
 
-from whatapp_bot import router as whatsapp_router
+from whatsapp_bot import router as whatsapp_router
 
 
 # Importação dos templates de email (se existirem)
