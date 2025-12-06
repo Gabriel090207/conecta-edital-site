@@ -24,6 +24,9 @@ ultima_interacao = {}
 # Controle de quem está sendo atendido
 atendimento_humano = {}
 
+# Inicializando o router
+router = APIRouter()
+
 # Enviar mensagem "digitando..."
 async def send_typing(numero):
     numero = ''.join(filter(str.isdigit, numero))
