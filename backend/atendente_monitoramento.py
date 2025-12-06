@@ -8,6 +8,8 @@ from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def responder(numero, texto):
+    print(f"📝 Iniciando atendimento com o atendente Carlos para o número {numero} com o texto: {texto}")
+    
     # Salva a mensagem do usuário na memória (banco de dados ou arquivo)
     salvar_mensagem(numero, "user", texto)
 
@@ -41,6 +43,7 @@ async def responder(numero, texto):
         await send_whatsapp(numero, texto_resposta)
 
         # Retorna um status de sucesso
+        print(f"📩 Resposta enviada para {numero}: {texto_resposta}")
         return {"status": "ok"}
 
     except Exception as e:
