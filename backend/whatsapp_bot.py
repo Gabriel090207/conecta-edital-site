@@ -24,9 +24,6 @@ ultima_interacao = {}
 # Controle de quem está sendo atendido
 atendimento_humano = {}
 
-# Inicializando o router
-router = APIRouter()
-
 # Enviar mensagem "digitando..."
 async def send_typing(numero):
     numero = ''.join(filter(str.isdigit, numero))
@@ -157,8 +154,9 @@ async def webhook_whatsapp(request: Request):
     # ============================
     if texto == "1":
         atendimento_humano[numero] = "monitoramento"
-        await send_whatsapp(numero, "👨‍💼 Um atendente será enviado para responder suas dúvidas sobre monitoramento.")
-        return {"status": "ok"}
+        await send_whatsapp(numero, "👨‍💼 Um atendente chamado *Carlos* será enviado para responder suas dúvidas sobre monitoramento.")
+        from atendente_monitoramento import responder
+        return await responder(numero, texto)
 
     if texto == "2":
         atendimento_humano[numero] = "planos"
