@@ -7,20 +7,34 @@ router = APIRouter()
 
 ZAPI_INSTANCE = "3EB273C95E6311A457864AD69F0E752E"
 ZAPI_TOKEN = "2031713C62727E8CBD2DB511"
-ZAPI_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-messages"
+
+# endpoint correto (sem headers extras)
+ZAPI_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
 
 # controle de flood 45s
 RATE_LIMIT_DELAY = 45
 ultima_interacao = {}
 
-# enviar mensagem
+
 async def send_whatsapp(numero, texto):
+    # remove caracteres especiais e garante prefixo 55
+    numero = ''.join(filter(str.isdigit, numero))
+    if not numero.startswith("55"):
+        numero = "55" + numero
+
+    payload = {
+        "phone": numero,
+        "message": texto
+    }
+
     async with httpx.AsyncClient() as client:
-        await client.post(ZAPI_URL, json={
-            "phone": numero,
-            "message": texto
-        })
-        print(f"📤 Enviado para {numero}: {texto}")
+        try:
+            r = await client.post(ZAPI_URL, json=payload)  # sem headers extras
+            print("📤 ENVIO Z-API RESPOSTA:", r.text)
+        except Exception as e:
+            print("❌ Erro no envio:", e)
+
+    print(f"📤 Enviado para {numero}: {texto}")
 
 
 def saudacao():
@@ -37,14 +51,19 @@ async def webhook_whatsapp(request: Request):
     data = await request.json()
     print("📩 RECEBIDO WEBHOOK:", data)
 
-    # ignora mensagens enviadas pelo bot
+    # ignora mensagens enviadas pelo próprio bot
     if data.get("fromMe"):
         return {"status": "ignored"}
 
     numero = data.get("phone")
-    texto = data.get("text", {}).get("message", "").lower().strip()
+    texto = data.get("text", {}).get("message", "")
+    texto = texto.lower().strip() if texto else ""
 
-    # rate limit
+    if not texto:
+        print("⚠️ Mensagem recebida sem texto (áudio/imagem/documento)")
+        return {"status": "no_text"}
+
+    # rate limit anti-flood
     agora = datetime.timestamp(datetime.now())
     ultimo = ultima_interacao.get(numero, 0)
 
@@ -53,7 +72,7 @@ async def webhook_whatsapp(request: Request):
 
     ultima_interacao[numero] = agora
 
-    # qualquer saudação dispara menu
+    # disparo inicial / menu
     if texto in ["oi", "opa", "olá", "ola", "bom dia", "boa tarde", "boa noite", "eai", "e aí", "oie", "oi!", "menu", "começar", "inicio", "start"]:
         mensagem = (
             f"{saudacao()} 👋\n\n"
@@ -91,6 +110,6 @@ async def webhook_whatsapp(request: Request):
         await send_whatsapp(numero, "✍️ Pode me contar, qual assunto deseja tratar?")
         return {"status": "ok"}
 
-    # fallback para mensagens não entendidas
+    # fallback
     await send_whatsapp(numero, "🤖 Não entendi. Digite *menu* para ver as opções.")
     return {"status": "ok"}
