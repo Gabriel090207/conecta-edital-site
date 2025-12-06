@@ -3,6 +3,7 @@ import httpx
 from datetime import datetime
 import pytz
 import os
+import asyncio
 
 router = APIRouter()
 
@@ -14,13 +15,36 @@ ZAPI_TOKEN = "2031713C62727E8CBD2DB511"
 ZAPI_CLIENT_TOKEN = os.getenv("ZAPI_CLIENT_TOKEN")
 
 SEND_TEXT_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
-SEND_BUTTON_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-button-message"
+SEND_STATUS_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/typing"
 
 # ==========================
 # ANTI FLOOD
 # ==========================
 RATE_LIMIT_DELAY = 45
 ultima_interacao = {}
+
+# ==========================
+# TYPING (digitando…)
+# ==========================
+async def send_typing(numero):
+    numero = ''.join(filter(str.isdigit, numero))
+    if not numero.startswith("55"):
+        numero = "55" + numero
+
+    payload = {
+        "phone": numero,
+        "typing": True
+    }
+
+    headers = {
+        "client-token": ZAPI_CLIENT_TOKEN,
+        "Content-Type": "application/json"
+    }
+
+    async with httpx.AsyncClient() as client:
+        await client.post(SEND_STATUS_URL, json=payload, headers=headers)
+
+    print(f"⌛ digitando enviado para {numero}")
 
 # ==========================
 # ENVIO TEXTO
@@ -47,39 +71,6 @@ async def send_whatsapp(numero, texto):
     print(f"📤 Enviado para {numero}: {texto}")
 
 # ==========================
-# ENVIO BOTÕES
-# ==========================
-async def send_buttons(numero, saudacao_texto):
-    numero = ''.join(filter(str.isdigit, numero))
-    if not numero.startswith("55"):
-        numero = "55" + numero
-
-    payload = {
-        "phone": numero,
-        "message": {
-            "text": saudacao_texto,
-            "buttons": [
-                {"id": "1", "text": "📊 Monitoramento"},
-                {"id": "2", "text": "💳 Planos"},
-                {"id": "3", "text": "💡 Dicas"},
-                {"id": "4", "text": "🎧 Suporte"},
-                {"id": "5", "text": "✍️ Outros"}
-            ]
-        }
-    }
-
-    headers = {
-        "client-token": ZAPI_CLIENT_TOKEN,
-        "Content-Type": "application/json"
-    }
-
-    async with httpx.AsyncClient() as client:
-        r = await client.post(SEND_BUTTON_URL, json=payload, headers=headers)
-        print("📤 RESPOSTA BOTÕES Z-API:", r.text)
-
-    print(f"📤 Botões enviados para {numero}")
-
-# ==========================
 # SAUDAÇÃO
 # ==========================
 def saudacao():
@@ -103,14 +94,8 @@ async def webhook_whatsapp(request: Request):
 
     numero = data.get("phone")
 
-    # texto normal
     texto = data.get("text", {}).get("message", "")
     texto = texto.lower().strip() if texto else ""
-
-    # resposta de botão
-    button = data.get("buttonResponse", {}).get("id")
-    if button:
-        texto = button  # força "1","2","3","4","5"
 
     if not texto:
         return {"status": "no_text"}
@@ -127,38 +112,63 @@ async def webhook_whatsapp(request: Request):
     # ==========================
     # MENU
     # ==========================
-    if texto in ["oi", "opa", "olá", "ola", "bom dia", "boa tarde", "boa noite", "eai", "e aí", "oie", "oi!", "menu", "começar", "inicio", "start"]:
-        menu_texto = (
+    if texto in ["oi", "opa", "olá", "ola", "bom dia", "boa tarde", "boa noite", "menu", "eai", "e aí", "oie", "começar", "inicio", "start"]:
+        await send_typing(numero)
+        await asyncio.sleep(2)
+
+        mensagem = (
             f"{saudacao()} 👋\n\n"
             f"Sou o *Conectinha*, seu assistente virtual 🤖✨\n\n"
-            f"Escolha uma opção:"
+            f"👇 *Selecione uma opção enviando o número:*\n\n"
+            f"1️⃣ Monitoramento\n"
+            f"2️⃣ Planos\n"
+            f"3️⃣ Dicas\n"
+            f"4️⃣ Suporte\n"
+            f"5️⃣ Outros\n\n"
+            f"📌 Se quiser voltar, envie *menu*."
         )
-        await send_buttons(numero, menu_texto)
+
+        await send_whatsapp(numero, mensagem)
         return {"status": "ok"}
 
     # ==========================
     # RESPOSTAS DO MENU
     # ==========================
+
     if texto == "1":
-        await send_whatsapp(numero, "🔍 Informe qual edital deseja monitorar.")
+        await send_typing(numero)
+        await asyncio.sleep(1.5)
+        await send_whatsapp(numero, "🔍 Me diga qual edital deseja monitorar.")
         return {"status": "ok"}
 
     if texto == "2":
+        await send_typing(numero)
+        await asyncio.sleep(1.5)
         await send_whatsapp(numero, "💳 Planos disponíveis: Essencial e Premium.")
         return {"status": "ok"}
 
     if texto == "3":
-        await send_whatsapp(numero, "💡 Dicas: posso sugerir métodos de estudo e alertas.")
+        await send_typing(numero)
+        await asyncio.sleep(1.5)
+        await send_whatsapp(numero, "💡 Posso te dar dicas sobre concursos, organização e preparação.")
         return {"status": "ok"}
 
     if texto == "4":
-        await send_whatsapp(numero, "🎧 Suporte: Nos conte seu problema.")
+        await send_typing(numero)
+        await asyncio.sleep(1.5)
+        await send_whatsapp(numero, "🎧 Informe qual dificuldade ou dúvida você tem.")
         return {"status": "ok"}
 
     if texto == "5":
+        await send_typing(numero)
+        await asyncio.sleep(1.5)
         await send_whatsapp(numero, "✍️ Pode me contar, qual assunto deseja tratar?")
         return {"status": "ok"}
 
-    # fallback
-    await send_whatsapp(numero, "🤖 Não entendi. Envie 'menu' para opções.")
+    # ==========================
+    # FALLBACK
+    # ==========================
+    await send_typing(numero)
+    await asyncio.sleep(1.5)
+    await send_whatsapp(numero, "🤖 Não entendi. Digite *menu* para ver as opções.")
     return {"status": "ok"}
