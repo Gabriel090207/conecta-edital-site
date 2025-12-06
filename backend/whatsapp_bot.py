@@ -15,7 +15,7 @@ ZAPI_TOKEN = "2031713C62727E8CBD2DB511"
 ZAPI_CLIENT_TOKEN = os.getenv("ZAPI_CLIENT_TOKEN")
 
 SEND_TEXT_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
-SEND_STATUS_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/typing"
+SEND_TYPING_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/typing"
 
 # ==========================
 # ANTI FLOOD
@@ -24,17 +24,14 @@ RATE_LIMIT_DELAY = 45
 ultima_interacao = {}
 
 # ==========================
-# TYPING (digitando…)
+# ENVIAR "DIGITANDO…"
 # ==========================
 async def send_typing(numero):
     numero = ''.join(filter(str.isdigit, numero))
     if not numero.startswith("55"):
         numero = "55" + numero
 
-    payload = {
-        "phone": numero,
-        "typing": True
-    }
+    payload = {"phone": numero, "typing": True}
 
     headers = {
         "client-token": ZAPI_CLIENT_TOKEN,
@@ -42,12 +39,12 @@ async def send_typing(numero):
     }
 
     async with httpx.AsyncClient() as client:
-        await client.post(SEND_STATUS_URL, json=payload, headers=headers)
+        await client.post(SEND_TYPING_URL, json=payload, headers=headers)
 
     print(f"⌛ digitando enviado para {numero}")
 
 # ==========================
-# ENVIO TEXTO
+# ENVIAR TEXTO
 # ==========================
 async def send_whatsapp(numero, texto):
     numero = ''.join(filter(str.isdigit, numero))
@@ -93,7 +90,6 @@ async def webhook_whatsapp(request: Request):
         return {"status": "ignored"}
 
     numero = data.get("phone")
-
     texto = data.get("text", {}).get("message", "")
     texto = texto.lower().strip() if texto else ""
 
@@ -103,14 +99,12 @@ async def webhook_whatsapp(request: Request):
     # anti flood
     agora = datetime.timestamp(datetime.now())
     ultimo = ultima_interacao.get(numero, 0)
-
     if agora - ultimo < RATE_LIMIT_DELAY:
         return {"status": "limit"}
-
     ultima_interacao[numero] = agora
 
     # ==========================
-    # MENU
+    # MENU PRINCIPAL
     # ==========================
     if texto in ["oi", "opa", "olá", "ola", "bom dia", "boa tarde", "boa noite", "menu", "eai", "e aí", "oie", "começar", "inicio", "start"]:
         await send_typing(numero)
@@ -125,16 +119,14 @@ async def webhook_whatsapp(request: Request):
             f"3️⃣ Dicas\n"
             f"4️⃣ Suporte\n"
             f"5️⃣ Outros\n\n"
-            f"📌 Se quiser voltar, envie *menu*."
+            f"📌 Para voltar ao menu, envie *menu*."
         )
-
         await send_whatsapp(numero, mensagem)
         return {"status": "ok"}
 
     # ==========================
-    # RESPOSTAS DO MENU
+    # OPÇÕES
     # ==========================
-
     if texto == "1":
         await send_typing(numero)
         await asyncio.sleep(1.5)
@@ -156,7 +148,7 @@ async def webhook_whatsapp(request: Request):
     if texto == "4":
         await send_typing(numero)
         await asyncio.sleep(1.5)
-        await send_whatsapp(numero, "🎧 Informe qual dificuldade ou dúvida você tem.")
+        await send_whatsapp(numero, "🎧 Qual suporte você precisa agora?")
         return {"status": "ok"}
 
     if texto == "5":
