@@ -7,24 +7,25 @@ import os
 router = APIRouter()
 
 # =====================================
-# CONFIGURAÇÃO Z-API (MODO SEGURO)
+# CONFIGURAÇÃO Z-API
 # =====================================
 ZAPI_INSTANCE = "3EB273C95E6311A457864AD69F0E752E"
 ZAPI_TOKEN = "2031713C62727E8CBD2DB511"
-ZAPI_CLIENT_TOKEN = os.getenv("ZAPI_CLIENT_TOKEN")  # precisa estar no .env
+ZAPI_CLIENT_TOKEN = os.getenv("ZAPI_CLIENT_TOKEN")
 
-# endpoint correto do modo seguro (SINGULAR!)
-ZAPI_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-message"
+# endpoint certo da sua conta
+ZAPI_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
 
-# =========================================
+# =====================================
 # ANTI-FLOOD
-# =========================================
+# =====================================
 RATE_LIMIT_DELAY = 45
 ultima_interacao = {}
 
-# =========================================
-# ENVIO CORRETO (client-token + send-message)
-# =========================================
+
+# =====================================
+# ENVIO CORRETO PARA A SUA INSTÂNCIA
+# =====================================
 async def send_whatsapp(numero, texto):
     numero = ''.join(filter(str.isdigit, numero))
     if not numero.startswith("55"):
@@ -32,7 +33,7 @@ async def send_whatsapp(numero, texto):
 
     payload = {
         "phone": numero,
-        "text": texto
+        "message": texto
     }
 
     headers = {
@@ -50,9 +51,9 @@ async def send_whatsapp(numero, texto):
     print(f"📤 Enviado para {numero}: {texto}")
 
 
-# =========================================
+# =====================================
 # SAUDAÇÃO
-# =========================================
+# =====================================
 def saudacao():
     hora = datetime.now(pytz.timezone("America/Sao_Paulo")).hour
     if hora < 12:
@@ -62,9 +63,9 @@ def saudacao():
     return "🌙 *Boa noite*"
 
 
-# =========================================
+# =====================================
 # WEBHOOK
-# =========================================
+# =====================================
 @router.post("/api/webhook-whatsapp")
 async def webhook_whatsapp(request: Request):
     data = await request.json()
@@ -77,25 +78,19 @@ async def webhook_whatsapp(request: Request):
     texto = data.get("text", {}).get("message", "")
     texto = texto.lower().strip() if texto else ""
 
-    # se usuario manda áudio, fig, img etc
     if not texto:
-        print("⚠️ Sem texto. Ignorado.")
+        print("⚠️ Mensagem sem texto (áudio, imagem, documento etc.)")
         return {"status": "no_text"}
 
-    # =========================================
-    # RATE LIMIT
-    # =========================================
+    # anti-flood
     agora = datetime.timestamp(datetime.now())
     ultimo = ultima_interacao.get(numero, 0)
-
     if agora - ultimo < RATE_LIMIT_DELAY:
         return {"status": "limit"}
 
     ultima_interacao[numero] = agora
 
-    # =========================================
     # MENU PRINCIPAL
-    # =========================================
     if texto in ["oi", "opa", "olá", "ola", "bom dia", "boa tarde", "boa noite", "eai", "e aí", "oie", "oi!", "menu", "começar", "inicio", "start"]:
         mensagem = (
             f"{saudacao()} 👋\n\n"
@@ -112,9 +107,7 @@ async def webhook_whatsapp(request: Request):
         await send_whatsapp(numero, mensagem)
         return {"status": "ok"}
 
-    # =========================================
-    # RESPOSTAS DO MENU
-    # =========================================
+    # OPÇÕES
     if texto == "1":
         await send_whatsapp(numero, "🔍 *Monitoramento*: Me diga qual edital ou nome deseja acompanhar.")
         return {"status": "ok"}
@@ -135,8 +128,6 @@ async def webhook_whatsapp(request: Request):
         await send_whatsapp(numero, "✍️ Pode me contar, qual assunto deseja tratar?")
         return {"status": "ok"}
 
-    # =========================================
     # FALLBACK
-    # =========================================
     await send_whatsapp(numero, "🤖 Não entendi. Digite *menu* para ver as opções.")
     return {"status": "ok"}
