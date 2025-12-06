@@ -5,9 +5,9 @@ import pytz
 import os
 import asyncio
 from memoria import salvar_mensagem, obter_historico, limpar_conversa
-
-# Atualize seu client OpenAI
 from openai import OpenAI
+
+# Inicializa o cliente OpenAI com sua chave de API
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Z-API configurações
@@ -22,7 +22,6 @@ RATE_LIMIT_DELAY = 45
 ultima_interacao = {}
 
 router = APIRouter()
-
 
 # Controle de quem está sendo atendido
 atendimento_humano = {}
@@ -158,6 +157,8 @@ async def webhook_whatsapp(request: Request):
     if texto == "1":
         atendimento_humano[numero] = "monitoramento"
         await send_whatsapp(numero, "👨‍💼 Um atendente chamado *Carlos* será enviado para responder suas dúvidas sobre monitoramento.")
+        
+        # Chama a função responder para o atendimento de Carlos
         from atendente_monitoramento import responder
         return await responder(numero, texto)
 
