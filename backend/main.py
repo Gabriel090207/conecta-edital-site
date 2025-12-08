@@ -51,14 +51,15 @@ load_dotenv()
 
 import smtplib
 
+from whatsapp_bot import router as whatsapp_router
+
 
 
 # Importação dos templates de email (se existirem)
 import email_templates
 
-from .whatsapp_bot import router as whatsapp_router
-from .subscriptions import router as subscriptions_router
-from .webhook_mp import router as mp_webhook_router
+from subscriptions import router as subscriptions_router
+from webhook_mp import router as mp_webhook_router
 
 
 app = FastAPI(
