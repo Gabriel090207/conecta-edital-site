@@ -46,9 +46,6 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
 from dotenv import load_dotenv
-load_dotenv()
-
-
 import smtplib
 
 from whatsapp_bot import router as whatsapp_router
@@ -77,7 +74,7 @@ app.include_router(whatsapp_router)
 router = APIRouter()
 
 # Carrega as variáveis de ambiente do arquivo .env
-
+load_dotenv()
 
 # --- LEIA AS VARIÁVEIS DE AMBIENTE AQUI ---
 SMTP_HOST = os.getenv("SMTP_HOST")
