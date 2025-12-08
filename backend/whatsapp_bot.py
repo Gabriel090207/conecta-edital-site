@@ -11,13 +11,14 @@ from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Z-API configurações
-ZAPI_INSTANCE = "3EB273C95E6311A457864AD69F0E752E"
-ZAPI_TOKEN = "2031713C62727E8CBD2DB511"
+ZAPI_INSTANCE = os.getenv("ZAPI_INSTANCE_ID")
+ZAPI_TOKEN = os.getenv("ZAPI_TOKEN")
 ZAPI_CLIENT_TOKEN = os.getenv("ZAPI_CLIENT_TOKEN")
+
 SEND_TEXT_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
 SEND_TYPING_URL = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/typing"
 
-# Anti-flood (45s entre interações)
+# Anti-flood
 RATE_LIMIT_DELAY = 45
 ultima_interacao = {}
 
@@ -37,11 +38,7 @@ async def send_typing(numero):
 
     payload = {"phone": numero, "typing": True}
 
-    headers = {
-        "client-token": ZAPI_CLIENT_TOKEN,
-        "Content-Type": "application/json"
-    }
-
+    headers = {"client-token": ZAPI_CLIENT_TOKEN}
     async with httpx.AsyncClient() as client:
         await client.post(SEND_TYPING_URL, json=payload, headers=headers)
 
@@ -52,11 +49,7 @@ async def send_whatsapp(numero, texto):
         numero = "55" + numero
 
     payload = {"phone": numero, "message": texto}
-
-    headers = {
-        "client-token": ZAPI_CLIENT_TOKEN,
-        "Content-Type": "application/json"
-    }
+    headers = {"client-token": ZAPI_CLIENT_TOKEN}
 
     async with httpx.AsyncClient() as client:
         r = await client.post(SEND_TEXT_URL, json=payload, headers=headers)
@@ -64,9 +57,8 @@ async def send_whatsapp(numero, texto):
 
     print(f"📤 Enviado para {numero}: {texto}")
 
-
 # -----------------------------
-# SAUDAÇÃO DINÂMICA
+# SAUDAÇÃO
 # -----------------------------
 
 def saudacao():
@@ -77,9 +69,8 @@ def saudacao():
         return "🌤️ *Boa tarde*"
     return "🌙 *Boa noite*"
 
-
 # -----------------------------
-# WEBHOOK PRINCIPAL
+# WEBHOOK FINAL CORRIGIDO
 # -----------------------------
 
 @router.post("/api/webhook-whatsapp")
@@ -93,16 +84,15 @@ async def webhook_whatsapp(request: Request):
     numero = data.get("phone")
 
     # -----------------------------
-    # CAPTURA DE TEXTO (SUPORTA FORMATOS NOVOS E ANTIGOS)
+    # CAPTURA DE TEXTO (FORMATOS ANTIGOS E NOVOS)
     # -----------------------------
     raw_text = data.get("text")
 
-    if isinstance(raw_text, dict):  # Formato antigo {"text": {"message": "..."}}
+    if isinstance(raw_text, dict):
         texto = raw_text.get("message", "")
     else:
         texto = raw_text
 
-    # Fallbacks adicionais
     if not texto:
         texto = data.get("body") or data.get("message") or data.get("caption")
 
@@ -123,7 +113,7 @@ async def webhook_whatsapp(request: Request):
     ultima_interacao[numero] = agora
 
     # -----------------------------
-    # SE JÁ ESTÁ EM ATENDIMENTO
+    # SE ESTIVER EM ATENDIMENTO
     # -----------------------------
     modo = atendimento_humano.get(numero)
 
@@ -131,10 +121,9 @@ async def webhook_whatsapp(request: Request):
         if texto == "menu":
             atendimento_humano[numero] = None
             limpar_conversa(numero)
-            await send_whatsapp(numero, "🔄 Você voltou ao atendimento automático. Digite *oi* para recomeçar.")
+            await send_whatsapp(numero, "🔄 Você voltou ao menu. Digite *oi*.")
             return {"status": "ok"}
 
-        # Encaminhamento para o respectivo atendente
         if modo == "monitoramento":
             from atendente_monitoramento import responder
             return await responder(numero, texto)
@@ -155,12 +144,10 @@ async def webhook_whatsapp(request: Request):
             from atendente_outros import responder
             return await responder(numero, texto)
 
-        return {"status": "unknown_mode"}
-
     # -----------------------------
     # MENU PRINCIPAL
     # -----------------------------
-    if texto in ["oi", "opa", "olá", "ola", "bom dia", "boa tarde", "boa noite", "menu", "eai", "e aí", "oie", "começar", "inicio", "start"]:
+    if texto in ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "menu", "eai", "start"]:
         await send_typing(numero)
         await asyncio.sleep(1)
 
@@ -173,44 +160,44 @@ async def webhook_whatsapp(request: Request):
             f"3️⃣ Dicas\n"
             f"4️⃣ Suporte\n"
             f"5️⃣ Outros\n\n"
-            f"📌 Para voltar ao menu, envie *menu*."
+            f"📌 Digite *menu* a qualquer momento."
         )
         await send_whatsapp(numero, mensagem)
         return {"status": "menu_sent"}
 
     # -----------------------------
-    # ATIVAÇÃO POR NÚMEROS
+    # OPÇÕES ATENDENTES
     # -----------------------------
     if texto in ["1", "1️⃣"]:
         atendimento_humano[numero] = "monitoramento"
-        await send_whatsapp(numero, "👨‍💼 Conectando você ao setor *Monitoramento*...")
+        await send_whatsapp(numero, "📊 Conectando você ao setor *Monitoramento*...")
         from atendente_monitoramento import responder
         return await responder(numero, texto)
 
     if texto in ["2", "2️⃣"]:
         atendimento_humano[numero] = "planos"
-        await send_whatsapp(numero, "📄 Estamos conectando você ao setor de *Planos*...")
+        await send_whatsapp(numero, "💳 Conectando ao setor *Planos*...")
         return {"status": "ok"}
 
     if texto in ["3", "3️⃣"]:
         atendimento_humano[numero] = "dicas"
-        await send_whatsapp(numero, "💡 Um atendente irá te enviar dicas úteis em instantes!")
+        await send_whatsapp(numero, "💡 Conectando ao setor *Dicas*...")
         return {"status": "ok"}
 
     if texto in ["4", "4️⃣"]:
         atendimento_humano[numero] = "suporte"
-        await send_whatsapp(numero, "🛠️ Redirecionando você para o suporte técnico...")
+        await send_whatsapp(numero, "🛠️ Conectando ao *Suporte*...")
         return {"status": "ok"}
 
     if texto in ["5", "5️⃣"]:
         atendimento_humano[numero] = "outros"
-        await send_whatsapp(numero, "📌 Direcionando você para atendimento geral...")
+        await send_whatsapp(numero, "📌 Conectando ao setor *Outros*...")
         return {"status": "ok"}
 
     # -----------------------------
-    # RESPOSTA PADRÃO
+    # FALLBACK
     # -----------------------------
     await send_typing(numero)
     await asyncio.sleep(1)
-    await send_whatsapp(numero, "🤖 Não entendi. Digite *menu* para ver as opções.")
+    await send_whatsapp(numero, "🤖 Não entendi. Digite *menu*.")
     return {"status": "fallback"}
