@@ -260,10 +260,12 @@
                     <span class="required-tag2">Obrigatório</span>
                 </div>
                 <div class="form-group mon1">
-                    <label for="personal-id"><i class="fas fa-id-card ic"></i> ID do Edital / Concurso</label>
-                    <input type="text" id="personal-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital">
-                    <span class="required-tag2">Obrigatório</span>
-                </div>
+                  <label for="personal-id"><i class="fas fa-id-card ic"></i> ID do Edital / Concurso</label>
+                  <input type="text" id="personal-id" placeholder="Ex: 001/2025 insira conforme está no documento do edital" pattern="^[0-9]+(\/[0-9]+)*$" required>
+                  <span class="required-tag2">Obrigatório</span>
+              </div>
+              
+              
                 <div class="form-group mon1">
                     <label for="personal-name"><i class="fas fa-user ic" style="font-size: 20px"></i> Nome Completo</label>
                     <input type="text" id="personal-name" placeholder="Seu nome completo">

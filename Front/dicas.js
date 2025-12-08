@@ -21,21 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
 // Converte marcações simples tipo *negrito*, **negrito forte**, _itálico_, __itálico forte__
 function formatMarkdown(text) {
     if (!text) return '';
+    
+    // ** MANTENHA A REMOÇÃO DE QUEBRAS DE LINHA AQUI SE FOR USAR A NOVA LÓGICA ABAIXO **
+    // text = text.replace(/\n/g, '<br>'); // <-- REMOVA ESTA LINHA SE FIZER A SOLUÇÃO 2 ABAIXO
+    
+    // 1. NEGRITO FORTE (**)
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // 2. NEGRITO SIMPLES (*) - (Use a regex segura)
+    text = text.replace(/\*([^*]+?)\*/g, '<strong>$1</strong>'); 
 
-    return text
-        // **negrito forte**
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        
-        // *negrito*
-        .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
-        
-        // __itálico forte__
-        .replace(/__(.*?)__/g, '<em>$1</em>')
-        
-        // _itálico_
-        .replace(/_(.*?)_/g, '<em>$1</em>');
+    // 3. ITÁLICO FORTE (__)
+    text = text.replace(/__(.+?)__/g, '<em>$1</em>');
+    
+    // 4. ITÁLICO SIMPLES (_)
+    text = text.replace(/_([^_]+?)_/g, '<em>$1</em>');
+
+    return text;
 }
-
 
     let allDicas = [];
 
@@ -174,30 +177,40 @@ dicaCard.innerHTML = `
     
     // --- Lógica do Modal de Visualização (já corrigida anteriormente) ---
    // --- Lógica do Modal de Visualização ---
-function openDicaViewerModal(dica) {
-
-    console.log("🔎 ID recebido da dica:", dica.id);
-
-
-    // Preencher título, autor e data
+   function openDicaViewerModal(dica) {
+    
+    // ... (preencher título, autor, data) ...
     dicaViewerTitle.textContent = dica.titulo;
-    dicaViewerAutor.textContent = dica.autor;
-    dicaViewerDate.textContent = new Date(dica.data_criacao).toLocaleDateString('pt-BR');
+    dicaViewerAutor.textContent = dica.autor;
+    dicaViewerDate.textContent = new Date(dica.data_criacao).toLocaleDateString('pt-BR');
 
-    // Converte quebras de linha para <p>
-   // Converte quebras de linha para <p> e aplica *negrito*
-const linhas = dica.conteudo.split('\n');
-let htmlConteudo = '';
 
-linhas.forEach(linha => {
-    if (linha.trim() !== '') {
-        const formatada = formatMarkdown(linha);  // aplica *negrito*
-        htmlConteudo += `<p>${formatada}</p>`;
-    }
-});
+    // 1. Aplica a formatação de Negrito/Itálico (Markdown)
+    let conteudoFormatado = formatMarkdown(dica.conteudo);
 
-dicaViewerConteudo.innerHTML = htmlConteudo;  // usa innerHTML, NÃO textContent
+    // 2. Substitui **duas ou mais** quebras de linha por um delimitador de parágrafo.
+    // Isso transforma linhas vazias em separadores de parágrafo.
+    const parágrafos = conteudoFormatado.split(/\n\s*\n/); 
+    
+    let htmlConteudo = '';
+    
+    parágrafos.forEach(paragrafo => {
+        const paragrafoTrim = paragrafo.trim();
+        if (paragrafoTrim) {
+            // 3. Dentro de cada "parágrafo", substitui as quebras de linha restantes (salto simples) por <br>
+            let conteudoComQuebra = paragrafoTrim.replace(/\n/g, '<br>');
+            
+            // 4. Envolve o parágrafo formatado em uma tag <p>
+            htmlConteudo += `<p>${conteudoComQuebra}</p>`;
+        }
+    });
 
+
+    // 5. Preenche o conteúdo no modal
+    dicaViewerConteudo.innerHTML = htmlConteudo;
+
+    // Abrir o modal
+    openModal(dicaViewerModal);
     // ==========================
     // 🔵 REGISTRAR VISUALIZAÇÃO
     // ==========================

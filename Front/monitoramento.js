@@ -2339,3 +2339,51 @@ async function fetchUserProfile() {
     alert("Erro ao buscar dados do usuário.");
   }
 }
+
+
+// Validação enquanto digita - permite apenas números e a barra "/"
+document.getElementById("personal-id").addEventListener("input", function(event) {
+  const personalIdInput = event.target;
+  // Remove qualquer caractere que não seja número ou barra "/"
+  personalIdInput.value = personalIdInput.value.replace(/[^0-9\/]/g, '');
+});
+
+// Validação ao enviar o formulário - confirma que o valor só tem números e barra "/"
+document.getElementById("personal-monitoring-form").addEventListener("submit", async function(event) {
+  const personalIdInput = document.getElementById("personal-id");
+  const personalIdValue = personalIdInput.value;
+
+  // Verifica se o valor contém apenas números e a barra "/"
+  const validIdPattern = /^[0-9\/]+$/;
+
+  if (!validIdPattern.test(personalIdValue)) {
+      alert("Por favor, insira um ID válido contendo apenas números e o símbolo '/'.");
+      event.preventDefault(); // Impede o envio do formulário
+  } else {
+      // Continua o fluxo normal do formulário, por exemplo, validando o usuário
+      const user = window.auth.currentUser;
+      if (!user) {
+          alert("Usuário não encontrado.");
+          return;
+      }
+      const idToken = await user.getIdToken();
+
+      try {
+          const response = await fetch(`${BACKEND_URL}/api/users/${user.uid}`, {
+              headers: {
+                  Authorization: `Bearer ${idToken}`, // Passa o token para autenticação
+              },
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+              document.getElementById('profile-username-display').textContent = `@${data.username}`;
+          } else {
+              alert("Erro ao buscar dados do usuário.");
+          }
+      } catch (error) {
+          console.error("Erro ao buscar dados do usuário:", error);
+          alert("Erro ao buscar dados do usuário.");
+      }
+  }
+});
