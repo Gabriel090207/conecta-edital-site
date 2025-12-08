@@ -1,52 +1,91 @@
 from whatsapp_bot import send_whatsapp, send_typing
-from memoria import salvar_mensagem, obter_historico
+from memoria import salvar_mensagem, obter_historico, limpar_conversa
 import asyncio
 import os
 from openai import OpenAI
 
-# Inicializa o cliente OpenAI com sua chave de API
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+
 async def responder(numero, texto):
-    print(f"📝 Iniciando atendimento com o atendente Carlos para o número {numero} com o texto: {texto}")
-    
-    # Salva a mensagem do usuário na memória (banco de dados ou arquivo)
+    print(f"📝 Monitoramento ativo para {numero} | Texto recebido: {texto}")
+
+    # ==============================
+    # VOLTAR AO MENU
+    # ==============================
+    if texto.lower().strip() in ["menu", "voltar", "início", "inicio"]:
+        limpar_conversa(numero)
+        await send_whatsapp(numero, "🔙 Você saiu do setor de Monitoramento.\nDigite *menu* para voltar ao início.")
+        return {"status": "ok"}
+
+    # ==============================
+    # SALVAR MENSAGEM DO USUÁRIO
+    # ==============================
     salvar_mensagem(numero, "user", texto)
 
-    # Envia um sinal de digitação (typing) para indicar que o bot está processando a resposta
+    # ==============================
+    # SINAL DIGITANDO
+    # ==============================
     await send_typing(numero)
-    await asyncio.sleep(1)  # Aguarda um tempo antes de enviar a resposta para dar a sensação de um humano
+    await asyncio.sleep(1.2)
 
-    # Obtém o histórico de mensagens do usuário para fornecer contexto para o modelo GPT
-    historico = obter_historico(numero)
+    # ==============================
+    # CONTEXTO COM HISTÓRICO
+    # ==============================
+    historico = obter_historico(numero) or []
+    historico = historico[-12:]  # pega últimos 12 turnos
 
-    # Monta o prompt com o histórico das últimas mensagens
     prompt = [
-        {"role": "system", "content": "Você é Carlos, atendente de suporte..."}  # Instruções para o bot Carlos
-    ] + historico[-10:]  # Usa os 10 últimos turnos para manter o contexto
+        {
+            "role": "system",
+            "content": (
+                "Você é *Carlos*, atendente humano do setor de Monitoramento📊.\n"
+                "Fale casual, curto e estilo WhatsApp.\n"
+                "Use no máximo 1 emoji.\n"
+                "Não pareça robô.\n"
+                "Ajude sempre.\n"
+                "Se o usuário estiver confuso, explique simples.\n"
+                "Nunca diga que é IA."
+            )
+        }
+    ]
 
+    for msg in historico:
+        prompt.append({"role": msg["role"], "content": msg["message"]})
+
+    # ==============================
+    # GERAR RESPOSTA
+    # ==============================
     try:
-        # Chama a API do OpenAI para gerar a resposta com base no prompt
         resposta = client.chat.completions.create(
-            model="gpt-4.1-mini",  # Modelo GPT-4.1 mini (pode ser outro modelo)
+            model="gpt-4o-mini",
             messages=prompt,
-            temperature=0.6  # Ajusta a criatividade da resposta
+            temperature=0.7,
+            max_tokens=300
         )
 
-        # Extrai a resposta gerada pelo modelo
-        texto_resposta = resposta.choices[0].message["content"]
+        texto_resposta = resposta.choices[0].message.content.strip()
 
-        # Salva a resposta do atendente Carlos
+        # ==============================
+        # SALVAR MENSAGEM DA IA
+        # ==============================
         salvar_mensagem(numero, "assistant", texto_resposta)
 
-        # Envia a resposta para o WhatsApp do usuário
+        # ==============================
+        # ENVIAR RESPOSTA
+        # ==============================
         await send_whatsapp(numero, texto_resposta)
+        print(f"📩 Resposta enviada a {numero}: {texto_resposta}")
 
-        # Retorna um status de sucesso
-        print(f"📩 Resposta enviada para {numero}: {texto_resposta}")
         return {"status": "ok"}
 
     except Exception as e:
-        # Caso ocorra algum erro
-        print(f"Erro ao gerar resposta: {e}")
+        print(f"❌ ERRO NO ATENDIMENTO MONITORAMENTO: {e}")
+
+        await send_whatsapp(
+            numero,
+            "⚠️ Tive um problema aqui, mas já estou resolvendo. "
+            "Tente novamente em alguns instantes ou envie *menu*."
+        )
+
         return {"status": "error", "message": str(e)}
