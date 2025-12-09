@@ -219,34 +219,26 @@ GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0
 
 @app.post("/chat")
 async def chat_with_ai(payload: dict):
-    if not GEMINI_API_KEY:
-        raise HTTPException(500, "API KEY da IA não configurada no servidor.")
-
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 GEMINI_URL + GEMINI_API_KEY,
-                json={
-                    "contents": [
-                        {"parts": [{"text": payload.get("message")}]}
-                    ]
-                },
+                json={"contents": payload["contents"]},
                 timeout=60
             )
 
         result = response.json()
 
-        # Gemini retorna dentro de candidates
-        if "candidates" in result:
+        if "candidates" in result and result["candidates"]:
             return {
                 "reply": result["candidates"][0]["content"]["parts"][0]["text"]
             }
 
-        return {"error": "Nenhuma resposta gerada pela IA."}
+        return {"error": "Sem resposta da IA"}
 
     except Exception as e:
-        print("Erro na IA:", e)
-        raise HTTPException(500, f"Erro IA: {str(e)}")
+        print("Erro IA:", e)
+        return {"error": str(e)}
 
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
 try:
