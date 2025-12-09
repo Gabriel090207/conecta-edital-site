@@ -217,6 +217,7 @@ from fastapi import HTTPException
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key="
 
+
 @app.post("/chat")
 async def chat_with_ai(payload: dict):
     try:
@@ -229,6 +230,9 @@ async def chat_with_ai(payload: dict):
 
         result = response.json()
 
+        # 👇 ADICIONE ESTA LINHA
+        print("🔍 JSON BRUTO GEMINI:", result)
+
         if "candidates" in result and result["candidates"]:
             return {
                 "reply": result["candidates"][0]["content"]["parts"][0]["text"]
@@ -239,6 +243,7 @@ async def chat_with_ai(payload: dict):
     except Exception as e:
         print("Erro IA:", e)
         return {"error": str(e)}
+
 
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
 try:
