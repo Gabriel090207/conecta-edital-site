@@ -637,7 +637,7 @@ def send_email_notification(
     print("📤 Iniciando envio de e-mail...")
     print(f"➡️ Tipo de template: {template_type}")
     print(f"➡️ Destinatário: {to_email}")
-    print(f"➡️ Edital: {monitoramento.edital_identifier}")
+    print(f"➡️ Edital: {monitoring_data.get("edital_identifier")}")
     print(f"➡️ Link do PDF real: {getattr(monitoramento, 'pdf_real_link', 'N/A')}")
 
     """
@@ -652,7 +652,7 @@ def send_email_notification(
     user_full_name_from_monitoramento = ""
     try:
         db_firestore_client = firestore.client()
-        user_doc_ref = db_firestore_client.collection('users').document(monitoramento.user_uid)
+        user_doc_ref = db_firestore_client.collection('users').document(monitoring_data.get("user_uid"))
         user_doc = user_doc_ref.get()
         if user_doc.exists:
             user_data = user_doc.to_dict()
@@ -666,13 +666,13 @@ def send_email_notification(
     if template_type == 'monitoring_active':
         html_content = email_templates.get_monitoring_active_email_html(
             user_full_name=user_full_name_from_monitoramento,
-            monitoring_type=monitoramento.monitoring_type,
+            monitoring_type=monitoring_data.get("monitoring_type"),
             official_gazette_link=str(monitoramento.official_gazette_link),
-            edital_identifier=monitoramento.edital_identifier,
+            edital_identifier=monitoring_data.get("edital_identifier"),
             candidate_name=monitoramento.candidate_name,
             keywords=monitoramento.keywords
         )
-        subject = f"Conecta Edital: Seu Monitoramento para '{monitoramento.edital_identifier}' está Ativo!"
+        subject = f"Conecta Edital: Seu Monitoramento para '{monitoring_data.get("edital_identifier")}' está Ativo!"
     elif template_type == 'occurrence_found':
         if not found_keywords:
             print("ALERTA: found_keywords é necessário para o template 'occurrence_found'.")
@@ -680,14 +680,14 @@ def send_email_notification(
 
         html_content = email_templates.get_occurrence_found_email_html(
         user_full_name=user_full_name_from_monitoramento,
-        edital_identifier=monitoramento.edital_identifier,
+        edital_identifier=monitoring_data.get("edital_identifier"),
         official_gazette_link=str(
             getattr(monitoramento, "pdf_real_link", monitoramento.official_gazette_link)
         ),
         found_keywords=found_keywords
     )
 
-        subject = f"Conecta Edital: Nova Ocorrência Encontrada no Edital '{monitoramento.edital_identifier}'"
+        subject = f"Conecta Edital: Nova Ocorrência Encontrada no Edital '{monitoring_data.get("edital_identifier")}'"
     else:
         print(f"ERRO: Tipo de template de email desconhecido: {template_type}")
         return
@@ -775,7 +775,7 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
     doc = doc_ref.get()
 
     if doc.exists and doc.to_dict().get("last_pdf_hash") == current_pdf_hash:
-        print(f"PDF para {monitoramento_id} não mudou desde a última verificação.")
+        print(f"PDF para {monitoring_id} não mudou desde a última verificação.")
         doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
         return
 
@@ -793,9 +793,6 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
     # ======================================================
     # 4️⃣ VERIFICAR PALAVRAS-CHAVE
     # ======================================================
-    # ======================================================
-# 4️⃣ VERIFICAR PALAVRAS-CHAVE
-# ======================================================
     found_keywords = []
     keywords_to_search = [monitoring_data.get("edital_identifier")]
 
@@ -812,19 +809,18 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
         if kw and (kw.lower() in pdf_text_lower or kw.lower() in file_name):
             found_keywords.append(kw)
 
-
     # ======================================================
     # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
     # ======================================================
     if found_keywords:
         print(f"✅ Ocorrência detectada: {found_keywords}")
 
-        # Armazena ocorrência no Firestore
+        # Salva ocorrência
         ocorrencias_ref = doc_ref.collection("occurrences")
         ocorrencias_ref.add({
             "edital_identifier": monitoring_data.get("edital_identifier"),
             "pdf_real_link": pdf_real_url,
-            "official_gazette_link": str(monitoring_data.get("official_gazette_link")),
+            "official_gazette_link": monitoring_data.get("official_gazette_link"),
             "last_pdf_hash": current_pdf_hash,
             "detected_at": firestore.SERVER_TIMESTAMP
         })
@@ -838,50 +834,39 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
 
         print(f"🔄 Contador sincronizado: occurrences = {occ_total}")
 
-        # Notificação interna (painel)
+        # Notificação interna
         await create_notification(
-            user_uid=monitoramento.user_uid,
+            user_uid=monitoring_data.get("user_uid"),
             type_="nova_ocorrencia",
             title="Nova ocorrência encontrada!",
-            message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
+            message=f"Encontramos uma nova ocorrência no edital '{monitoring_data.get('edital_identifier')}'.",
             link="/meus-monitoramentos"
         )
 
-        monitoramento.pdf_real_link = pdf_real_url
-
         # ==================================================
-        # ✉️ EMAIL (template atualizado)
+        # ✉️ EMAIL
         # ==================================================
-        send_email_notification(
-            monitoramento=monitoramento,
-            template_type="occurrence_found",
-            to_email=monitoramento.user_email,
-            found_keywords=found_keywords
+        await send_email_notification(
+            to=monitoring_data.get("user_email"),
+            edital=monitoring_data.get("edital_identifier"),
+            link=pdf_real_url
         )
 
         # ==================================================
-        # 📲 WHATSAPP (template moderno da nova função)
+        # 📲 WHATSAPP PREMIUM
         # ==================================================
         try:
-            user_doc = db.collection("users").document(monitoramento.user_uid).get()
+            user_doc = db.collection("users").document(monitoring_data.get("user_uid")).get()
             if user_doc.exists:
                 user_data = user_doc.to_dict()
 
                 user_phone = user_data.get("contact")
                 user_plan = user_data.get("plan_type", "sem_plano").lower()
-                user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
+                user_name = user_data.get("fullName") or monitoring_data.get("user_email").split("@")[0]
 
                 if user_plan == "premium" and user_phone:
 
-                    # Corrige keywords caso estejam em string
-                    if isinstance(monitoramento.keywords, str):
-                        kws = [kw.strip() for kw in monitoramento.keywords.split(",")]
-                    else:
-                        kws = monitoramento.keywords
-
-                    # formatar keywords sem repetir ">"
-                    
-                    keywords_formatted = "\n".join([f"`{kw}`" for kw in keywords_list])
+                    keywords_formatted = "\n".join([f"`{kw}`" for kw in found_keywords])
 
                     occurs_msg = (
                         f"> 🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n"
@@ -895,32 +880,26 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
                         f"> {keywords_formatted}\n"
                         f"\n"
                         f"📎 *Quer todos os detalhes da ocorrência? Acesse o link abaixo:* \n"
-                        f"{monitoramento.pdf_real_link}\n"
+                        f"{pdf_real_url}\n"
                         f"\n"
                         f"#Nomeação #ConcursoPúbIico #ConectaEdital #SuaVagaGarantida"
                     )
 
-
                     await send_whatsapp_safe(user_phone, occurs_msg)
-                    print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
-
-# ⏳ Delay fixo para evitar filtro anti-spam
-                    
-
-
+                    print(f"📲 WhatsApp enviado para {user_phone}")
 
                 else:
-                    print("ℹ️ Usuário não premium ou sem número salvo.")
+                    print("ℹ️ Usuário não é premium ou não possui número cadastrado.")
 
         except Exception as e:
             print(f"❌ ERRO ao enviar WhatsApp: {e}")
 
-        print(f"🏁 Ocorrência finalizada para {monitoramento.id} — PDF real: {pdf_real_url}")
+        print(f"🏁 Ocorrência finalizada para {monitoring_id}")
 
     else:
-        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
+        print(f"❌ Nenhuma ocorrência encontrada para {monitoring_id}.")
 
-    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
+    print(f"--- Verificação para {monitoring_id} concluída ---\n")
 
 
 async def get_user_plan(uid: str) -> str:
@@ -1046,11 +1025,11 @@ async def run_all_monitorings():
 async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
     try:
         if user_plan != "premium":
-            print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
+            print(f"ℹ️ Usuário {monitoring_data.get("user_uid")} não é premium. WhatsApp não enviado.")
             return
 
         db = firestore.client()
-        user_doc = db.collection("users").document(monitoramento.user_uid).get()
+        user_doc = db.collection("users").document(monitoring_data.get("user_uid")).get()
         if not user_doc.exists:
             print("⚠️ Usuário não encontrado para WhatsApp")
             return
