@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Body, BackgroundTasks, Depends, Request, status, UploadFile, File, Form, Query
+personalIdInput.value =from fastapi import FastAPI, HTTPException, Body, BackgroundTasks, Depends, Request, status, UploadFile, File, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl, EmailStr, Field
 from typing import List, Optional, Dict, Union
@@ -974,7 +974,33 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
 # 🕒 NOVO AGENDADOR DE VERIFICAÇÕES (05:45 e 23:45)
 # ===============================================================
 
-scheduler = AsyncIOScheduler()
+from pytz import timezone
+
+scheduler = AsyncIOScheduler(timezone=timezone("America/Sao_Paulo"))
+
+
+@app.on_event("startup")
+async def start_scheduler():
+    """
+    Inicia o agendador para rodar a verificação de todos
+    os monitoramentos às 05:45 e 23:45 todos os dias.
+    """
+    # Evita adicionar jobs duplicados se o app reiniciar
+    if not scheduler.get_jobs():
+        scheduler.add_job(
+            run_all_monitorings,
+            CronTrigger(hour=5, minute=45)
+        )
+        scheduler.add_job(
+            run_all_monitorings,
+            CronTrigger(hour=23, minute=45)
+        )
+
+        scheduler.start()
+        print("🕒 Scheduler iniciado com jobs às 05:45 e 23:45.")
+    else:
+        print("🕒 Scheduler já estava inicializado, mantendo jobs existentes.")
+
 
 async def run_all_monitorings():
     """

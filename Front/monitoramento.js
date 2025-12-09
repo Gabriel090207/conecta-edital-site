@@ -2348,6 +2348,14 @@ document.getElementById("personal-id").addEventListener("input", function(event)
   personalIdInput.value = personalIdInput.value.replace(/[^0-9\/]/g, '');
 });
 
+
+// Validação enquanto digita - permite apenas números e a barra "/" também no Radar
+document.getElementById("radar-id").addEventListener("input", function(event) {
+  const radarIdInput = event.target;
+  radarIdInput.value = radarIdInput.value.replace(/[^0-9\/]/g, '');
+});
+
+
 // Validação ao enviar o formulário - confirma que o valor só tem números e barra "/"
 document.getElementById("personal-monitoring-form").addEventListener("submit", async function(event) {
   const personalIdInput = document.getElementById("personal-id");
@@ -2386,4 +2394,26 @@ document.getElementById("personal-monitoring-form").addEventListener("submit", a
           alert("Erro ao buscar dados do usuário.");
       }
   }
+
+
+
+  // === suas lógicas ===
+
+
+// --- Função única para aceitar somente números (com ou sem "/")
+function validarInputNumerico(campoId, permitirBarra = false) {
+  const campo = document.getElementById(campoId);
+
+  if (!campo) return;
+
+  campo.addEventListener("input", () => {
+    const regex = permitirBarra ? /[^0-9\/]/g : /[^0-9]/g;
+    campo.value = campo.value.replace(regex, "");
+  });
+}
+
+validarInputNumerico("personal-id", true);
+validarInputNumerico("radar-id", true);
+
+
 });
