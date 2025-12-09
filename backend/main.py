@@ -775,7 +775,7 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
     doc = doc_ref.get()
 
     if doc.exists and doc.to_dict().get("last_pdf_hash") == current_pdf_hash:
-        print(f"PDF para {monitoring_id} não mudou desde a última verificação.")
+        print(f"PDF para {monitoramento_id} não mudou desde a última verificação.")
         doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
         return
 
@@ -793,6 +793,9 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
     # ======================================================
     # 4️⃣ VERIFICAR PALAVRAS-CHAVE
     # ======================================================
+    # ======================================================
+# 4️⃣ VERIFICAR PALAVRAS-CHAVE
+# ======================================================
     found_keywords = []
     keywords_to_search = [monitoring_data.get("edital_identifier")]
 
@@ -809,18 +812,19 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
         if kw and (kw.lower() in pdf_text_lower or kw.lower() in file_name):
             found_keywords.append(kw)
 
+
     # ======================================================
     # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
     # ======================================================
     if found_keywords:
         print(f"✅ Ocorrência detectada: {found_keywords}")
 
-        # Salva ocorrência
+        # Armazena ocorrência no Firestore
         ocorrencias_ref = doc_ref.collection("occurrences")
         ocorrencias_ref.add({
             "edital_identifier": monitoring_data.get("edital_identifier"),
             "pdf_real_link": pdf_real_url,
-            "official_gazette_link": monitoring_data.get("official_gazette_link"),
+            "official_gazette_link": str(monitoring_data.get("official_gazette_link")),
             "last_pdf_hash": current_pdf_hash,
             "detected_at": firestore.SERVER_TIMESTAMP
         })
@@ -834,26 +838,29 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
 
         print(f"🔄 Contador sincronizado: occurrences = {occ_total}")
 
-        # Notificação interna
+        # Notificação interna (painel)
         await create_notification(
             user_uid=monitoring_data.get("user_uid"),
             type_="nova_ocorrencia",
             title="Nova ocorrência encontrada!",
-            message=f"Encontramos uma nova ocorrência no edital '{monitoring_data.get('edital_identifier')}'.",
+            message=f"Encontramos uma nova ocorrência no edital '{monitoring_data.get("edital_identifier")}'.",
             link="/meus-monitoramentos"
         )
 
+        monitoramento.pdf_real_link = pdf_real_url
+
         # ==================================================
-        # ✉️ EMAIL
+        # ✉️ EMAIL (template atualizado)
         # ==================================================
-        await send_email_notification(
-            to=monitoring_data.get("user_email"),
-            edital=monitoring_data.get("edital_identifier"),
-            link=pdf_real_url
+        send_email_notification(
+            monitoramento=monitoramento,
+            template_type="occurrence_found",
+            to_email=monitoramento.user_email,
+            found_keywords=found_keywords
         )
 
         # ==================================================
-        # 📲 WHATSAPP PREMIUM
+        # 📲 WHATSAPP (template moderno da nova função)
         # ==================================================
         try:
             user_doc = db.collection("users").document(monitoring_data.get("user_uid")).get()
@@ -862,11 +869,19 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
 
                 user_phone = user_data.get("contact")
                 user_plan = user_data.get("plan_type", "sem_plano").lower()
-                user_name = user_data.get("fullName") or monitoring_data.get("user_email").split("@")[0]
+                user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
 
                 if user_plan == "premium" and user_phone:
 
-                    keywords_formatted = "\n".join([f"`{kw}`" for kw in found_keywords])
+                    # Corrige keywords caso estejam em string
+                    if isinstance(monitoramento.keywords, str):
+                        kws = [kw.strip() for kw in monitoramento.keywords.split(",")]
+                    else:
+                        kws = monitoramento.keywords
+
+                    # formatar keywords sem repetir ">"
+                    
+                    keywords_formatted = "\n".join([f"`{kw}`" for kw in keywords_list])
 
                     occurs_msg = (
                         f"> 🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n"
@@ -880,26 +895,32 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
                         f"> {keywords_formatted}\n"
                         f"\n"
                         f"📎 *Quer todos os detalhes da ocorrência? Acesse o link abaixo:* \n"
-                        f"{pdf_real_url}\n"
+                        f"{monitoramento.pdf_real_link}\n"
                         f"\n"
                         f"#Nomeação #ConcursoPúbIico #ConectaEdital #SuaVagaGarantida"
                     )
 
+
                     await send_whatsapp_safe(user_phone, occurs_msg)
-                    print(f"📲 WhatsApp enviado para {user_phone}")
+                    print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
+
+# ⏳ Delay fixo para evitar filtro anti-spam
+                    
+
+
 
                 else:
-                    print("ℹ️ Usuário não é premium ou não possui número cadastrado.")
+                    print("ℹ️ Usuário não premium ou sem número salvo.")
 
         except Exception as e:
             print(f"❌ ERRO ao enviar WhatsApp: {e}")
 
-        print(f"🏁 Ocorrência finalizada para {monitoring_id}")
+        print(f"🏁 Ocorrência finalizada para {monitoramento_id} — PDF real: {pdf_real_url}")
 
     else:
-        print(f"❌ Nenhuma ocorrência encontrada para {monitoring_id}.")
+        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento_id}.")
 
-    print(f"--- Verificação para {monitoring_id} concluída ---\n")
+    print(f"--- Verificação para {monitoramento_id} concluída ---\n")
 
 
 async def get_user_plan(uid: str) -> str:
