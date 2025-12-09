@@ -204,6 +204,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ===========================================
+# 🔥 ROTA PARA COMUNICAÇÃO COM A IA (GEMINI)
+# ===========================================
+
+import os
+import httpx
+from fastapi import HTTPException
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")  # 🔥 AGORA VEM DO .env
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
+
+@app.post("/chat")
+async def chat_with_ai(payload: dict):
+    try:
+        if not GEMINI_API_KEY:
+            raise HTTPException(500, "API KEY da IA não configurada no servidor.")
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                GEMINI_URL + GEMINI_API_KEY,
+                json=payload,
+                timeout=60
+            )
+
+        if response.status_code != 200:
+            print("Erro IA:", response.text)
+            return {"error": "Erro ao processar resposta da IA"}
+
+        result = response.json()
+        return result
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
 try:
     firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
@@ -2724,3 +2760,6 @@ async def whatsapp_status_webhook(request: Request):
     except Exception as e:
         print(f"❌ Erro processando webhook: {e}")
         return {"received": False}
+
+
+

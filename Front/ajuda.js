@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Lógica do Chatbot ---
-    const API_KEY = "AIzaSyD63T66wf1n_CV0ywmXabd8OoyJYYHHL6Y";
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=";
+    const API_URL = `${BACKEND_URL}/chat`;
+
     const SITE_CONTEXT = `
         Você é a Conectinha, a assistente de IA do Conecta Edital. Sua função é ajudar usuários com dúvidas sobre a plataforma.
         Responda de forma amigável, concisa e informativa, usando apenas as informações fornecidas. Se a pergunta estiver fora do seu conhecimento, diga que não tem essa informação.
@@ -115,11 +115,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error("API Key não configurada. A Conectinha não pode se comunicar com a IA.");
             }
 
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const response = await fetch(`${BACKEND_URL}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        contents: chatHistoryForAPI
+    })
+});
+
 
             if (!response.ok) {
                 const errorData = await response.json();
