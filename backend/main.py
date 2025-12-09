@@ -723,26 +723,21 @@ def send_email_notification(
 # 🔍 Função principal de verificação de monitoramentos
 # ===============================================================
 
-async def perform_monitoring_check(monitoramento: Monitoring):
-    """
-    Executa a verificação para um monitoramento específico.
-    Dispara email e WhatsApp (modelo novo) quando uma ocorrência é encontrada.
-    Armazena o link real do PDF e o histórico.
-    """
+async def perform_monitoring_check(monitoring_id, monitoring_data):
 
-    print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
+    print(f"\n--- Iniciando verificação para monitoramento {monitoring_id} ({monitoring_data.get('monitoring_type')}) do usuário {monitoring_data.get('user_uid')} ---")
 
     db = firestore.client()
-    doc_ref = db.collection("monitorings").document(monitoramento.id)
+    doc_ref = db.collection("monitorings").document(monitoring_id)
 
     # ======================================================
     # 1️⃣ TENTAR OBTER O PDF REAL
     # ======================================================
-    print(f"Tentando obter o PDF real de: {monitoramento.official_gazette_link}")
+    print(f"Tentando obter o PDF real de: {monitoring_data.get('official_gazette_link')}")
 
-    response = await fetch_content(monitoramento.official_gazette_link)
+    response = await fetch_content(monitoring_data.get('official_gazette_link'))
     if not response:
-        print(f"❌ Falha ao acessar {monitoramento.official_gazette_link}")
+        print(f"❌ Falha ao acessar {monitoring_data.get('official_gazette_link')}")
         return
 
     content_type = response.headers.get("Content-Type", "").lower()
@@ -750,13 +745,13 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     pdf_real_url = None
 
     if "application/pdf" in content_type:
-        pdf_real_url = str(monitoramento.official_gazette_link)
+        pdf_real_url = str(monitoring_data.get('official_gazette_link'))
         pdf_content = response.content
 
     elif "text/html" in content_type:
-        pdf_url_in_html = await find_pdf_in_html(response.content, monitoramento.official_gazette_link)
+        pdf_url_in_html = await find_pdf_in_html(response.content, monitoring_data.get('official_gazette_link'))
         if not pdf_url_in_html:
-            print(f"⚠️ Nenhum PDF encontrado na página {monitoramento.official_gazette_link}")
+            print(f"⚠️ Nenhum PDF encontrado na página {monitoring_data.get('official_gazette_link')}")
             return
 
         pdf_real_url = str(pdf_url_in_html)
@@ -780,7 +775,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     doc = doc_ref.get()
 
     if doc.exists and doc.to_dict().get("last_pdf_hash") == current_pdf_hash:
-        print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
+        print(f"PDF para {monitoramento_id} não mudou desde a última verificação.")
         doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
         return
 
@@ -798,13 +793,15 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     # ======================================================
     # 4️⃣ VERIFICAR PALAVRAS-CHAVE
     # ======================================================
+    # ======================================================
+# 4️⃣ VERIFICAR PALAVRAS-CHAVE
+# ======================================================
     found_keywords = []
-    keywords_to_search = [monitoramento.edital_identifier]
+    keywords_to_search = [monitoring_data.get("edital_identifier")]
 
-    if monitoramento.monitoring_type == "personal" and monitoramento.candidate_name:
-        keywords_to_search.append(monitoramento.candidate_name)
+    if monitoring_data.get("monitoring_type") == "personal" and monitoring_data.get("candidate_name"):
+        keywords_to_search.append(monitoring_data.get("candidate_name"))
 
-    # Verifica no texto e no nome do arquivo
     try:
         parsed_url = urlparse(pdf_real_url)
         file_name = parsed_url.path.split("/")[-1].lower()
@@ -812,8 +809,9 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         file_name = ""
 
     for kw in keywords_to_search:
-        if kw.lower() in pdf_text_lower or kw.lower() in file_name:
+        if kw and (kw.lower() in pdf_text_lower or kw.lower() in file_name):
             found_keywords.append(kw)
+
 
     # ======================================================
     # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
@@ -824,9 +822,9 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         # Armazena ocorrência no Firestore
         ocorrencias_ref = doc_ref.collection("occurrences")
         ocorrencias_ref.add({
-            "edital_identifier": monitoramento.edital_identifier,
+            "edital_identifier": monitoring_data.get("edital_identifier"),
             "pdf_real_link": pdf_real_url,
-            "official_gazette_link": str(monitoramento.official_gazette_link),
+            "official_gazette_link": str(monitoring_data.get("official_gazette_link")),
             "last_pdf_hash": current_pdf_hash,
             "detected_at": firestore.SERVER_TIMESTAMP
         })
