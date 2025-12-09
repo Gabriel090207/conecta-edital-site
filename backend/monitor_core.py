@@ -1,34 +1,47 @@
 # monitor_core.py
-import asyncio
+
 from firebase_admin import firestore
-from main import perform_monitoring_check  # já existe no seu main
+from main import perform_monitoring_check   # NÃO ALTERAR
+import asyncio
 
 db = firestore.client()
 
+
 async def run_all_monitorings_core():
-    """
-    Executa verificação de TODOS os monitoramentos direto no Firestore,
-    sem rodar FastAPI, sem Twilio, sem Mercado Pago, sem CORS, sem nada extra.
-    """
     print("🚀 Iniciando verificação geral...")
-    
-    monitoramentos_ref = db.collection("monitoramentos")
-    monitoramentos = monitoramentos_ref.stream()
+
+    # 🔥 Agora busca TODOS, sem filtro
+    docs = db.collection('monitorings').stream()
+
+    count = 0
+
+    async def process(doc):
+        nonlocal count
+        data = doc.to_dict()
+
+        if not data:
+            return
+
+        # ❗ Agora só pula se estiver claramente inativo
+        if data.get("status") in ["inactive", "inativo", "disabled"]:
+            return
+
+        count += 1
+        print(f"🔍 Verificando monitoramento: {doc.id} | Tipo: {data.get('monitoring_type')}")
+
+        try:
+            await perform_monitoring_check(doc.id, data)
+        except Exception as e:
+            print(f"❗Erro ao verificar {doc.id}: {str(e)}")
 
     tasks = []
-    for m in monitoramentos:
-        data = m.to_dict()
-        monitor_id = m.id
+    for doc in docs:
+        tasks.append(process(doc))
 
-        # pula monitoramentos inativos
-        if data.get("status") != "active":
-            continue
+    # executa 10 por vez para evitar limite de requisições
+    for i in range(0, len(tasks), 10):
+        batch = tasks[i:i+10]
+        await asyncio.gather(*batch)
 
-        print(f"🔍 Executando monitoramento: {monitor_id}")
-
-        tasks.append(perform_monitoring_check(monitor_id, data))
-
-    if tasks:
-        await asyncio.gather(*tasks)
-
+    print(f"📊 Total verificados: {count}")
     print("✅ Verificação geral finalizada!")
