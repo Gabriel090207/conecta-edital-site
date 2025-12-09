@@ -108,20 +108,16 @@ document.addEventListener('DOMContentLoaded', () => {
             chatHistoryForAPI.push({ role: "user", parts: [{ text: question }] });
             
             const payload = { contents: chatHistoryForAPI };
-            const apiKey = API_KEY; 
-            const apiUrl = API_URL + apiKey;
+            const apiUrl = API_URL;
 
-            if (!apiKey) {
-                throw new Error("API Key não configurada. A Conectinha não pode se comunicar com a IA.");
-            }
-
-            const response = await fetch(`${BACKEND_URL}/chat`, {
+const response = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
         contents: chatHistoryForAPI
     })
 });
+
 
 
             if (!response.ok) {
