@@ -208,37 +208,45 @@ app.add_middleware(
 # ===========================================
 # 🔥 ROTA PARA COMUNICAÇÃO COM A IA (GEMINI)
 # ===========================================
+# ====================== CHAT IA GEMINI ======================
 
 import os
 import httpx
 from fastapi import HTTPException
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")  # 🔥 AGORA VEM DO .env
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
 
 @app.post("/chat")
 async def chat_with_ai(payload: dict):
-    try:
-        if not GEMINI_API_KEY:
-            raise HTTPException(500, "API KEY da IA não configurada no servidor.")
+    if not GEMINI_API_KEY:
+        raise HTTPException(500, "API KEY da IA não configurada no servidor.")
 
+    try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 GEMINI_URL + GEMINI_API_KEY,
-                json=payload,
+                json={
+                    "contents": [
+                        {"parts": [{"text": payload.get("message")}]}
+                    ]
+                },
                 timeout=60
             )
 
-        if response.status_code != 200:
-            print("Erro IA:", response.text)
-            return {"error": "Erro ao processar resposta da IA"}
-
         result = response.json()
-        return result
+
+        # Gemini retorna dentro de candidates
+        if "candidates" in result:
+            return {
+                "reply": result["candidates"][0]["content"]["parts"][0]["text"]
+            }
+
+        return {"error": "Nenhuma resposta gerada pela IA."}
 
     except Exception as e:
-        return {"error": str(e)}
-
+        print("Erro na IA:", e)
+        raise HTTPException(500, f"Erro IA: {str(e)}")
 
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
 try:
