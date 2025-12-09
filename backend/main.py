@@ -842,7 +842,8 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
                     # formatar keywords sem repetir ">"
                     
-                    keywords_formatted = "\n".join([f"`{kw}`" for kw in keywords_list])
+                    keywords_formatted = "\n".join([f"`{kw}`" for kw in found_keywords])
+
 
                     occurs_msg = (
                         f"> 🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n"
