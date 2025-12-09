@@ -777,6 +777,9 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     # ======================================================
     # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
     # ======================================================
+        # ======================================================
+    # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
+    # ======================================================
     if found_keywords:
         print(f"✅ Ocorrência detectada: {found_keywords}")
 
@@ -834,16 +837,8 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
                 if user_plan == "premium" and user_phone:
 
-                    # Corrige keywords caso estejam em string
-                    if isinstance(monitoramento.keywords, str):
-                        kws = [kw.strip() for kw in monitoramento.keywords.split(",")]
-                    else:
-                        kws = monitoramento.keywords
-
-                    # formatar keywords sem repetir ">"
-                    
+                    # Vamos usar as keywords realmente encontradas no PDF
                     keywords_formatted = "\n".join([f"`{kw}`" for kw in found_keywords])
-
 
                     occurs_msg = (
                         f"> 🚨 *NOVA ATUALIZAÇÃO ENCONTRADA* 🚨\n"
@@ -853,24 +848,17 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                         f"Encontramos uma atualização relevante no seu monitoramento. "
                         f"Recomendamos que confira o quanto antes.\n"
                         f"\n"
-                        f"🔠 *PALAVRA-CHAVE SENDO MONITORADA*\n"
-                        f"> {keywords_formatted}\n"
+                        f"🔠 *PALAVRAS-CHAVE ENCONTRADAS:*\n"
+                        f"{keywords_formatted}\n"
                         f"\n"
                         f"📎 *Quer todos os detalhes da ocorrência? Acesse o link abaixo:* \n"
                         f"{monitoramento.pdf_real_link}\n"
                         f"\n"
-                        f"#Nomeação #ConcursoPúbIico #ConectaEdital #SuaVagaGarantida"
+                        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida"
                     )
-
 
                     await send_whatsapp_safe(user_phone, occurs_msg)
                     print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
-
-# ⏳ Delay fixo para evitar filtro anti-spam
-                    
-
-
-
                 else:
                     print("ℹ️ Usuário não premium ou sem número salvo.")
 
@@ -881,8 +869,6 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
     else:
         print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
-
-    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
 
 
 async def get_user_plan(uid: str) -> str:
