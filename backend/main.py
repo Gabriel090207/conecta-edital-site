@@ -204,47 +204,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# ===========================================
-# 🔥 ROTA PARA COMUNICAÇÃO COM A IA (GEMINI)
-# ===========================================
-# ====================== CHAT IA GEMINI ======================
-
-import os
-import httpx
-from fastapi import HTTPException
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key="
-
-
-@app.post("/chat")
-async def chat_with_ai(payload: dict):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                GEMINI_URL + GEMINI_API_KEY,
-                json={"contents": payload["contents"]},
-                timeout=60
-            )
-
-        result = response.json()
-
-        # 👇 ADICIONE ESTA LINHA
-        print("🔍 JSON BRUTO GEMINI:", result)
-
-        if "candidates" in result and result["candidates"]:
-            return {
-                "reply": result["candidates"][0]["content"]["parts"][0]["text"]
-            }
-
-        return {"error": "Sem resposta da IA"}
-
-    except Exception as e:
-        print("Erro IA:", e)
-        return {"error": str(e)}
-
-
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
 try:
     firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
@@ -637,7 +596,7 @@ def send_email_notification(
     print("📤 Iniciando envio de e-mail...")
     print(f"➡️ Tipo de template: {template_type}")
     print(f"➡️ Destinatário: {to_email}")
-    print(f"➡️ Edital: {monitoring_data.get("edital_identifier")}")
+    print(f"➡️ Edital: {monitoramento.edital_identifier}")
     print(f"➡️ Link do PDF real: {getattr(monitoramento, 'pdf_real_link', 'N/A')}")
 
     """
@@ -652,7 +611,7 @@ def send_email_notification(
     user_full_name_from_monitoramento = ""
     try:
         db_firestore_client = firestore.client()
-        user_doc_ref = db_firestore_client.collection('users').document(monitoring_data.get("user_uid"))
+        user_doc_ref = db_firestore_client.collection('users').document(monitoramento.user_uid)
         user_doc = user_doc_ref.get()
         if user_doc.exists:
             user_data = user_doc.to_dict()
@@ -666,13 +625,13 @@ def send_email_notification(
     if template_type == 'monitoring_active':
         html_content = email_templates.get_monitoring_active_email_html(
             user_full_name=user_full_name_from_monitoramento,
-            monitoring_type=monitoring_data.get("monitoring_type"),
+            monitoring_type=monitoramento.monitoring_type,
             official_gazette_link=str(monitoramento.official_gazette_link),
-            edital_identifier=monitoring_data.get("edital_identifier"),
+            edital_identifier=monitoramento.edital_identifier,
             candidate_name=monitoramento.candidate_name,
             keywords=monitoramento.keywords
         )
-        subject = f"Conecta Edital: Seu Monitoramento para '{monitoring_data.get("edital_identifier")}' está Ativo!"
+        subject = f"Conecta Edital: Seu Monitoramento para '{monitoramento.edital_identifier}' está Ativo!"
     elif template_type == 'occurrence_found':
         if not found_keywords:
             print("ALERTA: found_keywords é necessário para o template 'occurrence_found'.")
@@ -680,14 +639,14 @@ def send_email_notification(
 
         html_content = email_templates.get_occurrence_found_email_html(
         user_full_name=user_full_name_from_monitoramento,
-        edital_identifier=monitoring_data.get("edital_identifier"),
+        edital_identifier=monitoramento.edital_identifier,
         official_gazette_link=str(
             getattr(monitoramento, "pdf_real_link", monitoramento.official_gazette_link)
         ),
         found_keywords=found_keywords
     )
 
-        subject = f"Conecta Edital: Nova Ocorrência Encontrada no Edital '{monitoring_data.get("edital_identifier")}'"
+        subject = f"Conecta Edital: Nova Ocorrência Encontrada no Edital '{monitoramento.edital_identifier}'"
     else:
         print(f"ERRO: Tipo de template de email desconhecido: {template_type}")
         return
@@ -723,21 +682,26 @@ def send_email_notification(
 # 🔍 Função principal de verificação de monitoramentos
 # ===============================================================
 
-async def perform_monitoring_check(monitoring_id, monitoring_data):
+async def perform_monitoring_check(monitoramento: Monitoring):
+    """
+    Executa a verificação para um monitoramento específico.
+    Dispara email e WhatsApp (modelo novo) quando uma ocorrência é encontrada.
+    Armazena o link real do PDF e o histórico.
+    """
 
-    print(f"\n--- Iniciando verificação para monitoramento {monitoring_id} ({monitoring_data.get('monitoring_type')}) do usuário {monitoring_data.get('user_uid')} ---")
+    print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
 
     db = firestore.client()
-    doc_ref = db.collection("monitorings").document(monitoring_id)
+    doc_ref = db.collection("monitorings").document(monitoramento.id)
 
     # ======================================================
     # 1️⃣ TENTAR OBTER O PDF REAL
     # ======================================================
-    print(f"Tentando obter o PDF real de: {monitoring_data.get('official_gazette_link')}")
+    print(f"Tentando obter o PDF real de: {monitoramento.official_gazette_link}")
 
-    response = await fetch_content(monitoring_data.get('official_gazette_link'))
+    response = await fetch_content(monitoramento.official_gazette_link)
     if not response:
-        print(f"❌ Falha ao acessar {monitoring_data.get('official_gazette_link')}")
+        print(f"❌ Falha ao acessar {monitoramento.official_gazette_link}")
         return
 
     content_type = response.headers.get("Content-Type", "").lower()
@@ -745,13 +709,13 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
     pdf_real_url = None
 
     if "application/pdf" in content_type:
-        pdf_real_url = str(monitoring_data.get('official_gazette_link'))
+        pdf_real_url = str(monitoramento.official_gazette_link)
         pdf_content = response.content
 
     elif "text/html" in content_type:
-        pdf_url_in_html = await find_pdf_in_html(response.content, monitoring_data.get('official_gazette_link'))
+        pdf_url_in_html = await find_pdf_in_html(response.content, monitoramento.official_gazette_link)
         if not pdf_url_in_html:
-            print(f"⚠️ Nenhum PDF encontrado na página {monitoring_data.get('official_gazette_link')}")
+            print(f"⚠️ Nenhum PDF encontrado na página {monitoramento.official_gazette_link}")
             return
 
         pdf_real_url = str(pdf_url_in_html)
@@ -775,7 +739,7 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
     doc = doc_ref.get()
 
     if doc.exists and doc.to_dict().get("last_pdf_hash") == current_pdf_hash:
-        print(f"PDF para {monitoramento_id} não mudou desde a última verificação.")
+        print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
         doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
         return
 
@@ -793,15 +757,13 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
     # ======================================================
     # 4️⃣ VERIFICAR PALAVRAS-CHAVE
     # ======================================================
-    # ======================================================
-# 4️⃣ VERIFICAR PALAVRAS-CHAVE
-# ======================================================
     found_keywords = []
-    keywords_to_search = [monitoring_data.get("edital_identifier")]
+    keywords_to_search = [monitoramento.edital_identifier]
 
-    if monitoring_data.get("monitoring_type") == "personal" and monitoring_data.get("candidate_name"):
-        keywords_to_search.append(monitoring_data.get("candidate_name"))
+    if monitoramento.monitoring_type == "personal" and monitoramento.candidate_name:
+        keywords_to_search.append(monitoramento.candidate_name)
 
+    # Verifica no texto e no nome do arquivo
     try:
         parsed_url = urlparse(pdf_real_url)
         file_name = parsed_url.path.split("/")[-1].lower()
@@ -809,9 +771,8 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
         file_name = ""
 
     for kw in keywords_to_search:
-        if kw and (kw.lower() in pdf_text_lower or kw.lower() in file_name):
+        if kw.lower() in pdf_text_lower or kw.lower() in file_name:
             found_keywords.append(kw)
-
 
     # ======================================================
     # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
@@ -822,9 +783,9 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
         # Armazena ocorrência no Firestore
         ocorrencias_ref = doc_ref.collection("occurrences")
         ocorrencias_ref.add({
-            "edital_identifier": monitoring_data.get("edital_identifier"),
+            "edital_identifier": monitoramento.edital_identifier,
             "pdf_real_link": pdf_real_url,
-            "official_gazette_link": str(monitoring_data.get("official_gazette_link")),
+            "official_gazette_link": str(monitoramento.official_gazette_link),
             "last_pdf_hash": current_pdf_hash,
             "detected_at": firestore.SERVER_TIMESTAMP
         })
@@ -840,10 +801,10 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
 
         # Notificação interna (painel)
         await create_notification(
-            user_uid=monitoring_data.get("user_uid"),
+            user_uid=monitoramento.user_uid,
             type_="nova_ocorrencia",
             title="Nova ocorrência encontrada!",
-            message=f"Encontramos uma nova ocorrência no edital '{monitoring_data.get("edital_identifier")}'.",
+            message=f"Encontramos uma nova ocorrência no edital '{monitoramento.edital_identifier}'.",
             link="/meus-monitoramentos"
         )
 
@@ -863,7 +824,7 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
         # 📲 WHATSAPP (template moderno da nova função)
         # ==================================================
         try:
-            user_doc = db.collection("users").document(monitoring_data.get("user_uid")).get()
+            user_doc = db.collection("users").document(monitoramento.user_uid).get()
             if user_doc.exists:
                 user_data = user_doc.to_dict()
 
@@ -915,12 +876,12 @@ async def perform_monitoring_check(monitoring_id, monitoring_data):
         except Exception as e:
             print(f"❌ ERRO ao enviar WhatsApp: {e}")
 
-        print(f"🏁 Ocorrência finalizada para {monitoramento_id} — PDF real: {pdf_real_url}")
+        print(f"🏁 Ocorrência finalizada para {monitoramento.id} — PDF real: {pdf_real_url}")
 
     else:
-        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento_id}.")
+        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
 
-    print(f"--- Verificação para {monitoramento_id} concluída ---\n")
+    print(f"--- Verificação para {monitoramento.id} concluída ---\n")
 
 
 async def get_user_plan(uid: str) -> str:
@@ -972,33 +933,7 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
 # 🕒 NOVO AGENDADOR DE VERIFICAÇÕES (05:45 e 23:45)
 # ===============================================================
 
-from pytz import timezone
-
-scheduler = AsyncIOScheduler(timezone=timezone("America/Sao_Paulo"))
-
-
-@app.on_event("startup")
-async def start_scheduler():
-    """
-    Inicia o agendador para rodar a verificação de todos
-    os monitoramentos às 05:45 e 23:45 todos os dias.
-    """
-    # Evita adicionar jobs duplicados se o app reiniciar
-    if not scheduler.get_jobs():
-        scheduler.add_job(
-            run_all_monitorings,
-            CronTrigger(hour=5, minute=45)
-        )
-        scheduler.add_job(
-            run_all_monitorings,
-            CronTrigger(hour=23, minute=45)
-        )
-
-        scheduler.start()
-        print("🕒 Scheduler iniciado com jobs às 05:45 e 23:45.")
-    else:
-        print("🕒 Scheduler já estava inicializado, mantendo jobs existentes.")
-
+scheduler = AsyncIOScheduler()
 
 async def run_all_monitorings():
     """
@@ -1046,11 +981,11 @@ async def run_all_monitorings():
 async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
     try:
         if user_plan != "premium":
-            print(f"ℹ️ Usuário {monitoring_data.get("user_uid")} não é premium. WhatsApp não enviado.")
+            print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
             return
 
         db = firestore.client()
-        user_doc = db.collection("users").document(monitoring_data.get("user_uid")).get()
+        user_doc = db.collection("users").document(monitoramento.user_uid).get()
         if not user_doc.exists:
             print("⚠️ Usuário não encontrado para WhatsApp")
             return
@@ -2789,6 +2724,3 @@ async def whatsapp_status_webhook(request: Request):
     except Exception as e:
         print(f"❌ Erro processando webhook: {e}")
         return {"received": False}
-
-
-
