@@ -204,6 +204,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ====================== CHAT IA GEMINI ======================
+
+import os
+import httpx
+from fastapi import HTTPException
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
+
+@app.post("/chat")
+async def chat_with_ai(payload: dict):
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                GEMINI_URL + GEMINI_API_KEY,
+                json={"contents": payload["contents"]},
+                timeout=60
+            )
+
+        result = response.json()
+
+        # 👇 ADICIONE ESTA LINHA
+        print("🔍 JSON BRUTO GEMINI:", result)
+
+        if "candidates" in result and result["candidates"]:
+            return {
+                "reply": result["candidates"][0]["content"]["parts"][0]["text"]
+            }
+
+        return {"error": "Sem resposta da IA"}
+
+    except Exception as e:
+        print("Erro IA:", e)
+        return {"error": str(e)}
+
+
 # --- INICIALIZAÇÃO DO FIREBASE ADMIN SDK ---
 try:
     firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
