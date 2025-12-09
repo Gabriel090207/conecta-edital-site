@@ -215,7 +215,7 @@ import httpx
 from fastapi import HTTPException
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key="
 
 @app.post("/chat")
 async def chat_with_ai(payload: dict):

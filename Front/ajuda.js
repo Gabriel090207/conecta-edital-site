@@ -101,21 +101,20 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoadingIndicator(true);
 
         try {
-            let chatHistoryForAPI = [{ role: "user", parts: [{ text: SITE_CONTEXT }] }];
-            persistedChatHistory.forEach(msg => {
-                chatHistoryForAPI.push({ role: msg.sender === 'sent' ? 'user' : 'model', parts: [{ text: msg.text }] });
-            });
-            chatHistoryForAPI.push({ role: "user", parts: [{ text: question }] });
-            
-            const payload = { contents: chatHistoryForAPI };
-            const apiUrl = API_URL;
+           let chatHistoryForAPI = [{ parts: [{ text: SITE_CONTEXT }] }];
 
-const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        contents: chatHistoryForAPI
-    })
+persistedChatHistory.forEach(msg => {
+  chatHistoryForAPI.push({ parts: [{ text: msg.text }] });
+});
+
+chatHistoryForAPI.push({ parts: [{ text: question }] });
+
+const response = await fetch(`${BACKEND_URL}/chat`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    contents: chatHistoryForAPI
+  })
 });
 
 
