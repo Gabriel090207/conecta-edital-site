@@ -10,7 +10,7 @@ db = firestore.client()
 async def run_all_monitorings_core():
     print("🚀 Iniciando verificação geral...")
 
-    # 🔥 Agora busca TODOS, sem filtro
+    # 🔥 Busca TODOS os monitoramentos ativos
     docs = db.collection('monitorings').stream()
 
     count = 0
@@ -34,11 +34,21 @@ async def run_all_monitorings_core():
         except Exception as e:
             print(f"❗Erro ao verificar {doc.id}: {str(e)}")
 
+        # 🕒 Atualiza última verificação SEMPRE (teve ocorrência ou não)
+        try:
+            db.collection('monitorings').document(doc.id).update({
+                "last_checked": firestore.SERVER_TIMESTAMP
+            })
+            print(f"⏱️ Última verificação registrada para {doc.id}")
+        except Exception as e:
+            print(f"❗Falha ao atualizar última verificação de {doc.id}: {str(e)}")
+
+    # cria lista de tarefas
     tasks = []
     for doc in docs:
         tasks.append(process(doc))
 
-    # executa 10 por vez para evitar limite de requisições
+    # executa 10 por vez (evita limite de requisições)
     for i in range(0, len(tasks), 10):
         batch = tasks[i:i+10]
         await asyncio.gather(*batch)
