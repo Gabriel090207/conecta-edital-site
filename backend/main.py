@@ -146,16 +146,23 @@ whatsapp_lock = Lock()
 
 
 async def send_whatsapp_safe(to_number: str, message: str):
-    try:
-        async with whatsapp_lock:
-            send_whatsapp_zapi(to_number, message)
-            await asyncio.sleep(12)  # delay obrigatório anti-spam
-        return {"status": "success"}
+    async with whatsapp_lock:
+        print("\n📲 [WHATSAPP] Envio iniciado (com trava)")
 
-    except Exception as e:
-        print("Erro ao enviar pela Z-API:", str(e))
-        return {"status": "error", "detail": str(e)}
+        result = send_whatsapp_zapi(to_number, message)
 
+        # Log do retorno
+        print("📨 Resposta da API:", result)
+
+        # Delay obrigatório para anti-spam
+        await asyncio.sleep(10)
+
+        if result.get("status") == "success":
+            print("✅ WhatsApp enviado com sucesso!")
+            return {"status": "success"}
+
+        print("❌ Falha no envio WhatsApp:", result)
+        return {"status": "error", "detail": result}
 
 
 def send_template_visual_zapi(to_number: str, titulo: str, data: str, link: str):
@@ -281,7 +288,7 @@ class Monitoring(BaseModel):
     candidate_name: Optional[str] = None
     cpf: Optional[str] = None
     keywords: Union[str, List[str]]  # ✅ aceita string ou lista
-    last_checked_at: datetime
+    last_checked: datetime | None = None
     last_pdf_hash: Optional[str] = None
     occurrences: int = 0
     status: str = "inactive"
@@ -469,6 +476,57 @@ async def get_current_admin_uid(request: Request) -> str:
             detail="Você não tem permissão para acessar esta área."
         )
     return uid
+async def get_user_plan_from_firestore(uid: str) -> str:
+    """
+    Busca o tipo de plano do usuário no Firestore, normalizando nomes e cobrindo campos antigos.
+    """
+    db_firestore_client = firestore.client()
+    user_ref = db_firestore_client.collection('users').document(uid)
+    user_doc = user_ref.get()
+
+    if not user_doc.exists:
+        print(f"⚠️ Usuário {uid} não encontrado no Firestore — retornando 'sem plano'")
+        return "sem_plano"
+
+    user_data = user_doc.to_dict()
+
+    # Tenta encontrar o campo correto
+    plan_raw = (
+        user_data.get("plan_type") or
+        user_data.get("plano") or
+        user_data.get("plan") or
+        "sem_plano"
+    )
+
+    plan_normalizado = str(plan_raw).strip().lower()
+
+    # 🔹 Corrige possíveis variações
+    if "premium" in plan_normalizado:
+        return "premium"
+    elif "essencial" in plan_normalizado:
+        return "essencial"
+    elif "basico" in plan_normalizado or "básico" in plan_normalizado:
+        return "basico"
+    elif plan_normalizado in ["sem_plano", "sem plano", "gratuito", "free"]:
+        return "sem_plano"
+
+    return plan_normalizado
+
+
+def can_receive_whatsapp(user_plan: str, phone: str) -> bool:
+    """
+    Só recebe WhatsApp se:
+    - for premium
+    - e tiver telefone cadastrado
+    """
+    if not phone:
+        return False
+
+    if not user_plan:
+        return False
+
+    plan = user_plan.lower().strip()
+    return plan == "premium"
 
 
 # Função para obter o email do usuário do Firestore
@@ -518,6 +576,22 @@ async def get_user_plan_from_firestore(uid: str) -> str:
         return "sem_plano"
 
     return plan_normalizado
+
+
+def can_receive_whatsapp(user_plan: str, phone: str) -> bool:
+    """
+    Só recebe WhatsApp se:
+    - for premium
+    - e tiver telefone cadastrado
+    """
+    if not phone:
+        return False
+
+    if not user_plan:
+        return False
+
+    plan = user_plan.lower().strip()
+    return plan == "premium"
 
 
 # Função para determinar o número máximo de slots com base no plano
@@ -713,16 +787,11 @@ def send_email_notification(
 # ===============================================================
 # 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
 # ===============================================================
-
-# ===============================================================
-# 🔍 Função principal de verificação de monitoramentos
-# ===============================================================
-
 async def perform_monitoring_check(monitoramento: Monitoring):
     """
     Executa a verificação para um monitoramento específico.
-    Dispara email e WhatsApp (modelo novo) quando uma ocorrência é encontrada.
-    Armazena o link real do PDF e o histórico.
+    Dispara email e WhatsApp (somente premium) quando uma ocorrência válida é encontrada.
+    Armazena o link real do PDF e histórico.
     """
 
     print(f"\n--- Iniciando verificação para monitoramento {monitoramento.id} ({monitoramento.monitoring_type}) do usuário {monitoramento.user_uid} ---")
@@ -776,13 +845,15 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
     if doc.exists and doc.to_dict().get("last_pdf_hash") == current_pdf_hash:
         print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
-        doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
+        doc_ref.update({"last_checked": firestore.SERVER_TIMESTAMP})
         return
+
 
     doc_ref.update({
         "last_pdf_hash": current_pdf_hash,
-        "last_checked_at": firestore.SERVER_TIMESTAMP
-    })
+        "last_checked": firestore.SERVER_TIMESTAMP
+    }  )
+
 
     # ======================================================
     # 3️⃣ EXTRAIR TEXTO DO PDF
@@ -799,27 +870,35 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     if monitoramento.monitoring_type == "personal" and monitoramento.candidate_name:
         keywords_to_search.append(monitoramento.candidate_name)
 
-    # Verifica no texto e no nome do arquivo
     try:
         parsed_url = urlparse(pdf_real_url)
         file_name = parsed_url.path.split("/")[-1].lower()
     except:
         file_name = ""
 
-    for kw in keywords_to_search:
-        if kw.lower() in pdf_text_lower or kw.lower() in file_name:
-            found_keywords.append(kw)
+    if monitoramento.monitoring_type == "personal":
+        found_id = monitoramento.edital_identifier.lower() in pdf_text_lower or monitoramento.edital_identifier.lower() in file_name
+        found_name = monitoramento.candidate_name and (monitoramento.candidate_name.lower() in pdf_text_lower)
+
+        if found_id and found_name:
+            print("🔎 Personal: Nome + ID encontrados → notificar")
+            found_keywords = [monitoramento.edital_identifier, monitoramento.candidate_name]
+        elif found_id and not found_name:
+            print("ℹ️ Personal: Apenas ID encontrado → ignorado (correto)")
+        elif found_name and not found_id:
+            print("ℹ️ Personal: Apenas nome encontrado → ignorado (correto)")
+        else:
+            print("ℹ️ Personal: Nenhum dos dois encontrados → ok")
+    else:
+        for kw in keywords_to_search:
+            if kw.lower() in pdf_text_lower or kw.lower() in file_name:
+                found_keywords.append(kw)
 
     # ======================================================
-    # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
+    # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA (REGRA FINAL APLICADA)
     # ======================================================
-        # ======================================================
-    # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA
-    # ======================================================
-    if found_keywords:
-        print(f"✅ Ocorrência detectada: {found_keywords}")
+    if found_keywords and not (monitoramento.monitoring_type == "personal" and len(found_keywords) < 2):
 
-        # Armazena ocorrência no Firestore
         ocorrencias_ref = doc_ref.collection("occurrences")
         ocorrencias_ref.add({
             "edital_identifier": monitoramento.edital_identifier,
@@ -829,7 +908,6 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             "detected_at": firestore.SERVER_TIMESTAMP
         })
 
-        # Atualiza contador
         occ_total = len(list(ocorrencias_ref.stream()))
         doc_ref.update({
             "occurrences": occ_total,
@@ -838,7 +916,6 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
         print(f"🔄 Contador sincronizado: occurrences = {occ_total}")
 
-        # Notificação interna (painel)
         await create_notification(
             user_uid=monitoramento.user_uid,
             type_="nova_ocorrencia",
@@ -849,9 +926,7 @@ async def perform_monitoring_check(monitoramento: Monitoring):
 
         monitoramento.pdf_real_link = pdf_real_url
 
-        # ==================================================
-        # ✉️ EMAIL (template atualizado)
-        # ==================================================
+        # ✉️ EMAIL
         send_email_notification(
             monitoramento=monitoramento,
             template_type="occurrence_found",
@@ -859,21 +934,16 @@ async def perform_monitoring_check(monitoramento: Monitoring):
             found_keywords=found_keywords
         )
 
-        # ==================================================
-        # 📲 WHATSAPP (template moderno da nova função)
-        # ==================================================
+        # 📲 WHATSAPP
         try:
             user_doc = db.collection("users").document(monitoramento.user_uid).get()
             if user_doc.exists:
                 user_data = user_doc.to_dict()
-
                 user_phone = user_data.get("contact")
-                user_plan = user_data.get("plan_type", "sem_plano").lower()
+                user_plan = await get_user_plan_from_firestore(monitoramento.user_uid)
                 user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
 
-                if user_plan == "premium" and user_phone:
-
-                    # Vamos usar as keywords realmente encontradas no PDF
+                if can_receive_whatsapp(user_plan, user_phone):
                     keywords_formatted = "\n".join([f"`{kw}`" for kw in found_keywords])
 
                     occurs_msg = (
@@ -881,31 +951,25 @@ async def perform_monitoring_check(monitoramento: Monitoring):
                         f"\n"
                         f"Olá, *{user_name}!* 👋\n"
                         f"\n"
-                        f"Encontramos uma atualização relevante no seu monitoramento. "
-                        f"Recomendamos que confira o quanto antes.\n"
-                        f"\n"
                         f"🔠 *PALAVRAS-CHAVE ENCONTRADAS:*\n"
                         f"{keywords_formatted}\n"
-                        f"\n"
-                        f"📎 *Quer todos os detalhes da ocorrência? Acesse o link abaixo:* \n"
+                        "\n"
+                        f"📎 *Acesse o documento completo:* \n"
                         f"{monitoramento.pdf_real_link}\n"
                         f"\n"
-                        f"#Nomeação #ConcursoPúblico #ConectaEdital #SuaVagaGarantida"
+                        f"#ConectaEdital"
                     )
 
                     await send_whatsapp_safe(user_phone, occurs_msg)
-                    print(f"📲 WhatsApp enviado (ocorrência única) para {user_phone}")
+                    print(f"📲 WhatsApp enviado para {user_phone}")
                 else:
                     print("ℹ️ Usuário não premium ou sem número salvo.")
 
         except Exception as e:
             print(f"❌ ERRO ao enviar WhatsApp: {e}")
 
-        print(f"🏁 Ocorrência finalizada para {monitoramento.id} — PDF real: {pdf_real_url}")
-
     else:
-        print(f"❌ Nenhuma ocorrência encontrada para {monitoramento.id}.")
-
+        print("ℹ️ Nenhuma ocorrência válida encontrada — nada será enviado.")
 
 async def get_user_plan(uid: str) -> str:
     """
@@ -1003,12 +1067,9 @@ async def run_all_monitorings():
 # Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
 async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
     try:
-        if user_plan != "premium":
-            print(f"ℹ️ Usuário {monitoramento.user_uid} não é premium. WhatsApp não enviado.")
-            return
-
         db = firestore.client()
         user_doc = db.collection("users").document(monitoramento.user_uid).get()
+
         if not user_doc.exists:
             print("⚠️ Usuário não encontrado para WhatsApp")
             return
@@ -1017,11 +1078,16 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
         user_phone = user_data.get("contact")
         user_name = user_data.get("fullName") or monitoramento.user_email.split("@")[0]
 
+        # 🔍 Verificação agora só acontece DEPOIS de conhecer o número e o plano
+        if not can_receive_whatsapp(user_plan, user_phone):
+            print("ℹ️ WhatsApp não enviado: plano não premium ou sem telefone.")
+            return
+
         if not user_phone:
             print("⚠️ Usuário sem telefone cadastrado, WhatsApp não enviado.")
             return
 
-        # Formatação correta das keywords
+        # 🔠 Formatação das keywords
         keywords = monitoramento.keywords
         if isinstance(keywords, str):
             keywords_list = [kw.strip() for kw in keywords.split(",")]
@@ -1030,11 +1096,12 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
 
         keywords_formatted = "\n".join([f"`{kw}`" for kw in keywords_list])
 
+        # 📨 Mensagem completa
         activation_message = (
             f"> *MONITORAMENTO ATIVADO* ✅\n"
             f"\n"
             f"Olá, *{user_name}!* 👋\n"
-            f"Perfeito! Seu sistema de monitoramento está configurado e pronto para enviar as atualizações automaticamente.\n"
+            f"Perfeito! Seu sistema de monitoramento está configurado e pronto.\n"
             f"\n"
             f"📰 *DIÁRIO OFICIAL CONFIGURADO*\n"
             f"{monitoramento.official_gazette_link}\n"
@@ -1042,22 +1109,17 @@ async def send_whatsapp_notification(monitoramento: Monitoring, user_plan: str):
             f"🔠 *PALAVRA-CHAVE SENDO MONITORADA*\n"
             f"> {keywords_formatted}\n"
             f"\n"
-            f"A partir de agora, você não precisa fazer mais nada.\n"
-            f"Sempre que surgirem novas atualizações relacionadas à palavra-chave configurada, você será notificado.\n"
-            
+            f"A partir de agora, você não precisa fazer nada.\n"
+            f"Sempre que surgirem novas atualizações, você será notificado automaticamente. 🚀\n"
         )
 
-
+        # 📲 Envio seguro, com trava e delay
         await send_whatsapp_safe(user_phone, activation_message)
         print(f"📲 WhatsApp de ativação enviado para {user_phone}")
-
-        # ⏳ Delay fixo para não bloquear WhatsApp (evita ghost)
-        
 
     except Exception as e:
         print(f"❌ ERRO ao enviar WhatsApp de ativação: {e}")
 
-     
 @router.get("/teste-ultramsg")
 def teste_ultramsg():
     numero = "+5516994288026"  # seu número

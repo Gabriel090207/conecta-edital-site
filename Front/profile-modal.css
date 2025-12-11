@@ -687,7 +687,7 @@ footer {
   .pm-content.pm-large {
     /* 🔹 Ajuste automático da altura */
     height: auto;
-    max-height: 66vh;
+    max-height: 64vh;
     /* 🔹 Garante que não role internamente */
   
   }
@@ -723,7 +723,7 @@ footer {
   .pm-content.pm-large {
     /* 🔹 Ajuste automático da altura */
     height: auto;
-    max-height: 79vh;
+    max-height: 85vh;
     /* 🔹 Garante que não role internamente */
   
   }
@@ -740,7 +740,7 @@ footer {
   .pm-content.pm-large {
     /* 🔹 Ajuste automático da altura */
     height: auto;
-    max-height: 79vh;
+    max-height: 85vh;
     /* 🔹 Garante que não role internamente */
   
   }
@@ -757,7 +757,7 @@ footer {
   .pm-content.pm-large {
     /* 🔹 Ajuste automático da altura */
     height: auto;
-    max-height: 77vh;
+    max-height: 85vh;
     /* 🔹 Garante que não role internamente */
   
   }
@@ -774,7 +774,7 @@ footer {
   .pm-content.pm-large {
     /* 🔹 Ajuste automático da altura */
     height: auto;
-    max-height: 77vh;
+    max-height: 84vh;
     /* 🔹 Garante que não role internamente */
   
   }
@@ -784,4 +784,16 @@ footer {
     width: 21%;
 
   }
+}
+
+
+@media (max-width: 550px) {
+  .pm-content.pm-large {
+    /* 🔹 Ajuste automático da altura */
+    height: auto;
+    max-height: 89vh;
+    /* 🔹 Garante que não role internamente */
+  
+  }
+
 }
