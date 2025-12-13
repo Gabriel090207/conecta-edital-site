@@ -15,6 +15,62 @@ document.addEventListener("DOMContentLoaded", () => {
     // Elementos do formulário
     const authForm = document.getElementById('auth-form');
     const emailInput = document.getElementById('email-input');
+
+
+    // ===============================================
+// Esqueceu a senha (Reset via Firebase)
+// ===============================================
+
+const forgotPasswordLink = document.querySelector('.forgot-password-text');
+
+if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!window.auth) {
+            alert("Erro: sistema de autenticação não disponível.");
+            return;
+        }
+
+        const email = emailInput?.value.trim();
+
+        if (!email) {
+            alert("Por favor, digite seu e-mail para redefinir a senha.");
+            emailInput.focus();
+            return;
+        }
+
+        try {
+            await window.auth.sendPasswordResetEmail(email);
+        
+            alert(
+                "📧 Se existir uma conta com este e-mail, " +
+                "enviamos um link de redefinição de senha.\n\n" +
+                "Verifique sua caixa de entrada ou spam."
+            );
+        
+        } catch (error) {
+            console.error("Erro no reset de senha:", error);
+        
+            if (error.code === "auth/user-not-found") {
+                alert(
+                    "📧 Se existir uma conta com este e-mail, " +
+                    "enviamos um link de redefinição.\n\n" +
+                    "Caso tenha criado a conta com Google, use o botão 'Entrar com Google'."
+                );
+            } 
+            else if (error.code === "auth/invalid-email") {
+                alert("E-mail inválido.");
+            } 
+            else {
+                alert("Erro ao tentar redefinir a senha. Tente novamente.");
+            }
+        }
+        
+    });
+}
+
     const passwordInput = document.getElementById('password');
     const submitBtn = document.getElementById('submit-btn');
     const toggleModeLink = document.getElementById('toggle-mode');
@@ -146,11 +202,14 @@ document.querySelectorAll(".choose-plan-btn-index").forEach(btn => {
             if (contactInput) contactInput.required = true;
         }
         errorMessage.style.display = 'none';
-        emailInput.value = '';
-        passwordInput.value = '';
+
+        
         if (fullNameInput) fullNameInput.value = '';
         if (usernameInput) usernameInput.value = '';
         if (contactInput) contactInput.value = '';
+
+        if (passwordInput) passwordInput.value = '';
+
         attachPasswordToggleListeners();
     }
 
@@ -578,67 +637,6 @@ if (redirect) {
     });
 
 
-
-
-// === Função e evento do "Esqueceu a senha?" com detecção de login Google ===
-window.addEventListener('load', () => {
-    console.log("✅ Página carregada — configurando 'Esqueceu a senha'...");
-
-    const forgotPasswordLink = document.querySelector('.forgot-password-text');
-    const emailInput = document.getElementById('email-input');
-
-    if (!forgotPasswordLink) {
-        console.warn("⚠️ Elemento '.forgot-password-text' não encontrado no DOM.");
-        return;
-    }
-
-    forgotPasswordLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        if (!window.auth) {
-            alert("Erro: Firebase Auth não foi inicializado.");
-            console.error("Firebase Auth ausente.");
-            return;
-        }
-
-        const email = emailInput?.value.trim();
-        if (!email) {
-            alert("Por favor, insira seu e-mail antes de solicitar a redefinição de senha.");
-            emailInput?.focus();
-            return;
-        }
-
-        try {
-            // Verifica quais métodos de login existem para o e-mail digitado
-            const methods = await window.auth.fetchSignInMethodsForEmail(email);
-
-            if (methods.includes('password')) {
-                // Conta tradicional com e-mail e senha → envia redefinição normalmente
-                await window.auth.sendPasswordResetEmail(email);
-                alert(`📧 Um e-mail de redefinição foi enviado para: ${email}`);
-                console.log("E-mail de redefinição enviado com sucesso!");
-            } 
-            else if (methods.includes('google.com')) {
-                // Conta criada via Google → não tem senha para redefinir
-                alert('Esta conta usa login com Google. Use o botão "Entrar com Google" para acessar.');
-            } 
-            else if (methods.length === 0) {
-                alert('Nenhuma conta foi encontrada com este e-mail.');
-            } 
-            else {
-                alert('Este e-mail está vinculado a outro método de login.');
-            }
-
-        } catch (error) {
-            console.error("Erro ao processar redefinição:", error);
-            let message = "Ocorreu um erro ao enviar o e-mail de redefinição.";
-            if (error.code === "auth/invalid-email") {
-                message = "O e-mail informado é inválido.";
-            }
-            alert(message);
-        }
-    });
-});
 
 
 });
