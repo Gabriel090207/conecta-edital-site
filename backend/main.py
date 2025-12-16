@@ -2336,11 +2336,16 @@ async def create_faq(faq: FAQ):
 @app.get("/faq", response_model=List[FAQ])
 async def list_faqs():
     db = firestore.client()
-    # CORREÇÃO AQUI: Ordena por `popular` e depois por `data_criacao` para exibir no topo.
-    faqs_ref = db.collection('faq').order_by('popular', direction=firestore.Query.DESCENDING).order_by('data_criacao', direction=firestore.Query.DESCENDING)
+
+    faqs_ref = db.collection('faq').order_by(
+        'data_criacao',
+        direction=firestore.Query.DESCENDING
+    )
+
     faqs_list = []
     for doc in faqs_ref.stream():
         faqs_list.append(FAQ(id=doc.id, **doc.to_dict()))
+
     return faqs_list
 
 @app.put("/faq/{faq_id}", response_model=FAQ)
