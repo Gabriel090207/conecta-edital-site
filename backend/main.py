@@ -72,7 +72,8 @@ origins = [
     "http://localhost:5500",
     "https://conecta-edital-site-927y.onrender.com",
     "https://paineldeadminconectaedital.netlify.app",
-    "https://siteconectaedital.netlify.app"
+    "https://siteconectaedital.netlify.app",
+    "https://conectaedital.com.br"
 ]
 
 app.add_middleware(
