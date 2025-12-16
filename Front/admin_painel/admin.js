@@ -273,7 +273,8 @@ if (userSearchInput) {
             allTickets = await response.json();
             
             // Chama a função de filtro ao carregar os tickets
-            applyFilters();
+            applyTicketFilters();
+
 
         } catch (error) {
             console.error("Erro ao carregar tickets:", error);
@@ -293,51 +294,44 @@ if (userSearchInput) {
     }
 
     // Função para aplicar todos os filtros (busca e status)
-    function applyFilters() {
-        const searchTerm = ticketSearchAdminInput ? ticketSearchAdminInput.value.trim() : '';
-        // NOVO: Pega o valor do seletor customizado
-        const selectedStatus = ticketStatusFilterValue; 
-        
-        let filteredTickets = [...allTickets];
-        
-        // Aplica o filtro de busca
-        if (searchTerm) {
-            const normalizedSearchTerm = normalizeString(searchTerm);
-            filteredTickets = filteredTickets.filter(ticket =>
-                normalizeString(ticket.subject).includes(normalizedSearchTerm) ||
-                normalizeString(ticket.id).includes(normalizedSearchTerm) ||
-                (ticket.messages && ticket.messages.some(msg => normalizeString(msg.text).includes(normalizedSearchTerm)))
-            );
-        }
-
-        // Aplica o filtro de status
-        if (selectedStatus !== 'Todos') {
-            filteredTickets = filteredTickets.filter(ticket => ticket.status === selectedStatus);
-        }
-        
-        renderTicketsList(filteredTickets);
-    }
+    function applyTicketFilters() {
+    const searchTerm = ticketSearchAdminInput ? ticketSearchAdminInput.value.trim() : '';
+    const selectedStatus = ticketStatusFilterValue; 
     
-
-    // Função de filtro para pesquisar usuários por e-mail ou nome
-function applyFilters() {
-    const searchTerm = userSearchInput ? userSearchInput.value.trim() : ''; // Pega o valor da pesquisa no campo de busca de usuários
-
-    // Inicializa a lista de usuários filtrados a partir de todos os usuários carregados
-    let filteredUsers = [...allUsers]; // Usamos allUsers, que é onde todos os usuários estão armazenados
-
-    // Aplica o filtro de busca se o usuário digitou algo
+    let filteredTickets = [...allTickets];
+    
     if (searchTerm) {
-        const normalizedSearchTerm = normalizeString(searchTerm); // Normaliza o texto para uma busca mais eficiente
-
-        // Filtra os usuários pelo e-mail ou nome completo
-        filteredUsers = filteredUsers.filter(user =>
-            normalizeString(user.email).includes(normalizedSearchTerm) || // Verifica se o e-mail contém o termo de busca
-            normalizeString(user.full_name).includes(normalizedSearchTerm) // Verifica se o nome completo contém o termo de busca
+        const normalizedSearchTerm = normalizeString(searchTerm);
+        filteredTickets = filteredTickets.filter(ticket =>
+            normalizeString(ticket.subject).includes(normalizedSearchTerm) ||
+            normalizeString(ticket.id).includes(normalizedSearchTerm) ||
+            (ticket.messages && ticket.messages.some(msg => normalizeString(msg.text).includes(normalizedSearchTerm)))
         );
     }
 
-    // Chama a função de renderização para exibir os usuários filtrados
+    if (selectedStatus !== 'Todos') {
+        filteredTickets = filteredTickets.filter(ticket => ticket.status === selectedStatus);
+    }
+    
+    renderTicketsList(filteredTickets);
+}
+
+    
+
+    // Função de filtro para pesquisar usuários por e-mail ou nome
+function applyUserFilters() {
+    const searchTerm = userSearchInput ? userSearchInput.value.trim() : '';
+
+    let filteredUsers = [...allUsers];
+
+    if (searchTerm) {
+        const normalizedSearchTerm = normalizeString(searchTerm);
+        filteredUsers = filteredUsers.filter(user =>
+            normalizeString(user.email).includes(normalizedSearchTerm) ||
+            normalizeString(user.full_name).includes(normalizedSearchTerm)
+        );
+    }
+
     renderUserList(filteredUsers);
 }
 
@@ -1176,7 +1170,7 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
     if (ticketSearchAdminInput) {
         ticketSearchAdminInput.addEventListener('input', (e) => {
             // NOVO: Chama a função unificada de filtros
-            applyFilters();
+            applyTicketFilters();
         });
     }
 
@@ -1216,7 +1210,8 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
                 selectItemsContainer.classList.add('select-hide'); // Esconde a lista
                 selectSelected.classList.remove('select-arrow-active'); // Remove a classe de ativo do cabeçalho
                 
-                applyFilters(); // Aplica o filtro após a seleção
+                applyTicketFilters();
+// Aplica o filtro após a seleção
             });
         });
 
@@ -1573,7 +1568,8 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
                 allTickets = newTickets; 
                 
                 // NOVO: Chama a função unificada de filtros
-                applyFilters();
+                applyTicketFilters();
+
 
                 if (ticketDetailModal.classList.contains('show-modal') && currentViewingTicket) {
                     const updatedTicket = allTickets.find(t => t.id === currentViewingTicket.id);

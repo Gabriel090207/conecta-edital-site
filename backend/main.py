@@ -2411,26 +2411,40 @@ async def record_faq_view(faq_id: str):
 @app.post("/popular_faqs/{faq_id}/visualizacao")
 async def record_popular_faq_view(faq_id: str):
     db = firestore.client()
-    stats_doc_ref = db.collection('popular_faqs_stats').document(faq_id)
-    
+    stats_doc_ref = db.collection("popular_faqs_stats").document(faq_id)
+
     @firestore.transactional
-    def update_in_transaction(transaction, doc_ref):
-        snapshot = doc_ref.get(transaction=transaction)
-        
-        visualizacoes_atuais = snapshot.get('visualizacoes') or 0
-        novas_visualizacoes = visualizacoes_atuais + 1
-        
-        transaction.set(doc_ref, {'visualizacoes': novas_visualizacoes, 'last_updated': firestore.SERVER_TIMESTAMP})
+    def update_in_transaction(transaction):
+        snapshot = stats_doc_ref.get(transaction=transaction)
+
+        if snapshot.exists:
+            visualizacoes_atuais = snapshot.get("visualizacoes") or 0
+            novas_visualizacoes = visualizacoes_atuais + 1
+        else:
+            novas_visualizacoes = 1
+
+        transaction.set(
+            stats_doc_ref,
+            {
+                "visualizacoes": novas_visualizacoes,
+                "last_updated": firestore.SERVER_TIMESTAMP
+            },
+            merge=True
+        )
+
         return novas_visualizacoes
 
     try:
         transaction = db.transaction()
-        novas_visualizacoes = update_in_transaction(transaction, stats_doc_ref)
+        novas_visualizacoes = update_in_transaction(transaction)
         return {"visualizacoes": novas_visualizacoes}
-    
+
     except Exception as e:
-        print(f"ERRO: Falha ao atualizar visualização do FAQ popular. Erro: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno do servidor.")
+        print("❌ ERRO ao registrar visualização do FAQ:", e)
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao registrar visualização do FAQ"
+        )
 
 # ========================================================================================================
 #       NOVA ROTA PARA OBTER ESTATÍSTICAS
