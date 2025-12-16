@@ -2321,21 +2321,18 @@ async def record_article_view(article_id: str):
 @app.post("/faq", response_model=FAQ, status_code=201)
 async def create_faq(faq: FAQ):
     db = firestore.client()
+
     faq_dict = faq.dict(exclude_unset=True)
-    
-    # Use firestore.SERVER_TIMESTAMP para a data de criação
-    faq_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
-    
-    _, doc_ref = db.collection('faq').add(faq_dict)
-    
-    # Obtenha o documento recém-criado para ter a data real do servidor
+
+    faq_dict.update({
+        "data_criacao": firestore.SERVER_TIMESTAMP,
+        "visualizacoes": 0  # 🔥 ESSENCIAL
+    })
+
+    _, doc_ref = db.collection("faq").add(faq_dict)
     new_doc = doc_ref.get()
-    
-    if new_doc.exists:
-        new_faq = FAQ(id=new_doc.id, **new_doc.to_dict())
-        return new_faq
-    else:
-        raise HTTPException(status_code=500, detail="Erro ao buscar o documento recém-criado.")
+
+    return FAQ(id=new_doc.id, **new_doc.to_dict())
 
 @app.get("/faq", response_model=List[FAQ])
 async def list_faqs():

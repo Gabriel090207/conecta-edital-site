@@ -314,10 +314,17 @@ const response = await fetch(`${BACKEND_URL}/chat`, {
                     
                     const faqId = item.dataset.id;
                     if (faqId) {
-                        recordFaqView(faqId);
+                       if (!item.dataset.viewed) {
+    recordFaqView(faqId);
+    item.dataset.viewed = "true";
+}
+
                         const viewsSpan = item.querySelector('.faq-meta .views-counter');
-                        let currentViews = parseInt(viewsSpan.textContent.match(/\d+/)[0]);
-                        viewsSpan.innerHTML = `<i class="fas fa-eye eye-personal"></i> ${currentViews + 1} visualizações`;
+                        const match = viewsSpan.textContent.match(/\d+/);
+let currentViews = match ? parseInt(match[0], 10) : 0;
+
+viewsSpan.innerHTML = `<i class="fas fa-eye eye-personal"></i> ${currentViews + 1} visualizações`;
+
                     }
                 }
             });
