@@ -1630,39 +1630,43 @@ async def test_monitoring_endpoint(
 #       ROTAS DE SUPORTE
 # ========================================================================================================
 
-@app.get("/api/tickets", response_model=List[Ticket])
-async def list_user_tickets(user_uid: str = Depends(get_current_user_uid)):
+@app.get("/api/tickets")
+async def list_user_tickets(
+    user_uid: str = Depends(get_current_user_uid)
+):
     db = firestore.client()
-    tickets_ref = db.collection('tickets').where(filter=FieldFilter('user_uid', '==', user_uid)).order_by('last_updated_at', direction=firestore.Query.DESCENDING)
-    
+
+    tickets_ref = db.collection("tickets").where(
+        filter=FieldFilter("user_uid", "==", user_uid)
+    )
+
     tickets_list = []
+
     for doc in tickets_ref.stream():
         ticket_data = doc.to_dict()
-        
-        # Converte o timestamp do Firestore para o formato ISO
-        if 'created_at' in ticket_data and ticket_data['created_at']:
-            ticket_data['created_at'] = ticket_data['created_at'].isoformat()
-        if 'last_updated_at' in ticket_data and ticket_data['last_updated_at']:
-            ticket_data['last_updated_at'] = ticket_data['last_updated_at'].isoformat()
-        
-        if 'messages' in ticket_data and isinstance(ticket_data['messages'], list):
-            for message in ticket_data['messages']:
-                if isinstance(message.get('timestamp'), datetime):
-                    message['timestamp'] = message['timestamp'].isoformat()
 
-        # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
-                # Adiciona o campo 'category' com um valor padrão para tickets antigos, se necessário
-        if 'category' not in ticket_data:
-            ticket_data['category'] = 'Outros'
+        if isinstance(ticket_data.get("created_at"), datetime):
+            ticket_data["created_at"] = ticket_data["created_at"].isoformat()
 
-        # Garante que o campo 'assignee' sempre exista
-        if 'assignee' not in ticket_data or not ticket_data['assignee']:
-            ticket_data['assignee'] = 'Não Atribuído'
+        if isinstance(ticket_data.get("last_updated_at"), datetime):
+            ticket_data["last_updated_at"] = ticket_data["last_updated_at"].isoformat()
 
+        if isinstance(ticket_data.get("messages"), list):
+            for message in ticket_data["messages"]:
+                if isinstance(message.get("timestamp"), datetime):
+                    message["timestamp"] = message["timestamp"].isoformat()
 
-        tickets_list.append(Ticket(id=doc.id, **ticket_data))
+        ticket_data.setdefault("category", "Outros")
+        ticket_data.setdefault("assignee", "Não Atribuído")
+        ticket_data.setdefault("status", "Pendente")
+
+        tickets_list.append({
+            "id": doc.id,
+            **ticket_data
+        })
 
     return tickets_list
+
 
 # --- FUNÇÃO PARA GERAR ID DO TICKET ---
 def generate_ticket_id() -> str:
