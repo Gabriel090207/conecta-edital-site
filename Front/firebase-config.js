@@ -2,13 +2,13 @@
 
 // Suas configurações do Firebase que você copiou do console
 const firebaseConfig = {
-    apiKey: "AIzaSyAaKKRHcQqsfjLjPczsgxJhnjfyY4cclkQ",
-    authDomain: "conectaeditalapp.firebaseapp.com",
-    projectId: "conectaeditalapp",
-    storageBucket: "conectaeditalapp.firebasestorage.app",
-    messagingSenderId: "1057915288128",
-    appId: "1:1057915288128:web:30799f8972115a48173da5",
-    measurementId: "G-ZG4JPW6X3B"
+  apiKey: "AIzaSyCyGbbwPzPZgH4TL2KM8PFSKMzhvn-eT2o",
+  authDomain: "conecta-edital.firebaseapp.com",
+  projectId: "conecta-edital",
+  storageBucket: "conecta-edital.firebasestorage.app",
+  messagingSenderId: "71801719922",
+  appId: "1:71801719922:web:21c5b45efd7b37a34ec6eb",
+  measurementId: "G-T191Z3VHRM"
 };
 
 // Inicializa o Firebase e armazena a referência em uma variável global

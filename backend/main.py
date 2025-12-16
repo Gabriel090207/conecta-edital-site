@@ -65,6 +65,24 @@ app = FastAPI(
     version="0.1.0"
 )
 
+# Configuração do CORS
+origins = [
+    "http://127.0.0.1:5500",
+    "http://127.0.0.1:5501",
+    "http://localhost:5500",
+    "https://conecta-edital-site-927y.onrender.com",
+    "https://paineldeadminconectaedital.netlify.app",
+    "https://siteconectaedital.netlify.app"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 app.include_router(subscriptions_router)
 app.include_router(mp_webhook_router)
@@ -193,23 +211,7 @@ async def send_message(to_number: str, message: str):
     response = send_whatsapp_zapi(to_number, message)
     return response
 
-# Configuração do CORS
-origins = [
-    "http://127.0.0.1:5500",
-    "http://127.0.0.1:5501",
-    "http://localhost:5500",
-    "https://conecta-edital-site-927y.onrender.com",
-    "https://paineldeadminconectaedital.netlify.app",
-    "https://siteconectaedital.netlify.app"
-]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # ====================== CHAT IA GEMINI ======================
 
