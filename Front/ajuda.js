@@ -279,7 +279,10 @@ const response = await fetch(`${BACKEND_URL}/chat`, {
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-meta">
-                    <span class="views-counter" data-faq-id="${faq.id}"><i class="fas fa-eye eye-personal"></i> ${faq.visualizacoes} visualizações</span>
+                    <span class="views-counter" data-faq-id="${faq.id}">
+  <i class="fas fa-eye eye-personal"></i> ${faq.visualizacoes ?? 0} visualizações
+</span>
+
                     ${popularTagHtml}
                 </div>
                 <div class="faq-answer">

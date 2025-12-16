@@ -2374,35 +2374,38 @@ async def delete_faq(faq_id: str):
     return
 
 @app.post("/faq/{faq_id}/visualizacao")
-async def record_faq_view(faq_id: str):
+async def registrar_visualizacao_faq(faq_id: str):
     db = firestore.client()
-    faq_doc_ref = db.collection('faq').document(faq_id)
-    
-    # Usamos uma transação para garantir que a leitura e a atualização sejam atômicas
+    faq_ref = db.collection("faq").document(faq_id)
+
     @firestore.transactional
-    def update_in_transaction(transaction, doc_ref):
-        snapshot = doc_ref.get(transaction=transaction)
+    def atualizar_visualizacao(transaction):
+        snapshot = faq_ref.get(transaction=transaction)
+
         if not snapshot.exists:
-            raise HTTPException(status_code=404, detail="FAQ não encontrado")
-        
-        visualizacoes_atuais = snapshot.get('visualizacoes') or 0
+            raise Exception("FAQ não encontrado")
+
+        visualizacoes_atuais = snapshot.get("visualizacoes") or 0
         novas_visualizacoes = visualizacoes_atuais + 1
-        transaction.update(doc_ref, {'visualizacoes': novas_visualizacoes})
+
+        transaction.update(
+            faq_ref,
+            {
+                "visualizacoes": novas_visualizacoes,
+                "ultima_visualizacao": firestore.SERVER_TIMESTAMP
+            }
+        )
+
         return novas_visualizacoes
-    
+
     try:
-        # Executa a transação
         transaction = db.transaction()
-        novas_visualizacoes = update_in_transaction(transaction, faq_doc_ref)
-        
-        # Retorna o novo número de visualizações
-        return {"visualizacoes": novas_visualizacoes}
-    
-    except HTTPException:
-        raise
+        total = atualizar_visualizacao(transaction)
+        return {"visualizacoes": total}
+
     except Exception as e:
-        print(f"ERRO: Falha ao atualizar visualização do FAQ. Erro: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno do servidor.")
+        print("Erro ao registrar visualização do FAQ:", e)
+        raise HTTPException(status_code=500, detail="Erro ao registrar visualização")
 
 
 # ========================================================================================================
