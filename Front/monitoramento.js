@@ -188,6 +188,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function createMonitoringItemHTML(mon) {
+    console.log(
+      "🧪 Renderizando monitoramento:",
+      mon.id,
+      "last_checked_at =",
+      mon.last_checked_at
+    );
+    
     const itemCard = document.createElement("div");
     itemCard.classList.add("monitoramento-item-card");
     itemCard.dataset.id = mon.id;
@@ -248,14 +255,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     -1px  1px 0 #230094ff,
                      1px  1px 0 #230094ff;">
                 </i>
-                <span>Última Verificação</span>
-               <p><strong>${
-  lastCronRunAt
-    ? new Date(lastCronRunAt).toLocaleString("pt-BR", {
+               <span>Última Verificação</span>
+<p><strong>${
+  mon.last_checked_at
+    ? new Date(mon.last_checked_at).toLocaleString("pt-BR", {
         timeZone: "America/Sao_Paulo"
       })
-    : "Aguardando primeira execução"
+    : "Aguardando primeira verificação"
 }</strong></p>
+
 
 
             </div>
@@ -724,16 +732,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const statusData = await responseStatus.json();
-      const monitoramentosList = await responseMonitorings.json();
-      
-      lastCronRunAt = await fetchCronStatus();
+const monitoramentosList = await responseMonitorings.json();
 
-    
-      currentStatusData = statusData;
-      currentMonitorings = monitoramentosList;
+// 🔥 BUSCA O HORÁRIO DO CRON ANTES DE RENDERIZAR
+lastCronRunAt = await fetchCronStatus();
 
-      updateSummaryCards(statusData);
-      loadMonitorings(monitoramentosList);
+currentStatusData = statusData;
+currentMonitorings = monitoramentosList;
+
+// 🔁 Agora renderiza tudo com o horário correto
+updateSummaryCards(statusData);
+loadMonitorings(monitoramentosList);
+
       fetchUserProfile();
 
       // ⚡️ Reaplica favoritos depois de carregar os cards
@@ -1623,6 +1633,40 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   let pollingInterval;
+
+  // 🔁 Atualiza somente o horário da última verificação
+// 🔁 Atualiza somente o horário da última verificação (VERSÃO CORRIGIDA)
+async function refreshCronTimeOnly() {
+  const newCronTimeRaw = await fetchCronStatus();
+  if (!newCronTimeRaw) return;
+
+  // 🔥 Converte sempre para timestamp numérico
+  const newCronTimestamp = new Date(newCronTimeRaw).getTime();
+  const lastCronTimestamp = lastCronRunAt
+    ? new Date(lastCronRunAt).getTime()
+    : null;
+
+  // Se for o mesmo horário, não faz nada
+  if (lastCronTimestamp === newCronTimestamp) return;
+
+  // Atualiza estado global
+  lastCronRunAt = newCronTimeRaw;
+
+  // Atualiza somente o texto no DOM
+  document
+    .querySelectorAll(".detail-verificacao p strong")
+    .forEach((el) => {
+      el.textContent = new Date(newCronTimestamp).toLocaleString("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+      });
+    });
+
+  console.log(
+    "⏱️ Horário da última verificação atualizado:",
+    new Date(newCronTimestamp).toLocaleString("pt-BR")
+  );
+}
+
   async function checkMonitoringsForUpdates() {
     const user = window.auth.currentUser;
     if (!user) {
@@ -1658,9 +1702,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   if (!pollingInterval) {
-    pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
+    pollingInterval = setInterval(() => {
+      checkMonitoringsForUpdates();
+      refreshCronTimeOnly(); // 🕒 novo
+    }, 5000);
   }
-
+  
   // NOVA LÓGICA: Edição de nome de usuário no local
   function handleEditUsername() {
     const usernameDisplay = document.getElementById("profile-username-display");
@@ -2060,10 +2107,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Reinicia polling depois de 6s
         if (pollingInterval) {
           clearInterval(pollingInterval);
-          pollingInterval = null;
-          setTimeout(() => {
-            pollingInterval = setInterval(checkMonitoringsForUpdates, 5000);
-          }, 6000);
+          pollingInterval = setInterval(() => {
+            checkMonitoringsForUpdates();
+            refreshCronTimeOnly();
+          }, 5000);
+          
         }
       } else {
         const err = await response.json();

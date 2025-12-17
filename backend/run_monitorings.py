@@ -1,22 +1,15 @@
-import asyncio
-from datetime import datetime, timezone
-from firebase_admin import firestore
+import requests
 
-from monitor_core import run_all_monitorings_core
+URL = "https://conecta-edital-site-927y.onrender.com/run-monitorings-cron"
 
-db = firestore.client()
-
-def salvar_status_cron():
-    db.collection("system").document("cron_status").set(
-        {
-            "last_run_at": datetime.now(timezone.utc)
-        },
-        merge=True
-    )
-
-async def main_task():
-    salvar_status_cron()
-    await run_all_monitorings_core()
+def main():
+    try:
+        print("🚀 Chamando endpoint oficial de monitoramentos...")
+        r = requests.get(URL, timeout=600)
+        print("✅ Status:", r.status_code)
+        print("📄 Resposta:", r.text)
+    except Exception as e:
+        print("❌ Erro ao chamar o endpoint:", e)
 
 if __name__ == "__main__":
-    asyncio.run(main_task())
+    main()
