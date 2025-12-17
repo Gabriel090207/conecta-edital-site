@@ -228,12 +228,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 </i>
                 <span>Última Verificação</span>
                 <p><strong>${
-  mon.last_checked
-    ? new Date(mon.last_checked).toLocaleString("pt-BR", {
+  mon.last_checked_at
+    ? new Date(mon.last_checked_at).toLocaleString("pt-BR", {
         timeZone: "America/Sao_Paulo"
       })
     : "Nunca verificado"
 }</strong></p>
+
 
             </div>
     

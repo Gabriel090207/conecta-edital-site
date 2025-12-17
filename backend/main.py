@@ -291,7 +291,7 @@ class Monitoring(BaseModel):
     candidate_name: Optional[str] = None
     cpf: Optional[str] = None
     keywords: Union[str, List[str]]  # ✅ aceita string ou lista
-    last_checked: datetime | None = None
+    last_checked_at: datetime | None = None
     last_pdf_hash: Optional[str] = None
     occurrences: int = 0
     status: str = "inactive"
@@ -1053,32 +1053,35 @@ async def run_all_monitorings():
     Executa verificações automáticas de TODOS os monitoramentos ativos.
     """
     print("🚀 Executando verificação automática de todos os monitoramentos ativos...")
+
     db = firestore.client()
-    monitorings_ref = db.collection('monitorings').where('status', '==', 'active')
+    monitorings_ref = db.collection("monitorings").where("status", "==", "active")
     docs = monitorings_ref.stream()
 
     tasks = []
+
     for doc in docs:
-       
         data = doc.to_dict()
 
-        created_at = data.pop("created_at", datetime.now())
-        last_checked_at = data.pop("last_checked_at", datetime.now())
+        # 🔴 IMPORTANTE: NÃO usar datetime.now() como fallback aqui
+        created_at = data.pop("created_at", None)
+        last_checked_at = data.pop("last_checked_at", None)
 
         monitoring = Monitoring(
             id=doc.id,
             **data,
-            created_at=created_at,
+            created_at=created_at or datetime.now(timezone.utc),
             last_checked_at=last_checked_at
         )
 
         tasks.append(perform_monitoring_check(monitoring))
 
-    # Executa todos os monitoramentos em paralelo (sem travar)
+    # Executa todos os monitoramentos em paralelo
     await asyncio.gather(*tasks, return_exceptions=True)
+
     print("✅ Verificação automática concluída com sucesso.")
 
-    # Loga execução no Firestore (opcional)
+    # (Opcional) Log da execução do cron
     try:
         db.collection("system_logs").add({
             "type": "cron_check",
@@ -1087,7 +1090,6 @@ async def run_all_monitorings():
         })
     except Exception as e:
         print(f"⚠️ Erro ao salvar log da verificação: {e}")
-
 
 # Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
 # Função para enviar notificação quando monitoramento é ativado (somente para usuários PREMIUM)
