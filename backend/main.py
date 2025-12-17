@@ -1045,6 +1045,49 @@ async def create_notification(user_uid: str, type_: str, title: str, message: st
 # ===============================================================
 # 🕒 NOVO AGENDADOR DE VERIFICAÇÕES (05:45 e 23:45)
 # ===============================================================
+from fastapi import HTTPException
+from datetime import timezone
+
+@app.get("/api/cron-status")
+async def get_cron_status():
+    """
+    Retorna o último horário em que o cron rodou (independente de ocorrência).
+    """
+    try:
+        db = firestore.client()
+
+        doc_ref = db.collection("system").document("cron_status")
+        doc = doc_ref.get()
+
+        if not doc.exists:
+            raise HTTPException(
+                status_code=404,
+                detail="Status do cron ainda não registrado."
+            )
+
+        data = doc.to_dict()
+        last_run_at = data.get("last_run_at")
+
+        if not last_run_at:
+            raise HTTPException(
+                status_code=404,
+                detail="Campo last_run_at não encontrado."
+            )
+
+        # 🔹 Converte para ISO string (ideal pro front)
+        if isinstance(last_run_at, datetime):
+            last_run_at = last_run_at.astimezone(timezone.utc).isoformat()
+
+        return {
+            "last_run_at": last_run_at
+        }
+
+    except Exception as e:
+        print("❌ Erro ao buscar cron_status:", e)
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao buscar status do cron."
+        )
 
 scheduler = AsyncIOScheduler()
 
