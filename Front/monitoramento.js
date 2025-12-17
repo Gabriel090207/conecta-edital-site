@@ -108,6 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- VARIÁVEL GLOBAL PARA ARMAZENAR OS DADOS DO DASHBOARD ---
   let currentMonitorings = [];
   let currentStatusData = {};
+ let lastCronRunAt = null;
+
 
   // --- Funções Auxiliares de UI ---
   function openModal(modalElement) {
@@ -164,6 +166,26 @@ document.addEventListener("DOMContentLoaded", () => {
   function showUpgradeAlert() {
     window.location.href = "planos.html";
   }
+
+  async function fetchCronStatus() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/cron-status`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar status do cron");
+    }
+
+    const data = await response.json();
+
+    return data.last_run_at || null;
+  } catch (error) {
+    console.error("❌ Erro ao buscar cron-status:", error);
+    return null;
+  }
+}
+
 
   function createMonitoringItemHTML(mon) {
     const itemCard = document.createElement("div");
@@ -227,12 +249,12 @@ document.addEventListener("DOMContentLoaded", () => {
                      1px  1px 0 #230094ff;">
                 </i>
                 <span>Última Verificação</span>
-                <p><strong>${
-  mon.last_checked_at
-    ? new Date(mon.last_checked_at).toLocaleString("pt-BR", {
+               <p><strong>${
+  lastCronRunAt
+    ? new Date(lastCronRunAt).toLocaleString("pt-BR", {
         timeZone: "America/Sao_Paulo"
       })
-    : "Nunca verificado"
+    : "Aguardando primeira execução"
 }</strong></p>
 
 
@@ -703,7 +725,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const statusData = await responseStatus.json();
       const monitoramentosList = await responseMonitorings.json();
+      
+      lastCronRunAt = await fetchCronStatus();
 
+    
       currentStatusData = statusData;
       currentMonitorings = monitoramentosList;
 
