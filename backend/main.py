@@ -375,8 +375,10 @@ class Article(BaseModel):
     autor: str
     topico: str
     conteudo: str
+    capa_url: Optional[str] = None  # 🔥 NOVO
     data_criacao: datetime = Field(default_factory=datetime.now)
     visualizacoes: int = 0
+
 
 
 # NOVO MODELO PARA FAQ
@@ -422,6 +424,26 @@ class AdminProfileUpdate(BaseModel):
         allow_population_by_alias = True
 
 
+def upload_article_image(file: UploadFile) -> str:
+    """
+    Faz upload da imagem da capa no Firebase Storage
+    e retorna a URL pública.
+    """
+    bucket = storage.bucket()
+
+    file_ext = file.filename.split(".")[-1]
+    filename = f"articles/{uuid.uuid4()}.{file_ext}"
+
+    blob = bucket.blob(filename)
+    blob.upload_from_file(
+        file.file,
+        content_type=file.content_type
+    )
+
+    # Torna público
+    blob.make_public()
+
+    return blob.public_url
 
 
 # Quando você detectar uma nova ocorrência e ativar o monitoramento
@@ -2230,39 +2252,49 @@ async def record_dica_view(dica_id: str):
 #       ROTAS PARA ARTIGOS DO BLOG
 # ========================================================================================================
 @app.post("/articles", response_model=Article, status_code=201)
-async def create_article(article: Article):
+async def create_article(
+    titulo: str = Form(...),
+    autor: str = Form(...),
+    topico: str = Form(...),
+    conteudo: str = Form(...),
+    capa: UploadFile | None = File(None)  # 🔥 IMAGEM
+):
     db = firestore.client()
-    article_dict = article.dict(exclude_unset=True)
-    article_dict['data_criacao'] = firestore.SERVER_TIMESTAMP
 
-    # 🔹 Cria o artigo no Firestore
-    _, doc_ref = db.collection('articles').add(article_dict)
+    capa_url = None
+
+    # 🔹 Se imagem foi enviada
+    if capa:
+        capa_url = upload_article_image(capa)
+
+    article_dict = {
+        "titulo": titulo,
+        "autor": autor,
+        "topico": topico,
+        "conteudo": conteudo,
+        "capa_url": capa_url,
+        "visualizacoes": 0,
+        "data_criacao": firestore.SERVER_TIMESTAMP
+    }
+
+    _, doc_ref = db.collection("articles").add(article_dict)
     new_doc = doc_ref.get()
 
-    # 🔹 Verifica se o documento foi criado com sucesso
-    if new_doc.exists:
-        new_article = Article(id=new_doc.id, **new_doc.to_dict())
+    new_article = Article(id=new_doc.id, **new_doc.to_dict())
 
-        # 🔔 Envia notificação para todos os usuários
-        users = db.collection("users").stream()
-        for user in users:
-            await create_notification(
-                user_uid=user.id,
-                type_="novo_artigo",
-                title="📰 Novo artigo publicado!",
-                message=f"{new_article.titulo}",
-                link="/blog"
-            )
-            print(f"✅ Notificação enviada para {user.id}")
-
-        return new_article
-
-    # 🔹 Caso o documento não exista (erro no Firestore)
-    else:
-        raise HTTPException(
-            status_code=500,
-            detail="Erro ao buscar o documento recém-criado."
+    # 🔔 Notificação
+    users = db.collection("users").stream()
+    for user in users:
+        await create_notification(
+            user_uid=user.id,
+            type_="novo_artigo",
+            title="📰 Novo artigo publicado!",
+            message=new_article.titulo,
+            link="/blog"
         )
+
+    return new_article
+
 
 @app.get("/articles", response_model=List[Article])
 async def list_articles():

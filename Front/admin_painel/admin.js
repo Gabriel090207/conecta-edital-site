@@ -143,6 +143,7 @@ if (userSearchInput) {
     const blogTitleInput = document.getElementById('blog-title');
     const blogAuthorInput = document.getElementById('blog-author');
     const blogContentTextarea = document.getElementById('blog-content');
+    const blogImageInput = document.getElementById('blog-image');
 
     // NOVAS REFERÊNCIAS DO MODAL DE EDIÇÃO DE USUÁRIO
     const userEditModal = document.getElementById('user-edit-modal');
@@ -1484,47 +1485,52 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
     }
     
     if (blogForm) {
-        blogForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = blogIdInput.value;
-            const method = id ? 'PUT' : 'POST';
-            const url = id ? `${BACKEND_URL}/articles/${id}` : `${BACKEND_URL}/articles`;
-            
-            const conteudo = blogContentTextarea.value;
-            const tempoLeitura = calcularTempoDeLeitura(conteudo);
+    blogForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const articleData = {
-                titulo: blogTitleInput.value,
-                autor: blogAuthorInput.value,
-                topico: "Notícias", // Valor fixo
-                conteudo: conteudo,
-                tempo_leitura: tempoLeitura, // Adiciona o tempo de leitura
-            };
+        const id = blogIdInput.value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id
+            ? `${BACKEND_URL}/articles/${id}`
+            : `${BACKEND_URL}/articles`;
 
-            try {
-                const response = await fetch(url, {
-                    method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Removido cabeçalho de autorização para esta rota
-                    },
-                    body: JSON.stringify(articleData),
-                });
+        const conteudo = blogContentTextarea.value;
+        const tempoLeitura = calcularTempoDeLeitura(conteudo);
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        // ✅ FormData permite texto + arquivo
+        const formData = new FormData();
 
-                closeModal(blogFormModal);
-                loadArticles();
-                alert(`Artigo ${id ? 'editado' : 'criado'} com sucesso!`);
-            } catch (error) {
-                console.error("Erro ao salvar artigo:", error);
-                alert("Erro ao salvar artigo. Tente novamente.");
+        formData.append("titulo", blogTitleInput.value);
+        formData.append("autor", blogAuthorInput.value);
+        formData.append("topico", "Notícias");
+        formData.append("conteudo", conteudo);
+        formData.append("tempo_leitura", tempoLeitura);
+
+        // 📸 imagem (se existir)
+        if (blogImageInput && blogImageInput.files.length > 0) {
+            formData.append("imagem", blogImageInput.files[0]);
+        }
+
+        try {
+            const response = await fetch(url, {
+                method,
+                body: formData
+            });
+
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error(err);
             }
-        });
-    }
+
+            closeModal(blogFormModal);
+            loadArticles();
+            alert(`Artigo ${id ? 'editado' : 'criado'} com sucesso!`);
+        } catch (error) {
+            console.error("Erro ao salvar artigo:", error);
+            alert("Erro ao salvar artigo.");
+        }
+    });
+}
 
 
     // Iniciar carregamento de estatísticas e tickets ao carregar a página
