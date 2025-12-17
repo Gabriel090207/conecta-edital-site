@@ -1,18 +1,14 @@
-# monitor_core.py
-
 from firebase_admin import firestore
-from main import perform_monitoring_check   # NÃO ALTERAR
+from main import perform_monitoring_check, Monitoring
 import asyncio
+from datetime import datetime, timezone
 
 db = firestore.client()
-
 
 async def run_all_monitorings_core():
     print("🚀 Iniciando verificação geral...")
 
-    # 🔥 Busca TODOS os monitoramentos ativos
     docs = db.collection('monitorings').stream()
-
     count = 0
 
     async def process(doc):
@@ -22,7 +18,6 @@ async def run_all_monitorings_core():
         if not data:
             return
 
-        # ❗ Agora só pula se estiver claramente inativo
         if data.get("status") in ["inactive", "inativo", "disabled"]:
             return
 
@@ -30,28 +25,27 @@ async def run_all_monitorings_core():
         print(f"🔍 Verificando monitoramento: {doc.id} | Tipo: {data.get('monitoring_type')}")
 
         try:
-            await perform_monitoring_check(doc.id, data)
+            monitoring = Monitoring(
+                id=doc.id,
+                **data,
+                created_at=data.get("created_at") or datetime.now(timezone.utc),
+                last_checked_at=data.get("last_checked_at")
+            )
+
+            await perform_monitoring_check(monitoring)
+
         except Exception as e:
             print(f"❗Erro ao verificar {doc.id}: {str(e)}")
 
-        # 🕒 Atualiza última verificação SEMPRE (teve ocorrência ou não)
-        try:
-            db.collection('monitorings').document(doc.id).update({
-                "last_checked": firestore.SERVER_TIMESTAMP
-            })
-            print(f"⏱️ Última verificação registrada para {doc.id}")
-        except Exception as e:
-            print(f"❗Falha ao atualizar última verificação de {doc.id}: {str(e)}")
+        # 🕒 sempre atualiza
+        db.collection('monitorings').document(doc.id).update({
+            "last_checked_at": firestore.SERVER_TIMESTAMP
+        })
 
-    # cria lista de tarefas
-    tasks = []
-    for doc in docs:
-        tasks.append(process(doc))
+    tasks = [process(doc) for doc in docs]
 
-    # executa 10 por vez (evita limite de requisições)
     for i in range(0, len(tasks), 10):
-        batch = tasks[i:i+10]
-        await asyncio.gather(*batch)
+        await asyncio.gather(*tasks[i:i+10])
 
     print(f"📊 Total verificados: {count}")
     print("✅ Verificação geral finalizada!")
