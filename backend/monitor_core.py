@@ -18,18 +18,23 @@ async def run_all_monitorings_core():
         if not data:
             return
 
+        # ❌ pula apenas se estiver inativo
         if data.get("status") in ["inactive", "inativo", "disabled"]:
             return
 
         count += 1
         print(f"🔍 Verificando monitoramento: {doc.id} | Tipo: {data.get('monitoring_type')}")
 
+        # ✅ REMOVE CAMPOS QUE SERÃO PASSADOS MANUALMENTE
+        created_at = data.pop("created_at", None)
+        last_checked_at = data.pop("last_checked_at", None)
+
         try:
             monitoring = Monitoring(
                 id=doc.id,
                 **data,
-                created_at=data.get("created_at") or datetime.now(timezone.utc),
-                last_checked_at=data.get("last_checked_at")
+                created_at=created_at or datetime.now(timezone.utc),
+                last_checked_at=last_checked_at
             )
 
             await perform_monitoring_check(monitoring)
@@ -37,13 +42,18 @@ async def run_all_monitorings_core():
         except Exception as e:
             print(f"❗Erro ao verificar {doc.id}: {str(e)}")
 
-        # 🕒 sempre atualiza
-        db.collection('monitorings').document(doc.id).update({
-            "last_checked_at": firestore.SERVER_TIMESTAMP
-        })
+        # 🕒 ATUALIZA SEMPRE (TENHA OCORRÊNCIA OU NÃO)
+        try:
+            db.collection('monitorings').document(doc.id).update({
+                "last_checked_at": firestore.SERVER_TIMESTAMP
+            })
+            print(f"⏱️ Última verificação registrada para {doc.id}")
+        except Exception as e:
+            print(f"❗Erro ao atualizar last_checked_at de {doc.id}: {e}")
 
     tasks = [process(doc) for doc in docs]
 
+    # executa em blocos de 10
     for i in range(0, len(tasks), 10):
         await asyncio.gather(*tasks[i:i+10])
 
