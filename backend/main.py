@@ -809,6 +809,29 @@ def send_email_notification(
         print(f"ERRO: Falha ao conectar ao servidor SMTP {SMTP_HOST}:{SMTP_PORT} - {e}. Verifique o HOST e a PORTA.")
     except Exception as e:
         print(f"ERRO: Erro inesperado ao enviar e-mail: {e}")
+
+
+
+import re
+
+def keyword_exact_match(keyword: str, text: str) -> bool:
+    """
+    Faz match EXATO da keyword no texto.
+    Evita falsos positivos como datas quebradas ou números aproximados.
+    """
+    if not keyword or not text:
+        return False
+
+    keyword = keyword.strip()
+    text = text.lower()
+
+    escaped = re.escape(keyword.lower())
+
+    # 🔒 garante correspondência exata
+    pattern = rf'(?<!\w){escaped}(?!\w)'
+
+    return re.search(pattern, text) is not None
+
 # ===============================================================
 # 🔔 Função de Criação de Notificações (Fora de qualquer rota!)
 # ===============================================================
@@ -909,22 +932,40 @@ async def perform_monitoring_check(monitoramento: Monitoring):
         file_name = ""
 
     if monitoramento.monitoring_type == "personal":
-        found_id = monitoramento.edital_identifier.lower() in pdf_text_lower or monitoramento.edital_identifier.lower() in file_name
-        found_name = monitoramento.candidate_name and (monitoramento.candidate_name.lower() in pdf_text_lower)
+        found_id = keyword_exact_match(
+            monitoramento.edital_identifier,
+            pdf_text
+        ) or keyword_exact_match(
+            monitoramento.edital_identifier,
+            file_name
+        )
+
+        found_name = monitoramento.candidate_name and keyword_exact_match(
+            monitoramento.candidate_name,
+            pdf_text
+        )   
 
         if found_id and found_name:
             print("🔎 Personal: Nome + ID encontrados → notificar")
-            found_keywords = [monitoramento.edital_identifier, monitoramento.candidate_name]
+            found_keywords = [
+                monitoramento.edital_identifier,
+                monitoramento.candidate_name
+            ]
         elif found_id and not found_name:
             print("ℹ️ Personal: Apenas ID encontrado → ignorado (correto)")
         elif found_name and not found_id:
             print("ℹ️ Personal: Apenas nome encontrado → ignorado (correto)")
         else:
             print("ℹ️ Personal: Nenhum dos dois encontrados → ok")
+
     else:
         for kw in keywords_to_search:
-            if kw.lower() in pdf_text_lower or kw.lower() in file_name:
+            found_in_text = keyword_exact_match(kw, pdf_text)
+            found_in_filename = keyword_exact_match(kw, file_name)
+
+            if found_in_text or found_in_filename:
                 found_keywords.append(kw)
+
 
     # ======================================================
     # 5️⃣ NOVA OCORRÊNCIA ENCONTRADA (REGRA FINAL APLICADA)
