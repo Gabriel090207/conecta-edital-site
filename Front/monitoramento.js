@@ -1,3 +1,5 @@
+
+
 document.addEventListener("DOMContentLoaded", () => {
   // --- Referências aos elementos HTML dos Cards de Resumo e Modais ---
   const slotsAvailableValue = document.getElementById("slots-available-value");

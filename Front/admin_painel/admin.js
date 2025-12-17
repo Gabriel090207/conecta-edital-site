@@ -1,3 +1,15 @@
+import { app } from "../firebase-config.js";
+
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+
+const storage = getStorage(app);
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("admin.js: Script carregado e DOM content loaded.");
 
@@ -1484,53 +1496,71 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
         openNewArticleBtn.addEventListener('click', openNewArticleModal);
     }
     
-    if (blogForm) {
-    blogForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+  if (blogForm) {
+  blogForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        const id = blogIdInput.value;
-        const method = id ? 'PUT' : 'POST';
-        const url = id
-            ? `${BACKEND_URL}/articles/${id}`
-            : `${BACKEND_URL}/articles`;
+    const id = blogIdInput.value;
+    const method = id ? 'PUT' : 'POST';
+    const url = id
+      ? `${BACKEND_URL}/articles/${id}`
+      : `${BACKEND_URL}/articles`;
 
-        const conteudo = blogContentTextarea.value;
-        const tempoLeitura = calcularTempoDeLeitura(conteudo);
+    const titulo = blogTitleInput.value;
+    const autor = blogAuthorInput.value;
+    const conteudo = blogContentTextarea.value;
+    const tempoLeitura = calcularTempoDeLeitura(conteudo);
+    const imageFile = blogImageInput.files[0];
 
-        // ✅ FormData permite texto + arquivo
-        const formData = new FormData();
+    let capa_url = null;
 
-        formData.append("titulo", blogTitleInput.value);
-        formData.append("autor", blogAuthorInput.value);
-        formData.append("topico", "Notícias");
-        formData.append("conteudo", conteudo);
-        formData.append("tempo_leitura", tempoLeitura);
+    // 🔥 1. Upload da imagem no Firebase Storage
+    if (imageFile) {
+      // usa o storage já criado acima
+const imageRef = ref(
+  storage,
+  `blog_covers/${Date.now()}_${imageFile.name}`
+);
 
-        // 📸 imagem (se existir)
-        if (blogImageInput && blogImageInput.files.length > 0) {
-            formData.append("imagem", blogImageInput.files[0]);
-        }
 
-        try {
-            const response = await fetch(url, {
-                method,
-                body: formData
-            });
+      await uploadBytes(imageRef, imageFile);
+      capa_url = await getDownloadURL(imageRef);
+    }
 
-            if (!response.ok) {
-                const err = await response.text();
-                throw new Error(err);
-            }
+    // 🔥 2. Envia os dados do artigo (JSON NORMAL)
+    const payload = {
+      titulo,
+      autor,
+      topico: "Notícias",
+      conteudo,
+      tempo_leitura: tempoLeitura,
+      capa_url
+    };
 
-            closeModal(blogFormModal);
-            loadArticles();
-            alert(`Artigo ${id ? 'editado' : 'criado'} com sucesso!`);
-        } catch (error) {
-            console.error("Erro ao salvar artigo:", error);
-            alert("Erro ao salvar artigo.");
-        }
-    });
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao salvar artigo");
+      }
+
+      closeModal(blogFormModal);
+      loadArticles();
+      alert(`Artigo ${id ? 'editado' : 'criado'} com sucesso!`);
+
+    } catch (error) {
+      console.error("Erro ao salvar artigo:", error);
+      alert("Erro ao salvar artigo.");
+    }
+  });
 }
+
 
 
     // Iniciar carregamento de estatísticas e tickets ao carregar a página

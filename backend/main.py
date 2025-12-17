@@ -869,15 +869,16 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     doc = doc_ref.get()
 
     if doc.exists and doc.to_dict().get("last_pdf_hash") == current_pdf_hash:
-        print(f"PDF para {monitoramento.id} não mudou desde a última verificação.")
-        doc_ref.update({"last_checked": firestore.SERVER_TIMESTAMP})
+        doc_ref.update({"last_checked_at": firestore.SERVER_TIMESTAMP})
         return
+
 
 
     doc_ref.update({
         "last_pdf_hash": current_pdf_hash,
-        "last_checked": firestore.SERVER_TIMESTAMP
-    }  )
+        "last_checked_at": firestore.SERVER_TIMESTAMP
+    })
+
 
 
     # ======================================================
