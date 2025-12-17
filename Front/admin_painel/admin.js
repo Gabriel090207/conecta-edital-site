@@ -1,15 +1,3 @@
-import { app } from "../firebase-config.js";
-
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
-
-
-const storage = getStorage(app);
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("admin.js: Script carregado e DOM content loaded.");
 
@@ -155,7 +143,6 @@ if (userSearchInput) {
     const blogTitleInput = document.getElementById('blog-title');
     const blogAuthorInput = document.getElementById('blog-author');
     const blogContentTextarea = document.getElementById('blog-content');
-    const blogImageInput = document.getElementById('blog-image');
 
     // NOVAS REFERÊNCIAS DO MODAL DE EDIÇÃO DE USUÁRIO
     const userEditModal = document.getElementById('user-edit-modal');
@@ -1496,71 +1483,48 @@ document.getElementById("user-edit-form").addEventListener("submit", async (e) =
         openNewArticleBtn.addEventListener('click', openNewArticleModal);
     }
     
-  if (blogForm) {
-  blogForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    if (blogForm) {
+        blogForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = blogIdInput.value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${BACKEND_URL}/articles/${id}` : `${BACKEND_URL}/articles`;
+            
+            const conteudo = blogContentTextarea.value;
+            const tempoLeitura = calcularTempoDeLeitura(conteudo);
 
-    const id = blogIdInput.value;
-    const method = id ? 'PUT' : 'POST';
-    const url = id
-      ? `${BACKEND_URL}/articles/${id}`
-      : `${BACKEND_URL}/articles`;
+            const articleData = {
+                titulo: blogTitleInput.value,
+                autor: blogAuthorInput.value,
+                topico: "Notícias", // Valor fixo
+                conteudo: conteudo,
+                tempo_leitura: tempoLeitura, // Adiciona o tempo de leitura
+            };
 
-    const titulo = blogTitleInput.value;
-    const autor = blogAuthorInput.value;
-    const conteudo = blogContentTextarea.value;
-    const tempoLeitura = calcularTempoDeLeitura(conteudo);
-    const imageFile = blogImageInput.files[0];
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Removido cabeçalho de autorização para esta rota
+                    },
+                    body: JSON.stringify(articleData),
+                });
 
-    let capa_url = null;
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-    // 🔥 1. Upload da imagem no Firebase Storage
-    if (imageFile) {
-      // usa o storage já criado acima
-const imageRef = ref(
-  storage,
-  `blog_covers/${Date.now()}_${imageFile.name}`
-);
-
-
-      await uploadBytes(imageRef, imageFile);
-      capa_url = await getDownloadURL(imageRef);
+                closeModal(blogFormModal);
+                loadArticles();
+                alert(`Artigo ${id ? 'editado' : 'criado'} com sucesso!`);
+            } catch (error) {
+                console.error("Erro ao salvar artigo:", error);
+                alert("Erro ao salvar artigo. Tente novamente.");
+            }
+        });
     }
-
-    // 🔥 2. Envia os dados do artigo (JSON NORMAL)
-    const payload = {
-      titulo,
-      autor,
-      topico: "Notícias",
-      conteudo,
-      tempo_leitura: tempoLeitura,
-      capa_url
-    };
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao salvar artigo");
-      }
-
-      closeModal(blogFormModal);
-      loadArticles();
-      alert(`Artigo ${id ? 'editado' : 'criado'} com sucesso!`);
-
-    } catch (error) {
-      console.error("Erro ao salvar artigo:", error);
-      alert("Erro ao salvar artigo.");
-    }
-  });
-}
-
 
 
     // Iniciar carregamento de estatísticas e tickets ao carregar a página

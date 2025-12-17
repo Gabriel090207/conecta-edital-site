@@ -1050,7 +1050,9 @@ scheduler = AsyncIOScheduler()
 
 async def run_all_monitorings():
     """
-    Executa verificações automáticas de TODOS os monitoramentos ativos.
+    Executa verificações automáticas de TODOS os monitoramentos ativos
+    e salva SEMPRE o horário da execução do cron no Firestore,
+    independente de haver novas ocorrências.
     """
     print("🚀 Executando verificação automática de todos os monitoramentos ativos...")
 
@@ -1063,7 +1065,7 @@ async def run_all_monitorings():
     for doc in docs:
         data = doc.to_dict()
 
-        # 🔴 IMPORTANTE: NÃO usar datetime.now() como fallback aqui
+        # 🔴 IMPORTANTE: NÃO usar datetime.now() como fallback para last_checked_at
         created_at = data.pop("created_at", None)
         last_checked_at = data.pop("last_checked_at", None)
 
@@ -1077,11 +1079,24 @@ async def run_all_monitorings():
         tasks.append(perform_monitoring_check(monitoring))
 
     # Executa todos os monitoramentos em paralelo
-    await asyncio.gather(*tasks, return_exceptions=True)
+    if tasks:
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     print("✅ Verificação automática concluída com sucesso.")
 
-    # (Opcional) Log da execução do cron
+    # 🕒 SALVA EXECUÇÃO DO CRON (SEMPRE, COM OU SEM OCORRÊNCIA)
+    try:
+        db.collection("system").document("cron_status").set(
+            {
+                "last_run_at": firestore.SERVER_TIMESTAMP
+            },
+            merge=True
+        )
+        print("🕒 Horário do cron salvo com sucesso no Firestore.")
+    except Exception as e:
+        print(f"❌ Erro ao salvar horário do cron: {e}")
+
+    # (Opcional) log técnico
     try:
         db.collection("system_logs").add({
             "type": "cron_check",

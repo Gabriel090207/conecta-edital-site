@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 articleCard.innerHTML = `
                     <a href="artigo.html?id=${article.id}">
                         <div class="article-image-container">
-                            <img src="${article.capa_url || 'capa.png'}" alt="Capa do artigo">
+                            <img src="capa.png" alt="Capa do artigo">
                         </div>
                         <div class="article-body">
                             <h3>${article.titulo}</h3>
