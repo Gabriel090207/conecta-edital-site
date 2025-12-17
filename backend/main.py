@@ -824,6 +824,12 @@ async def perform_monitoring_check(monitoramento: Monitoring):
     db = firestore.client()
     doc_ref = db.collection("monitorings").document(monitoramento.id)
 
+    # 🕒 ATUALIZA SEMPRE O HORÁRIO DA VERIFICAÇÃO
+    doc_ref.update({
+        "last_checked_at": firestore.SERVER_TIMESTAMP
+    })
+
+
     # ======================================================
     # 1️⃣ TENTAR OBTER O PDF REAL
     # ======================================================
