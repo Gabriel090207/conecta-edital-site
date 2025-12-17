@@ -1431,18 +1431,7 @@ async def create_radar_monitoramento(
     _, doc_ref = db_firestore_client.collection('monitorings').add(new_monitoring_dict)
 
     # Ocorrência inicial
-    try:
-        doc_ref.collection("occurrences").add({
-            "edital_identifier": monitoramento_data.id_edital,
-            "official_gazette_link": str(monitoramento_data.link_diario),
-            "pdf_real_link": str(monitoramento_data.link_diario),
-            "last_pdf_hash": None,
-            "detected_at": firestore.SERVER_TIMESTAMP,
-            "last_checked_at": firestore.SERVER_TIMESTAMP,
-        })
-        doc_ref.update({"occurrences": 1})
-    except Exception as e:
-        print("Erro criando ocorrência inicial:", e)
+    
 
     new_monitoring_obj = Monitoring(
         id=doc_ref.id,
